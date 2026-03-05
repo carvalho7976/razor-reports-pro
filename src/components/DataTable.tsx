@@ -560,43 +560,26 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
-        <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
-          <ListFilter className="h-4 w-4" />
-          <span className="hidden sm:inline text-xs">Filtro</span>
-          {activeFilterCount > 0 && (
-            <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
-              {activeFilterCount}
-            </span>
-          )}
-        </button>
-
-        <SortDropdown columns={initialColumns} sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
-
-        <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
-
-        {showDateFilter && (
-          <>
-            <div className="h-5 w-px bg-border hidden sm:block" />
-            <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
-          </>
-        )}
-
-        <div className="ml-auto">
-          <ExportMenu />
+        <div className="relative">
+          <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
+            <ListFilter className="h-4 w-4" />
+            <span className="hidden sm:inline text-xs">Filtro</span>
+            {activeFilterCount > 0 && (
+              <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+          <FilterDropdown
+            columns={initialColumns}
+            columnFilterInputs={columnFilterInputs}
+            setColumnFilterInputs={setColumnFilterInputs}
+            columnFilters={columnFilters}
+            setColumnFilters={setColumnFilters}
+            open={showFilters}
+            setOpen={setShowFilters}
+          />
         </div>
-      </div>
-
-      {/* Filter Panel — separate card below toolbar */}
-      {showFilters && (
-        <FilterPanel
-          columns={initialColumns}
-          columnFilterInputs={columnFilterInputs}
-          setColumnFilterInputs={setColumnFilterInputs}
-          columnFilters={columnFilters}
-          setColumnFilters={setColumnFilters}
-          onClose={() => setShowFilters(false)}
-        />
-      )}
 
       {/* Active Filter Chips */}
       {activeFilters.length > 0 && (
