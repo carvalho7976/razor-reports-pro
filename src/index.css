@@ -147,6 +147,6 @@
   }
 
   .date-preset-btn-active {
-    @apply bg-primary text-primary-foreground shadow-sm shadow-primary/25;
+    @apply bg-primary text-primary-foreground shadow-sm shadow-primary/20;
   }
 }
