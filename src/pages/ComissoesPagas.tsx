@@ -1,0 +1,50 @@
+import { AppLayout } from "@/components/AppLayout";
+import { DataTable, Column } from "@/components/DataTable";
+
+const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+interface ComissaoPaga {
+  dataAcerto: string;
+  profissional: string;
+  cliente: string;
+  servico: string;
+  dataAtendimento: string;
+  valorComanda: number;
+  tipo: string;
+  descontoTaxa: number;
+  comissaoPaga: number;
+}
+
+const data: ComissaoPaga[] = [
+  { dataAcerto: "01/03/2026", profissional: "Cesar", cliente: "João Silva", servico: "Corte Masculino", dataAtendimento: "28/02/2026", valorComanda: 75, tipo: "Serviço", descontoTaxa: 2.5, comissaoPaga: 36.25 },
+  { dataAcerto: "01/03/2026", profissional: "Matheus", cliente: "Pedro Santos", servico: "Barba", dataAtendimento: "28/02/2026", valorComanda: 45, tipo: "Serviço", descontoTaxa: 1.5, comissaoPaga: 21.75 },
+  { dataAcerto: "01/03/2026", profissional: "Claudia", cliente: "Ana Costa", servico: "Hidratação", dataAtendimento: "27/02/2026", valorComanda: 120, tipo: "Serviço", descontoTaxa: 4, comissaoPaga: 58 },
+];
+
+const totalValor = data.reduce((s, r) => s + r.valorComanda, 0);
+const totalComissao = data.reduce((s, r) => s + r.comissaoPaga, 0);
+
+const columns: Column<ComissaoPaga>[] = [
+  { key: "dataAcerto", label: "Data do Acerto" },
+  { key: "profissional", label: "Profissional" },
+  { key: "cliente", label: "Cliente" },
+  { key: "servico", label: "Serviço" },
+  { key: "dataAtendimento", label: "Data Atendimento" },
+  { key: "valorComanda", label: "Valor da Comanda", align: "right", render: (v) => R$(v) },
+  { key: "tipo", label: "Tipo" },
+  { key: "descontoTaxa", label: "Desconto (Taxa Cartão + Assistente)", align: "right", render: (v) => R$(v) },
+  { key: "comissaoPaga", label: "Comissão Paga", align: "right", render: (v) => R$(v) },
+];
+
+export default function ComissoesPagas() {
+  return (
+    <AppLayout>
+      <DataTable
+        title="Comissões Pagas"
+        data={data}
+        columns={columns}
+        totalRow={{ valorComanda: R$(totalValor), descontoTaxa: "Valor Total:", comissaoPaga: R$(totalComissao) }}
+      />
+    </AppLayout>
+  );
+}
