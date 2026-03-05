@@ -324,14 +324,15 @@ export function DataTable<T extends Record<string, any>>({
         columns.some((col) => String(row[col.key] ?? "").toLowerCase().includes(s))
       );
     }
-    // Multi-value column filters (OR within column, AND across columns)
-    Object.entries(columnFilters).forEach(([key, values]) => {
-      if (values.length > 0) {
-        result = result.filter((row) =>
+    // Multi-value column filters (OR across all filters)
+    const allFilterEntries = Object.entries(columnFilters).filter(([, values]) => values.length > 0);
+    if (allFilterEntries.length > 0) {
+      result = result.filter((row) =>
+        allFilterEntries.some(([key, values]) =>
           values.some((v) => String(row[key] ?? "").toLowerCase().includes(v.toLowerCase()))
-        );
-      }
-    });
+        )
+      );
+    }
     if (sortKey) {
       result.sort((a, b) => {
         const aVal = a[sortKey], bVal = b[sortKey];
