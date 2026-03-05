@@ -3,10 +3,14 @@ import {
   Search, SlidersHorizontal, ChevronUp, ChevronDown,
   X, Pin, Eye, EyeOff, Calendar, Download, ListFilter,
   GripVertical, ChevronLeft, ChevronRight, ArrowUpDown,
+  FileSpreadsheet, FileText, MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, subYears, isWithinInterval } from "date-fns";
+import { format, startOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, endOfYear, subYears, isWithinInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
 
 export interface Column<T> {
   key: string;
@@ -19,7 +23,7 @@ export interface Column<T> {
   align?: "left" | "center" | "right";
 }
 
-type DatePreset = "hoje" | "ontem" | "semana" | "semana_passada" | "mes" | "mes_passado" | "ano" | "personalizado" | null;
+type DatePreset = "hoje" | "ontem" | "semana" | "semana_passada" | "mes" | "mes_passado" | "ano" | "ano_passado" | "personalizado" | null;
 
 interface ActiveFilter {
   key: string;
@@ -34,7 +38,7 @@ interface DataTableProps<T extends Record<string, any>> {
   actions?: ReactNode;
   totalRow?: Record<string, ReactNode>;
   emptyMessage?: string;
-  tabs?: { label: string; value: string }[];
+  tabs?: { label: string; value: string; count?: number }[];
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   showDateFilter?: boolean;
@@ -42,23 +46,19 @@ interface DataTableProps<T extends Record<string, any>> {
   pageSize?: number;
 }
 
-function DatePresetPicker({
+/* ── Date Range Picker with Presets + Dual Calendar ── */
+function DateRangePicker({
   datePreset,
   onSelect,
+  dateRange,
+  onRangeChange,
 }: {
   datePreset: DatePreset;
   onSelect: (p: DatePreset) => void;
+  dateRange: DateRange | undefined;
+  onRangeChange: (range: DateRange | undefined) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
 
   const presets: { key: DatePreset; label: string }[] = [
     { key: "hoje", label: "Hoje" },
@@ -68,38 +68,65 @@ function DatePresetPicker({
     { key: "mes", label: "Este mês" },
     { key: "mes_passado", label: "Mês passado" },
     { key: "ano", label: "Este ano" },
+    { key: "ano_passado", label: "Ano passado" },
   ];
 
-  const activeLabel = presets.find((p) => p.key === datePreset)?.label || "Período";
+  const handlePreset = (key: DatePreset) => {
+    const today = new Date();
+    let from: Date = today;
+    let to: Date = today;
+
+    switch (key) {
+      case "hoje": from = to = startOfDay(today); break;
+      case "ontem": from = to = subDays(startOfDay(today), 1); break;
+      case "semana": from = startOfWeek(today, { locale: ptBR }); to = endOfWeek(today, { locale: ptBR }); break;
+      case "semana_passada": { const pw = subWeeks(today, 1); from = startOfWeek(pw, { locale: ptBR }); to = endOfWeek(pw, { locale: ptBR }); break; }
+      case "mes": from = startOfMonth(today); to = endOfMonth(today); break;
+      case "mes_passado": { const pm = subMonths(today, 1); from = startOfMonth(pm); to = endOfMonth(pm); break; }
+      case "ano": from = startOfYear(today); to = endOfYear(today); break;
+      case "ano_passado": { const py = subYears(today, 1); from = startOfYear(py); to = endOfYear(py); break; }
+    }
+
+    onRangeChange({ from, to });
+    onSelect(key);
+  };
+
+  const displayLabel = useMemo(() => {
+    if (dateRange?.from && dateRange?.to) {
+      return `${format(dateRange.from, "dd/MM/yyyy")} - ${format(dateRange.to, "dd/MM/yyyy")}`;
+    }
+    if (dateRange?.from) {
+      return format(dateRange.from, "dd/MM/yyyy");
+    }
+    return "Selecionar período";
+  }, [dateRange]);
 
   return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        className={cn(
-          "toolbar-btn gap-2",
-          datePreset && "toolbar-btn-active"
-        )}
-      >
-        <Calendar className="h-4 w-4" />
-        <span>{activeLabel}</span>
-        <ChevronDown className="h-3 w-3 opacity-60" />
-      </button>
-
-      {open && (
-        <div className="dropdown-panel left-0 top-full mt-2 min-w-[180px]">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 pb-2">
-            Período
-          </p>
-          <div className="space-y-0.5">
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className={cn(
+            "toolbar-btn gap-2",
+            datePreset && "toolbar-btn-active"
+          )}
+        >
+          <Calendar className="h-4 w-4" />
+          <span className="text-xs">{displayLabel}</span>
+          <ChevronDown className="h-3 w-3 opacity-60" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
+        <div className="flex">
+          {/* Presets sidebar */}
+          <div className="border-r border-border p-3 min-w-[140px] space-y-0.5">
             {presets.map((p) => (
               <button
                 key={p.key}
-                onClick={() => { onSelect(datePreset === p.key ? null : p.key); setOpen(false); }}
+                onClick={() => handlePreset(p.key)}
                 className={cn(
                   "w-full text-left px-3 py-2 text-sm rounded-lg transition-colors",
                   datePreset === p.key
-                    ? "bg-primary/10 text-primary font-medium"
+                    ? "bg-primary text-primary-foreground font-medium"
                     : "text-foreground hover:bg-muted"
                 )}
               >
@@ -107,12 +134,42 @@ function DatePresetPicker({
               </button>
             ))}
           </div>
+
+          {/* Dual Calendar */}
+          <div className="p-3">
+            <CalendarComponent
+              mode="range"
+              selected={dateRange}
+              onSelect={(range) => {
+                onRangeChange(range);
+                if (range?.from && range?.to) {
+                  onSelect("personalizado");
+                }
+              }}
+              numberOfMonths={2}
+              locale={ptBR}
+              className="pointer-events-auto"
+            />
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Footer with clear */}
+        {datePreset && (
+          <div className="border-t border-border px-4 py-2.5 flex justify-end">
+            <button
+              onClick={() => { onSelect(null); onRangeChange(undefined); setOpen(false); }}
+              className="text-xs text-destructive hover:underline font-medium"
+            >
+              Limpar período
+            </button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
 
+/* ── Column Manager ── */
 function ColumnManager<T>({
   initialColumns,
   hiddenColumns,
@@ -173,11 +230,7 @@ function ColumnManager<T>({
                   )}
                 >
                   <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
-
-                  <span className="text-xs text-muted-foreground w-4 text-center shrink-0">
-                    {i + 1}
-                  </span>
-
+                  <span className="text-xs text-muted-foreground w-4 text-center shrink-0">{i + 1}</span>
                   <span className="flex-1 text-sm truncate">{col.label}</span>
 
                   <button
@@ -197,9 +250,7 @@ function ColumnManager<T>({
                     onClick={() => toggleColumn(col.key)}
                     className={cn(
                       "p-1 rounded-md transition-colors",
-                      visible
-                        ? "text-primary"
-                        : "text-muted-foreground/40 hover:text-foreground"
+                      visible ? "text-primary" : "text-muted-foreground/40 hover:text-foreground"
                     )}
                     title={visible ? "Ocultar" : "Mostrar"}
                   >
@@ -215,6 +266,46 @@ function ColumnManager<T>({
   );
 }
 
+/* ── Export Menu ── */
+function ExportMenu() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen(!open)} className="toolbar-btn">
+        <Download className="h-4 w-4" />
+        <span className="hidden sm:inline">Exportar</span>
+      </button>
+      {open && (
+        <div className="dropdown-panel right-0 top-full mt-2 min-w-[180px]">
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg hover:bg-muted transition-colors text-foreground">
+            <FileSpreadsheet className="h-4 w-4 text-primary" />
+            Exportar Excel
+          </button>
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg hover:bg-muted transition-colors text-foreground">
+            <FileText className="h-4 w-4 text-destructive" />
+            Exportar PDF
+          </button>
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg hover:bg-muted transition-colors text-foreground">
+            <Download className="h-4 w-4 text-muted-foreground" />
+            Exportar CSV
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
   data,
   columns: initialColumns,
@@ -241,6 +332,7 @@ export function DataTable<T extends Record<string, any>>({
     return set;
   });
   const [datePreset, setDatePreset] = useState<DatePreset>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [page, setPage] = useState(0);
 
   const columns = useMemo(() => {
@@ -260,7 +352,7 @@ export function DataTable<T extends Record<string, any>>({
       const labels: Record<string, string> = {
         hoje: "Hoje", ontem: "Ontem", semana: "Esta Semana",
         semana_passada: "Sem. Passada", mes: "Este Mês",
-        mes_passado: "Mês Passado", ano: "Este Ano", personalizado: "Personalizado",
+        mes_passado: "Mês Passado", ano: "Este Ano", ano_passado: "Ano Passado", personalizado: "Personalizado",
       };
       filters.push({ key: "__date", label: "Período", value: labels[datePreset] });
     }
@@ -275,7 +367,7 @@ export function DataTable<T extends Record<string, any>>({
 
   const removeFilter = useCallback((key: string) => {
     if (key === "__search") setSearch("");
-    else if (key === "__date") setDatePreset(null);
+    else if (key === "__date") { setDatePreset(null); setDateRange(undefined); }
     else setColumnFilters((prev) => ({ ...prev, [key]: "" }));
   }, []);
 
@@ -335,43 +427,51 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className="space-y-5">
-      {/* Header: Title + Actions */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground tracking-tight">{title}</h1>
-            {filteredData.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {actions}
-          </div>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-foreground tracking-tight">{title}</h1>
+          {filteredData.length > 0 && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}
+            </p>
+          )}
         </div>
-
-        {/* Tabs */}
-        {tabs && (
-          <div className="flex gap-1 border-b border-border">
-            {tabs.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => onTabChange?.(tab.value)}
-                className={cn(
-                  "px-4 py-2.5 text-sm font-medium transition-all border-b-2 -mb-px",
-                  activeTab === tab.value
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        {actions && (
+          <div className="flex items-center gap-2">{actions}</div>
         )}
       </div>
+
+      {/* Tabs */}
+      {tabs && (
+        <div className="flex gap-0.5 bg-muted/50 p-1 rounded-xl w-fit">
+          {tabs.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => onTabChange?.(tab.value)}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                activeTab === tab.value
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab.label}
+              {tab.count !== undefined && (
+                <span className={cn(
+                  "ml-2 text-xs px-1.5 py-0.5 rounded-full",
+                  activeTab === tab.value
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground"
+                )}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Summary Cards */}
       {summaryCards && (
@@ -379,7 +479,7 @@ export function DataTable<T extends Record<string, any>>({
           {summaryCards.map((card, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 px-4 py-3 bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow"
+              className="flex items-center gap-3 px-4 py-3 bg-card rounded-xl border border-border shadow-sm"
             >
               {card.icon && (
                 <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -395,17 +495,17 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-2.5 flex-wrap">
+      {/* Toolbar - compact single row */}
+      <div className="flex items-center gap-2 flex-wrap">
         {/* Search */}
-        <div className="relative flex-1 min-w-[220px] max-w-md">
+        <div className="relative flex-1 min-w-[180px] max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
           <input
             type="text"
-            placeholder="Pesquisar por nome, ID..."
+            placeholder="Pesquisar..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="toolbar-input pl-9 pr-3 py-2.5"
+            className="toolbar-input pl-9 pr-3 py-2"
           />
           {search && (
             <button
@@ -416,11 +516,6 @@ export function DataTable<T extends Record<string, any>>({
             </button>
           )}
         </div>
-
-        {/* Date Preset */}
-        {showDateFilter && (
-          <DatePresetPicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} />
-        )}
 
         {/* Filter Toggle */}
         <button
@@ -440,14 +535,27 @@ export function DataTable<T extends Record<string, any>>({
           togglePin={togglePin}
         />
 
+        {/* Divider */}
+        <div className="h-6 w-px bg-border hidden sm:block" />
+
+        {/* Date Preset */}
+        {showDateFilter && (
+          <DateRangePicker
+            datePreset={datePreset}
+            onSelect={(p) => { setDatePreset(p); setPage(0); }}
+            dateRange={dateRange}
+            onRangeChange={setDateRange}
+          />
+        )}
+
         {/* Sort indicator */}
         {sortKey && (
           <button
             onClick={() => { setSortKey(null); setSortDir("asc"); }}
-            className="toolbar-btn text-primary border-primary/20 bg-primary/5"
+            className="filter-chip"
           >
-            <ArrowUpDown className="h-4 w-4" />
-            <span className="text-xs">
+            <ArrowUpDown className="h-3 w-3" />
+            <span>
               {initialColumns.find(c => c.key === sortKey)?.label}
               {sortDir === "asc" ? " ↑" : " ↓"}
             </span>
@@ -455,11 +563,10 @@ export function DataTable<T extends Record<string, any>>({
           </button>
         )}
 
-        {/* Export */}
-        <button className="toolbar-btn ml-auto">
-          <Download className="h-4 w-4" />
-          <span className="hidden sm:inline">Exportar</span>
-        </button>
+        {/* Export - right aligned */}
+        <div className="ml-auto">
+          <ExportMenu />
+        </div>
       </div>
 
       {/* Active Filter Chips */}
@@ -477,7 +584,7 @@ export function DataTable<T extends Record<string, any>>({
             </span>
           ))}
           <button
-            onClick={() => { setSearch(""); setDatePreset(null); setColumnFilters({}); }}
+            onClick={() => { setSearch(""); setDatePreset(null); setDateRange(undefined); setColumnFilters({}); }}
             className="text-xs text-destructive hover:underline font-medium"
           >
             Limpar todos
@@ -494,7 +601,7 @@ export function DataTable<T extends Record<string, any>>({
                 <th
                   key={col.key}
                   className={cn(
-                    "px-4 py-3.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap border-b border-border",
+                    "px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap border-b border-border",
                     pinnedColumns.has(col.key) && "bg-muted/80 sticky left-0 z-10",
                     col.align === "right" && "text-right",
                     col.align === "center" && "text-center"
@@ -537,7 +644,7 @@ export function DataTable<T extends Record<string, any>>({
                     {col.filterable !== false ? (
                       <input
                         type="text"
-                        placeholder={`Filtrar ${col.label.toLowerCase()}...`}
+                        placeholder={`Filtrar...`}
                         value={columnFilters[col.key] || ""}
                         onChange={(e) => {
                           setColumnFilters((prev) => ({ ...prev, [col.key]: e.target.value }));
@@ -572,7 +679,7 @@ export function DataTable<T extends Record<string, any>>({
                     <td
                       key={col.key}
                       className={cn(
-                        "px-4 py-3.5 whitespace-nowrap text-sm",
+                        "px-4 py-3 whitespace-nowrap text-sm",
                         pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
                         col.align === "right" && "text-right font-mono",
                         col.align === "center" && "text-center"
@@ -592,7 +699,7 @@ export function DataTable<T extends Record<string, any>>({
                   <td
                     key={col.key}
                     className={cn(
-                      "px-4 py-3.5 whitespace-nowrap text-sm",
+                      "px-4 py-3 whitespace-nowrap text-sm",
                       pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/80",
                       col.align === "right" && "text-right font-mono",
                       col.align === "center" && "text-center"

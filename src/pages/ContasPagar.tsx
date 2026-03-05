@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column } from "@/components/DataTable";
 import { Plus, Minus, Download } from "lucide-react";
@@ -13,7 +14,7 @@ interface Conta {
   dataPagamento: string;
 }
 
-const data: Conta[] = [
+const allData: Conta[] = [
   { conta: "Aluguel", descricao: "Aluguel do salão", vencimento: "10/03/2026", valor: 3500, status: "Pendente", dataPagamento: "" },
   { conta: "Energia", descricao: "Conta de luz", vencimento: "15/03/2026", valor: 890, status: "Pendente", dataPagamento: "" },
   { conta: "Água", descricao: "Conta de água", vencimento: "12/03/2026", valor: 280, status: "Pago", dataPagamento: "12/03/2026" },
@@ -30,17 +31,20 @@ const columns: Column<Conta>[] = [
   {
     key: "status", label: "Status",
     render: (v) => (
-      <span className={v === "Pago" ? "text-primary font-medium" : "text-warning font-medium"}>
-        {v}
-      </span>
+      <span className={v === "Pago" ? "text-primary font-medium" : "text-warning font-medium"}>{v}</span>
     ),
   },
   { key: "dataPagamento", label: "Data Pagamento" },
 ];
 
-const total = data.reduce((s, r) => s + r.valor, 0);
-
 export default function ContasPagar() {
+  const [tab, setTab] = useState("pendentes");
+
+  const data = allData.filter((d) =>
+    tab === "todas" ? true : tab === "pendentes" ? d.status === "Pendente" : d.status === "Pago"
+  );
+  const total = data.reduce((s, r) => s + r.valor, 0);
+
   return (
     <AppLayout>
       <DataTable
@@ -48,12 +52,17 @@ export default function ContasPagar() {
         data={data}
         columns={columns}
         totalRow={{ conta: "Total:", valor: R$(total) }}
+        tabs={[
+          { label: "Todas", value: "todas", count: allData.length },
+          { label: "Pendentes", value: "pendentes", count: allData.filter(d => d.status === "Pendente").length },
+          { label: "Pagas", value: "pagas", count: allData.filter(d => d.status === "Pago").length },
+        ]}
+        activeTab={tab}
+        onTabChange={setTab}
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <button className="btn-action bg-primary text-primary-foreground"><Plus className="h-4 w-4" /> Adicionar</button>
-            <button className="btn-action bg-destructive text-destructive-foreground"><Minus className="h-4 w-4" /> Remover</button>
-            <button className="btn-action bg-secondary text-secondary-foreground"><Download className="h-4 w-4" /> Pagar</button>
-          </div>
+          <button className="btn-action bg-primary text-primary-foreground">
+            <Plus className="h-4 w-4" /> Nova conta
+          </button>
         }
       />
     </AppLayout>
