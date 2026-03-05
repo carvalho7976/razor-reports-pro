@@ -581,6 +581,21 @@ export function DataTable<T extends Record<string, any>>({
           />
         </div>
 
+        <SortDropdown columns={initialColumns} sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
+        <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
+
+        {showDateFilter && (
+          <>
+            <div className="h-5 w-px bg-border hidden sm:block" />
+            <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
+          </>
+        )}
+
+        <div className="ml-auto">
+          <ExportMenu />
+        </div>
+      </div>
+
       {/* Active Filter Chips */}
       {activeFilters.length > 0 && (
         <div className="flex items-center gap-1.5 flex-wrap">
