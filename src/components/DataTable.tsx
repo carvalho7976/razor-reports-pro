@@ -2,7 +2,7 @@ import { useState, useMemo, ReactNode, useCallback, useRef, useEffect, KeyboardE
 import {
   Search, SlidersHorizontal, ChevronUp, ChevronDown,
   X, Pin, Eye, EyeOff, Calendar, Download, ListFilter,
-  GripVertical, ChevronLeft, ChevronRight, ArrowUpDown,
+  ChevronLeft, ChevronRight, ArrowUpDown, MoreHorizontal,
   FileSpreadsheet, FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -49,10 +49,7 @@ interface DataTableProps<T extends Record<string, any>> {
 
 /* ── Compact Date Range Picker ── */
 function DateRangePicker({
-  datePreset,
-  onSelect,
-  dateRange,
-  onRangeChange,
+  datePreset, onSelect, dateRange, onRangeChange,
 }: {
   datePreset: DatePreset;
   onSelect: (p: DatePreset) => void;
@@ -151,6 +148,86 @@ function DateRangePicker({
   );
 }
 
+/* ── Filter Panel (popover instead of inline row) ── */
+function FilterPanel<T>({
+  columns,
+  columnFilterInputs,
+  setColumnFilterInputs,
+  columnFilters,
+  setColumnFilters,
+  onClose,
+}: {
+  columns: Column<T>[];
+  columnFilterInputs: Record<string, string>;
+  setColumnFilterInputs: (fn: (prev: Record<string, string>) => Record<string, string>) => void;
+  columnFilters: Record<string, string[]>;
+  setColumnFilters: (fn: (prev: Record<string, string[]>) => Record<string, string[]>) => void;
+  onClose: () => void;
+}) {
+  const filterableCols = columns.filter((c) => c.filterable !== false);
+
+  const handleKeyDown = (key: string, e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const val = columnFilterInputs[key]?.trim();
+      if (!val) return;
+      setColumnFilters((prev) => {
+        const existing = prev[key] || [];
+        if (existing.includes(val)) return prev;
+        return { ...prev, [key]: [...existing, val] };
+      });
+      setColumnFilterInputs((prev) => ({ ...prev, [key]: "" }));
+    }
+  };
+
+  const removeChip = (key: string, value: string) => {
+    setColumnFilters((prev) => {
+      const arr = (prev[key] || []).filter((v) => v !== value);
+      const next = { ...prev };
+      if (arr.length === 0) delete next[key];
+      else next[key] = arr;
+      return next;
+    });
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-4 space-y-3 shadow-sm animate-in fade-in-0 slide-in-from-top-2 duration-200">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filtrar por coluna</h3>
+        <button onClick={onClose} className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        {filterableCols.map((col) => (
+          <div key={col.key} className="space-y-1.5">
+            <label className="text-[11px] font-medium text-muted-foreground">{col.label}</label>
+            <input
+              type="text"
+              placeholder="Digite e Enter..."
+              value={columnFilterInputs[col.key] || ""}
+              onChange={(e) => setColumnFilterInputs((prev) => ({ ...prev, [col.key]: e.target.value }))}
+              onKeyDown={(e) => handleKeyDown(col.key, e)}
+              className="w-full text-xs bg-background border border-border rounded-lg px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-primary/50 placeholder:text-muted-foreground/50 transition-all"
+            />
+            {(columnFilters[col.key] || []).length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {columnFilters[col.key].map((v, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                    {v}
+                    <button onClick={() => removeChip(col.key, v)} className="hover:text-destructive">
+                      <X className="h-2.5 w-2.5" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Column Manager ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
@@ -171,28 +248,25 @@ function ColumnManager<T>({
     <div className="relative" ref={ref}>
       <button onClick={() => setOpen(!open)} className="toolbar-btn" title="Colunas">
         <SlidersHorizontal className="h-4 w-4" />
-        <span className="hidden sm:inline">Colunas</span>
       </button>
       {open && (
-        <div className="dropdown-panel right-0 top-full mt-2 min-w-[260px]">
+        <div className="dropdown-panel right-0 top-full mt-2 min-w-[240px]">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Colunas</p>
             <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
           </div>
           <div className="space-y-0.5 max-h-[320px] overflow-y-auto">
-            {initialColumns.map((col, i) => {
+            {initialColumns.map((col) => {
               const visible = !hiddenColumns.has(col.key);
               const pinned = pinnedColumns.has(col.key);
               return (
-                <div key={col.key} className={cn("flex items-center gap-2 px-2 py-2 rounded-lg group transition-colors", visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50")}>
-                  <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
-                  <span className="text-xs text-muted-foreground w-4 text-center shrink-0">{i + 1}</span>
+                <div key={col.key} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-lg group transition-colors", visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50")}>
                   <span className="flex-1 text-sm truncate">{col.label}</span>
-                  <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary bg-primary/10" : "text-muted-foreground/40 hover:text-foreground hover:bg-muted opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
-                    <Pin className="h-3.5 w-3.5" />
+                  <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary" : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
+                    <Pin className="h-3 w-3" />
                   </button>
-                  <button onClick={() => toggleColumn(col.key)} className={cn("p-1 rounded-md transition-colors", visible ? "text-primary" : "text-muted-foreground/40 hover:text-foreground")} title={visible ? "Ocultar" : "Mostrar"}>
-                    {visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                  <button onClick={() => toggleColumn(col.key)} className={cn("p-1 rounded-md transition-colors", visible ? "text-foreground" : "text-muted-foreground/40 hover:text-foreground")} title={visible ? "Ocultar" : "Mostrar"}>
+                    {visible ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                   </button>
                 </div>
               );
@@ -218,10 +292,9 @@ function ExportMenu() {
     <div className="relative" ref={ref}>
       <button onClick={() => setOpen(!open)} className="toolbar-btn">
         <Download className="h-4 w-4" />
-        <span className="hidden sm:inline">Exportar</span>
       </button>
       {open && (
-        <div className="dropdown-panel right-0 top-full mt-2 min-w-[170px]">
+        <div className="dropdown-panel right-0 top-full mt-2 min-w-[150px]">
           <button className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors">
             <FileSpreadsheet className="h-4 w-4 text-success" /> Excel
           </button>
@@ -231,6 +304,67 @@ function ExportMenu() {
           <button className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors">
             <Download className="h-4 w-4 text-muted-foreground" /> CSV
           </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Sort Dropdown ── */
+function SortDropdown<T>({
+  columns, sortKey, sortDir, onSort,
+}: {
+  columns: Column<T>[]; sortKey: string | null; sortDir: "asc" | "desc";
+  onSort: (key: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const sortableCols = columns.filter((c) => c.sortable !== false);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen(!open)} className={cn("toolbar-btn", sortKey && "toolbar-btn-active")}>
+        <ArrowUpDown className="h-4 w-4" />
+        <span className="hidden sm:inline text-xs">
+          {sortKey ? `${columns.find(c => c.key === sortKey)?.label} ${sortDir === "asc" ? "A-Z" : "Z-A"}` : "Ordenar"}
+        </span>
+      </button>
+      {open && (
+        <div className="dropdown-panel left-0 top-full mt-2 min-w-[200px]">
+          {sortableCols.map((col) => (
+            <button
+              key={col.key}
+              onClick={() => { onSort(col.key); setOpen(false); }}
+              className={cn(
+                "w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
+                sortKey === col.key && "text-primary font-medium"
+              )}
+            >
+              <span>{col.label}</span>
+              {sortKey === col.key && (
+                <span className="text-xs text-primary">
+                  {sortDir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                </span>
+              )}
+            </button>
+          ))}
+          {sortKey && (
+            <>
+              <div className="h-px bg-border my-1" />
+              <button
+                onClick={() => { onSort("__clear"); setOpen(false); }}
+                className="w-full px-3 py-2 text-sm text-destructive rounded-lg hover:bg-muted transition-colors text-left"
+              >
+                Limpar ordenação
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -266,7 +400,7 @@ export function DataTable<T extends Record<string, any>>({
       .sort((a, b) => (pinnedColumns.has(a.key) ? 0 : 1) - (pinnedColumns.has(b.key) ? 0 : 1));
   }, [initialColumns, hiddenColumns, pinnedColumns]);
 
-  // Build active filters from multi-value column filters
+  // Build active filters
   const activeFilters = useMemo<ActiveFilter[]>(() => {
     const filters: ActiveFilter[] = [];
     if (search) filters.push({ id: "__search", key: "__search", label: "Pesquisa", value: search });
@@ -301,19 +435,10 @@ export function DataTable<T extends Record<string, any>>({
     }
   }, []);
 
-  // Handle Enter on column filter inputs — add value as a filter chip
-  const handleFilterKeyDown = (key: string, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const val = columnFilterInputs[key]?.trim();
-      if (!val) return;
-      setColumnFilters((prev) => {
-        const existing = prev[key] || [];
-        if (existing.includes(val)) return prev;
-        return { ...prev, [key]: [...existing, val] };
-      });
-      setColumnFilterInputs((prev) => ({ ...prev, [key]: "" }));
-      setPage(0);
-    }
+  const handleSort = (key: string) => {
+    if (key === "__clear") { setSortKey(null); setSortDir("asc"); return; }
+    if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
   };
 
   const filteredData = useMemo(() => {
@@ -324,7 +449,6 @@ export function DataTable<T extends Record<string, any>>({
         columns.some((col) => String(row[col.key] ?? "").toLowerCase().includes(s))
       );
     }
-    // Multi-value column filters (OR across all filters)
     const allFilterEntries = Object.entries(columnFilters).filter(([, values]) => values.length > 0);
     if (allFilterEntries.length > 0) {
       result = result.filter((row) =>
@@ -348,11 +472,6 @@ export function DataTable<T extends Record<string, any>>({
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
 
-  const handleSort = (key: string) => {
-    if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
-    else { setSortKey(key); setSortDir("asc"); }
-  };
-
   const togglePin = (key: string) => {
     setPinnedColumns((prev) => { const next = new Set(prev); next.has(key) ? next.delete(key) : next.add(key); return next; });
   };
@@ -360,15 +479,17 @@ export function DataTable<T extends Record<string, any>>({
     setHiddenColumns((prev) => { const next = new Set(prev); next.has(key) ? next.delete(key) : next.add(key); return next; });
   };
 
+  const activeFilterCount = Object.values(columnFilters).flat().length;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold text-foreground tracking-tight">{title}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">{title}</h1>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
-      {/* Tabs — pill style */}
+      {/* Tabs */}
       {tabs && (
         <div className="border-b border-border">
           <div className="flex gap-0">
@@ -386,7 +507,7 @@ export function DataTable<T extends Record<string, any>>({
                 {tab.label}
                 {tab.count !== undefined && (
                   <span className={cn(
-                    "ml-1.5 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+                    "ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
                     activeTab === tab.value
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
@@ -415,10 +536,10 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
-      {/* Toolbar */}
+      {/* Toolbar — compact, clean row */}
       <div className="flex items-center gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[160px] max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+        <div className="relative flex-1 min-w-[180px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
           <input
             type="text"
             placeholder="Pesquisar..."
@@ -435,24 +556,23 @@ export function DataTable<T extends Record<string, any>>({
 
         <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
           <ListFilter className="h-4 w-4" />
-          <span className="hidden sm:inline">Filtro</span>
+          <span className="hidden sm:inline text-xs">Filtro</span>
+          {activeFilterCount > 0 && (
+            <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+              {activeFilterCount}
+            </span>
+          )}
         </button>
+
+        <SortDropdown columns={initialColumns} sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
 
         <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
 
         {showDateFilter && (
           <>
-            <div className="h-6 w-px bg-border hidden sm:block" />
+            <div className="h-5 w-px bg-border hidden sm:block" />
             <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
           </>
-        )}
-
-        {sortKey && (
-          <button onClick={() => { setSortKey(null); setSortDir("asc"); }} className="filter-chip">
-            <ArrowUpDown className="h-3 w-3" />
-            <span>{initialColumns.find(c => c.key === sortKey)?.label} {sortDir === "asc" ? "↑" : "↓"}</span>
-            <X className="h-3 w-3 opacity-60" />
-          </button>
         )}
 
         <div className="ml-auto">
@@ -460,9 +580,21 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       </div>
 
+      {/* Filter Panel — separate card below toolbar */}
+      {showFilters && (
+        <FilterPanel
+          columns={initialColumns}
+          columnFilterInputs={columnFilterInputs}
+          setColumnFilterInputs={setColumnFilterInputs}
+          columnFilters={columnFilters}
+          setColumnFilters={setColumnFilters}
+          onClose={() => setShowFilters(false)}
+        />
+      )}
+
       {/* Active Filter Chips */}
       {activeFilters.length > 0 && (
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {activeFilters.map((f) => (
             <span key={f.id} className="filter-chip">
               <span className="font-semibold">{f.label}:</span> {f.value}
@@ -473,135 +605,107 @@ export function DataTable<T extends Record<string, any>>({
           ))}
           <button
             onClick={() => { setSearch(""); setDatePreset(null); setDateRange(undefined); setColumnFilters({}); }}
-            className="text-xs text-destructive hover:underline font-medium"
+            className="text-xs text-destructive hover:underline font-medium ml-1"
           >
-            Limpar todos
+            Limpar
           </button>
         </div>
       )}
 
-      {/* Count */}
-      <p className="text-xs text-muted-foreground">{filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}</p>
-
       {/* Table */}
-      <div className="table-container overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-muted/50">
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className={cn(
-                    "px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap border-b border-border",
-                    pinnedColumns.has(col.key) && "bg-muted/80 sticky left-0 z-10",
-                    col.align === "right" && "text-right",
-                    col.align === "center" && "text-center"
-                  )}
-                  style={col.width ? { width: col.width } : undefined}
-                >
-                  <button
-                    onClick={() => col.sortable !== false ? handleSort(col.key) : undefined}
-                    className={cn("inline-flex items-center gap-1.5 group", col.sortable !== false && "cursor-pointer hover:text-foreground transition-colors")}
-                  >
-                    <span>{col.label}</span>
-                    {col.sortable !== false && (
-                      <span className="text-muted-foreground/40 group-hover:text-muted-foreground transition-colors">
-                        {sortKey === col.key ? (
-                          sortDir === "asc" ? <ChevronUp className="h-3.5 w-3.5 text-primary" /> : <ChevronDown className="h-3.5 w-3.5 text-primary" />
-                        ) : (
-                          <ArrowUpDown className="h-3 w-3" />
-                        )}
-                      </span>
-                    )}
-                  </button>
-                </th>
-              ))}
-            </tr>
-
-            {showFilters && (
-              <tr className="bg-muted/30">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr>
                 {columns.map((col) => (
-                  <th key={col.key} className={cn("px-4 py-2 border-b border-border", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/50")}>
-                    {col.filterable !== false ? (
-                      <input
-                        type="text"
-                        placeholder="Enter p/ filtrar..."
-                        value={columnFilterInputs[col.key] || ""}
-                        onChange={(e) => setColumnFilterInputs((prev) => ({ ...prev, [col.key]: e.target.value }))}
-                        onKeyDown={(e) => handleFilterKeyDown(col.key, e)}
-                        className="toolbar-input px-2.5 py-1.5 text-xs"
-                      />
-                    ) : null}
+                  <th
+                    key={col.key}
+                    className={cn(
+                      "px-5 py-3.5 text-left text-xs font-medium text-muted-foreground whitespace-nowrap border-b border-border",
+                      pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
+                      col.align === "right" && "text-right",
+                      col.align === "center" && "text-center"
+                    )}
+                    style={col.width ? { width: col.width } : undefined}
+                  >
+                    {col.label}
                   </th>
                 ))}
               </tr>
-            )}
-          </thead>
+            </thead>
 
-          <tbody>
-            {pagedData.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="px-4 py-12 text-center text-muted-foreground">
-                  <div className="flex flex-col items-center gap-2">
-                    <Search className="h-8 w-8 text-muted-foreground/30" />
-                    <p className="text-sm">{emptyMessage}</p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              pagedData.map((row, i) => (
-                <tr key={i} className="border-b border-border/60 hover:bg-muted/40 transition-colors">
+            <tbody>
+              {pagedData.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="px-5 py-16 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center gap-2">
+                      <Search className="h-8 w-8 text-muted-foreground/20" />
+                      <p className="text-sm">{emptyMessage}</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                pagedData.map((row, i) => (
+                  <tr key={i} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    {columns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={cn(
+                          "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
+                          pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
+                          col.align === "right" && "text-right font-mono",
+                          col.align === "center" && "text-center"
+                        )}
+                      >
+                        {col.render ? col.render(row[col.key], row, i) : (row[col.key] ?? "—")}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
+
+              {totalRow && (
+                <tr className="bg-muted/40 font-semibold border-t border-border">
                   {columns.map((col) => (
-                    <td
-                      key={col.key}
-                      className={cn(
-                        "px-4 py-3 whitespace-nowrap text-sm",
-                        pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
-                        col.align === "right" && "text-right font-mono",
-                        col.align === "center" && "text-center"
-                      )}
-                    >
-                      {col.render ? col.render(row[col.key], row, i) : (row[col.key] ?? "—")}
+                    <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right font-mono", col.align === "center" && "text-center")}>
+                      {totalRow[col.key] ?? ""}
                     </td>
                   ))}
                 </tr>
-              ))
-            )}
+              )}
+            </tbody>
+          </table>
+        </div>
 
-            {totalRow && (
-              <tr className="bg-muted/60 font-semibold border-t-2 border-primary/20">
-                {columns.map((col) => (
-                  <td key={col.key} className={cn("px-4 py-3 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/80", col.align === "right" && "text-right font-mono", col.align === "center" && "text-center")}>
-                    {totalRow[col.key] ?? ""}
-                  </td>
-                ))}
-              </tr>
-            )}
-          </tbody>
-        </table>
+        {/* Pagination inside card */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-3 border-t border-border">
+            <span className="text-xs text-muted-foreground">
+              {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                const pageNum = totalPages <= 5 ? i : Math.max(0, Math.min(page - 2, totalPages - 5)) + i;
+                return (
+                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-8 w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
+                    {pageNum + 1}
+                  </button>
+                );
+              })}
+              <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page === totalPages - 1} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-xs text-muted-foreground">
-            {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
-          </span>
-          <div className="flex items-center gap-1">
-            <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="toolbar-btn px-2 py-1.5 disabled:opacity-30">
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button key={i} onClick={() => setPage(i)} className={cn("h-8 w-8 rounded-lg text-xs font-medium transition-all", page === i ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted")}>
-                {i + 1}
-              </button>
-            ))}
-            <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page === totalPages - 1} className="toolbar-btn px-2 py-1.5 disabled:opacity-30">
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Record count */}
+      <p className="text-xs text-muted-foreground">{filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}</p>
     </div>
   );
 }
