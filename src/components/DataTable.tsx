@@ -678,7 +678,7 @@ export function DataTable<T extends Record<string, any>>({
             </span>
           ))}
           <button
-            onClick={() => { setSearch(""); setDatePreset(null); setDateRange(undefined); setColumnFilters({}); }}
+            onClick={() => { setSearch(""); setDatePreset(null); setDateRange(undefined); setColumnFilters({}); setSortEntries([]); }}
             className="text-xs text-destructive hover:underline font-medium ml-1"
           >
             Limpar
