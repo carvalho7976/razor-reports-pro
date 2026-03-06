@@ -518,17 +518,21 @@ export function DataTable<T extends Record<string, any>>({
         )
       );
     }
-    if (sortKey) {
+    if (sortEntries.length > 0) {
       result.sort((a, b) => {
-        const aVal = a[sortKey], bVal = b[sortKey];
-        if (aVal == null) return 1;
-        if (bVal == null) return -1;
-        const cmp = typeof aVal === "number" ? aVal - (bVal as number) : String(aVal).localeCompare(String(bVal));
-        return sortDir === "asc" ? cmp : -cmp;
+        for (const { key, dir } of sortEntries) {
+          const aVal = a[key], bVal = b[key];
+          if (aVal == null && bVal == null) continue;
+          if (aVal == null) return 1;
+          if (bVal == null) return -1;
+          const cmp = typeof aVal === "number" ? aVal - (bVal as number) : String(aVal).localeCompare(String(bVal));
+          if (cmp !== 0) return dir === "asc" ? cmp : -cmp;
+        }
+        return 0;
       });
     }
     return result;
-  }, [data, search, columnFilters, sortKey, sortDir, columns]);
+  }, [data, search, columnFilters, sortEntries, columns]);
 
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
