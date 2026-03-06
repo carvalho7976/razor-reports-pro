@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column } from "@/components/DataTable";
-import { Plus, Lock, Pencil, X } from "lucide-react";
+import { DataTable, Column, ActionsMenu } from "@/components/DataTable";
+import { Plus, Lock, Pencil, Trash2 } from "lucide-react";
 
 interface Profissional {
   nome: string;
@@ -31,11 +31,11 @@ const columns: Column<Profissional>[] = [
   {
     key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
     render: () => (
-      <div className="flex items-center gap-2 justify-center">
-        <button className="text-muted-foreground hover:text-foreground"><Lock className="h-4 w-4" /></button>
-        <button className="text-accent hover:text-accent/80"><Pencil className="h-4 w-4" /></button>
-        <button className="text-destructive hover:text-destructive/80"><X className="h-4 w-4" /></button>
-      </div>
+      <ActionsMenu items={[
+        { label: "Alterar senha", icon: <Lock className="h-4 w-4" /> },
+        { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+      ]} />
     ),
   },
 ];
