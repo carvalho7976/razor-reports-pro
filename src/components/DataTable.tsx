@@ -475,8 +475,12 @@ export function DataTable<T extends Record<string, any>>({
         filters.push({ id: `${key}_${idx}`, key, label: col?.label || key, value });
       });
     });
+    sortEntries.forEach((s, idx) => {
+      const col = initialColumns.find((c) => c.key === s.key);
+      filters.push({ id: `__sort_${idx}`, key: "__sort", label: "Ordenar", value: `${col?.label || s.key} ${s.dir === "asc" ? "A-Z" : "Z-A"}` });
+    });
     return filters;
-  }, [search, datePreset, columnFilters, initialColumns]);
+  }, [search, datePreset, columnFilters, sortEntries, initialColumns]);
 
   const removeFilter = useCallback((id: string, key: string, value: string) => {
     if (key === "__search") setSearch("");
