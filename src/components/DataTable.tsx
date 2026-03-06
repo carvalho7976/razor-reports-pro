@@ -316,12 +316,51 @@ function ExportMenu() {
   );
 }
 
-/* ── Sort Dropdown ── */
+/* ── Actions Menu (3-dot) ── */
+export function ActionsMenu({ items }: { items: { label: string; icon?: ReactNode; onClick?: () => void; variant?: "default" | "destructive" }[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="relative inline-flex" ref={ref}>
+      <button onClick={() => setOpen(!open)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+      {open && (
+        <div className="dropdown-panel right-0 top-full mt-1 min-w-[160px]">
+          {items.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => { item.onClick?.(); setOpen(false); }}
+              className={cn(
+                "w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
+                item.variant === "destructive" && "text-destructive hover:bg-destructive/10"
+              )}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Sort Dropdown (cumulative) ── */
+interface SortEntry { key: string; dir: "asc" | "desc" }
+
 function SortDropdown<T>({
-  columns, sortKey, sortDir, onSort,
+  columns, sortEntries, onToggleSort, onClear,
 }: {
-  columns: Column<T>[]; sortKey: string | null; sortDir: "asc" | "desc";
-  onSort: (key: string) => void;
+  columns: Column<T>[]; sortEntries: SortEntry[];
+  onToggleSort: (key: string) => void; onClear: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -332,39 +371,52 @@ function SortDropdown<T>({
   }, []);
 
   const sortableCols = columns.filter((c) => c.sortable !== false);
+  const sortMap = new Map(sortEntries.map((s) => [s.key, s.dir]));
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} className={cn("toolbar-btn", sortKey && "toolbar-btn-active")}>
+      <button onClick={() => setOpen(!open)} className={cn("toolbar-btn", sortEntries.length > 0 && "toolbar-btn-active")}>
         <ArrowUpDown className="h-4 w-4" />
         <span className="hidden sm:inline text-xs">
-          {sortKey ? `${columns.find(c => c.key === sortKey)?.label} ${sortDir === "asc" ? "A-Z" : "Z-A"}` : "Ordenar"}
+          {sortEntries.length > 0 ? `Ordenação (${sortEntries.length})` : "Ordenar"}
         </span>
       </button>
       {open && (
-        <div className="dropdown-panel left-0 top-full mt-2 min-w-[200px]">
-          {sortableCols.map((col) => (
-            <button
-              key={col.key}
-              onClick={() => { onSort(col.key); setOpen(false); }}
-              className={cn(
-                "w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
-                sortKey === col.key && "text-primary font-medium"
-              )}
-            >
-              <span>{col.label}</span>
-              {sortKey === col.key && (
-                <span className="text-xs text-primary">
-                  {sortDir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        <div className="dropdown-panel left-0 top-full mt-2 min-w-[220px]">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">Clique para adicionar/alternar</p>
+          {sortableCols.map((col) => {
+            const dir = sortMap.get(col.key);
+            const idx = sortEntries.findIndex((s) => s.key === col.key);
+            return (
+              <button
+                key={col.key}
+                onClick={() => onToggleSort(col.key)}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
+                  dir && "text-primary font-medium"
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  {dir && (
+                    <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                      {idx + 1}
+                    </span>
+                  )}
+                  {col.label}
                 </span>
-              )}
-            </button>
-          ))}
-          {sortKey && (
+                {dir && (
+                  <span className="text-xs text-primary">
+                    {dir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+          {sortEntries.length > 0 && (
             <>
               <div className="h-px bg-border my-1" />
               <button
-                onClick={() => { onSort("__clear"); setOpen(false); }}
+                onClick={() => { onClear(); setOpen(false); }}
                 className="w-full px-3 py-2 text-sm text-destructive rounded-lg hover:bg-muted transition-colors text-left"
               >
                 Limpar ordenação
