@@ -485,6 +485,13 @@ export function DataTable<T extends Record<string, any>>({
   const removeFilter = useCallback((id: string, key: string, value: string) => {
     if (key === "__search") setSearch("");
     else if (key === "__date") { setDatePreset(null); setDateRange(undefined); }
+    else if (key === "__sort") {
+      const sortLabel = value.replace(/ A-Z$| Z-A$/, "");
+      setSortEntries((prev) => prev.filter((s) => {
+        const col = initialColumns.find((c) => c.key === s.key);
+        return (col?.label || s.key) !== sortLabel;
+      }));
+    }
     else {
       setColumnFilters((prev) => {
         const arr = (prev[key] || []).filter((v) => v !== value);
@@ -494,7 +501,7 @@ export function DataTable<T extends Record<string, any>>({
         return next;
       });
     }
-  }, []);
+  }, [initialColumns]);
 
   const handleToggleSort = useCallback((key: string) => {
     setSortEntries((prev) => {
