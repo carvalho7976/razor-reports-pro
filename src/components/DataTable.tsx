@@ -492,11 +492,15 @@ export function DataTable<T extends Record<string, any>>({
     }
   }, []);
 
-  const handleSort = (key: string) => {
-    if (key === "__clear") { setSortKey(null); setSortDir("asc"); return; }
-    if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
-    else { setSortKey(key); setSortDir("asc"); }
-  };
+  const handleToggleSort = useCallback((key: string) => {
+    setSortEntries((prev) => {
+      const idx = prev.findIndex((s) => s.key === key);
+      if (idx === -1) return [...prev, { key, dir: "asc" }];
+      if (prev[idx].dir === "asc") return prev.map((s, i) => i === idx ? { ...s, dir: "desc" as const } : s);
+      return prev.filter((_, i) => i !== idx);
+    });
+  }, []);
+  const clearSort = useCallback(() => setSortEntries([]), []);
 
   const filteredData = useMemo(() => {
     let result = [...data];
