@@ -445,6 +445,7 @@ export function DataTable<T extends Record<string, any>>({
   emptyMessage = "Nenhum registro encontrado",
   tabs, activeTab, onTabChange, showDateFilter = true,
   summaryCards, pageSize = 20,
+  selectable = false, selectionActions = [], rowId,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
   const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
@@ -460,6 +461,7 @@ export function DataTable<T extends Record<string, any>>({
   const [datePreset, setDatePreset] = useState<DatePreset>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [page, setPage] = useState(0);
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
   const columns = useMemo(() => {
     return initialColumns
