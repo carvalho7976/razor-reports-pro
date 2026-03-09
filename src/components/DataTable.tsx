@@ -565,53 +565,6 @@ export function DataTable<T extends Record<string, any>>({
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
-      {/* Tabs */}
-      {tabs && (
-        <div className="border-b border-border">
-          <div className="flex gap-0">
-            {tabs.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => onTabChange?.(tab.value)}
-                className={cn(
-                  "relative px-5 py-2.5 text-sm font-medium transition-colors -mb-px border-b-2",
-                  activeTab === tab.value
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
-                )}
-              >
-                {tab.label}
-                {tab.count !== undefined && (
-                  <span className={cn(
-                    "ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
-                    activeTab === tab.value
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                  )}>
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Summary Cards */}
-      {summaryCards && (
-        <div className="flex gap-3 flex-wrap">
-          {summaryCards.map((card, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 py-3 bg-card rounded-xl border border-border shadow-sm">
-              {card.icon && <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">{card.icon}</div>}
-              <div>
-                <p className="text-xs text-muted-foreground">{card.label}</p>
-                <p className="text-sm font-bold text-foreground">{card.value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Toolbar — compact, clean row */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative flex-1 min-w-[180px] max-w-sm">
@@ -683,6 +636,53 @@ export function DataTable<T extends Record<string, any>>({
           >
             Limpar
           </button>
+        </div>
+      )}
+
+      {/* Summary Cards */}
+      {summaryCards && (
+        <div className="flex gap-3 flex-wrap">
+          {summaryCards.map((card, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3 bg-card rounded-xl border border-border shadow-sm">
+              {card.icon && <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">{card.icon}</div>}
+              <div>
+                <p className="text-xs text-muted-foreground">{card.label}</p>
+                <p className="text-sm font-bold text-foreground">{card.value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Tabs */}
+      {tabs && (
+        <div className="border-b border-border">
+          <div className="flex gap-0">
+            {tabs.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => onTabChange?.(tab.value)}
+                className={cn(
+                  "relative px-5 py-2.5 text-sm font-medium transition-colors -mb-px border-b-2",
+                  activeTab === tab.value
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
+                )}
+              >
+                {tab.label}
+                {tab.count !== undefined && (
+                  <span className={cn(
+                    "ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+                    activeTab === tab.value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
+                  )}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
