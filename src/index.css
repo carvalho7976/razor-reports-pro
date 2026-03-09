@@ -56,9 +56,9 @@
     --info: 207 85% 50%;
     --info-foreground: 0 0% 100%;
 
-    --table-header: 0 0% 96%;
-    --table-row-hover: 0 0% 98%;
-    --table-border: 0 0% 92%;
+     --table-header: 0 0% 20%;
+     --table-row-hover: 0 0% 98%;
+     --table-border: 0 0% 92%;
   }
 
   .dark {
