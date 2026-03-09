@@ -170,7 +170,7 @@ function DateRangePicker({
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
         <div className="flex">
-          <div className="border-r border-border py-2 px-1.5 min-w-[120px] space-y-0.5">
+          <div className="border-r border-border py-2 pl-0 pr-1.5 min-w-[120px] space-y-0.5">
             {presets.map((p) => (
               <button
                 key={p.key}
