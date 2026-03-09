@@ -700,7 +700,6 @@ export function DataTable<T extends Record<string, any>>({
           <ExportMenu />
           {novoMenuItems && <NovoButton items={novoMenuItems} />}
         </div>
-        </div>
       </div>
 
       {/* Active Filter Chips */}
