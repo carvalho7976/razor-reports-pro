@@ -169,22 +169,24 @@ function DateRangePicker({
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
-        <div className="flex">
-          <div className="border-r border-border py-2 pl-0 pr-1.5 min-w-[120px] space-y-0.5">
-            {presets.map((p) => (
-              <button
-                key={p.key}
-                onClick={() => handlePreset(p.key)}
-                className={cn(
-                  "w-full text-left px-2.5 py-1.5 text-xs rounded-md transition-colors",
-                  datePreset === p.key
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-foreground hover:bg-muted"
-                )}
-              >
-                {p.label}
-              </button>
-            ))}
+        <div className="flex flex-col sm:flex-row">
+          <div className="border-b sm:border-b-0 sm:border-r border-border py-2 px-1.5 sm:pl-0 sm:pr-1.5 sm:min-w-[120px]">
+            <div className="flex sm:flex-col gap-1 overflow-x-auto sm:overflow-x-visible">
+              {presets.map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => handlePreset(p.key)}
+                  className={cn(
+                    "whitespace-nowrap text-left px-2.5 py-1.5 text-xs rounded-md transition-colors shrink-0",
+                    datePreset === p.key
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="p-2">
             <CalendarComponent
@@ -194,7 +196,7 @@ function DateRangePicker({
                 onRangeChange(range);
                 if (range?.from && range?.to) onSelect("personalizado");
               }}
-              numberOfMonths={2}
+              numberOfMonths={typeof window !== "undefined" && window.innerWidth < 640 ? 1 : 2}
               locale={ptBR}
               className="pointer-events-auto"
             />
