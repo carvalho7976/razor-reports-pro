@@ -668,7 +668,7 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto">
+        <div className="flex items-center gap-2 flex-wrap">
           {showDateFilter && (
             <>
               <div className="h-5 w-px bg-border hidden sm:block" />
