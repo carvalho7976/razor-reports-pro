@@ -724,7 +724,7 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
-          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
+          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} columnOrder={columnOrder} onReorder={setColumnOrder} />
 
           <div className="relative">
             <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
