@@ -729,13 +729,13 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Summary Cards */}
       {summaryCards && (
-        <div className="flex gap-3 flex-wrap">
+        <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 sm:flex-wrap">
           {summaryCards.map((card, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 py-3 bg-card rounded-xl border border-border shadow-sm">
-              {card.icon && <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">{card.icon}</div>}
-              <div>
-                <p className="text-xs text-muted-foreground">{card.label}</p>
-                <p className="text-sm font-bold text-foreground">{card.value}</p>
+            <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+              {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
               </div>
             </div>
           ))}
