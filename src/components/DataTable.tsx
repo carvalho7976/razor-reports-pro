@@ -666,6 +666,15 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
+        {showDateFilter && (
+          <>
+            <div className="h-5 w-px bg-border hidden sm:block" />
+            <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
+          </>
+        )}
+
+        <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
+
         <div className="relative">
           <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
             <ListFilter className="h-4 w-4" />
@@ -686,15 +695,6 @@ export function DataTable<T extends Record<string, any>>({
             setOpen={setShowFilters}
           />
         </div>
-
-        <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
-
-        {showDateFilter && (
-          <>
-            <div className="h-5 w-px bg-border hidden sm:block" />
-            <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
-          </>
-        )}
 
         <div className="ml-auto flex items-center gap-2">
           <ExportMenu />
