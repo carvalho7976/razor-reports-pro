@@ -645,10 +645,7 @@ export function DataTable<T extends Record<string, any>>({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground tracking-tight">{title}</h1>
-        <div className="flex items-center gap-2">
-          {actions}
-          {novoMenuItems && <NovoButton items={novoMenuItems} />}
-        </div>
+        {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
       {/* Toolbar */}
