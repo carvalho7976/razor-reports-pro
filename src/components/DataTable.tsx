@@ -298,21 +298,43 @@ function FilterDropdown<T>({
   );
 }
 
-/* ── Column Manager ── */
+/* ── Column Manager (with drag & drop reorder) ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
+  columnOrder, onReorder,
 }: {
   initialColumns: Column<T>[]; hiddenColumns: Set<string>; pinnedColumns: Set<string>;
   toggleColumn: (key: string) => void; togglePin: (key: string) => void;
+  columnOrder: string[]; onReorder: (newOrder: string[]) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  const orderedColumns = useMemo(() => {
+    const map = new Map(initialColumns.map((c) => [c.key, c]));
+    return columnOrder.map((k) => map.get(k)!).filter(Boolean);
+  }, [initialColumns, columnOrder]);
+
+  const handleDragStart = (idx: number) => { setDragIdx(idx); };
+  const handleDragOver = (e: React.DragEvent, idx: number) => { e.preventDefault(); setOverIdx(idx); };
+  const handleDragEnd = () => {
+    if (dragIdx !== null && overIdx !== null && dragIdx !== overIdx) {
+      const newOrder = [...columnOrder];
+      const [moved] = newOrder.splice(dragIdx, 1);
+      newOrder.splice(overIdx, 0, moved);
+      onReorder(newOrder);
+    }
+    setDragIdx(null);
+    setOverIdx(null);
+  };
 
   return (
     <div className="relative" ref={ref}>
@@ -326,11 +348,26 @@ function ColumnManager<T>({
             <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
           </div>
           <div className="space-y-0.5 max-h-[320px] overflow-y-auto">
-            {initialColumns.map((col) => {
+            {orderedColumns.map((col, idx) => {
               const visible = !hiddenColumns.has(col.key);
               const pinned = pinnedColumns.has(col.key);
+              const isDragging = dragIdx === idx;
+              const isOver = overIdx === idx;
               return (
-                <div key={col.key} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-lg group transition-colors", visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50")}>
+                <div
+                  key={col.key}
+                  draggable
+                  onDragStart={() => handleDragStart(idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDragEnd={handleDragEnd}
+                  className={cn(
+                    "flex items-center gap-1.5 px-1.5 py-1.5 rounded-lg group transition-colors cursor-grab active:cursor-grabbing select-none",
+                    visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50",
+                    isDragging && "opacity-40",
+                    isOver && !isDragging && "border-t-2 border-primary"
+                  )}
+                >
+                  <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0 group-hover:text-muted-foreground" />
                   <span className="flex-1 text-sm truncate">{col.label}</span>
                   <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary" : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
                     <Pin className="h-3 w-3" />
