@@ -776,26 +776,26 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Selection Action Bar */}
       {selectable && selectedRows.size > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-primary/5 border border-primary/20 rounded-xl">
-          <span className="text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-primary/5 border border-primary/20 rounded-xl">
+          <span className="text-xs sm:text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
           <div className="h-4 w-px bg-border" />
           {selectionActions.map((action, i) => (
             <button
               key={i}
               onClick={() => { action.onClick(Array.from(selectedRows)); setSelectedRows(new Set()); }}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
+                "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
                 action.variant === "destructive"
                   ? "text-destructive hover:bg-destructive/10"
                   : "text-foreground hover:bg-muted"
               )}
             >
               {action.icon}
-              {action.label}
+              <span className="hidden sm:inline">{action.label}</span>
             </button>
           ))}
           <button onClick={() => setSelectedRows(new Set())} className="ml-auto text-xs text-muted-foreground hover:text-foreground">
-            Limpar seleção
+            Limpar
           </button>
         </div>
       )}
