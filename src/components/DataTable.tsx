@@ -744,14 +744,14 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Tabs */}
       {tabs && (
-        <div className="border-b border-border">
-          <div className="flex gap-0">
+        <div className="border-b border-border overflow-x-auto">
+          <div className="flex gap-0 min-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => onTabChange?.(tab.value)}
                 className={cn(
-                  "relative px-5 py-2.5 text-sm font-medium transition-colors -mb-px border-b-2",
+                  "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                   activeTab === tab.value
                     ? "border-primary text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
@@ -760,7 +760,7 @@ export function DataTable<T extends Record<string, any>>({
                 {tab.label}
                 {tab.count !== undefined && (
                   <span className={cn(
-                    "ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+                    "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
                     activeTab === tab.value
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
