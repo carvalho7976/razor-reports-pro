@@ -651,7 +651,7 @@ export function DataTable<T extends Record<string, any>>({
           />
         </div>
 
-        <SortDropdown columns={initialColumns} sortEntries={sortEntries} onToggleSort={handleToggleSort} onClear={clearSort} />
+        
         <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
 
         {showDateFilter && (
