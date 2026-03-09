@@ -1,9 +1,9 @@
-import { useState, useMemo, ReactNode, useCallback, useRef, useEffect, KeyboardEvent } from "react";
+import { useState, useMemo, ReactNode, useCallback, useRef, useEffect, KeyboardEvent, DragEvent } from "react";
 import {
   Search, SlidersHorizontal, ChevronUp, ChevronDown,
   X, Pin, Eye, EyeOff, Calendar, Download, ListFilter,
   ChevronLeft, ChevronRight, ArrowUpDown, MoreHorizontal,
-  FileSpreadsheet, FileText, Plus, ChevronDown as ChevronDownIcon,
+  FileSpreadsheet, FileText, Plus, ChevronDown as ChevronDownIcon, GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, startOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, endOfYear, subYears } from "date-fns";
@@ -230,7 +230,25 @@ function FilterDropdown<T>({
   setOpen: (v: boolean) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const filterableCols = columns.filter((c) => c.filterable !== false);
+  const filterableCols = useMemo(() => columns.filter((c) => c.filterable !== false), [columns]);
+  const [orderedKeys, setOrderedKeys] = useState<string[]>(() => filterableCols.map((c) => c.key));
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
+
+  // Sync keys when columns change
+  useEffect(() => {
+    setOrderedKeys((prev) => {
+      const newKeys = filterableCols.map((c) => c.key);
+      const existing = prev.filter((k) => newKeys.includes(k));
+      const added = newKeys.filter((k) => !prev.includes(k));
+      return [...existing, ...added];
+    });
+  }, [filterableCols]);
+
+  const orderedCols = useMemo(() => {
+    const colMap = new Map(filterableCols.map((c) => [c.key, c]));
+    return orderedKeys.map((k) => colMap.get(k)).filter(Boolean) as Column<T>[];
+  }, [orderedKeys, filterableCols]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
@@ -261,15 +279,57 @@ function FilterDropdown<T>({
     });
   };
 
+  const handleDragStart = (e: DragEvent, idx: number) => {
+    setDragIdx(idx);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(idx));
+  };
+
+  const handleDragOver = (e: DragEvent, idx: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setOverIdx(idx);
+  };
+
+  const handleDrop = (e: DragEvent, dropIdx: number) => {
+    e.preventDefault();
+    if (dragIdx === null || dragIdx === dropIdx) { setDragIdx(null); setOverIdx(null); return; }
+    setOrderedKeys((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(dragIdx, 1);
+      next.splice(dropIdx, 0, moved);
+      return next;
+    });
+    setDragIdx(null);
+    setOverIdx(null);
+  };
+
+  const handleDragEnd = () => { setDragIdx(null); setOverIdx(null); };
+
   if (!open) return null;
 
   return (
     <div ref={ref} className="dropdown-panel left-0 top-full mt-2 min-w-[280px] max-h-[400px] overflow-y-auto">
       <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">Filtrar por coluna</p>
-      <div className="space-y-2.5">
-        {filterableCols.map((col) => (
-          <div key={col.key} className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground px-1">{col.label}</label>
+      <div className="space-y-1">
+        {orderedCols.map((col, idx) => (
+          <div
+            key={col.key}
+            draggable
+            onDragStart={(e) => handleDragStart(e, idx)}
+            onDragOver={(e) => handleDragOver(e, idx)}
+            onDrop={(e) => handleDrop(e, idx)}
+            onDragEnd={handleDragEnd}
+            className={cn(
+              "space-y-1 p-1.5 rounded-lg border border-transparent transition-all",
+              dragIdx === idx && "opacity-40",
+              overIdx === idx && dragIdx !== idx && "border-primary/40 bg-primary/5"
+            )}
+          >
+            <div className="flex items-center gap-1.5">
+              <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 cursor-grab shrink-0 hover:text-muted-foreground" />
+              <label className="text-xs font-medium text-muted-foreground">{col.label}</label>
+            </div>
             <input
               type="text"
               placeholder="Digite e pressione Enter"
