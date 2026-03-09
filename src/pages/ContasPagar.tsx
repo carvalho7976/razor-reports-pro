@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, ActionsMenu } from "@/components/DataTable";
-import { Plus, CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
+import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
+import { CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -34,11 +34,7 @@ export default function ContasPagar() {
     setAllData((prev) =>
       prev.map((d) =>
         d.id === id
-          ? {
-              ...d,
-              status: d.status === "Pendente" ? "Pago" : "Pendente",
-              dataPagamento: d.status === "Pendente" ? new Date().toLocaleDateString("pt-BR") : "",
-            }
+          ? { ...d, status: d.status === "Pendente" ? "Pago" : "Pendente", dataPagamento: d.status === "Pendente" ? new Date().toLocaleDateString("pt-BR") : "" }
           : d
       )
     );
@@ -49,6 +45,29 @@ export default function ContasPagar() {
     setAllData((prev) => prev.filter((d) => d.id !== id));
     toast({ title: "Conta removida", variant: "destructive" });
   };
+
+  const data = allData.filter((d) =>
+    tab === "todas" ? true : tab === "pendentes" ? d.status === "Pendente" : d.status === "Pago"
+  );
+
+  const bulkMarkPaid = (indices: number[]) => {
+    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
+    setAllData((prev) =>
+      prev.map((d) => ids.includes(d.id) ? { ...d, status: "Pago", dataPagamento: new Date().toLocaleDateString("pt-BR") } : d)
+    );
+    toast({ title: `${ids.length} conta(s) marcada(s) como paga(s)` });
+  };
+
+  const bulkDelete = (indices: number[]) => {
+    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
+    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
+    toast({ title: `${ids.length} conta(s) removida(s)`, variant: "destructive" });
+  };
+
+  const selectionActions: SelectionAction[] = [
+    { label: "Marcar como pago", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkMarkPaid },
+    { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, onClick: bulkDelete, variant: "destructive" },
+  ];
 
   const columns: Column<Conta>[] = [
     { key: "conta", label: "Conta", pinned: true },
@@ -78,9 +97,6 @@ export default function ContasPagar() {
     },
   ];
 
-  const data = allData.filter((d) =>
-    tab === "todas" ? true : tab === "pendentes" ? d.status === "Pendente" : d.status === "Pago"
-  );
   const total = data.reduce((s, r) => s + r.valor, 0);
 
   return (
@@ -90,6 +106,9 @@ export default function ContasPagar() {
         data={data}
         columns={columns}
         totalRow={{ conta: "Total:", valor: R$(total) }}
+        selectable
+        selectionActions={selectionActions}
+        novoMenuItems={[{ label: "Nova conta" }]}
         tabs={[
           { label: "Todas", value: "todas", count: allData.length },
           { label: "Pendentes", value: "pendentes", count: allData.filter(d => d.status === "Pendente").length },
@@ -97,11 +116,6 @@ export default function ContasPagar() {
         ]}
         activeTab={tab}
         onTabChange={setTab}
-        actions={
-          <button className="btn-action bg-primary text-primary-foreground">
-            <Plus className="h-4 w-4" /> Nova conta
-          </button>
-        }
       />
     </AppLayout>
   );

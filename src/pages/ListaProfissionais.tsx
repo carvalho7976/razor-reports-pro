@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu } from "@/components/DataTable";
-import { Plus, Lock, Pencil, Trash2 } from "lucide-react";
+import { Lock, Pencil, Trash2 } from "lucide-react";
 
 interface Profissional {
   nome: string;
@@ -48,11 +48,7 @@ export default function ListaProfissionais() {
         data={data}
         columns={columns}
         showDateFilter={false}
-        actions={
-          <button className="btn-action bg-primary text-primary-foreground">
-            <Plus className="h-4 w-4" /> Adicionar
-          </button>
-        }
+        novoMenuItems={[{ label: "Novo profissional" }]}
       />
     </AppLayout>
   );
