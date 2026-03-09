@@ -60,6 +60,15 @@ export default function Agenda() {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 2, 9));
   const [waitingQueue] = useState(0);
   const [viewDays, setViewDays] = useState(1);
+  const [selectedAppointment, setSelectedAppointment] = useState<{
+    client: string;
+    service: string;
+    startTime: string;
+    endTime: string;
+    professionalName: string;
+    color: string;
+  } | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const weekday = getWeekdayName(currentDate);
   const formattedDate = formatDate(currentDate);
