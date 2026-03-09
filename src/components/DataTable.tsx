@@ -698,6 +698,7 @@ export function DataTable<T extends Record<string, any>>({
 
         <div className="ml-auto flex items-center gap-2">
           <ExportMenu />
+          <div className="h-5 w-px bg-border" />
           {novoMenuItems && <NovoButton items={novoMenuItems} />}
         </div>
       </div>
