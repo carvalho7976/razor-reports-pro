@@ -3,7 +3,7 @@ import {
   Search, SlidersHorizontal, ChevronUp, ChevronDown,
   X, Pin, Eye, EyeOff, Calendar, Download, ListFilter,
   ChevronLeft, ChevronRight, ArrowUpDown, MoreHorizontal,
-  FileSpreadsheet, FileText, Plus,
+  FileSpreadsheet, FileText, Plus, ChevronDown as ChevronDownIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, startOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, endOfYear, subYears } from "date-fns";
