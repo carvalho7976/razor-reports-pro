@@ -90,7 +90,7 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.85)] transition-colors shadow-sm"
       >
         <Plus className="h-4 w-4" />
         Novo
