@@ -73,9 +73,10 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
-        "table-header": "hsl(var(--table-header))",
-        "table-row-hover": "hsl(var(--table-row-hover))",
-        "table-border": "hsl(var(--table-border))",
+         "table-header": "hsl(var(--table-header))",
+         "table-header-foreground": "hsl(var(--table-header-foreground))",
+         "table-row-hover": "hsl(var(--table-row-hover))",
+         "table-border": "hsl(var(--table-border))",
       },
       borderRadius: {
         lg: "var(--radius)",
