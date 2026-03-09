@@ -881,7 +881,7 @@ export function DataTable<T extends Record<string, any>>({
                       <span className="inline-flex items-center gap-1.5">
                         {col.label}
                         {sortable && (
-                          <span className={cn("inline-flex items-center", !sortDir && "opacity-30")}>
+                          <span className={cn("inline-flex items-center text-table-header-foreground", !sortDir && "opacity-30")}>
                             {sortDir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : sortDir === "desc" ? <ChevronDown className="h-3.5 w-3.5" /> : <ArrowUpDown className="h-3 w-3" />}
                           </span>
                         )}
