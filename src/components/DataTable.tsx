@@ -79,7 +79,7 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
   // Single item: no dropdown
   if (items.length === 1) {
     return (
-      <button onClick={items[0].onClick} className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+      <button onClick={items[0].onClick} className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.85)] transition-colors shadow-sm">
         <Plus className="h-4 w-4" />
         Novo
       </button>
@@ -90,7 +90,7 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.85)] transition-colors shadow-sm"
       >
         <Plus className="h-4 w-4" />
         Novo
@@ -645,10 +645,7 @@ export function DataTable<T extends Record<string, any>>({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground tracking-tight">{title}</h1>
-        <div className="flex items-center gap-2">
-          {actions}
-          {novoMenuItems && <NovoButton items={novoMenuItems} />}
-        </div>
+        {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
       {/* Toolbar */}
@@ -699,8 +696,9 @@ export function DataTable<T extends Record<string, any>>({
           </>
         )}
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
           <ExportMenu />
+          {novoMenuItems && <NovoButton items={novoMenuItems} />}
         </div>
       </div>
 
