@@ -230,25 +230,7 @@ function FilterDropdown<T>({
   setOpen: (v: boolean) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const filterableCols = useMemo(() => columns.filter((c) => c.filterable !== false), [columns]);
-  const [orderedKeys, setOrderedKeys] = useState<string[]>(() => filterableCols.map((c) => c.key));
-  const [dragIdx, setDragIdx] = useState<number | null>(null);
-  const [overIdx, setOverIdx] = useState<number | null>(null);
-
-  // Sync keys when columns change
-  useEffect(() => {
-    setOrderedKeys((prev) => {
-      const newKeys = filterableCols.map((c) => c.key);
-      const existing = prev.filter((k) => newKeys.includes(k));
-      const added = newKeys.filter((k) => !prev.includes(k));
-      return [...existing, ...added];
-    });
-  }, [filterableCols]);
-
-  const orderedCols = useMemo(() => {
-    const colMap = new Map(filterableCols.map((c) => [c.key, c]));
-    return orderedKeys.map((k) => colMap.get(k)).filter(Boolean) as Column<T>[];
-  }, [orderedKeys, filterableCols]);
+  const filterableCols = columns.filter((c) => c.filterable !== false);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
@@ -279,57 +261,15 @@ function FilterDropdown<T>({
     });
   };
 
-  const handleDragStart = (e: DragEvent, idx: number) => {
-    setDragIdx(idx);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", String(idx));
-  };
-
-  const handleDragOver = (e: DragEvent, idx: number) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    setOverIdx(idx);
-  };
-
-  const handleDrop = (e: DragEvent, dropIdx: number) => {
-    e.preventDefault();
-    if (dragIdx === null || dragIdx === dropIdx) { setDragIdx(null); setOverIdx(null); return; }
-    setOrderedKeys((prev) => {
-      const next = [...prev];
-      const [moved] = next.splice(dragIdx, 1);
-      next.splice(dropIdx, 0, moved);
-      return next;
-    });
-    setDragIdx(null);
-    setOverIdx(null);
-  };
-
-  const handleDragEnd = () => { setDragIdx(null); setOverIdx(null); };
-
   if (!open) return null;
 
   return (
     <div ref={ref} className="dropdown-panel left-0 top-full mt-2 min-w-[280px] max-h-[400px] overflow-y-auto">
       <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">Filtrar por coluna</p>
-      <div className="space-y-1">
-        {orderedCols.map((col, idx) => (
-          <div
-            key={col.key}
-            draggable
-            onDragStart={(e) => handleDragStart(e, idx)}
-            onDragOver={(e) => handleDragOver(e, idx)}
-            onDrop={(e) => handleDrop(e, idx)}
-            onDragEnd={handleDragEnd}
-            className={cn(
-              "space-y-1 p-1.5 rounded-lg border border-transparent transition-all",
-              dragIdx === idx && "opacity-40",
-              overIdx === idx && dragIdx !== idx && "border-primary/40 bg-primary/5"
-            )}
-          >
-            <div className="flex items-center gap-1.5">
-              <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 cursor-grab shrink-0 hover:text-muted-foreground" />
-              <label className="text-xs font-medium text-muted-foreground">{col.label}</label>
-            </div>
+      <div className="space-y-2.5">
+        {filterableCols.map((col) => (
+          <div key={col.key} className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground px-1">{col.label}</label>
             <input
               type="text"
               placeholder="Digite e pressione Enter"
@@ -357,21 +297,52 @@ function FilterDropdown<T>({
   );
 }
 
-/* ── Column Manager ── */
+/* ── Column Manager (with drag reorder) ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
+  columnOrder, onReorder,
 }: {
   initialColumns: Column<T>[]; hiddenColumns: Set<string>; pinnedColumns: Set<string>;
   toggleColumn: (key: string) => void; togglePin: (key: string) => void;
+  columnOrder: string[]; onReorder: (newOrder: string[]) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  const orderedCols = useMemo(() => {
+    const colMap = new Map(initialColumns.map((c) => [c.key, c]));
+    return columnOrder.map((k) => colMap.get(k)).filter(Boolean) as Column<T>[];
+  }, [columnOrder, initialColumns]);
+
+  const handleDragStart = (e: DragEvent, idx: number) => {
+    setDragIdx(idx);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(idx));
+  };
+  const handleDragOver = (e: DragEvent, idx: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setOverIdx(idx);
+  };
+  const handleDrop = (e: DragEvent, dropIdx: number) => {
+    e.preventDefault();
+    if (dragIdx === null || dragIdx === dropIdx) { setDragIdx(null); setOverIdx(null); return; }
+    const next = [...columnOrder];
+    const [moved] = next.splice(dragIdx, 1);
+    next.splice(dropIdx, 0, moved);
+    onReorder(next);
+    setDragIdx(null);
+    setOverIdx(null);
+  };
+  const handleDragEnd = () => { setDragIdx(null); setOverIdx(null); };
 
   return (
     <div className="relative" ref={ref}>
@@ -385,11 +356,25 @@ function ColumnManager<T>({
             <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
           </div>
           <div className="space-y-0.5 max-h-[320px] overflow-y-auto">
-            {initialColumns.map((col) => {
+            {orderedCols.map((col, idx) => {
               const visible = !hiddenColumns.has(col.key);
               const pinned = pinnedColumns.has(col.key);
               return (
-                <div key={col.key} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-lg group transition-colors", visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50")}>
+                <div
+                  key={col.key}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDrop={(e) => handleDrop(e, idx)}
+                  onDragEnd={handleDragEnd}
+                  className={cn(
+                    "flex items-center gap-1.5 px-2 py-1.5 rounded-lg group transition-all border border-transparent",
+                    visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50",
+                    dragIdx === idx && "opacity-40",
+                    overIdx === idx && dragIdx !== idx && "border-primary/40 bg-primary/5"
+                  )}
+                >
+                  <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 cursor-grab shrink-0 hover:text-muted-foreground" />
                   <span className="flex-1 text-sm truncate">{col.label}</span>
                   <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary" : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
                     <Pin className="h-3 w-3" />
