@@ -297,7 +297,7 @@ function FilterDropdown<T>({
   );
 }
 
-/* ── Column Manager (with drag reorder) ── */
+/* ── Column Manager (with move buttons) ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
   columnOrder, onReorder,
@@ -308,8 +308,6 @@ function ColumnManager<T>({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const [dragIdx, setDragIdx] = useState<number | null>(null);
-  const [overIdx, setOverIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
@@ -322,27 +320,13 @@ function ColumnManager<T>({
     return columnOrder.map((k) => colMap.get(k)).filter(Boolean) as Column<T>[];
   }, [columnOrder, initialColumns]);
 
-  const handleDragStart = (e: DragEvent, idx: number) => {
-    setDragIdx(idx);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", String(idx));
-  };
-  const handleDragOver = (e: DragEvent, idx: number) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    setOverIdx(idx);
-  };
-  const handleDrop = (e: DragEvent, dropIdx: number) => {
-    e.preventDefault();
-    if (dragIdx === null || dragIdx === dropIdx) { setDragIdx(null); setOverIdx(null); return; }
+  const moveItem = (fromIdx: number, toIdx: number) => {
+    if (toIdx < 0 || toIdx >= columnOrder.length) return;
     const next = [...columnOrder];
-    const [moved] = next.splice(dragIdx, 1);
-    next.splice(dropIdx, 0, moved);
+    const [moved] = next.splice(fromIdx, 1);
+    next.splice(toIdx, 0, moved);
     onReorder(next);
-    setDragIdx(null);
-    setOverIdx(null);
   };
-  const handleDragEnd = () => { setDragIdx(null); setOverIdx(null); };
 
   return (
     <div className="relative" ref={ref}>
@@ -350,7 +334,7 @@ function ColumnManager<T>({
         <SlidersHorizontal className="h-4 w-4" />
       </button>
       {open && (
-        <div className="dropdown-panel right-0 top-full mt-2 min-w-[240px]">
+        <div className="dropdown-panel right-0 top-full mt-2 min-w-[260px]">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Colunas</p>
             <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
@@ -362,20 +346,31 @@ function ColumnManager<T>({
               return (
                 <div
                   key={col.key}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, idx)}
-                  onDragOver={(e) => handleDragOver(e, idx)}
-                  onDrop={(e) => handleDrop(e, idx)}
-                  onDragEnd={handleDragEnd}
                   className={cn(
-                    "flex items-center gap-1.5 px-2 py-1.5 rounded-lg group transition-all border border-transparent",
-                    visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50",
-                    dragIdx === idx && "opacity-40",
-                    overIdx === idx && dragIdx !== idx && "border-primary/40 bg-primary/5"
+                    "flex items-center gap-1 px-1.5 py-1.5 rounded-lg group transition-all",
+                    visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50"
                   )}
                 >
-                  <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 cursor-grab shrink-0 hover:text-muted-foreground" />
-                  <span className="flex-1 text-sm truncate">{col.label}</span>
+                  {/* Move buttons */}
+                  <div className="flex flex-col">
+                    <button
+                      onClick={() => moveItem(idx, idx - 1)}
+                      disabled={idx === 0}
+                      className="p-0.5 text-muted-foreground/50 hover:text-foreground disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                      title="Mover para cima"
+                    >
+                      <ChevronUp className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={() => moveItem(idx, idx + 1)}
+                      disabled={idx === orderedCols.length - 1}
+                      className="p-0.5 text-muted-foreground/50 hover:text-foreground disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                      title="Mover para baixo"
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <span className="flex-1 text-sm truncate pl-1">{col.label}</span>
                   <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary" : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
                     <Pin className="h-3 w-3" />
                   </button>
