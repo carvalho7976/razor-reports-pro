@@ -170,7 +170,7 @@ function DateRangePicker({
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
         <div className="flex">
-          <div className="border-r border-border py-1.5 px-1 space-y-0">
+          <div className="border-r border-border py-2 px-1.5 min-w-[120px] space-y-0.5">
             {presets.map((p) => (
               <button
                 key={p.key}
@@ -186,7 +186,7 @@ function DateRangePicker({
               </button>
             ))}
           </div>
-          <div className="p-1.5">
+          <div className="p-2">
             <CalendarComponent
               mode="range"
               selected={dateRange}
@@ -194,9 +194,9 @@ function DateRangePicker({
                 onRangeChange(range);
                 if (range?.from && range?.to) onSelect("personalizado");
               }}
-              numberOfMonths={1}
+              numberOfMonths={2}
               locale={ptBR}
-              className="pointer-events-auto p-2"
+              className="pointer-events-auto"
             />
           </div>
         </div>
