@@ -266,6 +266,12 @@ export default function Agenda() {
             </table>
           </div>
         </div>
+
+        <AgendaAppointmentDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          appointment={selectedAppointment}
+        />
       </div>
     </AppLayout>
   );
