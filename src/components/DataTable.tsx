@@ -641,23 +641,23 @@ export function DataTable<T extends Record<string, any>>({
   const activeFilterCount = Object.values(columnFilters).flat().length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">{title}</h1>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">{title}</h1>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[180px] max-w-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:flex-wrap">
+        <div className="relative flex-1 min-w-0 sm:min-w-[180px] sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
           <input
             type="text"
             placeholder="Pesquisar..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="toolbar-input pl-9 pr-3 py-2"
+            className="toolbar-input pl-9 pr-3 py-2 w-full"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted-foreground hover:text-foreground">
@@ -666,40 +666,42 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
-        {showDateFilter && (
-          <>
-            <div className="h-5 w-px bg-border hidden sm:block" />
-            <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
-          </>
-        )}
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {showDateFilter && (
+            <>
+              <div className="h-5 w-px bg-border hidden sm:block" />
+              <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
+            </>
+          )}
 
-        <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
+          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
 
-        <div className="relative">
-          <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
-            <ListFilter className="h-4 w-4" />
-            <span className="hidden sm:inline text-xs">Filtro</span>
-            {activeFilterCount > 0 && (
-              <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-          <FilterDropdown
-            columns={initialColumns}
-            columnFilterInputs={columnFilterInputs}
-            setColumnFilterInputs={setColumnFilterInputs}
-            columnFilters={columnFilters}
-            setColumnFilters={setColumnFilters}
-            open={showFilters}
-            setOpen={setShowFilters}
-          />
-        </div>
+          <div className="relative">
+            <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
+              <ListFilter className="h-4 w-4" />
+              <span className="hidden sm:inline text-xs">Filtro</span>
+              {activeFilterCount > 0 && (
+                <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+            <FilterDropdown
+              columns={initialColumns}
+              columnFilterInputs={columnFilterInputs}
+              setColumnFilterInputs={setColumnFilterInputs}
+              columnFilters={columnFilters}
+              setColumnFilters={setColumnFilters}
+              open={showFilters}
+              setOpen={setShowFilters}
+            />
+          </div>
 
-        <div className="ml-auto flex items-center gap-2">
-          <ExportMenu />
-          <div className="h-5 w-px bg-border" />
-          {novoMenuItems && <NovoButton items={novoMenuItems} />}
+          <div className="ml-auto flex items-center gap-2">
+            <ExportMenu />
+            <div className="h-5 w-px bg-border" />
+            {novoMenuItems && <NovoButton items={novoMenuItems} />}
+          </div>
         </div>
       </div>
 
