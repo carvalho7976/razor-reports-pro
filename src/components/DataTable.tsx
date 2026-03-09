@@ -553,11 +553,17 @@ export function DataTable<T extends Record<string, any>>({
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [page, setPage] = useState(0);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const [columnOrder, setColumnOrder] = useState<string[]>(() => initialColumns.map((c) => c.key));
 
   const columns = useMemo(() => {
+    const orderMap = new Map(columnOrder.map((k, i) => [k, i]));
     return initialColumns
       .filter((c) => !hiddenColumns.has(c.key))
-      .sort((a, b) => (pinnedColumns.has(a.key) ? 0 : 1) - (pinnedColumns.has(b.key) ? 0 : 1));
+      .sort((a, b) => {
+        const pinDiff = (pinnedColumns.has(a.key) ? 0 : 1) - (pinnedColumns.has(b.key) ? 0 : 1);
+        if (pinDiff !== 0) return pinDiff;
+        return (orderMap.get(a.key) ?? 999) - (orderMap.get(b.key) ?? 999);
+      });
   }, [initialColumns, hiddenColumns, pinnedColumns]);
 
   const activeFilters = useMemo<ActiveFilter[]>(() => {
