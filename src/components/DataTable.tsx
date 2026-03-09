@@ -788,8 +788,8 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Tabs */}
       {tabs && (
-        <div className="border-b border-border overflow-x-auto">
-          <div className="flex gap-0 min-w-max">
+        <div className="border-b border-border">
+          <div className="flex gap-0 flex-wrap">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
