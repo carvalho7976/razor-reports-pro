@@ -224,11 +224,24 @@ export default function Agenda() {
                             rowSpan={span}
                             className="border-r border-table-border last:border-r-0 p-1"
                           >
-                            <div className={cn(
-                              "rounded-lg p-2.5 h-full text-primary-foreground cursor-pointer",
-                              "hover:brightness-110 transition-all shadow-sm",
-                              appt.color
-                            )}>
+                            <div
+                              onClick={() => {
+                                setSelectedAppointment({
+                                  client: appt.client,
+                                  service: appt.service,
+                                  startTime: appt.startTime,
+                                  endTime: appt.endTime,
+                                  professionalName: professionals[appt.professionalIndex].name,
+                                  color: appt.color,
+                                });
+                                setDialogOpen(true);
+                              }}
+                              className={cn(
+                                "rounded-lg p-2.5 h-full text-primary-foreground cursor-pointer",
+                                "hover:brightness-110 transition-all shadow-sm",
+                                appt.color
+                              )}
+                            >
                               <div className="text-[11px] font-medium opacity-90">
                                 {appt.startTime} - {appt.endTime}
                               </div>
