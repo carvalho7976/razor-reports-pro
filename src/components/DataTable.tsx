@@ -169,22 +169,24 @@ function DateRangePicker({
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
-        <div className="flex">
-          <div className="border-r border-border py-2 pl-0 pr-1.5 min-w-[120px] space-y-0.5">
-            {presets.map((p) => (
-              <button
-                key={p.key}
-                onClick={() => handlePreset(p.key)}
-                className={cn(
-                  "w-full text-left px-2.5 py-1.5 text-xs rounded-md transition-colors",
-                  datePreset === p.key
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-foreground hover:bg-muted"
-                )}
-              >
-                {p.label}
-              </button>
-            ))}
+        <div className="flex flex-col sm:flex-row">
+          <div className="border-b sm:border-b-0 sm:border-r border-border py-2 px-1.5 sm:pl-0 sm:pr-1.5 sm:min-w-[120px]">
+            <div className="flex sm:flex-col gap-1 overflow-x-auto sm:overflow-x-visible">
+              {presets.map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => handlePreset(p.key)}
+                  className={cn(
+                    "whitespace-nowrap text-left px-2.5 py-1.5 text-xs rounded-md transition-colors shrink-0",
+                    datePreset === p.key
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="p-2">
             <CalendarComponent
@@ -194,7 +196,7 @@ function DateRangePicker({
                 onRangeChange(range);
                 if (range?.from && range?.to) onSelect("personalizado");
               }}
-              numberOfMonths={2}
+              numberOfMonths={typeof window !== "undefined" && window.innerWidth < 640 ? 1 : 2}
               locale={ptBR}
               className="pointer-events-auto"
             />
@@ -641,23 +643,23 @@ export function DataTable<T extends Record<string, any>>({
   const activeFilterCount = Object.values(columnFilters).flat().length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">{title}</h1>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">{title}</h1>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[180px] max-w-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:flex-wrap">
+        <div className="relative flex-1 min-w-0 sm:min-w-[180px] sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
           <input
             type="text"
             placeholder="Pesquisar..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="toolbar-input pl-9 pr-3 py-2"
+            className="toolbar-input pl-9 pr-3 py-2 w-full"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted-foreground hover:text-foreground">
@@ -666,40 +668,42 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
-        {showDateFilter && (
-          <>
-            <div className="h-5 w-px bg-border hidden sm:block" />
-            <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
-          </>
-        )}
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {showDateFilter && (
+            <>
+              <div className="h-5 w-px bg-border hidden sm:block" />
+              <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
+            </>
+          )}
 
-        <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
+          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
 
-        <div className="relative">
-          <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
-            <ListFilter className="h-4 w-4" />
-            <span className="hidden sm:inline text-xs">Filtro</span>
-            {activeFilterCount > 0 && (
-              <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-          <FilterDropdown
-            columns={initialColumns}
-            columnFilterInputs={columnFilterInputs}
-            setColumnFilterInputs={setColumnFilterInputs}
-            columnFilters={columnFilters}
-            setColumnFilters={setColumnFilters}
-            open={showFilters}
-            setOpen={setShowFilters}
-          />
-        </div>
+          <div className="relative">
+            <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
+              <ListFilter className="h-4 w-4" />
+              <span className="hidden sm:inline text-xs">Filtro</span>
+              {activeFilterCount > 0 && (
+                <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+            <FilterDropdown
+              columns={initialColumns}
+              columnFilterInputs={columnFilterInputs}
+              setColumnFilterInputs={setColumnFilterInputs}
+              columnFilters={columnFilters}
+              setColumnFilters={setColumnFilters}
+              open={showFilters}
+              setOpen={setShowFilters}
+            />
+          </div>
 
-        <div className="ml-auto flex items-center gap-2">
-          <ExportMenu />
-          <div className="h-5 w-px bg-border" />
-          {novoMenuItems && <NovoButton items={novoMenuItems} />}
+          <div className="ml-auto flex items-center gap-2">
+            <ExportMenu />
+            <div className="h-5 w-px bg-border" />
+            {novoMenuItems && <NovoButton items={novoMenuItems} />}
+          </div>
         </div>
       </div>
 
@@ -725,13 +729,13 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Summary Cards */}
       {summaryCards && (
-        <div className="flex gap-3 flex-wrap">
+        <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 sm:flex-wrap">
           {summaryCards.map((card, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 py-3 bg-card rounded-xl border border-border shadow-sm">
-              {card.icon && <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">{card.icon}</div>}
-              <div>
-                <p className="text-xs text-muted-foreground">{card.label}</p>
-                <p className="text-sm font-bold text-foreground">{card.value}</p>
+            <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+              {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
               </div>
             </div>
           ))}
@@ -740,14 +744,14 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Tabs */}
       {tabs && (
-        <div className="border-b border-border">
-          <div className="flex gap-0">
+        <div className="border-b border-border overflow-x-auto">
+          <div className="flex gap-0 min-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => onTabChange?.(tab.value)}
                 className={cn(
-                  "relative px-5 py-2.5 text-sm font-medium transition-colors -mb-px border-b-2",
+                  "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                   activeTab === tab.value
                     ? "border-primary text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
@@ -756,7 +760,7 @@ export function DataTable<T extends Record<string, any>>({
                 {tab.label}
                 {tab.count !== undefined && (
                   <span className={cn(
-                    "ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+                    "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
                     activeTab === tab.value
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
@@ -772,26 +776,26 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Selection Action Bar */}
       {selectable && selectedRows.size > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-primary/5 border border-primary/20 rounded-xl">
-          <span className="text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-primary/5 border border-primary/20 rounded-xl">
+          <span className="text-xs sm:text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
           <div className="h-4 w-px bg-border" />
           {selectionActions.map((action, i) => (
             <button
               key={i}
               onClick={() => { action.onClick(Array.from(selectedRows)); setSelectedRows(new Set()); }}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
+                "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
                 action.variant === "destructive"
                   ? "text-destructive hover:bg-destructive/10"
                   : "text-foreground hover:bg-muted"
               )}
             >
               {action.icon}
-              {action.label}
+              <span className="hidden sm:inline">{action.label}</span>
             </button>
           ))}
           <button onClick={() => setSelectedRows(new Set())} className="ml-auto text-xs text-muted-foreground hover:text-foreground">
-            Limpar seleção
+            Limpar
           </button>
         </div>
       )}
@@ -909,18 +913,19 @@ export function DataTable<T extends Record<string, any>>({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-            <span className="text-xs text-muted-foreground">
+          <div className="flex items-center justify-between px-3 sm:px-5 py-3 border-t border-border">
+            <span className="text-[10px] sm:text-xs text-muted-foreground">
               {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
             </span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                const pageNum = totalPages <= 5 ? i : Math.max(0, Math.min(page - 2, totalPages - 5)) + i;
+              {Array.from({ length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) }, (_, i) => {
+                const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+                const pageNum = totalPages <= maxVisible ? i : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
                 return (
-                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-8 w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
+                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
                     {pageNum + 1}
                   </button>
                 );
