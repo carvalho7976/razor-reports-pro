@@ -57,7 +57,7 @@
     --info-foreground: 0 0% 100%;
 
      --table-header: 0 0% 20%;
-     --table-header-foreground: 0 0% 95%;
+     --table-header-foreground: 0 0% 100%;
      --table-row-hover: 0 0% 98%;
      --table-border: 0 0% 92%;
   }
