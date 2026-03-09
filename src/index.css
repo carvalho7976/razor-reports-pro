@@ -93,6 +93,7 @@
     --header-bg: 0 0% 4%;
     --header-fg: 0 0% 90%;
      --table-header: 0 0% 20%;
+     --table-header-foreground: 0 0% 90%;
      --table-row-hover: 0 0% 8%;
      --table-border: 0 0% 15%;
   }

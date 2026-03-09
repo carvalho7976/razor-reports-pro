@@ -849,9 +849,9 @@ export function DataTable<T extends Record<string, any>>({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-table-header text-foreground">
+              <tr className="bg-table-header text-table-header-foreground">
                 {selectable && (
-                  <th className="w-10 px-3 py-3.5 border-b border-sidebar-border">
+                  <th className="w-10 px-3 py-3.5 border-b border-table-border">
                     <input
                       type="checkbox"
                       checked={allPageSelected}
@@ -870,9 +870,9 @@ export function DataTable<T extends Record<string, any>>({
                       key={col.key}
                       onClick={sortable ? () => handleToggleSort(col.key) : undefined}
                       className={cn(
-                        "px-5 py-3.5 text-left text-xs font-semibold whitespace-nowrap border-b border-sidebar-border",
-                        sortable && "cursor-pointer select-none hover:bg-sidebar-accent transition-colors",
-                        pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-sidebar",
+                        "px-5 py-3.5 text-left text-xs font-semibold whitespace-nowrap border-b border-table-border",
+                        sortable && "cursor-pointer select-none hover:bg-table-header/80 transition-colors",
+                        pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-table-header",
                         col.align === "right" && "text-right",
                         col.align === "center" && "text-center"
                       )}
