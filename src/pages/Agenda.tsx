@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
+import { AgendaAppointmentDialog } from "@/components/AgendaAppointmentDialog";
 import { ChevronLeft, ChevronRight, Plus, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +60,15 @@ export default function Agenda() {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 2, 9));
   const [waitingQueue] = useState(0);
   const [viewDays, setViewDays] = useState(1);
+  const [selectedAppointment, setSelectedAppointment] = useState<{
+    client: string;
+    service: string;
+    startTime: string;
+    endTime: string;
+    professionalName: string;
+    color: string;
+  } | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const weekday = getWeekdayName(currentDate);
   const formattedDate = formatDate(currentDate);
@@ -214,11 +224,24 @@ export default function Agenda() {
                             rowSpan={span}
                             className="border-r border-table-border last:border-r-0 p-1"
                           >
-                            <div className={cn(
-                              "rounded-lg p-2.5 h-full text-primary-foreground cursor-pointer",
-                              "hover:brightness-110 transition-all shadow-sm",
-                              appt.color
-                            )}>
+                            <div
+                              onClick={() => {
+                                setSelectedAppointment({
+                                  client: appt.client,
+                                  service: appt.service,
+                                  startTime: appt.startTime,
+                                  endTime: appt.endTime,
+                                  professionalName: professionals[appt.professionalIndex].name,
+                                  color: appt.color,
+                                });
+                                setDialogOpen(true);
+                              }}
+                              className={cn(
+                                "rounded-lg p-2.5 h-full text-primary-foreground cursor-pointer",
+                                "hover:brightness-110 transition-all shadow-sm",
+                                appt.color
+                              )}
+                            >
                               <div className="text-[11px] font-medium opacity-90">
                                 {appt.startTime} - {appt.endTime}
                               </div>
@@ -243,6 +266,12 @@ export default function Agenda() {
             </table>
           </div>
         </div>
+
+        <AgendaAppointmentDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          appointment={selectedAppointment}
+        />
       </div>
     </AppLayout>
   );
