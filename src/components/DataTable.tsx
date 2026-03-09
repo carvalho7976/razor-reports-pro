@@ -913,18 +913,19 @@ export function DataTable<T extends Record<string, any>>({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-            <span className="text-xs text-muted-foreground">
+          <div className="flex items-center justify-between px-3 sm:px-5 py-3 border-t border-border">
+            <span className="text-[10px] sm:text-xs text-muted-foreground">
               {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
             </span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                const pageNum = totalPages <= 5 ? i : Math.max(0, Math.min(page - 2, totalPages - 5)) + i;
+              {Array.from({ length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) }, (_, i) => {
+                const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+                const pageNum = totalPages <= maxVisible ? i : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
                 return (
-                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-8 w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
+                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
                     {pageNum + 1}
                   </button>
                 );
