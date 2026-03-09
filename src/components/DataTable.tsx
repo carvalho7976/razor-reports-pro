@@ -3,7 +3,7 @@ import {
   Search, SlidersHorizontal, ChevronUp, ChevronDown,
   X, Pin, Eye, EyeOff, Calendar, Download, ListFilter,
   ChevronLeft, ChevronRight, ArrowUpDown, MoreHorizontal,
-  FileSpreadsheet, FileText,
+  FileSpreadsheet, FileText, Plus, ChevronDown as ChevronDownIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, startOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, endOfYear, subYears } from "date-fns";
@@ -39,6 +39,12 @@ export interface SelectionAction {
   variant?: "default" | "destructive";
 }
 
+export interface NovoMenuItem {
+  label: string;
+  icon?: ReactNode;
+  onClick?: () => void;
+}
+
 interface DataTableProps<T extends Record<string, any>> {
   data: T[];
   columns: Column<T>[];
@@ -54,7 +60,58 @@ interface DataTableProps<T extends Record<string, any>> {
   pageSize?: number;
   selectable?: boolean;
   selectionActions?: SelectionAction[];
-  rowId?: (row: T) => string | number;
+  novoMenuItems?: NovoMenuItem[];
+}
+
+/* ── Novo Button (Notion-style) ── */
+export function NovoButton({ items }: { items: NovoMenuItem[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  if (items.length === 0) return null;
+
+  // Single item: no dropdown
+  if (items.length === 1) {
+    return (
+      <button onClick={items[0].onClick} className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+        <Plus className="h-4 w-4" />
+        Novo
+      </button>
+    );
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+      >
+        <Plus className="h-4 w-4" />
+        Novo
+        <ChevronDown className="h-3.5 w-3.5 ml-0.5 opacity-70" />
+      </button>
+      {open && (
+        <div className="dropdown-panel right-0 top-full mt-2 min-w-[180px]">
+          {items.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => { item.onClick?.(); setOpen(false); }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors"
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /* ── Compact Date Range Picker ── */
@@ -160,13 +217,7 @@ function DateRangePicker({
 
 /* ── Filter Dropdown ── */
 function FilterDropdown<T>({
-  columns,
-  columnFilterInputs,
-  setColumnFilterInputs,
-  columnFilters,
-  setColumnFilters,
-  open,
-  setOpen,
+  columns, columnFilterInputs, setColumnFilterInputs, columnFilters, setColumnFilters, open, setOpen,
 }: {
   columns: Column<T>[];
   columnFilterInputs: Record<string, string>;
@@ -445,7 +496,7 @@ export function DataTable<T extends Record<string, any>>({
   emptyMessage = "Nenhum registro encontrado",
   tabs, activeTab, onTabChange, showDateFilter = true,
   summaryCards, pageSize = 20,
-  selectable = false, selectionActions = [], rowId,
+  selectable = false, selectionActions = [], novoMenuItems,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
   const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
@@ -469,7 +520,6 @@ export function DataTable<T extends Record<string, any>>({
       .sort((a, b) => (pinnedColumns.has(a.key) ? 0 : 1) - (pinnedColumns.has(b.key) ? 0 : 1));
   }, [initialColumns, hiddenColumns, pinnedColumns]);
 
-  // Build active filters
   const activeFilters = useMemo<ActiveFilter[]>(() => {
     const filters: ActiveFilter[] = [];
     if (search) filters.push({ id: "__search", key: "__search", label: "Pesquisa", value: search });
@@ -561,8 +611,7 @@ export function DataTable<T extends Record<string, any>>({
   const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
 
   // Selection helpers
-  const getRowId = useCallback((row: T, idx: number) => rowId ? rowId(row) : idx, [rowId]);
-  const pagedIds = pagedData.map((row, i) => page * pageSize + i);
+  const pagedIds = pagedData.map((_, i) => page * pageSize + i);
   const allPageSelected = selectable && pagedIds.length > 0 && pagedIds.every((id) => selectedRows.has(id));
   const somePageSelected = selectable && pagedIds.some((id) => selectedRows.has(id));
 
@@ -596,10 +645,13 @@ export function DataTable<T extends Record<string, any>>({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground tracking-tight">{title}</h1>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        <div className="flex items-center gap-2">
+          {actions}
+          {novoMenuItems && <NovoButton items={novoMenuItems} />}
+        </div>
       </div>
 
-      {/* Toolbar — compact, clean row */}
+      {/* Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative flex-1 min-w-[180px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
@@ -638,7 +690,6 @@ export function DataTable<T extends Record<string, any>>({
           />
         </div>
 
-        
         <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
 
         {showDateFilter && (
@@ -720,12 +771,49 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
+      {/* Selection Action Bar */}
+      {selectable && selectedRows.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-primary/5 border border-primary/20 rounded-xl">
+          <span className="text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
+          <div className="h-4 w-px bg-border" />
+          {selectionActions.map((action, i) => (
+            <button
+              key={i}
+              onClick={() => { action.onClick(Array.from(selectedRows)); setSelectedRows(new Set()); }}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
+                action.variant === "destructive"
+                  ? "text-destructive hover:bg-destructive/10"
+                  : "text-foreground hover:bg-muted"
+              )}
+            >
+              {action.icon}
+              {action.label}
+            </button>
+          ))}
+          <button onClick={() => setSelectedRows(new Set())} className="ml-auto text-xs text-muted-foreground hover:text-foreground">
+            Limpar seleção
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-sidebar text-sidebar-foreground">
+                {selectable && (
+                  <th className="w-10 px-3 py-3.5 border-b border-sidebar-border">
+                    <input
+                      type="checkbox"
+                      checked={allPageSelected}
+                      ref={(el) => { if (el) el.indeterminate = somePageSelected && !allPageSelected; }}
+                      onChange={toggleSelectAll}
+                      className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
+                    />
+                  </th>
+                )}
                 {columns.map((col) => {
                   const sortable = col.sortable !== false;
                   const sortIdx = sortEntries.findIndex((s) => s.key === col.key);
@@ -765,7 +853,7 @@ export function DataTable<T extends Record<string, any>>({
             <tbody>
               {pagedData.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-5 py-16 text-center text-muted-foreground">
+                  <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-5 py-16 text-center text-muted-foreground">
                     <div className="flex flex-col items-center gap-2">
                       <Search className="h-8 w-8 text-muted-foreground/20" />
                       <p className="text-sm">{emptyMessage}</p>
@@ -773,27 +861,42 @@ export function DataTable<T extends Record<string, any>>({
                   </td>
                 </tr>
               ) : (
-                pagedData.map((row, i) => (
-                  <tr key={i} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                    {columns.map((col) => (
-                      <td
-                        key={col.key}
-                        className={cn(
-                          "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
-                          pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
-                          col.align === "right" && "text-right font-mono",
-                          col.align === "center" && "text-center"
-                        )}
-                      >
-                        {col.render ? col.render(row[col.key], row, i) : (row[col.key] ?? "—")}
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                pagedData.map((row, i) => {
+                  const globalIdx = page * pageSize + i;
+                  const isSelected = selectedRows.has(globalIdx);
+                  return (
+                    <tr key={i} className={cn("border-b border-border/50 hover:bg-muted/30 transition-colors", isSelected && "bg-primary/5")}>
+                      {selectable && (
+                        <td className="w-10 px-3 py-3.5">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelectRow(globalIdx)}
+                            className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
+                          />
+                        </td>
+                      )}
+                      {columns.map((col) => (
+                        <td
+                          key={col.key}
+                          className={cn(
+                            "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
+                            pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
+                            col.align === "right" && "text-right font-mono",
+                            col.align === "center" && "text-center"
+                          )}
+                        >
+                          {col.render ? col.render(row[col.key], row, i) : (row[col.key] ?? "—")}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
               )}
 
               {totalRow && (
                 <tr className="bg-muted/40 font-semibold border-t border-border">
+                  {selectable && <td className="w-10 px-3 py-3.5" />}
                   {columns.map((col) => (
                     <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right font-mono", col.align === "center" && "text-center")}>
                       {totalRow[col.key] ?? ""}
@@ -805,7 +908,7 @@ export function DataTable<T extends Record<string, any>>({
           </table>
         </div>
 
-        {/* Pagination inside card */}
+        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-5 py-3 border-t border-border">
             <span className="text-xs text-muted-foreground">
