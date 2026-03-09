@@ -886,7 +886,7 @@ export function DataTable<T extends Record<string, any>>({
                           </span>
                         )}
                         {sortIdx !== -1 && sortEntries.length > 1 && (
-                          <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground text-[10px] font-bold">
+                          <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
                             {sortIdx + 1}
                           </span>
                         )}
