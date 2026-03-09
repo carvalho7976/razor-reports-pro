@@ -297,14 +297,12 @@ function FilterDropdown<T>({
   );
 }
 
-/* ── Column Manager (with move buttons) ── */
+/* ── Column Manager ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
-  columnOrder, onReorder,
 }: {
   initialColumns: Column<T>[]; hiddenColumns: Set<string>; pinnedColumns: Set<string>;
   toggleColumn: (key: string) => void; togglePin: (key: string) => void;
-  columnOrder: string[]; onReorder: (newOrder: string[]) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -315,62 +313,24 @@ function ColumnManager<T>({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const orderedCols = useMemo(() => {
-    const colMap = new Map(initialColumns.map((c) => [c.key, c]));
-    return columnOrder.map((k) => colMap.get(k)).filter(Boolean) as Column<T>[];
-  }, [columnOrder, initialColumns]);
-
-  const moveItem = (fromIdx: number, toIdx: number) => {
-    if (toIdx < 0 || toIdx >= columnOrder.length) return;
-    const next = [...columnOrder];
-    const [moved] = next.splice(fromIdx, 1);
-    next.splice(toIdx, 0, moved);
-    onReorder(next);
-  };
-
   return (
     <div className="relative" ref={ref}>
       <button onClick={() => setOpen(!open)} className="toolbar-btn" title="Colunas">
         <SlidersHorizontal className="h-4 w-4" />
       </button>
       {open && (
-        <div className="dropdown-panel right-0 top-full mt-2 min-w-[260px]">
+        <div className="dropdown-panel right-0 top-full mt-2 min-w-[240px]">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Colunas</p>
             <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
           </div>
           <div className="space-y-0.5 max-h-[320px] overflow-y-auto">
-            {orderedCols.map((col, idx) => {
+            {initialColumns.map((col) => {
               const visible = !hiddenColumns.has(col.key);
               const pinned = pinnedColumns.has(col.key);
               return (
-                <div
-                  key={col.key}
-                  className={cn(
-                    "flex items-center gap-1 px-1.5 py-1.5 rounded-lg group transition-all",
-                    visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50"
-                  )}
-                >
-                  {/* Move buttons */}
-                  <div className="flex flex-col">
-                    <button
-                      onClick={() => moveItem(idx, idx - 1)}
-                      disabled={idx === 0}
-                      className="p-0.5 text-muted-foreground/50 hover:text-foreground disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                      title="Mover para cima"
-                    >
-                      <ChevronUp className="h-3 w-3" />
-                    </button>
-                    <button
-                      onClick={() => moveItem(idx, idx + 1)}
-                      disabled={idx === orderedCols.length - 1}
-                      className="p-0.5 text-muted-foreground/50 hover:text-foreground disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                      title="Mover para baixo"
-                    >
-                      <ChevronDown className="h-3 w-3" />
-                    </button>
-                  </div>
-                  <span className="flex-1 text-sm truncate pl-1">{col.label}</span>
+                <div key={col.key} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-lg group transition-colors", visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50")}>
+                  <span className="flex-1 text-sm truncate">{col.label}</span>
                   <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary" : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
                     <Pin className="h-3 w-3" />
                   </button>
@@ -551,19 +511,16 @@ export function DataTable<T extends Record<string, any>>({
     initialColumns.forEach((c) => c.pinned && set.add(c.key));
     return set;
   });
-  const [columnOrder, setColumnOrder] = useState<string[]>(() => initialColumns.map((c) => c.key));
   const [datePreset, setDatePreset] = useState<DatePreset>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [page, setPage] = useState(0);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
   const columns = useMemo(() => {
-    const colMap = new Map(initialColumns.map((c) => [c.key, c]));
-    return columnOrder
-      .map((k) => colMap.get(k))
-      .filter((c): c is Column<T> => !!c && !hiddenColumns.has(c.key))
+    return initialColumns
+      .filter((c) => !hiddenColumns.has(c.key))
       .sort((a, b) => (pinnedColumns.has(a.key) ? 0 : 1) - (pinnedColumns.has(b.key) ? 0 : 1));
-  }, [initialColumns, hiddenColumns, pinnedColumns, columnOrder]);
+  }, [initialColumns, hiddenColumns, pinnedColumns]);
 
   const activeFilters = useMemo<ActiveFilter[]>(() => {
     const filters: ActiveFilter[] = [];
@@ -719,7 +676,7 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
-          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} columnOrder={columnOrder} onReorder={setColumnOrder} />
+          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
 
           <div className="relative">
             <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
