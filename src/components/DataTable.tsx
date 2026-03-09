@@ -32,6 +32,13 @@ interface ActiveFilter {
   value: string;
 }
 
+export interface SelectionAction {
+  label: string;
+  icon?: ReactNode;
+  onClick: (selectedIndices: number[]) => void;
+  variant?: "default" | "destructive";
+}
+
 interface DataTableProps<T extends Record<string, any>> {
   data: T[];
   columns: Column<T>[];
@@ -45,6 +52,9 @@ interface DataTableProps<T extends Record<string, any>> {
   showDateFilter?: boolean;
   summaryCards?: { label: string; value: string; icon?: ReactNode }[];
   pageSize?: number;
+  selectable?: boolean;
+  selectionActions?: SelectionAction[];
+  rowId?: (row: T) => string | number;
 }
 
 /* ── Compact Date Range Picker ── */
