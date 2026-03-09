@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
+import { AgendaAppointmentDialog } from "@/components/AgendaAppointmentDialog";
 import { ChevronLeft, ChevronRight, Plus, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
