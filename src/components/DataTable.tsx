@@ -560,6 +560,28 @@ export function DataTable<T extends Record<string, any>>({
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
 
+  // Selection helpers
+  const getRowId = useCallback((row: T, idx: number) => rowId ? rowId(row) : idx, [rowId]);
+  const pagedIds = pagedData.map((row, i) => page * pageSize + i);
+  const allPageSelected = selectable && pagedIds.length > 0 && pagedIds.every((id) => selectedRows.has(id));
+  const somePageSelected = selectable && pagedIds.some((id) => selectedRows.has(id));
+
+  const toggleSelectAll = () => {
+    setSelectedRows((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) { pagedIds.forEach((id) => next.delete(id)); }
+      else { pagedIds.forEach((id) => next.add(id)); }
+      return next;
+    });
+  };
+  const toggleSelectRow = (idx: number) => {
+    setSelectedRows((prev) => {
+      const next = new Set(prev);
+      next.has(idx) ? next.delete(idx) : next.add(idx);
+      return next;
+    });
+  };
+
   const togglePin = (key: string) => {
     setPinnedColumns((prev) => { const next = new Set(prev); next.has(key) ? next.delete(key) : next.add(key); return next; });
   };
