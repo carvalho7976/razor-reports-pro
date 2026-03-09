@@ -564,7 +564,7 @@ export function DataTable<T extends Record<string, any>>({
         if (pinDiff !== 0) return pinDiff;
         return (orderMap.get(a.key) ?? 999) - (orderMap.get(b.key) ?? 999);
       });
-  }, [initialColumns, hiddenColumns, pinnedColumns]);
+  }, [initialColumns, hiddenColumns, pinnedColumns, columnOrder]);
 
   const activeFilters = useMemo<ActiveFilter[]>(() => {
     const filters: ActiveFilter[] = [];
