@@ -849,7 +849,7 @@ export function DataTable<T extends Record<string, any>>({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-sidebar text-sidebar-foreground">
+              <tr className="bg-table-header text-foreground">
                 {selectable && (
                   <th className="w-10 px-3 py-3.5 border-b border-sidebar-border">
                     <input
