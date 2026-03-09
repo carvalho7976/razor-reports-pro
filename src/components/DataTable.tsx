@@ -651,7 +651,7 @@ export function DataTable<T extends Record<string, any>>({
           />
         </div>
 
-        <SortDropdown columns={initialColumns} sortEntries={sortEntries} onToggleSort={handleToggleSort} onClear={clearSort} />
+        
         <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} />
 
         {showDateFilter && (
@@ -691,21 +691,40 @@ export function DataTable<T extends Record<string, any>>({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr>
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    className={cn(
-                      "px-5 py-3.5 text-left text-xs font-medium text-muted-foreground whitespace-nowrap border-b border-border",
-                      pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
-                      col.align === "right" && "text-right",
-                      col.align === "center" && "text-center"
-                    )}
-                    style={col.width ? { width: col.width } : undefined}
-                  >
-                    {col.label}
-                  </th>
-                ))}
+              <tr className="bg-sidebar text-sidebar-foreground">
+                {columns.map((col) => {
+                  const sortable = col.sortable !== false;
+                  const sortIdx = sortEntries.findIndex((s) => s.key === col.key);
+                  const sortDir = sortIdx !== -1 ? sortEntries[sortIdx].dir : null;
+                  return (
+                    <th
+                      key={col.key}
+                      onClick={sortable ? () => handleToggleSort(col.key) : undefined}
+                      className={cn(
+                        "px-5 py-3.5 text-left text-xs font-semibold whitespace-nowrap border-b border-sidebar-border",
+                        sortable && "cursor-pointer select-none hover:bg-sidebar-accent transition-colors",
+                        pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-sidebar",
+                        col.align === "right" && "text-right",
+                        col.align === "center" && "text-center"
+                      )}
+                      style={col.width ? { width: col.width } : undefined}
+                    >
+                      <span className="inline-flex items-center gap-1.5">
+                        {col.label}
+                        {sortable && (
+                          <span className={cn("inline-flex items-center", !sortDir && "opacity-30")}>
+                            {sortDir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : sortDir === "desc" ? <ChevronDown className="h-3.5 w-3.5" /> : <ArrowUpDown className="h-3 w-3" />}
+                          </span>
+                        )}
+                        {sortIdx !== -1 && sortEntries.length > 1 && (
+                          <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground text-[10px] font-bold">
+                            {sortIdx + 1}
+                          </span>
+                        )}
+                      </span>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
 
