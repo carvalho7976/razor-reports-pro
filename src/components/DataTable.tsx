@@ -52,6 +52,7 @@ interface DataTableProps<T extends Record<string, any>> {
   data: T[];
   columns: Column<T>[];
   title: string;
+  titleIcon?: ReactNode;
   actions?: ReactNode;
   totalRow?: Record<string, ReactNode>;
   emptyMessage?: string;
