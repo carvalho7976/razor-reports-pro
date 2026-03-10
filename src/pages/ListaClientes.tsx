@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3, Trash2, Merge } from "lucide-react";
+import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3, Trash2, Merge, PlayCircle } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -212,15 +212,21 @@ export default function ListaClientes() {
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive" },
-    { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge },
-    { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage },
+    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
+    { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge, description: "Unifica cadastros duplicados em um único registro" },
+    { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage, description: "Envia mensagem via WhatsApp para os clientes selecionados" },
   ];
 
   return (
     <AppLayout>
       <DataTable
         title="Lista de Clientes"
+        titleIcon={
+          <button className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors" title="Assistir aula">
+            <PlayCircle className="h-4 w-4" />
+            Aula
+          </button>
+        }
         data={filteredData}
         columns={columns}
         showDateFilter={false}
