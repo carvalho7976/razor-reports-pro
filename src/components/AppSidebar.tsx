@@ -11,7 +11,7 @@ const navItems = [
   { icon: CalendarDays, label: "Agenda", path: "/agenda" },
   { icon: MessageCircle, label: "Chat", path: "/chat", badge: 1 },
   { icon: Bot, label: "Automação", path: "/automacao" },
-  { icon: User, label: "Clientes", path: "/relatorio-clientes" },
+  { icon: User, label: "Clientes", path: "/lista-clientes" },
   { icon: Users, label: "Equipe", path: "/profissionais" },
   { icon: Scissors, label: "Serviços", path: "/servicos" },
   { icon: Package, label: "Produtos", path: "/produtos" },
