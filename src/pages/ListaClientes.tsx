@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu } from "@/components/DataTable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -176,29 +176,37 @@ const columns: Column<Cliente>[] = [
   },
 ];
 
-// Summary counts
-const totalClientes = data.length;
-const ativos = data.filter((c) => c.status === "ativo").length;
-const semiAtivos = data.filter((c) => c.status === "semi-ativo").length;
-const inativos = data.filter((c) => c.status === "inativo").length;
-
 export default function ListaClientes() {
+  const [activeTab, setActiveTab] = useState("todos");
+
+  const filteredData = useMemo(() => {
+    if (activeTab === "todos") return data;
+    return data.filter((c) => c.status === activeTab);
+  }, [activeTab]);
+
+  const totalClientes = data.length;
+  const ativos = data.filter((c) => c.status === "ativo").length;
+  const semiAtivos = data.filter((c) => c.status === "semi-ativo").length;
+  const inativos = data.filter((c) => c.status === "inativo").length;
+
   return (
     <AppLayout>
       <DataTable
         title="Lista de Clientes"
-        data={data}
+        data={filteredData}
         columns={columns}
         showDateFilter={false}
         selectable
         pageSize={15}
         novoMenuItems={[{ label: "Novo cliente" }]}
-        summaryCards={[
-          { label: "Total", value: String(totalClientes) },
-          { label: "Ativos", value: String(ativos) },
-          { label: "Semi-ativos", value: String(semiAtivos) },
-          { label: "Inativos", value: String(inativos) },
+        tabs={[
+          { label: "Todos", value: "todos", count: totalClientes },
+          { label: "Ativos", value: "ativo", count: ativos },
+          { label: "Semi-ativos", value: "semi-ativo", count: semiAtivos },
+          { label: "Inativos", value: "inativo", count: inativos },
         ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
     </AppLayout>
   );
