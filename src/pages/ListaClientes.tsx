@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu } from "@/components/DataTable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
