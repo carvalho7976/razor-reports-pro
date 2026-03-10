@@ -535,7 +535,7 @@ function SortDropdown<T>({
 
 /* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
-  data, columns: initialColumns, title, actions, totalRow,
+  data, columns: initialColumns, title, titleIcon, actions, totalRow,
   emptyMessage = "Nenhum registro encontrado",
   tabs, activeTab, onTabChange, showDateFilter = true,
   summaryCards, pageSize = 20,
