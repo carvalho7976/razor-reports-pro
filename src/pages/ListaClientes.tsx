@@ -212,9 +212,9 @@ export default function ListaClientes() {
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive" },
-    { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge },
-    { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage },
+    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
+    { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge, description: "Unifica cadastros duplicados em um único registro" },
+    { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage, description: "Envia mensagem via WhatsApp para os clientes selecionados" },
   ];
 
   return (
