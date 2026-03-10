@@ -37,6 +37,7 @@ interface ActiveFilter {
 export interface SelectionAction {
   label: string;
   icon?: ReactNode;
+  description?: string;
   onClick: (selectedIndices: number[]) => void;
   variant?: "default" | "destructive";
 }
