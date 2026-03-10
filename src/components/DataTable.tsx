@@ -830,19 +830,32 @@ export function DataTable<T extends Record<string, any>>({
           <span className="text-xs sm:text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
           <div className="h-4 w-px bg-border" />
           {selectionActions.map((action, i) => (
-            <button
-              key={i}
-              onClick={() => { action.onClick(Array.from(selectedRows)); setSelectedRows(new Set()); }}
-              className={cn(
-                "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
-                action.variant === "destructive"
-                  ? "text-destructive hover:bg-destructive/10"
-                  : "text-foreground hover:bg-muted"
+            <div key={i} className="inline-flex items-center gap-0.5">
+              <button
+                onClick={() => { action.onClick(Array.from(selectedRows)); setSelectedRows(new Set()); }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
+                  action.variant === "destructive"
+                    ? "text-destructive hover:bg-destructive/10"
+                    : "text-foreground hover:bg-muted"
+                )}
+              >
+                {action.icon}
+                <span className="hidden sm:inline">{action.label}</span>
+              </button>
+              {action.description && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button className="p-0.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-[200px] text-xs">
+                    {action.description}
+                  </TooltipContent>
+                </Tooltip>
               )}
-            >
-              {action.icon}
-              <span className="hidden sm:inline">{action.label}</span>
-            </button>
+            </div>
           ))}
           <button onClick={() => setSelectedRows(new Set())} className="ml-auto text-xs text-muted-foreground hover:text-foreground">
             Limpar
