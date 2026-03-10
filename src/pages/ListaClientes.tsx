@@ -1,11 +1,12 @@
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, ActionsMenu } from "@/components/DataTable";
+import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3 } from "lucide-react";
+import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3, Trash2, Merge } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
