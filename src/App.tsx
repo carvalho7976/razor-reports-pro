@@ -15,6 +15,7 @@ import ComissoesPagas from "./pages/ComissoesPagas";
 import Adiantamentos from "./pages/Adiantamentos";
 import RelatorioProfissionais from "./pages/RelatorioProfissionais";
 import ExclusaoAgendamentos from "./pages/ExclusaoAgendamentos";
+import ListaClientes from "./pages/ListaClientes";
 
 const queryClient = new QueryClient();
 
