@@ -15,6 +15,7 @@ import ComissoesPagas from "./pages/ComissoesPagas";
 import Adiantamentos from "./pages/Adiantamentos";
 import RelatorioProfissionais from "./pages/RelatorioProfissionais";
 import ExclusaoAgendamentos from "./pages/ExclusaoAgendamentos";
+import ListaClientes from "./pages/ListaClientes";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/adiantamentos" element={<Adiantamentos />} />
           <Route path="/relatorio-profissionais" element={<RelatorioProfissionais />} />
           <Route path="/exclusao-agendamentos" element={<ExclusaoAgendamentos />} />
+          <Route path="/lista-clientes" element={<ListaClientes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
