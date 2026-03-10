@@ -178,16 +178,43 @@ const columns: Column<Cliente>[] = [
 
 export default function ListaClientes() {
   const [activeTab, setActiveTab] = useState("todos");
+  const [allData, setAllData] = useState(data);
+  const { toast } = useToast();
 
   const filteredData = useMemo(() => {
-    if (activeTab === "todos") return data;
-    return data.filter((c) => c.status === activeTab);
-  }, [activeTab]);
+    if (activeTab === "todos") return allData;
+    return allData.filter((c) => c.status === activeTab);
+  }, [activeTab, allData]);
 
-  const totalClientes = data.length;
-  const ativos = data.filter((c) => c.status === "ativo").length;
-  const semiAtivos = data.filter((c) => c.status === "semi-ativo").length;
-  const inativos = data.filter((c) => c.status === "inativo").length;
+  const totalClientes = allData.length;
+  const ativos = allData.filter((c) => c.status === "ativo").length;
+  const semiAtivos = allData.filter((c) => c.status === "semi-ativo").length;
+  const inativos = allData.filter((c) => c.status === "inativo").length;
+
+  const bulkRemove = (indices: number[]) => {
+    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    setAllData((prev) => prev.filter((c) => !cods.includes(c.cod)));
+    toast({ title: `${cods.length} cliente(s) removido(s)`, variant: "destructive" });
+  };
+
+  const bulkMerge = (indices: number[]) => {
+    toast({ title: `Mesclar ${indices.length} clientes`, description: "Funcionalidade em desenvolvimento" });
+  };
+
+  const bulkMessage = (indices: number[]) => {
+    const clients = indices.map((i) => filteredData[i]).filter(Boolean).filter((c) => c.telefone);
+    if (clients.length === 0) {
+      toast({ title: "Nenhum cliente com telefone", variant: "destructive" });
+      return;
+    }
+    toast({ title: `Enviar mensagem para ${clients.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
+  };
+
+  const selectionActions: SelectionAction[] = [
+    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive" },
+    { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge },
+    { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage },
+  ];
 
   return (
     <AppLayout>
@@ -197,6 +224,7 @@ export default function ListaClientes() {
         columns={columns}
         showDateFilter={false}
         selectable
+        selectionActions={selectionActions}
         pageSize={15}
         novoMenuItems={[{ label: "Novo cliente" }]}
         tabs={[
