@@ -27,17 +27,17 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/contas-pagar" element={<ContasPagar />} />
-          <Route path="/movimentacao-comandas" element={<MovimentacaoComandas />} />
-          <Route path="/relatorio-clientes" element={<RelatorioClientes />} />
-          <Route path="/exclusao-clientes" element={<ExclusaoClientes />} />
-          <Route path="/profissionais" element={<ListaProfissionais />} />
-          <Route path="/comissoes-pagar" element={<ComissoesPagar />} />
-          <Route path="/comissoes-pagas" element={<ComissoesPagas />} />
-          <Route path="/adiantamentos" element={<Adiantamentos />} />
-          <Route path="/relatorio-profissionais" element={<RelatorioProfissionais />} />
-          <Route path="/exclusao-agendamentos" element={<ExclusaoAgendamentos />} />
-          <Route path="/lista-clientes" element={<ListaClientes />} />
+          <Route path="/contasPesquisa" element={<ContasPagar />} />
+          <Route path="/relatorioMovimentacaoDiaria" element={<MovimentacaoComandas />} />
+          <Route path="/relatorioClientes" element={<RelatorioClientes />} />
+          <Route path="/relatorioExclusaoCliente" element={<ExclusaoClientes />} />
+          <Route path="/funcionarioPesquisa" element={<ListaProfissionais />} />
+          <Route path="/comissao" element={<ComissoesPagar />} />
+          <Route path="/comissoesPagas" element={<ComissoesPagas />} />
+          <Route path="/adiantamento" element={<Adiantamentos />} />
+          <Route path="/relatorioDesempenhoFuncionario" element={<RelatorioProfissionais />} />
+          <Route path="/relatorioExclusaoAgendamento" element={<ExclusaoAgendamentos />} />
+          <Route path="/clientePesquisa" element={<ListaClientes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
