@@ -233,7 +233,7 @@ export default function ListaClientes() {
         }
         data={filteredData}
         columns={columns}
-        showDateFilter={false}
+        showDateFilter={true}
         selectable
         selectionActions={selectionActions}
         pageSize={15}
