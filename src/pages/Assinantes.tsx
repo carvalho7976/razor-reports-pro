@@ -29,10 +29,10 @@ export default function Assinantes() {
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
-  const [tab, setTab] = useState("ativo");
+  const [tab, setTab] = useState("total");
 
   const data = useMemo(() =>
-    allData.filter(d => tab === "ativo" ? d.status === "Ativo" : d.status === "Atrasado"),
+    tab === "total" ? allData : allData.filter(d => tab === "ativo" ? d.status === "Ativo" : d.status === "Atrasado"),
     [tab, allData]);
 
   const bulkCancel = (indices: number[]) => {
