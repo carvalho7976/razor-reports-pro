@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
+import { DataTable, Column, ActionsMenu, SelectionAction, SummaryCard } from "@/components/DataTable";
 import { CheckCircle, XCircle, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,8 +25,20 @@ const initialData: Conta[] = [
   { id: 6, conta: "Manutenção", descricao: "Reparo cadeira", vencimento: "25/03/2026", valor: 450, status: "Pendente", dataPagamento: "" },
 ];
 
+function StatusBadge({ status }: { status: string }) {
+  const isPago = status === "Pago";
+  return (
+    <span
+      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white"
+      style={{ backgroundColor: isPago ? "#00c5b4" : "#ff2f2f" }}
+    >
+      {status}
+    </span>
+  );
+}
+
 export default function ContasPagar() {
-  const [tab, setTab] = useState("pendentes");
+  const [tab, setTab] = useState("todas");
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
@@ -46,9 +58,13 @@ export default function ContasPagar() {
     toast({ title: "Conta removida", variant: "destructive" });
   };
 
-  const data = allData.filter((d) =>
-    tab === "todas" ? true : tab === "pendentes" ? d.status === "Pendente" : d.status === "Pago"
-  );
+  const data = useMemo(() =>
+    allData.filter((d) =>
+      tab === "todas" ? true : tab === "pendentes" ? d.status === "Pendente" : d.status === "Pago"
+    ), [tab, allData]);
+
+  const totalEmAberto = allData.filter((d) => d.status === "Pendente").reduce((s, r) => s + r.valor, 0);
+  const totalPago = allData.filter((d) => d.status === "Pago").reduce((s, r) => s + r.valor, 0);
 
   const bulkMarkPaid = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
@@ -58,15 +74,13 @@ export default function ContasPagar() {
     toast({ title: `${ids.length} conta(s) marcada(s) como paga(s)` });
   };
 
-  const bulkDelete = (indices: number[]) => {
-    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
-    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
-    toast({ title: `${ids.length} conta(s) removida(s)`, variant: "destructive" });
-  };
-
   const selectionActions: SelectionAction[] = [
-    { label: "Marcar como pago", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkMarkPaid },
-    { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, onClick: bulkDelete, variant: "destructive" },
+    { label: "Pagar", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkMarkPaid, description: "Marca as contas selecionadas como pagas" },
+  ];
+
+  const summaryCards: SummaryCard[] = [
+    { label: "Em aberto", value: R$(totalEmAberto), type: "monetary", sentiment: "negative" },
+    { label: "Pago", value: R$(totalPago), type: "monetary", sentiment: "positive" },
   ];
 
   const columns: Column<Conta>[] = [
@@ -76,9 +90,7 @@ export default function ContasPagar() {
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     {
       key: "status", label: "Status",
-      render: (v) => (
-        <span className={v === "Pago" ? "text-primary font-medium" : "text-warning font-medium"}>{v}</span>
-      ),
+      render: (v) => <StatusBadge status={v} />,
     },
     { key: "dataPagamento", label: "Data Pagamento" },
     {
@@ -109,13 +121,8 @@ export default function ContasPagar() {
         selectable
         selectionActions={selectionActions}
         novoMenuItems={[{ label: "Nova conta" }]}
-        tabs={[
-          { label: "Todas", value: "todas", count: allData.length },
-          { label: "Pendentes", value: "pendentes", count: allData.filter(d => d.status === "Pendente").length },
-          { label: "Pagas", value: "pagas", count: allData.filter(d => d.status === "Pago").length },
-        ]}
-        activeTab={tab}
-        onTabChange={setTab}
+        summaryCards={summaryCards}
+        pageSize={15}
       />
     </AppLayout>
   );
