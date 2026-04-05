@@ -148,15 +148,14 @@ function StatusBadge({ status }: { status: StatusCliente }) {
 }
 
 const columns: Column<Cliente>[] = [
-  {
-    key: "whatsapp", label: "Zap", sortable: false, filterable: false, align: "center", width: "50px",
-    render: (_, row) => <WhatsAppCell telefone={row.telefone} nome={row.nome} />,
-  },
   { key: "cod", label: "Cod", width: "90px" },
   { key: "nome", label: "Nome", pinned: true },
-  { key: "cpf", label: "CPF" },
-  { key: "email", label: "Email" },
-  { key: "telefone", label: "Telefone" },
+  { key: "telefone", label: "Telefone", render: (v, row) => v ? (
+    <div className="flex items-center gap-1.5">
+      <span className="text-xs">{v}</span>
+      <WhatsAppCell telefone={v} nome={row.nome} />
+    </div>
+  ) : <span className="text-muted-foreground text-xs">—</span> },
   { key: "aniversario", label: "Aniversário" },
   { key: "ultimaVisita", label: "Última Visita" },
   { key: "moedas", label: "Moedas", align: "center" },
