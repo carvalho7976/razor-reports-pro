@@ -789,7 +789,7 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Summary Cards */}
       {summaryCards && (
-        <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 sm:flex-wrap">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {summaryCards.map((card, i) => {
             const isMonetary = card.type === "monetary";
             const isQuantity = card.type === "quantity";
