@@ -73,13 +73,6 @@ export default function MovimentacaoComandas() {
         data={data}
         columns={columns}
         totalRow={{ cliente: "Total:", valorPago: R$(total) }}
-        tabs={[
-          { label: "Todas", value: "todas", count: allData.length },
-          { label: "Entradas", value: "entradas", count: allData.filter(d => d.tipo === "Entrada").length },
-          { label: "Saídas", value: "saidas", count: allData.filter(d => d.tipo === "Saída").length },
-        ]}
-        activeTab={tab}
-        onTabChange={setTab}
         summaryCards={summaryCards}
         selectable
         selectionActions={selectionActions}
