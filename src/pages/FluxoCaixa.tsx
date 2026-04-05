@@ -1,19 +1,10 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SummaryCard } from "@/components/DataTable";
+import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { CreditCard, TrendingUp, TrendingDown } from "lucide-react";
-
-interface FluxoItem {
-  id: number;
-  data: string;
-  descricao: string;
-  categoria: string;
-  entrada: number;
-  saida: number;
-  formaPagamento: string;
-}
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+interface FluxoItem { id: number; data: string; descricao: string; categoria: string; entrada: number; saida: number; formaPagamento: string; }
 
 const initialData: FluxoItem[] = [
   { id: 1, data: "05/04/2026", descricao: "Corte Masculino - João Silva", categoria: "Serviços", entrada: 50, saida: 0, formaPagamento: "Pix" },
@@ -36,21 +27,16 @@ export default function FluxoCaixa() {
   const saldo = totalEntrada - totalSaida;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Entradas", value: R$(totalEntrada), icon: <TrendingUp className="h-4 w-4" />, sentiment: "positive" as const, type: "monetary" as const },
-    { label: "Saídas", value: R$(totalSaida), icon: <TrendingDown className="h-4 w-4" />, sentiment: "negative" as const, type: "monetary" as const },
+    { label: "Entradas", value: R$(totalEntrada), icon: <TrendingUp className="h-4 w-4" />, sentiment: "positive", type: "monetary" },
+    { label: "Saídas", value: R$(totalSaida), icon: <TrendingDown className="h-4 w-4" />, sentiment: "negative", type: "monetary" },
     { label: "Saldo", value: R$(saldo), icon: <CreditCard className="h-4 w-4" /> },
   ];
 
-  // Resumido: agrupar por data
   const resumidoData = useMemo(() => {
     const grouped = initialData.reduce((acc, item) => {
       const existing = acc.find(a => a.data === item.data);
-      if (existing) {
-        existing.entrada += item.entrada;
-        existing.saida += item.saida;
-      } else {
-        acc.push({ id: acc.length + 1, data: item.data, entrada: item.entrada, saida: item.saida });
-      }
+      if (existing) { existing.entrada += item.entrada; existing.saida += item.saida; }
+      else { acc.push({ id: acc.length + 1, data: item.data, entrada: item.entrada, saida: item.saida }); }
       return acc;
     }, [] as { id: number; data: string; entrada: number; saida: number }[]);
     return grouped.map(g => ({ ...g, total: g.entrada - g.saida }));
@@ -72,22 +58,14 @@ export default function FluxoCaixa() {
     { key: "total", label: "Total", align: "right", render: (v: number) => <span className="font-bold" style={{ color: v >= 0 ? "#00c5b4" : "#ff2f2f" }}>{R$(v)}</span> },
   ];
 
+  const tabs: TabDef[] = [
+    { label: "Detalhado", value: "detalhado", color: "neutral" },
+    { label: "Resumido", value: "resumido", color: "info" },
+  ];
+
   return (
     <AppLayout>
-      <DataTable
-        title="Fluxo de Caixa"
-        data={tab === "detalhado" ? initialData : resumidoData}
-        columns={tab === "detalhado" ? columnsDetalhado : columnsResumido}
-        summaryCards={summaryCards}
-        tabs={[
-          { label: "Detalhado", value: "detalhado" },
-          { label: "Resumido", value: "resumido" },
-        ]}
-        activeTab={tab}
-        onTabChange={setTab}
-        showDateFilter={false}
-        pageSize={15}
-      />
+      <DataTable title="Fluxo de Caixa" data={tab === "detalhado" ? initialData : resumidoData} columns={tab === "detalhado" ? columnsDetalhado : columnsResumido} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} showDateFilter={true} pageSize={15} tableId="fluxo_caixa" />
     </AppLayout>
   );
 }

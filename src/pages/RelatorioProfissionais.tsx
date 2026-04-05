@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column } from "@/components/DataTable";
-import { Download, User } from "lucide-react";
+import { User } from "lucide-react";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -31,22 +31,18 @@ const data: RelProf[] = [
 
 const columns: Column<RelProf>[] = [
   {
-    key: "foto" as any, label: "Foto", sortable: false, filterable: false, align: "center", width: "60px",
+    key: "foto" as any, label: "", sortable: false, filterable: false, align: "center", width: "60px",
     render: () => (
       <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center mx-auto">
         <User className="h-4 w-4 text-muted-foreground" />
       </div>
     ),
   },
-  { key: "profissional", label: "Profissional", pinned: true },
   {
-    key: "funcao", label: "Função",
-    render: (v) => (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground">
-        {v}
-      </span>
-    ),
+    key: "profissional", label: "Profissional", pinned: true,
+    render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
   },
+  { key: "funcao", label: "Função", render: (v) => <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground">{v}</span> },
   { key: "totalServicos", label: "Total em Serviços", align: "right", render: (v) => R$(v) },
   { key: "qtdServicos", label: "Qtd Serviços", align: "center" },
   { key: "ticketMedio", label: "Ticket Médio", align: "right", render: (v) => R$(v) },
@@ -55,10 +51,6 @@ const columns: Column<RelProf>[] = [
   { key: "totalProdutos", label: "Total em Produtos", align: "right", render: (v) => R$(v) },
   { key: "qtdProdutos", label: "Qtd Produtos", align: "center" },
   { key: "totalAberto", label: "Total em aberto", align: "right", render: (v) => R$(v) },
-  {
-    key: "detalhar" as any, label: "Detalhar", sortable: false, filterable: false, align: "center",
-    render: () => <Download className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground mx-auto" />,
-  },
 ];
 
 const activeProfs = data.filter(d => d.qtdServicos > 0);
@@ -77,13 +69,7 @@ const totals: Record<string, any> = {
 export default function RelatorioProfissionais() {
   return (
     <AppLayout>
-      <DataTable
-        title="Relatório Profissional"
-        data={data}
-        columns={columns}
-        totalRow={totals}
-        pageSize={15}
-      />
+      <DataTable title="Relatório Profissional" data={data} columns={columns} totalRow={totals} pageSize={15} showDateFilter={true} tableId="relatorio_profissionais" />
     </AppLayout>
   );
 }

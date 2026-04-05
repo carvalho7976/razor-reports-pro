@@ -1,21 +1,10 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
-import { Trash2, Calendar } from "lucide-react";
+import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
+import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface Agendamento {
-  id: number;
-  cliente: string;
-  profissional: string;
-  servico: string;
-  data: string;
-  horario: string;
-  origem: string;
-  valor: number;
-  status: "Aberto" | "Realizado";
-}
-
+interface Agendamento { id: number; cliente: string; profissional: string; servico: string; data: string; horario: string; origem: string; valor: number; status: "Aberto" | "Realizado"; }
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const initialData: Agendamento[] = [
@@ -54,37 +43,25 @@ export default function RelatorioAgendamentos() {
   ];
 
   const columns: Column<Agendamento>[] = [
-    { key: "cliente", label: "Cliente", pinned: true },
-    { key: "profissional", label: "Profissional" },
+    { key: "cliente", label: "Cliente", pinned: true, render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a> },
+    { key: "profissional", label: "Profissional", render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a> },
     { key: "servico", label: "Serviço" },
     { key: "data", label: "Data" },
     { key: "horario", label: "Horário" },
     { key: "origem", label: "Origem" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    {
-      key: "status", label: "Status",
-      render: v => <span className="font-medium" style={{ color: v === "Realizado" ? "#00c5b4" : "#f59e0b" }}>{v}</span>,
-    },
+    { key: "status", label: "Status", render: v => <span className="font-medium" style={{ color: v === "Realizado" ? "#00c5b4" : "#f59e0b" }}>{v}</span> },
+  ];
+
+  const tabs: TabDef[] = [
+    { label: "Todos", value: "todos", count: allData.length, color: "neutral" },
+    { label: "Abertos", value: "abertos", count: allData.filter(d => d.status === "Aberto").length, color: "warning" },
+    { label: "Realizados", value: "realizados", count: allData.filter(d => d.status === "Realizado").length, color: "success" },
   ];
 
   return (
     <AppLayout>
-      <DataTable
-        title="Relatório de Agendamentos"
-        data={data}
-        columns={columns}
-        summaryCards={summaryCards}
-        selectable
-        selectionActions={selectionActions}
-        tabs={[
-          { label: "Todos", value: "todos", count: allData.length },
-          { label: "Abertos", value: "abertos", count: allData.filter(d => d.status === "Aberto").length },
-          { label: "Realizados", value: "realizados", count: allData.filter(d => d.status === "Realizado").length },
-        ]}
-        activeTab={tab}
-        onTabChange={setTab}
-        pageSize={15}
-      />
+      <DataTable title="Relatório de Agendamentos" data={data} columns={columns} summaryCards={summaryCards} selectable selectionActions={selectionActions} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_agendamentos" />
     </AppLayout>
   );
 }

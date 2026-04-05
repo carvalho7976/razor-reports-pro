@@ -1,18 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { CreditCard } from "lucide-react";
-
-interface Pacote {
-  id: number;
-  nome: string;
-  cliente: string;
-  totalVendido: number;
-  valor: number;
-  dataVenda: string;
-  profissional: string;
-}
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+interface Pacote { id: number; nome: string; cliente: string; totalVendido: number; valor: number; dataVenda: string; profissional: string; }
 
 const initialData: Pacote[] = [
   { id: 1, nome: "Pacote Barba + Corte 4x", cliente: "João Silva", totalVendido: 4, valor: 160, dataVenda: "01/03/2026", profissional: "Carlos" },
@@ -23,18 +14,15 @@ const initialData: Pacote[] = [
 ];
 
 export default function RelatorioPacotes() {
-  const totalPacotes = initialData.length;
-  const valorTotal = initialData.reduce((s, r) => s + r.valor, 0);
-
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(totalPacotes), type: "quantity" },
-    { label: "Valor Total", value: R$(valorTotal), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total", value: String(initialData.length), type: "quantity" },
+    { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
   ];
 
   const columns: Column<Pacote>[] = [
     { key: "nome", label: "Pacote", pinned: true },
-    { key: "cliente", label: "Cliente" },
-    { key: "profissional", label: "Profissional" },
+    { key: "cliente", label: "Cliente", render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a> },
+    { key: "profissional", label: "Profissional", render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a> },
     { key: "totalVendido", label: "Total Vendido", align: "center" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
     { key: "dataVenda", label: "Data Venda" },
@@ -42,13 +30,7 @@ export default function RelatorioPacotes() {
 
   return (
     <AppLayout>
-      <DataTable
-        title="Relatório de Pacotes"
-        data={initialData}
-        columns={columns}
-        summaryCards={summaryCards}
-        pageSize={15}
-      />
+      <DataTable title="Relatório de Pacotes" data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="relatorio_pacotes" dateField="dataVenda" />
     </AppLayout>
   );
 }

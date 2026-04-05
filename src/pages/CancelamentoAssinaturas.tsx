@@ -1,17 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { CreditCard } from "lucide-react";
-
-interface Cancelamento {
-  id: number;
-  nome: string;
-  plano: string;
-  motivo: string;
-  dataCancelamento: string;
-  valor: number;
-}
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+interface Cancelamento { id: number; nome: string; plano: string; motivo: string; dataCancelamento: string; valor: number; }
 
 const initialData: Cancelamento[] = [
   { id: 1, nome: "Ricardo Ferreira", plano: "Plano Mensal", motivo: "Mudança de cidade", dataCancelamento: "01/04/2026", valor: 89.9 },
@@ -22,16 +14,13 @@ const initialData: Cancelamento[] = [
 ];
 
 export default function CancelamentoAssinaturas() {
-  const total = initialData.length;
-  const valorTotal = initialData.reduce((s, r) => s + r.valor, 0);
-
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(total), type: "quantity" },
-    { label: "Valor Total", value: R$(valorTotal), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total", value: String(initialData.length), type: "quantity" },
+    { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
   ];
 
   const columns: Column<Cancelamento>[] = [
-    { key: "nome", label: "Nome", pinned: true },
+    { key: "nome", label: "Nome", pinned: true, render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a> },
     { key: "plano", label: "Plano" },
     { key: "motivo", label: "Motivo" },
     { key: "dataCancelamento", label: "Data Cancelamento" },
@@ -40,13 +29,7 @@ export default function CancelamentoAssinaturas() {
 
   return (
     <AppLayout>
-      <DataTable
-        title="Cancelamento de Assinaturas"
-        data={initialData}
-        columns={columns}
-        summaryCards={summaryCards}
-        pageSize={15}
-      />
+      <DataTable title="Cancelamento de Assinaturas" data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="cancelamento_assinaturas" />
     </AppLayout>
   );
 }

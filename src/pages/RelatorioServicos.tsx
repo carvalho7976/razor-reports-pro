@@ -1,19 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { CreditCard } from "lucide-react";
-
-interface Servico {
-  id: number;
-  nome: string;
-  profissional: string;
-  quantidade: number;
-  valor: number;
-  vendaExtra: number;
-  desconto: number;
-  data: string;
-}
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+interface Servico { id: number; nome: string; profissional: string; quantidade: number; valor: number; vendaExtra: number; desconto: number; data: string; }
 
 const initialData: Servico[] = [
   { id: 1, nome: "Corte Masculino", profissional: "Carlos", quantidade: 45, valor: 2250, vendaExtra: 150, desconto: 80, data: "05/04/2026" },
@@ -25,21 +15,16 @@ const initialData: Servico[] = [
 ];
 
 export default function RelatorioServicos() {
-  const totalQtd = initialData.reduce((s, r) => s + r.quantidade, 0);
-  const totalValor = initialData.reduce((s, r) => s + r.valor, 0);
-  const totalVendaExtra = initialData.reduce((s, r) => s + r.vendaExtra, 0);
-  const totalDesconto = initialData.reduce((s, r) => s + r.desconto, 0);
-
   const summaryCards: SummaryCard[] = [
-    { label: "Valor Total", value: R$(totalValor), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Venda Extra", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Desconto", value: R$(totalDesconto), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Total", value: String(totalQtd), type: "quantity" },
+    { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Venda Extra", value: R$(initialData.reduce((s, r) => s + r.vendaExtra, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Desconto", value: R$(initialData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total", value: String(initialData.reduce((s, r) => s + r.quantidade, 0)), type: "quantity" },
   ];
 
   const columns: Column<Servico>[] = [
     { key: "nome", label: "Serviço", pinned: true },
-    { key: "profissional", label: "Profissional" },
+    { key: "profissional", label: "Profissional", render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a> },
     { key: "quantidade", label: "Qtd", align: "center" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
     { key: "vendaExtra", label: "Venda Extra", align: "right", render: v => R$(v) },
@@ -49,13 +34,7 @@ export default function RelatorioServicos() {
 
   return (
     <AppLayout>
-      <DataTable
-        title="Relatório de Serviços"
-        data={initialData}
-        columns={columns}
-        summaryCards={summaryCards}
-        pageSize={15}
-      />
+      <DataTable title="Relatório de Serviços" data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="relatorio_servicos" />
     </AppLayout>
   );
 }

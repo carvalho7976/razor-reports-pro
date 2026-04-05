@@ -37,8 +37,8 @@ export default function ExclusaoAgendamentos() {
 
   const columns: Column<Exclusao>[] = [
     { key: "dataAgendada", label: "Data Agendada" },
-    { key: "cliente", label: "Cliente", pinned: true },
-    { key: "profissional", label: "Profissional" },
+    { key: "cliente", label: "Cliente", pinned: true, render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a> },
+    { key: "profissional", label: "Profissional", render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a> },
     { key: "servico", label: "Serviço" },
     { key: "excluidoPor", label: "Excluído por" },
     { key: "dataExclusao", label: "Data Exclusão" },
@@ -46,15 +46,7 @@ export default function ExclusaoAgendamentos() {
 
   return (
     <AppLayout>
-      <DataTable
-        title="Exclusão de Agendamentos"
-        data={allData}
-        columns={columns}
-        showDateFilter={false}
-        selectable
-        selectionActions={selectionActions}
-        pageSize={15}
-      />
+      <DataTable title="Exclusão de Agendamentos" data={allData} columns={columns} showDateFilter={true} selectable selectionActions={selectionActions} pageSize={15} tableId="exclusao_agendamentos" />
     </AppLayout>
   );
 }
