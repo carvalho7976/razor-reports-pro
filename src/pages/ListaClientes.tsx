@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3, Trash2, Merge, PlayCircle } from "lucide-react";
+import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3, Trash2, Merge, PlayCircle, Tag } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -148,15 +148,14 @@ function StatusBadge({ status }: { status: StatusCliente }) {
 }
 
 const columns: Column<Cliente>[] = [
-  {
-    key: "whatsapp", label: "Zap", sortable: false, filterable: false, align: "center", width: "50px",
-    render: (_, row) => <WhatsAppCell telefone={row.telefone} nome={row.nome} />,
-  },
   { key: "cod", label: "Cod", width: "90px" },
   { key: "nome", label: "Nome", pinned: true },
-  { key: "cpf", label: "CPF" },
-  { key: "email", label: "Email" },
-  { key: "telefone", label: "Telefone" },
+  { key: "telefone", label: "Telefone", render: (v, row) => v ? (
+    <div className="flex items-center gap-1.5">
+      <span className="text-xs">{v}</span>
+      <WhatsAppCell telefone={v} nome={row.nome} />
+    </div>
+  ) : <span className="text-muted-foreground text-xs">—</span> },
   { key: "aniversario", label: "Aniversário" },
   { key: "ultimaVisita", label: "Última Visita" },
   { key: "moedas", label: "Moedas", align: "center" },
@@ -211,10 +210,15 @@ export default function ListaClientes() {
     toast({ title: `Enviar mensagem para ${clients.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
   };
 
+  const bulkTag = (indices: number[]) => {
+    toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
+  };
+
   const selectionActions: SelectionAction[] = [
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
     { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge, description: "Unifica cadastros duplicados em um único registro" },
+    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
     { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage, description: "Envia mensagem via WhatsApp para os clientes selecionados" },
+    { label: "Tag", icon: <Tag className="h-4 w-4" />, onClick: bulkTag, description: "Adiciona uma tag aos clientes selecionados" },
   ];
 
   return (
