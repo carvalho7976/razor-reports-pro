@@ -5,16 +5,16 @@ import {
 } from "lucide-react";
 
 const shortcuts = [
-  { icon: Wallet, label: "Contas à Pagar", path: "/contas-pagar", color: "bg-primary" },
-  { icon: CreditCard, label: "Movimentação de Comandas", path: "/movimentacao-comandas", color: "bg-accent" },
-  { icon: Users, label: "Profissionais", path: "/profissionais", color: "bg-info" },
-  { icon: BarChart3, label: "Relatório Profissionais", path: "/relatorio-profissionais", color: "bg-warning" },
-  { icon: Scissors, label: "Comissões à Pagar", path: "/comissoes-pagar", color: "bg-primary" },
-  { icon: FileText, label: "Comissões Pagas", path: "/comissoes-pagas", color: "bg-accent" },
-  { icon: UserMinus, label: "Exclusão de Clientes", path: "/exclusao-clientes", color: "bg-destructive" },
-  { icon: CalendarX, label: "Exclusão de Agendamentos", path: "/exclusao-agendamentos", color: "bg-destructive" },
-  { icon: Users, label: "Relatório de Clientes", path: "/relatorio-clientes", color: "bg-info" },
-  { icon: Wallet, label: "Adiantamentos", path: "/adiantamentos", color: "bg-warning" },
+  { icon: Wallet, label: "Contas à Pagar", path: "/contasPesquisa", color: "bg-primary" },
+  { icon: CreditCard, label: "Movimentação de Comandas", path: "/relatorioMovimentacaoDiaria", color: "bg-accent" },
+  { icon: Users, label: "Profissionais", path: "/funcionarioPesquisa", color: "bg-info" },
+  { icon: BarChart3, label: "Relatório Profissionais", path: "/relatorioDesempenhoFuncionario", color: "bg-warning" },
+  { icon: Scissors, label: "Comissões à Pagar", path: "/comissao", color: "bg-primary" },
+  { icon: FileText, label: "Comissões Pagas", path: "/comissoesPagas", color: "bg-accent" },
+  { icon: UserMinus, label: "Exclusão de Clientes", path: "/relatorioExclusaoCliente", color: "bg-destructive" },
+  { icon: CalendarX, label: "Exclusão de Agendamentos", path: "/relatorioExclusaoAgendamento", color: "bg-destructive" },
+  { icon: Users, label: "Relatório de Clientes", path: "/relatorioClientes", color: "bg-info" },
+  { icon: Wallet, label: "Adiantamentos", path: "/adiantamento", color: "bg-warning" },
 ];
 
 const Index = () => (

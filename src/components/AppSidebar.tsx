@@ -11,12 +11,12 @@ const navItems = [
   { icon: CalendarDays, label: "Agenda", path: "/agenda" },
   { icon: MessageCircle, label: "Chat", path: "/chat", badge: 1 },
   { icon: Bot, label: "Automação", path: "/automacao" },
-  { icon: User, label: "Clientes", path: "/lista-clientes" },
-  { icon: Users, label: "Equipe", path: "/profissionais" },
+  { icon: User, label: "Clientes", path: "/clientePesquisa" },
+  { icon: Users, label: "Equipe", path: "/funcionarioPesquisa" },
   { icon: Scissors, label: "Serviços", path: "/servicos" },
   { icon: Package, label: "Produtos", path: "/produtos" },
-  { icon: Wallet, label: "Financeiro", path: "/contas-pagar" },
-  { icon: BarChart3, label: "Relatórios", path: "/relatorio-profissionais" },
+  { icon: Wallet, label: "Financeiro", path: "/contasPesquisa" },
+  { icon: BarChart3, label: "Relatórios", path: "/relatorioDesempenhoFuncionario" },
   { icon: Star, label: "Favoritos", path: "/favoritos" },
 ];
 
