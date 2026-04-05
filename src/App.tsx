@@ -16,6 +16,7 @@ import Adiantamentos from "./pages/Adiantamentos";
 import RelatorioProfissionais from "./pages/RelatorioProfissionais";
 import ExclusaoAgendamentos from "./pages/ExclusaoAgendamentos";
 import ListaClientes from "./pages/ListaClientes";
+import Assinantes from "./pages/Assinantes";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/relatorioDesempenhoFuncionario" element={<RelatorioProfissionais />} />
           <Route path="/relatorioExclusaoAgendamento" element={<ExclusaoAgendamentos />} />
           <Route path="/clientePesquisa" element={<ListaClientes />} />
+          <Route path="/assinantePesquisa" element={<Assinantes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
