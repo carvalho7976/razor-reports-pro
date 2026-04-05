@@ -48,6 +48,16 @@ export interface NovoMenuItem {
   onClick?: () => void;
 }
 
+export interface SummaryCard {
+  label: string;
+  value: string;
+  icon?: ReactNode;
+  /** "monetary" = movimentação style with emoji, "quantity" = relatório clientes style */
+  type?: "monetary" | "quantity";
+  /** Sentiment for emoji color: positive=blue, negative=red, neutral=black */
+  sentiment?: "positive" | "negative" | "neutral";
+}
+
 interface DataTableProps<T extends Record<string, any>> {
   data: T[];
   columns: Column<T>[];
@@ -60,7 +70,7 @@ interface DataTableProps<T extends Record<string, any>> {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   showDateFilter?: boolean;
-  summaryCards?: { label: string; value: string; icon?: ReactNode }[];
+  summaryCards?: SummaryCard[];
   pageSize?: number;
   selectable?: boolean;
   selectionActions?: SelectionAction[];
