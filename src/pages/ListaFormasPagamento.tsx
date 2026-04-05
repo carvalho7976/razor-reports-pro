@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, Ban, CreditCard, Banknote, Smartphone, ArrowRightLeft, Gift, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface FormaPagamento {
@@ -22,8 +22,18 @@ const initialData: FormaPagamento[] = [
   { id: 7, nome: "Vale Presente", tipo: "Outros", taxa: 0, status: "Desativado" },
 ];
 
+const logoMap: Record<string, React.ReactNode> = {
+  "Dinheiro": <Banknote className="h-5 w-5 text-success" />,
+  "Pix": <Smartphone className="h-5 w-5 text-info" />,
+  "Cartão Crédito": <CreditCard className="h-5 w-5 text-primary" />,
+  "Cartão Débito": <CreditCard className="h-5 w-5 text-warning" />,
+  "Transferência": <ArrowRightLeft className="h-5 w-5 text-info" />,
+  "Cheque": <FileText className="h-5 w-5 text-muted-foreground" />,
+  "Vale Presente": <Gift className="h-5 w-5 text-primary" />,
+};
+
 export default function ListaFormasPagamento() {
-  const [allData] = useState(initialData);
+  const [allData, setAllData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
 
@@ -36,12 +46,26 @@ export default function ListaFormasPagamento() {
   const bulkRemove = (indices: number[]) => {
     toast({ title: `${indices.length} forma(s) removida(s)`, variant: "destructive" });
   };
+  const bulkDesativar = (indices: number[]) => {
+    const ids = indices.map(i => data[i]?.id).filter(Boolean);
+    setAllData(prev => prev.map(d => ids.includes(d.id) ? { ...d, status: "Desativado" as const } : d));
+    toast({ title: `${ids.length} forma(s) desativada(s)` });
+  };
 
   const selectionActions: SelectionAction[] = [
+    { label: "Desativar", icon: <Ban className="h-4 w-4" />, onClick: bulkDesativar, variant: "destructive", description: "Desativa as formas de pagamento selecionadas" },
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove as formas de pagamento selecionadas" },
   ];
 
   const columns: Column<FormaPagamento>[] = [
+    {
+      key: "logo" as any, label: "", sortable: false, filterable: false, width: "50px", align: "center",
+      render: (_v: any, row: FormaPagamento) => (
+        <div className="flex items-center justify-center">
+          {logoMap[row.nome] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
+        </div>
+      ),
+    },
     { key: "nome", label: "Nome", pinned: true },
     { key: "tipo", label: "Tipo" },
     { key: "taxa", label: "Taxa %", align: "center", render: v => `${v}%` },
@@ -53,6 +77,7 @@ export default function ListaFormasPagamento() {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
       render: () => <ActionsMenu items={[
         { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+        { label: "Desativar", icon: <Ban className="h-4 w-4" /> },
         { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
       ]} />,
     },

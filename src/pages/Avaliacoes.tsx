@@ -1,5 +1,6 @@
+import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SummaryCard } from "@/components/DataTable";
+import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, Star } from "lucide-react";
 
@@ -16,10 +17,43 @@ const initialData: Avaliacao[] = [
 ];
 
 export default function Avaliacoes() {
-  const npsGeral = Math.round(initialData.reduce((s, r) => s + r.nota, 0) / initialData.length * 10);
-  const summaryCards: SummaryCard[] = [{ label: "NPS Geral", value: `${npsGeral}%`, icon: <Star className="h-4 w-4" /> }];
+  const [tab, setTab] = useState("detalhado");
 
-  const columns: Column<Avaliacao>[] = [
+  const npsEmpresa = Math.round(initialData.reduce((s, r) => s + r.nota, 0) / initialData.length * 10);
+
+  // NPS by profissional
+  const profMap = useMemo(() => {
+    const map: Record<string, { total: number; count: number }> = {};
+    initialData.forEach(r => {
+      if (!map[r.profissional]) map[r.profissional] = { total: 0, count: 0 };
+      map[r.profissional].total += r.nota;
+      map[r.profissional].count++;
+    });
+    return map;
+  }, []);
+
+  const npsEquipe = Math.round(
+    Object.values(profMap).reduce((s, v) => s + (v.total / v.count * 10), 0) / Object.keys(profMap).length
+  );
+
+  const npsRecepcao = 85; // placeholder
+
+  const summaryCards: SummaryCard[] = [
+    { label: "NPS Empresa", value: `${npsEmpresa}%`, icon: <Star className="h-4 w-4" /> },
+    { label: "NPS Equipe Profissional", value: `${npsEquipe}%`, icon: <Star className="h-4 w-4" /> },
+    { label: "NPS Recepção", value: `${npsRecepcao}%`, icon: <Star className="h-4 w-4" /> },
+  ];
+
+  const resumidoData = useMemo(() => {
+    return Object.entries(profMap).map(([nome, v], i) => ({
+      id: i + 1,
+      profissional: nome,
+      npsMedia: Math.round(v.total / v.count * 10),
+      totalAvaliacoes: v.count,
+    }));
+  }, [profMap]);
+
+  const columnsDetalhado: Column<Avaliacao>[] = [
     {
       key: "cliente", label: "Cliente", pinned: true,
       render: (v, row) => (
@@ -46,9 +80,45 @@ export default function Avaliacoes() {
     { key: "data", label: "Data" },
   ];
 
+  const columnsResumido: Column<any>[] = [
+    {
+      key: "foto" as any, label: "", sortable: false, filterable: false, width: "50px", align: "center",
+      render: () => (
+        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center mx-auto">
+          <User className="h-4 w-4 text-muted-foreground" />
+        </div>
+      ),
+    },
+    {
+      key: "profissional", label: "Profissional", pinned: true,
+      render: (v: string) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
+    },
+    {
+      key: "npsMedia", label: "NPS Média", align: "center",
+      render: (v: number) => <span className="font-bold" style={{ color: v >= 90 ? "#00c5b4" : v >= 70 ? "#f59e0b" : "#ff2f2f" }}>{v}%</span>,
+    },
+    { key: "totalAvaliacoes", label: "Avaliações", align: "center" },
+  ];
+
+  const tabs: TabDef[] = [
+    { label: "Resumido", value: "resumido", color: "neutral" },
+    { label: "Detalhado", value: "detalhado", color: "info" },
+  ];
+
   return (
     <AppLayout>
-      <DataTable title="Avaliações" data={initialData} columns={columns} summaryCards={summaryCards} showDateFilter={true} pageSize={15} tableId="avaliacoes" />
+      <DataTable
+        title="Avaliações"
+        data={tab === "resumido" ? resumidoData : initialData}
+        columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
+        summaryCards={summaryCards}
+        tabs={tabs}
+        activeTab={tab}
+        onTabChange={setTab}
+        showDateFilter={true}
+        pageSize={15}
+        tableId="avaliacoes"
+      />
     </AppLayout>
   );
 }

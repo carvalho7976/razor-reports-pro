@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
-import { Trash2, Pencil } from "lucide-react";
+import { DataTable, Column, SelectionAction, ActionsMenu, TabDef, SummaryCard } from "@/components/DataTable";
+import { Trash2, Pencil, Package, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Produto {
   id: number;
@@ -13,8 +15,6 @@ interface Produto {
   valor: number;
   status: "Normal" | "Mínimo" | "Sem estoque";
 }
-
-const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const initialData: Produto[] = [
   { id: 1, nome: "Pomada Modeladora", categoria: "Finalizadores", estoque: 25, estoqueMinimo: 5, valor: 40, status: "Normal" },
@@ -38,6 +38,14 @@ export default function ListaProdutos() {
     if (tab === "minimo") return allData.filter(d => d.status === "Mínimo");
     return allData.filter(d => d.status === "Sem estoque");
   }, [tab, allData]);
+
+  const totalEstoque = allData.reduce((s, d) => s + d.estoque, 0);
+  const valorEstoque = allData.reduce((s, d) => s + d.estoque * d.valor, 0);
+
+  const summaryCards: SummaryCard[] = [
+    { label: "Produtos em Estoque", value: String(totalEstoque), type: "quantity", size: "compact" },
+    { label: "Valor em Estoque", value: R$(valorEstoque), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+  ];
 
   const bulkRemove = (indices: number[]) => {
     toast({ title: `${indices.length} produto(s) removido(s)`, variant: "destructive" });
@@ -79,6 +87,7 @@ export default function ListaProdutos() {
         title="Produtos"
         data={data}
         columns={columns}
+        summaryCards={summaryCards}
         selectable
         selectionActions={selectionActions}
         showDateFilter={true}
