@@ -1142,7 +1142,7 @@ export function DataTable<T extends Record<string, any>>({
             <thead>
               <tr className="bg-table-header text-table-header-foreground sticky top-0 z-20">
                 {selectable && (
-                  <th className="w-10 px-3 py-3.5 border-b border-table-border">
+                  <th className="w-10 px-3 py-2.5 border-b border-table-border">
                     <input
                       type="checkbox"
                       checked={allPageSelected}
@@ -1161,7 +1161,7 @@ export function DataTable<T extends Record<string, any>>({
                       key={col.key}
                       onClick={sortable ? () => handleToggleSort(col.key) : undefined}
                       className={cn(
-                        "px-5 py-3.5 text-left text-xs font-semibold whitespace-nowrap border-b border-table-border",
+                        "px-5 py-2.5 text-left text-xs font-semibold whitespace-nowrap border-b border-table-border",
                         sortable && "cursor-pointer select-none hover:bg-table-header/80 transition-colors",
                         pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-table-header",
                         col.align === "right" && "text-right",
@@ -1205,7 +1205,7 @@ export function DataTable<T extends Record<string, any>>({
                   return (
                     <tr key={i} className={cn("border-b border-border/50 hover:bg-muted/30 transition-colors", isSelected && "bg-primary/5")}>
                       {selectable && (
-                        <td className="w-10 px-3 py-3.5">
+                        <td className="w-10 px-3 py-2">
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -1218,7 +1218,7 @@ export function DataTable<T extends Record<string, any>>({
                         <td
                           key={col.key}
                           className={cn(
-                            "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
+                            "px-5 py-2 whitespace-nowrap text-sm text-foreground",
                             pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
                             col.align === "right" && "text-right",
                             col.align === "center" && "text-center"
@@ -1234,9 +1234,9 @@ export function DataTable<T extends Record<string, any>>({
 
               {totalRow && (
                 <tr className="bg-muted/40 font-semibold border-t border-border">
-                  {selectable && <td className="w-10 px-3 py-3.5" />}
+                  {selectable && <td className="w-10 px-3 py-2" />}
                   {columns.map((col) => (
-                    <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right", col.align === "center" && "text-center")}>
+                    <td key={col.key} className={cn("px-5 py-2 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right", col.align === "center" && "text-center")}>
                       {totalRow[col.key] ?? ""}
                     </td>
                   ))}
