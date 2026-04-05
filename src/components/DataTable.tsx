@@ -454,8 +454,6 @@ function ColumnManager<T>({
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-muted-foreground">{initialColumns.filter(c => !NATIVE_COLUMN_KEYS.has(c.key)).length - hiddenColumns.size}/{initialColumns.filter(c => !NATIVE_COLUMN_KEYS.has(c.key)).length}</span>
               <button onClick={onReset} className="text-[10px] text-destructive hover:underline font-medium" title="Resetar para padrão">
-                <RotateCcw className="h-3 w-3" />
-              </button>
               </button>
             </div>
           </div>
