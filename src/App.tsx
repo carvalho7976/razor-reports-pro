@@ -17,6 +17,21 @@ import RelatorioProfissionais from "./pages/RelatorioProfissionais";
 import ExclusaoAgendamentos from "./pages/ExclusaoAgendamentos";
 import ListaClientes from "./pages/ListaClientes";
 import Assinantes from "./pages/Assinantes";
+import Comandas from "./pages/Comandas";
+import Avaliacoes from "./pages/Avaliacoes";
+import RelatorioAgendamentos from "./pages/RelatorioAgendamentos";
+import RelatorioPacotes from "./pages/RelatorioPacotes";
+import CancelamentoAssinaturas from "./pages/CancelamentoAssinaturas";
+import RelatorioServicos from "./pages/RelatorioServicos";
+import RelatorioProdutos from "./pages/RelatorioProdutos";
+import HistoricoCompras from "./pages/HistoricoCompras";
+import RelatorioDebitos from "./pages/RelatorioDebitos";
+import FluxoCaixa from "./pages/FluxoCaixa";
+import ListaServicos from "./pages/ListaServicos";
+import ListaCategorias from "./pages/ListaCategorias";
+import ListaProdutos from "./pages/ListaProdutos";
+import ListaPacotes from "./pages/ListaPacotes";
+import ListaFormasPagamento from "./pages/ListaFormasPagamento";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +55,21 @@ const App = () => (
           <Route path="/relatorioExclusaoAgendamento" element={<ExclusaoAgendamentos />} />
           <Route path="/clientePesquisa" element={<ListaClientes />} />
           <Route path="/assinantePesquisa" element={<Assinantes />} />
+          <Route path="/comandasAbertas" element={<Comandas />} />
+          <Route path="/avaliacoes" element={<Avaliacoes />} />
+          <Route path="/relatorioAgendamentos" element={<RelatorioAgendamentos />} />
+          <Route path="/relatorioCombos" element={<RelatorioPacotes />} />
+          <Route path="/relatorioExclusaoAssinante" element={<CancelamentoAssinaturas />} />
+          <Route path="/relatorioServicos" element={<RelatorioServicos />} />
+          <Route path="/relatorioProdutos" element={<RelatorioProdutos />} />
+          <Route path="/comprasPesquisa" element={<HistoricoCompras />} />
+          <Route path="/debitoClientes" element={<RelatorioDebitos />} />
+          <Route path="/relatorioFluxoCaixaNovo" element={<FluxoCaixa />} />
+          <Route path="/servicoPesquisa" element={<ListaServicos />} />
+          <Route path="/categoriaServicoPesquisa" element={<ListaCategorias />} />
+          <Route path="/produtoPesquisa" element={<ListaProdutos />} />
+          <Route path="/comboPesquisa" element={<ListaPacotes />} />
+          <Route path="/formaPagamentoPesquisa" element={<ListaFormasPagamento />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
