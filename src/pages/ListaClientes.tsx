@@ -170,6 +170,8 @@ const columns: Column<Cliente>[] = [
     render: () => (
       <ActionsMenu items={[
         { label: "Editar" },
+        { label: "Moedas" },
+        { label: "Crédito" },
         { label: "Excluir", variant: "destructive" },
       ]} />
     ),
@@ -233,7 +235,7 @@ export default function ListaClientes() {
         }
         data={filteredData}
         columns={columns}
-        showDateFilter={false}
+        showDateFilter={true}
         selectable
         selectionActions={selectionActions}
         pageSize={15}
