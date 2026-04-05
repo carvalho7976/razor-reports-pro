@@ -16,6 +16,7 @@ import Adiantamentos from "./pages/Adiantamentos";
 import RelatorioProfissionais from "./pages/RelatorioProfissionais";
 import ExclusaoAgendamentos from "./pages/ExclusaoAgendamentos";
 import ListaClientes from "./pages/ListaClientes";
+import Assinantes from "./pages/Assinantes";
 
 const queryClient = new QueryClient();
 
