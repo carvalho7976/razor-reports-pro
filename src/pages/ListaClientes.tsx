@@ -210,10 +210,15 @@ export default function ListaClientes() {
     toast({ title: `Enviar mensagem para ${clients.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
   };
 
+  const bulkTag = (indices: number[]) => {
+    toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
+  };
+
   const selectionActions: SelectionAction[] = [
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
     { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge, description: "Unifica cadastros duplicados em um único registro" },
+    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
     { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage, description: "Envia mensagem via WhatsApp para os clientes selecionados" },
+    { label: "Tag", icon: <Tag className="h-4 w-4" />, onClick: bulkTag, description: "Adiciona uma tag aos clientes selecionados" },
   ];
 
   return (
