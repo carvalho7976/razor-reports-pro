@@ -29,8 +29,14 @@ export default function Assinantes() {
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
+  const [tab, setTab] = useState("ativo");
+
+  const data = useMemo(() =>
+    allData.filter(d => tab === "ativo" ? d.status === "Ativo" : d.status === "Atrasado"),
+    [tab, allData]);
+
   const bulkCancel = (indices: number[]) => {
-    const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
+    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
     setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
     toast({ title: `${ids.length} assinatura(s) cancelada(s)`, variant: "destructive" });
   };
@@ -41,10 +47,14 @@ export default function Assinantes() {
 
   const totalAssinantes = allData.length;
   const totalAtrasados = allData.filter(d => d.status === "Atrasado").length;
+  const valorTotalAssinatura = allData.filter(d => d.status === "Ativo").reduce((s, r) => s + r.valor, 0);
+  const valorTotalAtrasado = allData.filter(d => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0);
 
   const summaryCards: SummaryCard[] = [
     { label: "Total", value: String(totalAssinantes), type: "quantity" },
     { label: "Atrasados", value: String(totalAtrasados), type: "quantity" },
+    { label: "Total Assinatura", value: R$(valorTotalAssinatura), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total Atrasado", value: R$(valorTotalAtrasado), icon: <CreditCard className="h-4 w-4" /> },
   ];
 
   const columns: Column<Assinante>[] = [
