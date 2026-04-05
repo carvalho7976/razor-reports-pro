@@ -694,6 +694,7 @@ export function DataTable<T extends Record<string, any>>({
   
   const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [columnFilterInputs, setColumnFilterInputs] = useState<Record<string, string>>({});
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
