@@ -51,10 +51,10 @@ export default function Assinantes() {
   const valorTotalAtrasado = allData.filter(d => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(totalAssinantes), type: "quantity" },
-    { label: "Atrasados", value: String(totalAtrasados), type: "quantity" },
     { label: "Total Assinatura", value: R$(valorTotalAssinatura), icon: <CreditCard className="h-4 w-4" /> },
     { label: "Total Atrasado", value: R$(valorTotalAtrasado), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total", value: String(totalAssinantes), type: "quantity" },
+    { label: "Atrasados", value: String(totalAtrasados), type: "quantity" },
   ];
 
   const columns: Column<Assinante>[] = [
