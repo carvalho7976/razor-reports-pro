@@ -32,12 +32,9 @@ export default function Adiantamentos() {
 
   const bulkQuitar = (indices: number[]) => {
     const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
-    setAllData((prev) =>
-      prev.map((d) => ids.includes(d.id) ? { ...d, status: "Devolvido" } : d)
-    );
+    setAllData((prev) => prev.map((d) => ids.includes(d.id) ? { ...d, status: "Devolvido" } : d));
     toast({ title: `${ids.length} adiantamento(s) quitado(s)` });
   };
-
   const bulkDelete = (indices: number[]) => {
     const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
     setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
@@ -56,15 +53,14 @@ export default function Adiantamentos() {
 
   const columns: Column<Adiantamento>[] = [
     { key: "data", label: "Data" },
-    { key: "profissional", label: "Profissional", pinned: true },
+    {
+      key: "profissional", label: "Profissional", pinned: true,
+      render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    },
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     {
       key: "status", label: "Status",
-      render: (v) => (
-        <span className="font-medium" style={{ color: v === "Devolvido" ? "#00c5b4" : "#ff2f2f" }}>
-          {v}
-        </span>
-      ),
+      render: (v) => <span className="font-medium" style={{ color: v === "Devolvido" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
     },
     { key: "observacao", label: "Observação" },
   ];
@@ -81,11 +77,10 @@ export default function Adiantamentos() {
         summaryCards={summaryCards}
         selectable
         selectionActions={selectionActions}
-        novoMenuItems={[
-          { label: "Novo Vale" },
-          { label: "Vender Produto" },
-        ]}
+        novoMenuItems={[{ label: "Novo Vale" }, { label: "Vender Produto" }]}
         pageSize={15}
+        showDateFilter={true}
+        tableId="adiantamentos"
       />
     </AppLayout>
   );

@@ -1,19 +1,10 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
+import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { CreditCard, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface Assinante {
-  id: number;
-  nome: string;
-  plano: string;
-  inicio: string;
-  vencimento: string;
-  valor: number;
-  status: string;
-}
-
+interface Assinante { id: number; nome: string; plano: string; inicio: string; vencimento: string; valor: number; status: string; }
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const initialData: Assinante[] = [
@@ -28,12 +19,9 @@ const initialData: Assinante[] = [
 export default function Assinantes() {
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
-
   const [tab, setTab] = useState("total");
 
-  const data = useMemo(() =>
-    tab === "total" ? allData : allData.filter(d => tab === "ativo" ? d.status === "Ativo" : d.status === "Atrasado"),
-    [tab, allData]);
+  const data = useMemo(() => tab === "total" ? allData : allData.filter(d => tab === "ativo" ? d.status === "Ativo" : d.status === "Atrasado"), [tab, allData]);
 
   const bulkCancel = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
@@ -45,54 +33,31 @@ export default function Assinantes() {
     { label: "Cancelar", icon: <XCircle className="h-4 w-4" />, onClick: bulkCancel, variant: "destructive", description: "Cancela as assinaturas selecionadas" },
   ];
 
-  const totalAssinantes = allData.length;
-  const totalAtrasados = allData.filter(d => d.status === "Atrasado").length;
-  const valorTotalAssinatura = allData.filter(d => d.status === "Ativo").reduce((s, r) => s + r.valor, 0);
-  const valorTotalAtrasado = allData.filter(d => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0);
-
   const summaryCards: SummaryCard[] = [
-    { label: "Total Assinatura", value: R$(valorTotalAssinatura), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Total Atrasado", value: R$(valorTotalAtrasado), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Total", value: String(totalAssinantes), type: "quantity" },
-    { label: "Atrasados", value: String(totalAtrasados), type: "quantity" },
+    { label: "Total Assinatura", value: R$(allData.filter(d => d.status === "Ativo").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total Atrasado", value: R$(allData.filter(d => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total", value: String(allData.length), type: "quantity" },
+    { label: "Atrasados", value: String(allData.filter(d => d.status === "Atrasado").length), type: "quantity" },
   ];
 
   const columns: Column<Assinante>[] = [
-    { key: "nome", label: "Nome", pinned: true },
+    { key: "nome", label: "Nome", pinned: true, render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a> },
     { key: "plano", label: "Plano" },
     { key: "inicio", label: "Início" },
     { key: "vencimento", label: "Vencimento" },
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
-    {
-      key: "status", label: "Status",
-      render: (v) => (
-        <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>
-          {v}
-        </span>
-      ),
-    },
+    { key: "status", label: "Status", render: (v) => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span> },
+  ];
+
+  const tabs: TabDef[] = [
+    { label: "Total", value: "total", count: allData.length, color: "neutral" },
+    { label: "Ativos", value: "ativo", count: allData.filter(d => d.status === "Ativo").length, color: "success" },
+    { label: "Atrasados", value: "atrasado", count: allData.filter(d => d.status === "Atrasado").length, color: "destructive" },
   ];
 
   return (
     <AppLayout>
-      <DataTable
-        title="Assinantes"
-        data={data}
-        columns={columns}
-        showDateFilter={false}
-        summaryCards={summaryCards}
-        tabs={[
-          { label: "Total", value: "total", count: totalAssinantes },
-          { label: "Ativos", value: "ativo", count: allData.filter(d => d.status === "Ativo").length },
-          { label: "Atrasados", value: "atrasado", count: totalAtrasados },
-        ]}
-        activeTab={tab}
-        onTabChange={setTab}
-        selectable
-        selectionActions={selectionActions}
-        novoMenuItems={[{ label: "Novo assinante" }]}
-        pageSize={15}
-      />
+      <DataTable title="Assinantes" data={data} columns={columns} showDateFilter={true} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} selectable selectionActions={selectionActions} novoMenuItems={[{ label: "Novo assinante" }]} pageSize={15} tableId="assinantes" />
     </AppLayout>
   );
 }

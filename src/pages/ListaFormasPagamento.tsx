@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SelectionAction, ActionsMenu } from "@/components/DataTable";
-import { Trash2 } from "lucide-react";
+import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
+import { Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface FormaPagamento {
@@ -39,22 +39,36 @@ export default function ListaFormasPagamento() {
     toast({ title: `${ids.length} forma(s) removida(s)`, variant: "destructive" });
   };
 
+  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
+    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
+    toast({ title: "Campo atualizado" });
+  };
+
   const selectionActions: SelectionAction[] = [
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove as formas de pagamento selecionadas" },
   ];
 
   const columns: Column<FormaPagamento>[] = [
-    { key: "nome", label: "Nome", pinned: true },
-    { key: "tipo", label: "Tipo" },
-    { key: "taxa", label: "Taxa %", align: "center", render: v => `${v}%` },
+    { key: "nome", label: "Nome", pinned: true, editable: true },
+    { key: "tipo", label: "Tipo", editable: true },
+    { key: "taxa", label: "Taxa %", align: "center", render: v => `${v}%`, editable: true, editType: "number" },
     {
       key: "status", label: "Status",
-      render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#6b7280" }}>{v}</span>,
+      render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
     },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
-      render: () => <ActionsMenu items={[{ label: "Editar" }, { label: "Excluir", variant: "destructive" }]} />,
+      render: () => <ActionsMenu items={[
+        { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+      ]} />,
     },
+  ];
+
+  const tabs: TabDef[] = [
+    { label: "Todos", value: "todos", count: allData.length, color: "neutral" },
+    { label: "Ativos", value: "ativos", count: allData.filter(d => d.status === "Ativo").length, color: "success" },
+    { label: "Desativados", value: "desativados", count: allData.filter(d => d.status === "Desativado").length, color: "destructive" },
   ];
 
   return (
@@ -65,16 +79,14 @@ export default function ListaFormasPagamento() {
         columns={columns}
         selectable
         selectionActions={selectionActions}
-        showDateFilter={false}
+        showDateFilter={true}
         novoMenuItems={[{ label: "Nova forma de pagamento" }]}
-        tabs={[
-          { label: "Todos", value: "todos", count: allData.length },
-          { label: "Ativos", value: "ativos", count: allData.filter(d => d.status === "Ativo").length },
-          { label: "Desativados", value: "desativados", count: allData.filter(d => d.status === "Desativado").length },
-        ]}
+        tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
         pageSize={15}
+        onCellEdit={handleCellEdit}
+        tableId="lista_formas_pagamento"
       />
     </AppLayout>
   );

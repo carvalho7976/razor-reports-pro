@@ -35,23 +35,31 @@ export default function ListaProfissionais() {
     toast({ title: `${ids.length} profissional(is) removido(s)`, variant: "destructive" });
   };
 
+  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
+    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
+    toast({ title: "Campo atualizado" });
+  };
+
   const selectionActions: SelectionAction[] = [
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os profissionais selecionados" },
   ];
 
   const columns: Column<Profissional>[] = [
     {
-      key: "foto" as any, label: "Foto", sortable: false, filterable: false, align: "center", width: "60px",
+      key: "foto" as any, label: "", sortable: false, filterable: false, align: "center", width: "60px",
       render: () => (
         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center mx-auto">
           <User className="h-4 w-4 text-muted-foreground" />
         </div>
       ),
     },
-    { key: "nome", label: "Nome", pinned: true },
-    { key: "email", label: "Email" },
-    { key: "celular", label: "Celular" },
-    { key: "aniversario", label: "Aniversário" },
+    {
+      key: "nome", label: "Nome", pinned: true,
+      render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    },
+    { key: "email", label: "Email", editable: true },
+    { key: "celular", label: "Celular", editable: true },
+    { key: "aniversario", label: "Aniversário", editable: true },
     {
       key: "funcao", label: "Função",
       render: (v) => (
@@ -78,11 +86,13 @@ export default function ListaProfissionais() {
         title="Profissionais"
         data={allData}
         columns={columns}
-        showDateFilter={false}
+        showDateFilter={true}
         selectable
         selectionActions={selectionActions}
         novoMenuItems={[{ label: "Novo profissional" }]}
         pageSize={15}
+        onCellEdit={handleCellEdit}
+        tableId="lista_profissionais"
       />
     </AppLayout>
   );

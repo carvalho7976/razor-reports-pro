@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, ActionsMenu, SelectionAction, SummaryCard } from "@/components/DataTable";
+import { DataTable, Column, ActionsMenu, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { CheckCircle, XCircle, Pencil, Trash2, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -78,29 +78,26 @@ export default function ContasPagar() {
     { label: "Pago", value: R$(totalPago), icon: <CreditCard className="h-4 w-4" /> },
   ];
 
+  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
+    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
+    toast({ title: "Campo atualizado" });
+  };
+
   const columns: Column<Conta>[] = [
-    { key: "conta", label: "Conta", pinned: true },
-    { key: "descricao", label: "Descrição" },
-    { key: "vencimento", label: "Vencimento" },
-    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    { key: "conta", label: "Conta", pinned: true, editable: true },
+    { key: "descricao", label: "Descrição", editable: true },
+    { key: "vencimento", label: "Vencimento", editable: true },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v), editable: true, editType: "currency" },
     {
       key: "status", label: "Status",
-      render: (v) => (
-        <span className="font-medium" style={{ color: v === "Pago" ? "#00c5b4" : "#ff2f2f" }}>
-          {v}
-        </span>
-      ),
+      render: (v) => <span className="font-medium" style={{ color: v === "Pago" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
     },
     { key: "dataPagamento", label: "Data Pagamento" },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
-      render: (_v, row) => (
+      render: (_v: any, row: Conta) => (
         <ActionsMenu items={[
-          {
-            label: row.status === "Pendente" ? "Marcar como pago" : "Marcar como pendente",
-            icon: row.status === "Pendente" ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />,
-            onClick: () => toggleStatus(row.id),
-          },
+          { label: row.status === "Pendente" ? "Marcar como pago" : "Marcar como pendente", icon: row.status === "Pendente" ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />, onClick: () => toggleStatus(row.id) },
           { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
           { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive", onClick: () => remove(row.id) },
         ]} />
@@ -109,6 +106,12 @@ export default function ContasPagar() {
   ];
 
   const total = data.reduce((s, r) => s + r.valor, 0);
+
+  const tabs: TabDef[] = [
+    { label: "Todas", value: "todas", count: allData.length, color: "neutral" },
+    { label: "Pendentes", value: "pendentes", count: allData.filter(d => d.status === "Pendente").length, color: "destructive" },
+    { label: "Pagas", value: "pagas", count: allData.filter(d => d.status === "Pago").length, color: "success" },
+  ];
 
   return (
     <AppLayout>
@@ -121,14 +124,13 @@ export default function ContasPagar() {
         selectionActions={selectionActions}
         novoMenuItems={[{ label: "Nova conta" }]}
         summaryCards={summaryCards}
-        tabs={[
-          { label: "Todas", value: "todas", count: allData.length },
-          { label: "Pendentes", value: "pendentes", count: allData.filter(d => d.status === "Pendente").length },
-          { label: "Pagas", value: "pagas", count: allData.filter(d => d.status === "Pago").length },
-        ]}
+        tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
         pageSize={15}
+        showDateFilter={true}
+        onCellEdit={handleCellEdit}
+        tableId="contas_pagar"
       />
     </AppLayout>
   );

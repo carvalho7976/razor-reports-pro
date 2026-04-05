@@ -4,11 +4,11 @@ import {
   X, Pin, Eye, EyeOff, Calendar, Download, ListFilter,
   ChevronLeft, ChevronRight, ArrowUpDown, MoreHorizontal,
   FileSpreadsheet, FileText, Plus, ChevronDown as ChevronDownIcon,
-  GripVertical, Info,
+  GripVertical, Info, RotateCcw,
 } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { format, startOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, endOfYear, subYears } from "date-fns";
+import { format, startOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, endOfYear, subYears, parse, isWithinInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -23,6 +23,8 @@ export interface Column<T> {
   render?: (value: any, row: T, index: number) => ReactNode;
   width?: string;
   align?: "left" | "center" | "right";
+  editable?: boolean;
+  editType?: "text" | "number" | "currency";
 }
 
 type DatePreset = "hoje" | "ontem" | "semana" | "semana_passada" | "mes" | "mes_passado" | "ano" | "ano_passado" | "personalizado" | null;
@@ -52,10 +54,17 @@ export interface SummaryCard {
   label: string;
   value: string;
   icon?: ReactNode;
-  /** "monetary" = movimentação style with emoji, "quantity" = relatório clientes style */
   type?: "monetary" | "quantity";
-  /** Sentiment for emoji color: positive=blue, negative=red, neutral=black */
   sentiment?: "positive" | "negative" | "neutral";
+  filterValue?: string;
+  onFilter?: (value: string) => void;
+}
+
+export interface TabDef {
+  label: string;
+  value: string;
+  count?: number;
+  color?: "neutral" | "success" | "info" | "warning" | "destructive";
 }
 
 interface DataTableProps<T extends Record<string, any>> {
@@ -66,7 +75,7 @@ interface DataTableProps<T extends Record<string, any>> {
   actions?: ReactNode;
   totalRow?: Record<string, ReactNode>;
   emptyMessage?: string;
-  tabs?: { label: string; value: string; count?: number }[];
+  tabs?: TabDef[];
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   showDateFilter?: boolean;
@@ -75,6 +84,9 @@ interface DataTableProps<T extends Record<string, any>> {
   selectable?: boolean;
   selectionActions?: SelectionAction[];
   novoMenuItems?: NovoMenuItem[];
+  onCellEdit?: (rowIndex: number, key: string, value: any) => void;
+  tableId?: string;
+  dateField?: string;
 }
 
 /* ── Novo Button (Notion-style) ── */
@@ -90,7 +102,6 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
 
   if (items.length === 0) return null;
 
-  // Single item: no dropdown
   if (items.length === 1) {
     return (
       <button onClick={items[0].onClick} className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.85)] transition-colors shadow-sm">
@@ -233,7 +244,7 @@ function DateRangePicker({
 
 /* ── Filter Dropdown ── */
 function FilterDropdown<T>({
-  columns, columnFilterInputs, setColumnFilterInputs, columnFilters, setColumnFilters, open, setOpen,
+  columns, columnFilterInputs, setColumnFilterInputs, columnFilters, setColumnFilters, open, setOpen, data,
 }: {
   columns: Column<T>[];
   columnFilterInputs: Record<string, string>;
@@ -242,6 +253,7 @@ function FilterDropdown<T>({
   setColumnFilters: (fn: (prev: Record<string, string[]>) => Record<string, string[]>) => void;
   open: boolean;
   setOpen: (v: boolean) => void;
+  data: T[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const filterableCols = columns.filter((c) => c.filterable !== false);
@@ -251,6 +263,15 @@ function FilterDropdown<T>({
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [setOpen]);
+
+  const getUniqueValues = useCallback((key: string) => {
+    const values = new Set<string>();
+    (data as Record<string, any>[]).forEach((row) => {
+      const val = String(row[key] ?? "").trim();
+      if (val) values.add(val);
+    });
+    return Array.from(values).sort();
+  }, [data]);
 
   const handleKeyDown = (key: string, e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -263,6 +284,20 @@ function FilterDropdown<T>({
       });
       setColumnFilterInputs((prev) => ({ ...prev, [key]: "" }));
     }
+  };
+
+  const addFilterValue = (key: string, value: string) => {
+    setColumnFilters((prev) => {
+      const existing = prev[key] || [];
+      if (existing.includes(value)) {
+        const arr = existing.filter(v => v !== value);
+        const next = { ...prev };
+        if (arr.length === 0) delete next[key];
+        else next[key] = arr;
+        return next;
+      }
+      return { ...prev, [key]: [...existing, value] };
+    });
   };
 
   const removeChip = (key: string, value: string) => {
@@ -281,44 +316,68 @@ function FilterDropdown<T>({
     <div ref={ref} className="dropdown-panel left-0 top-full mt-2 min-w-[280px] max-h-[400px] overflow-y-auto">
       <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">Filtrar por coluna</p>
       <div className="space-y-2.5">
-        {filterableCols.map((col) => (
-          <div key={col.key} className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground px-1">{col.label}</label>
-            <input
-              type="text"
-              placeholder="Digite e pressione Enter"
-              value={columnFilterInputs[col.key] || ""}
-              onChange={(e) => setColumnFilterInputs((prev) => ({ ...prev, [col.key]: e.target.value }))}
-              onKeyDown={(e) => handleKeyDown(col.key, e)}
-              className="w-full text-xs bg-background border border-border rounded-lg px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-primary/50 placeholder:text-muted-foreground/40 transition-all"
-            />
-            {(columnFilters[col.key] || []).length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-0.5">
-                {columnFilters[col.key].map((v, i) => (
-                  <span key={i} className="filter-chip !py-0.5 !px-2 !text-[10px]">
-                    {v}
-                    <button onClick={() => removeChip(col.key, v)} className="hover:text-destructive">
-                      <X className="h-2.5 w-2.5" />
+        {filterableCols.map((col) => {
+          const inputVal = columnFilterInputs[col.key] || "";
+          const uniqueValues = getUniqueValues(col.key);
+          const filteredValues = inputVal ? uniqueValues.filter(v => v.toLowerCase().includes(inputVal.toLowerCase())) : uniqueValues;
+          const selectedValues = columnFilters[col.key] || [];
+
+          return (
+            <div key={col.key} className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground px-1">{col.label}</label>
+              <input
+                type="text"
+                placeholder="Pesquisar..."
+                value={inputVal}
+                onChange={(e) => setColumnFilterInputs((prev) => ({ ...prev, [col.key]: e.target.value }))}
+                onKeyDown={(e) => handleKeyDown(col.key, e)}
+                className="w-full text-xs bg-background border border-border rounded-lg px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-primary/50 placeholder:text-muted-foreground/40 transition-all"
+              />
+              {filteredValues.length > 0 && (
+                <div className="max-h-[120px] overflow-y-auto space-y-0.5 pt-0.5">
+                  {filteredValues.slice(0, 20).map((val) => (
+                    <button
+                      key={val}
+                      onClick={() => addFilterValue(col.key, val)}
+                      className={cn(
+                        "w-full text-left px-2 py-1 text-xs rounded-md transition-colors truncate",
+                        selectedValues.includes(val) ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted"
+                      )}
+                    >
+                      {selectedValues.includes(val) && "✓ "}{val}
                     </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+                  ))}
+                </div>
+              )}
+              {selectedValues.length > 0 && (
+                <div className="flex flex-wrap gap-1 pt-0.5">
+                  {selectedValues.map((v, i) => (
+                    <span key={i} className="filter-chip !py-0.5 !px-2 !text-[10px]">
+                      {v}
+                      <button onClick={() => removeChip(col.key, v)} className="hover:text-destructive">
+                        <X className="h-2.5 w-2.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-/* ── Column Manager (with drag & drop reorder) ── */
+/* ── Column Manager (with drag & drop reorder + reset) ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
-  columnOrder, onReorder,
+  columnOrder, onReorder, onReset,
 }: {
   initialColumns: Column<T>[]; hiddenColumns: Set<string>; pinnedColumns: Set<string>;
   toggleColumn: (key: string) => void; togglePin: (key: string) => void;
   columnOrder: string[]; onReorder: (newOrder: string[]) => void;
+  onReset: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -358,7 +417,12 @@ function ColumnManager<T>({
         <div className="dropdown-panel right-0 top-full mt-2 min-w-[240px]">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Colunas</p>
-            <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
+              <button onClick={onReset} className="text-[10px] text-destructive hover:underline font-medium" title="Resetar para padrão">
+                <RotateCcw className="h-3 w-3" />
+              </button>
+            </div>
           </div>
           <div className="space-y-0.5 max-h-[320px] overflow-y-auto">
             {orderedColumns.map((col, idx) => {
@@ -381,7 +445,7 @@ function ColumnManager<T>({
                   )}
                 >
                   <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0 group-hover:text-muted-foreground" />
-                  <span className="flex-1 text-sm truncate">{col.label}</span>
+                  <span className="flex-1 text-sm truncate">{col.label || col.key}</span>
                   <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary" : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
                     <Pin className="h-3 w-3" />
                   </button>
@@ -543,6 +607,80 @@ function SortDropdown<T>({
   );
 }
 
+/* ── Inline Edit Cell ── */
+function EditableCell({ value, onChange, type = "text" }: { value: any; onChange: (v: any) => void; type?: "text" | "number" | "currency" }) {
+  const [editing, setEditing] = useState(false);
+  const [editVal, setEditVal] = useState(String(value ?? ""));
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
+
+  if (!editing) {
+    return (
+      <span
+        onDoubleClick={() => { setEditVal(String(value ?? "")); setEditing(true); }}
+        className="cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded transition-colors min-w-[20px] inline-block"
+        title="Duplo-clique para editar"
+      >
+        {value ?? "—"}
+      </span>
+    );
+  }
+
+  const commit = () => {
+    setEditing(false);
+    const newVal = type === "number" || type === "currency" ? parseFloat(editVal) || 0 : editVal;
+    if (newVal !== value) onChange(newVal);
+  };
+
+  return (
+    <input
+      ref={inputRef}
+      value={editVal}
+      onChange={(e) => setEditVal(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => { if (e.key === "Enter") commit(); if (e.key === "Escape") setEditing(false); }}
+      className="bg-background border border-primary/50 rounded px-1.5 py-0.5 text-sm w-full max-w-[150px] focus:outline-none focus:ring-1 focus:ring-primary/50"
+      type={type === "number" || type === "currency" ? "number" : "text"}
+      step={type === "currency" ? "0.01" : undefined}
+    />
+  );
+}
+
+/* ── Parse date helper ── */
+function parseDateBR(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  // Try dd/MM/yyyy HH:mm first, then dd/MM/yyyy
+  const clean = dateStr.trim();
+  const formats = ["dd/MM/yyyy HH:mm", "dd/MM/yyyy"];
+  for (const fmt of formats) {
+    try {
+      const d = parse(clean, fmt, new Date());
+      if (!isNaN(d.getTime())) return d;
+    } catch { /* skip */ }
+  }
+  return null;
+}
+
+/* ── Tab color mapping ── */
+const tabColorMap: Record<string, string> = {
+  neutral: "bg-muted text-muted-foreground",
+  success: "bg-success/20 text-success",
+  info: "bg-info/20 text-info",
+  warning: "bg-warning/20 text-warning",
+  destructive: "bg-destructive/20 text-destructive",
+};
+
+const tabColorMapActive: Record<string, string> = {
+  neutral: "bg-foreground text-background",
+  success: "bg-success text-success-foreground",
+  info: "bg-info text-info-foreground",
+  warning: "bg-warning text-warning-foreground",
+  destructive: "bg-destructive text-destructive-foreground",
+};
+
 /* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
   data, columns: initialColumns, title, titleIcon, actions, totalRow,
@@ -550,7 +688,10 @@ export function DataTable<T extends Record<string, any>>({
   tabs, activeTab, onTabChange, showDateFilter = true,
   summaryCards, pageSize = 20,
   selectable = false, selectionActions = [], novoMenuItems,
+  onCellEdit, tableId, dateField,
 }: DataTableProps<T>) {
+  const storageKey = tableId || title.replace(/\s+/g, "_").toLowerCase();
+  
   const [search, setSearch] = useState("");
   const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -566,7 +707,43 @@ export function DataTable<T extends Record<string, any>>({
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [page, setPage] = useState(0);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [columnOrder, setColumnOrder] = useState<string[]>(() => initialColumns.map((c) => c.key));
+  
+  const defaultOrder = useMemo(() => initialColumns.map((c) => c.key), [initialColumns]);
+  const [columnOrder, setColumnOrder] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(`col_order_${storageKey}`);
+      if (saved) {
+        const parsed = JSON.parse(saved) as string[];
+        // Validate that all keys still exist
+        const validKeys = new Set(initialColumns.map(c => c.key));
+        const filtered = parsed.filter(k => validKeys.has(k));
+        // Add any new keys not in saved order
+        initialColumns.forEach(c => { if (!filtered.includes(c.key)) filtered.push(c.key); });
+        return filtered;
+      }
+    } catch { /* ignore */ }
+    return initialColumns.map((c) => c.key);
+  });
+
+  const saveColumnOrder = useCallback((newOrder: string[]) => {
+    setColumnOrder(newOrder);
+    try { localStorage.setItem(`col_order_${storageKey}`, JSON.stringify(newOrder)); } catch { /* ignore */ }
+  }, [storageKey]);
+
+  const resetColumnOrder = useCallback(() => {
+    setColumnOrder(defaultOrder);
+    try { localStorage.removeItem(`col_order_${storageKey}`); } catch { /* ignore */ }
+  }, [defaultOrder, storageKey]);
+
+  // Auto-detect date field
+  const autoDateField = useMemo(() => {
+    if (dateField) return dateField;
+    const dateKeys = ["data", "dataFechamento", "dataCancelamento", "dataExclusao", "dataVenda", "vencimento", "ultimaVisita", "aniversario", "abertura"];
+    for (const key of dateKeys) {
+      if (initialColumns.some(c => c.key === key)) return key;
+    }
+    return null;
+  }, [dateField, initialColumns]);
 
   const columns = useMemo(() => {
     const orderMap = new Map(columnOrder.map((k, i) => [k, i]));
@@ -650,6 +827,15 @@ export function DataTable<T extends Record<string, any>>({
         )
       );
     }
+    // Date range filtering
+    if (dateRange?.from && dateRange?.to && autoDateField) {
+      result = result.filter((row) => {
+        const dateStr = String(row[autoDateField] ?? "");
+        const d = parseDateBR(dateStr);
+        if (!d) return true; // keep rows without parseable dates
+        return isWithinInterval(d, { start: startOfDay(dateRange.from!), end: startOfDay(dateRange.to!) });
+      });
+    }
     if (sortEntries.length > 0) {
       result.sort((a, b) => {
         for (const { key, dir } of sortEntries) {
@@ -664,12 +850,11 @@ export function DataTable<T extends Record<string, any>>({
       });
     }
     return result;
-  }, [data, search, columnFilters, sortEntries, columns]);
+  }, [data, search, columnFilters, sortEntries, columns, dateRange, autoDateField]);
 
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
 
-  // Selection helpers
   const pagedIds = pagedData.map((_, i) => page * pageSize + i);
   const allPageSelected = selectable && pagedIds.length > 0 && pagedIds.every((id) => selectedRows.has(id));
   const somePageSelected = selectable && pagedIds.some((id) => selectedRows.has(id));
@@ -698,6 +883,10 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   const activeFilterCount = Object.values(columnFilters).flat().length;
+
+  // Card width: max 2 per row for few cards, otherwise fill grid
+  const cardCount = summaryCards?.length || 0;
+  const cardGridClass = cardCount <= 2 ? "grid-cols-2 max-w-md" : cardCount <= 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2 sm:grid-cols-4";
 
   return (
     <div className="space-y-3 sm:space-y-5">
@@ -736,7 +925,7 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
-          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} columnOrder={columnOrder} onReorder={setColumnOrder} />
+          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} columnOrder={columnOrder} onReorder={saveColumnOrder} onReset={resetColumnOrder} />
 
           <div className="relative">
             <button onClick={() => setShowFilters(!showFilters)} className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}>
@@ -756,6 +945,7 @@ export function DataTable<T extends Record<string, any>>({
               setColumnFilters={setColumnFilters}
               open={showFilters}
               setOpen={setShowFilters}
+              data={data}
             />
           </div>
 
@@ -789,7 +979,7 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Summary Cards */}
       {summaryCards && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <div className={cn("grid gap-2 sm:gap-3", cardGridClass)}>
           {summaryCards.map((card, i) => {
             const isMonetary = card.type === "monetary";
             const isQuantity = card.type === "quantity";
@@ -804,9 +994,21 @@ export function DataTable<T extends Record<string, any>>({
                 ? "🔴"
                 : "⚫";
 
+            const isClickable = card.onFilter && card.filterValue;
+            const clickProps = isClickable ? {
+              onClick: () => card.onFilter!(card.filterValue!),
+              role: "button" as const,
+              className: cn(
+                "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm transition-colors",
+                "cursor-pointer hover:border-primary/30 hover:shadow-md"
+              ),
+            } : {
+              className: "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm",
+            };
+
             if (isQuantity) {
               return (
-                <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+                <div key={i} {...clickProps}>
                   <div className="min-w-0">
                     <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
                     <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
@@ -817,7 +1019,7 @@ export function DataTable<T extends Record<string, any>>({
 
             if (isMonetary) {
               return (
-                <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+                <div key={i} {...clickProps}>
                   <span className="text-base sm:text-lg">{sentimentEmoji}</span>
                   <div className="min-w-0">
                     <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
@@ -827,9 +1029,8 @@ export function DataTable<T extends Record<string, any>>({
               );
             }
 
-            // Default legacy style
             return (
-              <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+              <div key={i} {...clickProps}>
                 {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
                 <div className="min-w-0">
                   <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
@@ -845,30 +1046,33 @@ export function DataTable<T extends Record<string, any>>({
       {tabs && (
         <div className="border-b border-border">
           <div className="flex gap-0 flex-wrap">
-            {tabs.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => onTabChange?.(tab.value)}
-                className={cn(
-                  "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
-                  activeTab === tab.value
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
-                )}
-              >
-                {tab.label}
-                {tab.count !== undefined && (
-                  <span className={cn(
-                    "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+            {tabs.map((tab) => {
+              const color = tab.color || "neutral";
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => onTabChange?.(tab.value)}
+                  className={cn(
+                    "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     activeTab === tab.value
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                  )}>
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            ))}
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
+                  )}
+                >
+                  {tab.label}
+                  {tab.count !== undefined && (
+                    <span className={cn(
+                      "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+                      activeTab === tab.value
+                        ? tabColorMapActive[color]
+                        : tabColorMap[color]
+                    )}>
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -948,7 +1152,7 @@ export function DataTable<T extends Record<string, any>>({
                     >
                       <span className="inline-flex items-center gap-1.5">
                         {col.label}
-                        {sortable && (
+                        {sortable && col.label && (
                           <span className={cn("inline-flex items-center text-table-header-foreground", !sortDir && "opacity-50")}>
                             {sortDir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : sortDir === "desc" ? <ChevronDown className="h-3.5 w-3.5" /> : <ArrowUpDown className="h-3 w-3" />}
                           </span>
@@ -997,11 +1201,19 @@ export function DataTable<T extends Record<string, any>>({
                           className={cn(
                             "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
                             pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
-                            col.align === "right" && "text-right font-mono",
+                            col.align === "right" && "text-right",
                             col.align === "center" && "text-center"
                           )}
                         >
-                          {col.render ? col.render(row[col.key], row, i) : (row[col.key] ?? "—")}
+                          {col.editable && onCellEdit ? (
+                            <EditableCell
+                              value={row[col.key]}
+                              onChange={(v) => onCellEdit(globalIdx, col.key, v)}
+                              type={col.editType}
+                            />
+                          ) : (
+                            col.render ? col.render(row[col.key], row, i) : (row[col.key] ?? "—")
+                          )}
                         </td>
                       ))}
                     </tr>
@@ -1013,7 +1225,7 @@ export function DataTable<T extends Record<string, any>>({
                 <tr className="bg-muted/40 font-semibold border-t border-border">
                   {selectable && <td className="w-10 px-3 py-3.5" />}
                   {columns.map((col) => (
-                    <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right font-mono", col.align === "center" && "text-center")}>
+                    <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right", col.align === "center" && "text-center")}>
                       {totalRow[col.key] ?? ""}
                     </td>
                   ))}

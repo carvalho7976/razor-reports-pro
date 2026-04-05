@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
+import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { CheckCircle, Printer, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,15 +43,10 @@ export default function ComissoesPagar() {
 
   const bulkPagar = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
-    setAllData((prev) =>
-      prev.map((d) => ids.includes(d.id) ? { ...d, status: "Pago" } : d)
-    );
+    setAllData((prev) => prev.map((d) => ids.includes(d.id) ? { ...d, status: "Pago" } : d));
     toast({ title: `${ids.length} comissão(ões) marcada(s) como paga(s)` });
   };
-
-  const bulkPrint = (indices: number[]) => {
-    toast({ title: `Imprimir relatório de ${indices.length} funcionário(s)`, description: "Funcionalidade em desenvolvimento" });
-  };
+  const bulkPrint = (indices: number[]) => { toast({ title: `Imprimir relatório de ${indices.length} funcionário(s)`, description: "Funcionalidade em desenvolvimento" }); };
 
   const selectionActions: SelectionAction[] = [
     { label: "Pagar", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkPagar, description: "Marca as comissões selecionadas como pagas" },
@@ -65,20 +60,24 @@ export default function ComissoesPagar() {
   ];
 
   const columns: Column<Comissao>[] = [
-    { key: "profissional", label: "Profissional", pinned: true },
+    {
+      key: "profissional", label: "Profissional", pinned: true,
+      render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    },
     { key: "totalComissoes", label: "Total em comissões", align: "right", render: (v) => R$(v) },
     { key: "totalAdiantamentos", label: "Total em adiantamentos", align: "right", render: (v) => R$(v) },
     {
       key: "totalPagar", label: "Total a Pagar", align: "right",
-      render: (v) => (
-        <span className="font-medium" style={{ color: v < 0 ? "#ff2f2f" : "#00c5b4" }}>
-          {R$(v)}
-        </span>
-      ),
+      render: (v) => <span className="font-medium" style={{ color: v < 0 ? "#ff2f2f" : "#00c5b4" }}>{R$(v)}</span>,
     },
   ];
 
   const total = data.reduce((s, r) => s + r.totalPagar, 0);
+
+  const tabs: TabDef[] = [
+    { label: "Em aberto", value: "em_aberto", count: allData.filter(d => d.status === "Em aberto").length, color: "destructive" },
+    { label: "Pagas", value: "pagas", count: allData.filter(d => d.status === "Pago").length, color: "success" },
+  ];
 
   return (
     <AppLayout>
@@ -88,15 +87,14 @@ export default function ComissoesPagar() {
         columns={columns}
         totalRow={{ profissional: "Total:", totalPagar: R$(total) }}
         summaryCards={summaryCards}
-        tabs={[
-          { label: "Em aberto", value: "em_aberto", count: allData.filter(d => d.status === "Em aberto").length },
-          { label: "Pagas", value: "pagas", count: allData.filter(d => d.status === "Pago").length },
-        ]}
+        tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
         selectable
         selectionActions={selectionActions}
         pageSize={15}
+        showDateFilter={true}
+        tableId="comissoes_pagar"
       />
     </AppLayout>
   );

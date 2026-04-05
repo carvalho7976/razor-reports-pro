@@ -1,19 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { CreditCard } from "lucide-react";
-
-interface Produto {
-  id: number;
-  nome: string;
-  categoria: string;
-  quantidade: number;
-  valor: number;
-  vendaExtra: number;
-  desconto: number;
-  data: string;
-}
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+interface Produto { id: number; nome: string; categoria: string; quantidade: number; valor: number; vendaExtra: number; desconto: number; data: string; }
 
 const initialData: Produto[] = [
   { id: 1, nome: "Pomada Modeladora", categoria: "Finalizadores", quantidade: 30, valor: 1200, vendaExtra: 200, desconto: 50, data: "05/04/2026" },
@@ -25,16 +15,11 @@ const initialData: Produto[] = [
 ];
 
 export default function RelatorioProdutos() {
-  const totalQtd = initialData.reduce((s, r) => s + r.quantidade, 0);
-  const totalValor = initialData.reduce((s, r) => s + r.valor, 0);
-  const totalVendaExtra = initialData.reduce((s, r) => s + r.vendaExtra, 0);
-  const totalDesconto = initialData.reduce((s, r) => s + r.desconto, 0);
-
   const summaryCards: SummaryCard[] = [
-    { label: "Valor Total", value: R$(totalValor), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Venda Extra", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Desconto", value: R$(totalDesconto), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Total", value: String(totalQtd), type: "quantity" },
+    { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Venda Extra", value: R$(initialData.reduce((s, r) => s + r.vendaExtra, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Desconto", value: R$(initialData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total", value: String(initialData.reduce((s, r) => s + r.quantidade, 0)), type: "quantity" },
   ];
 
   const columns: Column<Produto>[] = [
@@ -49,13 +34,7 @@ export default function RelatorioProdutos() {
 
   return (
     <AppLayout>
-      <DataTable
-        title="Relatório de Produtos"
-        data={initialData}
-        columns={columns}
-        summaryCards={summaryCards}
-        pageSize={15}
-      />
+      <DataTable title="Relatório de Produtos" data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="relatorio_produtos" />
     </AppLayout>
   );
 }

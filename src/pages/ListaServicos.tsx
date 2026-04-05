@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu } from "@/components/DataTable";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Servico {
@@ -35,19 +35,27 @@ export default function ListaServicos() {
     toast({ title: `${ids.length} serviço(s) removido(s)`, variant: "destructive" });
   };
 
+  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
+    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
+    toast({ title: "Campo atualizado" });
+  };
+
   const selectionActions: SelectionAction[] = [
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os serviços selecionados" },
   ];
 
   const columns: Column<Servico>[] = [
-    { key: "nome", label: "Nome", pinned: true },
-    { key: "categoria", label: "Categoria" },
-    { key: "duracao", label: "Duração" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "comissao", label: "Comissão %", align: "center", render: v => `${v}%` },
+    { key: "nome", label: "Nome", pinned: true, editable: true },
+    { key: "categoria", label: "Categoria", editable: true },
+    { key: "duracao", label: "Duração", editable: true },
+    { key: "valor", label: "Valor", align: "right", render: v => R$(v), editable: true, editType: "currency" },
+    { key: "comissao", label: "Comissão %", align: "center", render: v => `${v}%`, editable: true, editType: "number" },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
-      render: () => <ActionsMenu items={[{ label: "Editar" }, { label: "Excluir", variant: "destructive" }]} />,
+      render: () => <ActionsMenu items={[
+        { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+      ]} />,
     },
   ];
 
@@ -59,9 +67,11 @@ export default function ListaServicos() {
         columns={columns}
         selectable
         selectionActions={selectionActions}
-        showDateFilter={false}
+        showDateFilter={true}
         novoMenuItems={[{ label: "Novo serviço" }]}
         pageSize={15}
+        onCellEdit={handleCellEdit}
+        tableId="lista_servicos"
       />
     </AppLayout>
   );

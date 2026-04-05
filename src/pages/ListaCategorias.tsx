@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu } from "@/components/DataTable";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Categoria {
@@ -30,17 +30,25 @@ export default function ListaCategorias() {
     toast({ title: `${ids.length} categoria(s) removida(s)`, variant: "destructive" });
   };
 
+  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
+    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
+    toast({ title: "Campo atualizado" });
+  };
+
   const selectionActions: SelectionAction[] = [
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove as categorias selecionadas" },
   ];
 
   const columns: Column<Categoria>[] = [
-    { key: "nome", label: "Nome", pinned: true },
+    { key: "nome", label: "Nome", pinned: true, editable: true },
     { key: "qtdServicos", label: "Qtd Serviços", align: "center" },
-    { key: "descricao", label: "Descrição" },
+    { key: "descricao", label: "Descrição", editable: true },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
-      render: () => <ActionsMenu items={[{ label: "Editar" }, { label: "Excluir", variant: "destructive" }]} />,
+      render: () => <ActionsMenu items={[
+        { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+      ]} />,
     },
   ];
 
@@ -52,9 +60,11 @@ export default function ListaCategorias() {
         columns={columns}
         selectable
         selectionActions={selectionActions}
-        showDateFilter={false}
+        showDateFilter={true}
         novoMenuItems={[{ label: "Nova categoria" }]}
         pageSize={15}
+        onCellEdit={handleCellEdit}
+        tableId="lista_categorias"
       />
     </AppLayout>
   );

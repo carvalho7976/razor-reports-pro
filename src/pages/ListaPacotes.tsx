@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SelectionAction, ActionsMenu } from "@/components/DataTable";
-import { Trash2, Eye, Power } from "lucide-react";
+import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
+import { Trash2, Eye, Power, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Pacote {
@@ -40,27 +40,38 @@ export default function ListaPacotes() {
     toast({ title: `${ids.length} pacote(s) removido(s)`, variant: "destructive" });
   };
 
+  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
+    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
+    toast({ title: "Campo atualizado" });
+  };
+
   const selectionActions: SelectionAction[] = [
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os pacotes selecionados" },
   ];
 
   const columns: Column<Pacote>[] = [
-    { key: "nome", label: "Nome", pinned: true },
-    { key: "servicos", label: "Serviços" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "validade", label: "Validade" },
+    { key: "nome", label: "Nome", pinned: true, editable: true },
+    { key: "servicos", label: "Serviços", editable: true },
+    { key: "valor", label: "Valor", align: "right", render: v => R$(v), editable: true, editType: "currency" },
+    { key: "validade", label: "Validade", editable: true },
     {
       key: "status", label: "Status",
-      render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#6b7280" }}>{v}</span>,
+      render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
     },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
       render: (_, row) => <ActionsMenu items={[
-        { label: "Visualizar" },
-        { label: row.status === "Ativo" ? "Desativar" : "Ativar" },
-        { label: "Excluir", variant: "destructive" },
+        { label: "Visualizar", icon: <Eye className="h-4 w-4" /> },
+        { label: row.status === "Ativo" ? "Desativar" : "Ativar", icon: <Power className="h-4 w-4" /> },
+        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
       ]} />,
     },
+  ];
+
+  const tabs: TabDef[] = [
+    { label: "Todos", value: "todos", count: allData.length, color: "neutral" },
+    { label: "Ativos", value: "ativos", count: allData.filter(d => d.status === "Ativo").length, color: "success" },
+    { label: "Desativados", value: "desativados", count: allData.filter(d => d.status === "Desativado").length, color: "destructive" },
   ];
 
   return (
@@ -71,16 +82,14 @@ export default function ListaPacotes() {
         columns={columns}
         selectable
         selectionActions={selectionActions}
-        showDateFilter={false}
+        showDateFilter={true}
         novoMenuItems={[{ label: "Novo pacote" }]}
-        tabs={[
-          { label: "Todos", value: "todos", count: allData.length },
-          { label: "Ativos", value: "ativos", count: allData.filter(d => d.status === "Ativo").length },
-          { label: "Desativados", value: "desativados", count: allData.filter(d => d.status === "Desativado").length },
-        ]}
+        tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
         pageSize={15}
+        onCellEdit={handleCellEdit}
+        tableId="lista_pacotes"
       />
     </AppLayout>
   );
