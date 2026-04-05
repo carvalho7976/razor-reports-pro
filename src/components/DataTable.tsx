@@ -400,6 +400,9 @@ function FilterDropdown<T>({
   );
 }
 
+/* ── Hidden column keys (native, not configurable) ── */
+const NATIVE_COLUMN_KEYS = new Set(["foto", "logo", "cor"]);
+
 /* ── Column Manager (with drag & drop reorder + reset) ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
