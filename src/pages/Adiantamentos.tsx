@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column } from "@/components/DataTable";
-import { Plus, XCircle } from "lucide-react";
+import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
+import { CheckCircle, Trash2, CreditCard } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Adiantamento {
+  id: number;
   data: string;
   profissional: string;
   valor: number;
@@ -13,55 +15,77 @@ interface Adiantamento {
   observacao: string;
 }
 
-const allData: Adiantamento[] = [
-  { data: "03/02/2026", profissional: "Cesar", valor: 100, status: "Pendente", observacao: "Balm - Qtd: 1 - R$ 100.00 desconto" },
-  { data: "10/02/2026", profissional: "Claudia", valor: 20, status: "Pago", observacao: "Vale transporte" },
-  { data: "15/02/2026", profissional: "Lara", valor: 100, status: "Pendente", observacao: "Adiantamento salarial" },
-  { data: "20/02/2026", profissional: "Ramon", valor: 150, status: "Pago", observacao: "Vale alimentação" },
-  { data: "01/03/2026", profissional: "Fila de espera", valor: 60, status: "Pendente", observacao: "Produto desconto" },
-];
-
-const columns: Column<Adiantamento>[] = [
-  { key: "data", label: "Data" },
-  { key: "profissional", label: "Profissional" },
-  { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
-  {
-    key: "status", label: "Status",
-    render: (v) => (
-      <span className={v === "Pago" ? "text-primary font-medium" : "text-warning font-medium"}>{v}</span>
-    ),
-  },
-  { key: "observacao", label: "Observação" },
+const initialData: Adiantamento[] = [
+  { id: 1, data: "03/02/2026", profissional: "Cesar", valor: 100, status: "Em aberto", observacao: "Balm - Qtd: 1 - R$ 100.00 desconto" },
+  { id: 2, data: "10/02/2026", profissional: "Claudia", valor: 20, status: "Devolvido", observacao: "Vale transporte" },
+  { id: 3, data: "15/02/2026", profissional: "Lara", valor: 100, status: "Em aberto", observacao: "Adiantamento salarial" },
+  { id: 4, data: "20/02/2026", profissional: "Ramon", valor: 150, status: "Devolvido", observacao: "Vale alimentação" },
+  { id: 5, data: "01/03/2026", profissional: "Fila de espera", valor: 60, status: "Em aberto", observacao: "Produto desconto" },
 ];
 
 export default function Adiantamentos() {
-  const [tab, setTab] = useState("todos");
+  const [allData, setAllData] = useState(initialData);
+  const { toast } = useToast();
 
-  const data = allData.filter((d) =>
-    tab === "todos" ? true : tab === "pendentes" ? d.status === "Pendente" : d.status === "Pago"
-  );
-  const total = data.reduce((s, r) => s + r.valor, 0);
+  const totalEmAberto = allData.filter(d => d.status === "Em aberto").reduce((s, r) => s + r.valor, 0);
+  const totalDevolvido = allData.filter(d => d.status === "Devolvido").reduce((s, r) => s + r.valor, 0);
+
+  const bulkQuitar = (indices: number[]) => {
+    const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
+    setAllData((prev) =>
+      prev.map((d) => ids.includes(d.id) ? { ...d, status: "Devolvido" } : d)
+    );
+    toast({ title: `${ids.length} adiantamento(s) quitado(s)` });
+  };
+
+  const bulkDelete = (indices: number[]) => {
+    const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
+    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
+    toast({ title: `${ids.length} adiantamento(s) removido(s)`, variant: "destructive" });
+  };
+
+  const selectionActions: SelectionAction[] = [
+    { label: "Quitar", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkQuitar, description: "Marca os adiantamentos selecionados como devolvidos" },
+    { label: "Deletar", icon: <Trash2 className="h-4 w-4" />, onClick: bulkDelete, variant: "destructive", description: "Remove permanentemente os adiantamentos selecionados" },
+  ];
+
+  const summaryCards: SummaryCard[] = [
+    { label: "Em aberto", value: R$(totalEmAberto), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Devolvido", value: R$(totalDevolvido), icon: <CreditCard className="h-4 w-4" /> },
+  ];
+
+  const columns: Column<Adiantamento>[] = [
+    { key: "data", label: "Data" },
+    { key: "profissional", label: "Profissional", pinned: true },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    {
+      key: "status", label: "Status",
+      render: (v) => (
+        <span className="font-medium" style={{ color: v === "Devolvido" ? "#00c5b4" : "#ff2f2f" }}>
+          {v}
+        </span>
+      ),
+    },
+    { key: "observacao", label: "Observação" },
+  ];
+
+  const total = allData.reduce((s, r) => s + r.valor, 0);
 
   return (
     <AppLayout>
       <DataTable
         title="Adiantamentos"
-        data={data}
+        data={allData}
         columns={columns}
         totalRow={{ profissional: "Total:", valor: R$(total) }}
-        tabs={[
-          { label: "Todos", value: "todos", count: allData.length },
-          { label: "Pendentes", value: "pendentes", count: allData.filter(d => d.status === "Pendente").length },
-          { label: "Pagos", value: "pagos", count: allData.filter(d => d.status === "Pago").length },
+        summaryCards={summaryCards}
+        selectable
+        selectionActions={selectionActions}
+        novoMenuItems={[
+          { label: "Novo Vale" },
+          { label: "Vender Produto" },
         ]}
-        activeTab={tab}
-        onTabChange={setTab}
-        actions={
-          <div className="flex items-center gap-2">
-            <button className="btn-action bg-primary text-primary-foreground"><Plus className="h-4 w-4" /> Novo Vale</button>
-            <button className="btn-action bg-accent text-accent-foreground"><Plus className="h-4 w-4" /> Vender Produto</button>
-          </div>
-        }
+        pageSize={15}
       />
     </AppLayout>
   );
