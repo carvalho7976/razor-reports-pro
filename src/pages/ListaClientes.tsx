@@ -170,6 +170,8 @@ const columns: Column<Cliente>[] = [
     render: () => (
       <ActionsMenu items={[
         { label: "Editar" },
+        { label: "Moedas" },
+        { label: "Crédito" },
         { label: "Excluir", variant: "destructive" },
       ]} />
     ),
