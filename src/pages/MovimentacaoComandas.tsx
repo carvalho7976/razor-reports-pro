@@ -40,15 +40,12 @@ export default function MovimentacaoComandas() {
   const [tab, setTab] = useState("todas");
   const { toast } = useToast();
 
-  const data = useMemo(() =>
-    allData.filter((d) =>
-      tab === "todas" ? true : tab === "entradas" ? d.tipo === "Entrada" : d.tipo === "Saída"
-    ), [tab]);
+  const data = allData;
 
   const totalBruto = allData.filter(d => d.tipo === "Entrada").reduce((s, r) => s + r.valorPago, 0);
   const totalTaxas = allData.reduce((s, r) => s + r.taxas, 0);
   const totalLiquido = totalBruto - totalTaxas;
-  const total = data.reduce((s, r) => s + r.valorPago, 0);
+  const total = allData.reduce((s, r) => s + r.valorPago, 0);
 
   const bulkNotaFiscal = (indices: number[]) => {
     toast({ title: `Gerar nota fiscal para ${indices.length} comanda(s)`, description: "Funcionalidade em desenvolvimento" });
