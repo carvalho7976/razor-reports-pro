@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3, Trash2, Merge, PlayCircle } from "lucide-react";
+import { MessageCircle, ChevronRight, Gift, RotateCcw, Bell, Users, Edit3, Trash2, Merge, PlayCircle, Tag } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
