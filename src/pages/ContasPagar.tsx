@@ -67,8 +67,8 @@ export default function ContasPagar() {
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Em aberto", value: R$(totalEmAberto), type: "monetary", sentiment: "negative" },
-    { label: "Pago", value: R$(totalPago), type: "monetary", sentiment: "positive" },
+    { label: "Em aberto", value: R$(totalEmAberto), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Pago", value: R$(totalPago), icon: <CreditCard className="h-4 w-4" /> },
   ];
 
   const columns: Column<Conta>[] = [
