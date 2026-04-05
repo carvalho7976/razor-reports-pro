@@ -54,16 +54,15 @@ export default function ContasPagar() {
   const totalEmAberto = allData.filter((d) => d.status === "Pendente").reduce((s, r) => s + r.valor, 0);
   const totalPago = allData.filter((d) => d.status === "Pago").reduce((s, r) => s + r.valor, 0);
 
-  const bulkMarkPaid = (indices: number[]) => {
+  const bulkDelete = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
-    setAllData((prev) =>
-      prev.map((d) => ids.includes(d.id) ? { ...d, status: "Pago", dataPagamento: new Date().toLocaleDateString("pt-BR") } : d)
-    );
-    toast({ title: `${ids.length} conta(s) marcada(s) como paga(s)` });
+    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
+    toast({ title: `${ids.length} conta(s) removida(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
     { label: "Pagar", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkMarkPaid, description: "Marca as contas selecionadas como pagas" },
+    { label: "Deletar", icon: <Trash2 className="h-4 w-4" />, onClick: bulkDelete, variant: "destructive", description: "Remove permanentemente as contas selecionadas" },
   ];
 
   const summaryCards: SummaryCard[] = [
