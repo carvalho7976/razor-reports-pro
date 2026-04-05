@@ -400,6 +400,9 @@ function FilterDropdown<T>({
   );
 }
 
+/* ── Hidden column keys (native, not configurable) ── */
+const NATIVE_COLUMN_KEYS = new Set(["foto", "logo", "cor"]);
+
 /* ── Column Manager (with drag & drop reorder + reset) ── */
 function ColumnManager<T>({
   initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
@@ -423,7 +426,7 @@ function ColumnManager<T>({
 
   const orderedColumns = useMemo(() => {
     const map = new Map(initialColumns.map((c) => [c.key, c]));
-    return columnOrder.map((k) => map.get(k)!).filter(Boolean);
+    return columnOrder.map((k) => map.get(k)!).filter(Boolean).filter(c => !NATIVE_COLUMN_KEYS.has(c.key));
   }, [initialColumns, columnOrder]);
 
   const handleDragStart = (idx: number) => { setDragIdx(idx); };
@@ -449,9 +452,8 @@ function ColumnManager<T>({
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Colunas</p>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
+              <span className="text-[10px] text-muted-foreground">{initialColumns.filter(c => !NATIVE_COLUMN_KEYS.has(c.key)).length - hiddenColumns.size}/{initialColumns.filter(c => !NATIVE_COLUMN_KEYS.has(c.key)).length}</span>
               <button onClick={onReset} className="text-[10px] text-destructive hover:underline font-medium" title="Resetar para padrão">
-                <RotateCcw className="h-3 w-3" />
               </button>
             </div>
           </div>
@@ -678,18 +680,21 @@ const tabBorderColor: Record<string, string> = {
   destructive: "border-[hsl(var(--destructive))]",
 };
 
+
+
 /* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
   data, columns: initialColumns, title, titleIcon, actions, totalRow,
   emptyMessage = "Nenhum registro encontrado",
   tabs, activeTab, onTabChange, showDateFilter = true,
-  summaryCards, pageSize = 20,
+  summaryCards, pageSize: defaultPageSize = 15,
   selectable = false, selectionActions = [], novoMenuItems,
   onCellEdit, tableId, dateField,
 }: DataTableProps<T>) {
   const storageKey = tableId || title.replace(/\s+/g, "_").toLowerCase();
   
   const [search, setSearch] = useState("");
+  const [pageSize, setPageSize] = useState(defaultPageSize);
   const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [columnFilterInputs, setColumnFilterInputs] = useState<Record<string, string>>({});
@@ -1137,7 +1142,7 @@ export function DataTable<T extends Record<string, any>>({
             <thead>
               <tr className="bg-table-header text-table-header-foreground sticky top-0 z-20">
                 {selectable && (
-                  <th className="w-10 px-3 py-3.5 border-b border-table-border">
+                  <th className="w-10 px-3 py-2.5 border-b border-table-border">
                     <input
                       type="checkbox"
                       checked={allPageSelected}
@@ -1156,7 +1161,7 @@ export function DataTable<T extends Record<string, any>>({
                       key={col.key}
                       onClick={sortable ? () => handleToggleSort(col.key) : undefined}
                       className={cn(
-                        "px-5 py-3.5 text-left text-xs font-semibold whitespace-nowrap border-b border-table-border",
+                        "px-5 py-2.5 text-left text-xs font-semibold whitespace-nowrap border-b border-table-border",
                         sortable && "cursor-pointer select-none hover:bg-table-header/80 transition-colors",
                         pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-table-header",
                         col.align === "right" && "text-right",
@@ -1200,7 +1205,7 @@ export function DataTable<T extends Record<string, any>>({
                   return (
                     <tr key={i} className={cn("border-b border-border/50 hover:bg-muted/30 transition-colors", isSelected && "bg-primary/5")}>
                       {selectable && (
-                        <td className="w-10 px-3 py-3.5">
+                        <td className="w-10 px-3 py-2">
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -1213,7 +1218,7 @@ export function DataTable<T extends Record<string, any>>({
                         <td
                           key={col.key}
                           className={cn(
-                            "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
+                            "px-5 py-2 whitespace-nowrap text-sm text-foreground",
                             pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
                             col.align === "right" && "text-right",
                             col.align === "center" && "text-center"
@@ -1229,9 +1234,9 @@ export function DataTable<T extends Record<string, any>>({
 
               {totalRow && (
                 <tr className="bg-muted/40 font-semibold border-t border-border">
-                  {selectable && <td className="w-10 px-3 py-3.5" />}
+                  {selectable && <td className="w-10 px-3 py-2" />}
                   {columns.map((col) => (
-                    <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right", col.align === "center" && "text-center")}>
+                    <td key={col.key} className={cn("px-5 py-2 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right", col.align === "center" && "text-center")}>
                       {totalRow[col.key] ?? ""}
                     </td>
                   ))}
@@ -1242,34 +1247,42 @@ export function DataTable<T extends Record<string, any>>({
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-3 sm:px-5 py-3 border-t border-border">
-            <span className="text-[10px] sm:text-xs text-muted-foreground">
-              {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
-            </span>
-            <div className="flex items-center gap-0.5 sm:gap-1">
-              <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              {Array.from({ length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) }, (_, i) => {
-                const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
-                const pageNum = totalPages <= maxVisible ? i : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
-                return (
-                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
-                    {pageNum + 1}
-                  </button>
-                );
-              })}
-              <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page === totalPages - 1} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+        <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 border-t border-border bg-table-header text-table-header-foreground rounded-b-xl">
+          <span className="text-[10px] sm:text-xs opacity-70">
+            ({page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length})
+          </span>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <button onClick={() => setPage(0)} disabled={page === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              |&lt;
+            </button>
+            <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              &lt;
+            </button>
+            {Array.from({ length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) }, (_, i) => {
+              const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+              const pageNum = totalPages <= maxVisible ? i : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
+              return (
+                <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-full text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-table-header-foreground/70 hover:text-table-header-foreground")}>
+                  {pageNum + 1}
+                </button>
+              );
+            })}
+            <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page === totalPages - 1 || totalPages === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              &gt;
+            </button>
+            <button onClick={() => setPage(totalPages - 1)} disabled={page === totalPages - 1 || totalPages === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              &gt;|
+            </button>
+            <select
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
+              className="ml-2 h-7 px-1.5 rounded bg-table-header border border-table-header-foreground/20 text-table-header-foreground text-xs cursor-pointer focus:outline-none"
+            >
+              {[10, 15, 20, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
           </div>
-        )}
+        </div>
       </div>
-
-      {/* Record count */}
-      <p className="text-xs text-muted-foreground">{filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}</p>
     </div>
   );
 }

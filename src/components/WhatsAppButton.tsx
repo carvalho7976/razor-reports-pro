@@ -44,7 +44,7 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
   return (
     <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setCustomOpen(false); setCustomText(""); } }}>
       <PopoverTrigger asChild>
-        <button className="p-1 rounded hover:bg-success/20 transition-colors" title="Enviar mensagem WhatsApp">
+        <button className="p-1 rounded hover:bg-[hsl(142_71%_45%/0.12)] transition-colors" title="Enviar mensagem WhatsApp">
           <MessageCircle className="h-4 w-4 text-success" />
         </button>
       </PopoverTrigger>
@@ -95,7 +95,7 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
 
 export function ClienteLink({ nome, children }: { nome: string; children?: React.ReactNode }) {
   return (
-    <a href="/clientePesquisa" className="text-primary hover:underline font-medium">
+    <a href="/clientePesquisa" className="hover:underline font-medium text-foreground">
       {children || nome}
     </a>
   );
@@ -103,7 +103,7 @@ export function ClienteLink({ nome, children }: { nome: string; children?: React
 
 export function ProfissionalLink({ nome, children }: { nome: string; children?: React.ReactNode }) {
   return (
-    <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">
+    <a href="/funcionarioPesquisa" className="hover:underline font-medium text-foreground">
       {children || nome}
     </a>
   );
