@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
-import { XCircle } from "lucide-react";
+import { CreditCard, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Assinante {
