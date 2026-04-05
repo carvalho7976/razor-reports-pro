@@ -678,12 +678,15 @@ const tabBorderColor: Record<string, string> = {
   destructive: "border-[hsl(var(--destructive))]",
 };
 
+/* ── Hidden column keys (native, not configurable) ── */
+const NATIVE_COLUMN_KEYS = new Set(["foto", "logo", "cor"]);
+
 /* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
   data, columns: initialColumns, title, titleIcon, actions, totalRow,
   emptyMessage = "Nenhum registro encontrado",
   tabs, activeTab, onTabChange, showDateFilter = true,
-  summaryCards, pageSize = 20,
+  summaryCards, pageSize: defaultPageSize = 15,
   selectable = false, selectionActions = [], novoMenuItems,
   onCellEdit, tableId, dateField,
 }: DataTableProps<T>) {
