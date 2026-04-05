@@ -1,5 +1,5 @@
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, ActionsMenu, SelectionAction, TabDef } from "@/components/DataTable";
+import { DataTable, Column, ActionsMenu, SelectionAction, TabDef, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Trash2, Merge, PlayCircle, Tag, MessageCircle, Pencil, Coins, CreditCard } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -54,6 +54,9 @@ export default function ListaClientes() {
   const semiAtivos = allData.filter((c) => c.status === "semi-ativo").length;
   const inativos = allData.filter((c) => c.status === "inativo").length;
 
+  const totalMoedas = allData.reduce((s, c) => s + c.moedas, 0);
+  const totalCreditos = allData.reduce((s, c) => s + c.creditos, 0);
+
   const bulkRemove = (indices: number[]) => { toast({ title: `${indices.length} cliente(s) removido(s)`, variant: "destructive" }); };
   const bulkMerge = (indices: number[]) => { toast({ title: `Mesclar ${indices.length} clientes`, description: "Funcionalidade em desenvolvimento" }); };
   const bulkMessage = (indices: number[]) => { toast({ title: `Enviar mensagem para ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" }); };
@@ -64,6 +67,11 @@ export default function ListaClientes() {
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
     { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage, description: "Envia mensagem via WhatsApp para os clientes selecionados" },
     { label: "Tag", icon: <Tag className="h-4 w-4" />, onClick: bulkTag, description: "Adiciona uma tag aos clientes selecionados" },
+  ];
+
+  const summaryCards: SummaryCard[] = [
+    { label: "Moedas Distribuídas", value: String(totalMoedas), type: "quantity", size: "compact" },
+    { label: "Créditos em Aberto", value: R$(totalCreditos), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 
   const columns: Column<Cliente>[] = [
@@ -77,7 +85,6 @@ export default function ListaClientes() {
         </div>
       ),
     },
-    { key: "telefone", label: "Telefone" },
     { key: "aniversario", label: "Aniversário" },
     { key: "ultimaVisita", label: "Última Visita" },
     { key: "moedas", label: "Moedas", align: "center" },
@@ -127,6 +134,7 @@ export default function ListaClientes() {
         }
         data={filteredData}
         columns={columns}
+        summaryCards={summaryCards}
         showDateFilter={true}
         selectable
         selectionActions={selectionActions}

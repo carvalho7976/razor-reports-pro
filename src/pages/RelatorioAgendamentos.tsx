@@ -38,9 +38,21 @@ export default function RelatorioAgendamentos() {
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os agendamentos selecionados" },
   ];
 
+  // Origin cards with percentage
+  const origemCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allData.forEach(d => { counts[d.origem] = (counts[d.origem] || 0) + 1; });
+    return counts;
+  }, [allData]);
+
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(allData.length), type: "quantity" },
-    { label: "Origem App", value: String(allData.filter(d => d.origem === "App").length), type: "quantity" },
+    { label: "Total", value: String(allData.length), type: "quantity", size: "compact" },
+    ...Object.entries(origemCounts).map(([origem, count]) => ({
+      label: `Origem ${origem}`,
+      value: `${count} (${Math.round(count / allData.length * 100)}%)`,
+      type: "quantity" as const,
+      size: "compact" as const,
+    })),
   ];
 
   const columns: Column<Agendamento>[] = [
@@ -65,8 +77,10 @@ export default function RelatorioAgendamentos() {
       ),
     },
     { key: "servico", label: "Serviço" },
-    { key: "data", label: "Data" },
-    { key: "horario", label: "Horário" },
+    {
+      key: "data", label: "Data / Horário",
+      render: (v, row) => `${v} ${row.horario}`,
+    },
     { key: "origem", label: "Origem" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
     { key: "status", label: "Status", render: v => <span className="font-medium" style={{ color: v === "Realizado" ? "#00c5b4" : "#f59e0b" }}>{v}</span> },
