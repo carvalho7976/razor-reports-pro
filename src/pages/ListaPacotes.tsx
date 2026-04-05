@@ -24,7 +24,7 @@ const initialData: Pacote[] = [
 ];
 
 export default function ListaPacotes() {
-  const [allData, setAllData] = useState(initialData);
+  const [allData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
 
@@ -35,14 +35,7 @@ export default function ListaPacotes() {
   }, [tab, allData]);
 
   const bulkRemove = (indices: number[]) => {
-    const ids = indices.map(i => data[i]?.id).filter(Boolean);
-    setAllData(prev => prev.filter(d => !ids.includes(d.id)));
-    toast({ title: `${ids.length} pacote(s) removido(s)`, variant: "destructive" });
-  };
-
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
+    toast({ title: `${indices.length} pacote(s) removido(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
@@ -50,10 +43,10 @@ export default function ListaPacotes() {
   ];
 
   const columns: Column<Pacote>[] = [
-    { key: "nome", label: "Nome", pinned: true, editable: true },
-    { key: "servicos", label: "Serviços", editable: true },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v), editable: true, editType: "currency" },
-    { key: "validade", label: "Validade", editable: true },
+    { key: "nome", label: "Nome", pinned: true },
+    { key: "servicos", label: "Serviços" },
+    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
+    { key: "validade", label: "Validade" },
     {
       key: "status", label: "Status",
       render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
@@ -88,7 +81,6 @@ export default function ListaPacotes() {
         activeTab={tab}
         onTabChange={setTab}
         pageSize={15}
-        onCellEdit={handleCellEdit}
         tableId="lista_pacotes"
       />
     </AppLayout>

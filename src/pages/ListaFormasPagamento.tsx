@@ -23,7 +23,7 @@ const initialData: FormaPagamento[] = [
 ];
 
 export default function ListaFormasPagamento() {
-  const [allData, setAllData] = useState(initialData);
+  const [allData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
 
@@ -34,14 +34,7 @@ export default function ListaFormasPagamento() {
   }, [tab, allData]);
 
   const bulkRemove = (indices: number[]) => {
-    const ids = indices.map(i => data[i]?.id).filter(Boolean);
-    setAllData(prev => prev.filter(d => !ids.includes(d.id)));
-    toast({ title: `${ids.length} forma(s) removida(s)`, variant: "destructive" });
-  };
-
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
+    toast({ title: `${indices.length} forma(s) removida(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
@@ -49,9 +42,9 @@ export default function ListaFormasPagamento() {
   ];
 
   const columns: Column<FormaPagamento>[] = [
-    { key: "nome", label: "Nome", pinned: true, editable: true },
-    { key: "tipo", label: "Tipo", editable: true },
-    { key: "taxa", label: "Taxa %", align: "center", render: v => `${v}%`, editable: true, editType: "number" },
+    { key: "nome", label: "Nome", pinned: true },
+    { key: "tipo", label: "Tipo" },
+    { key: "taxa", label: "Taxa %", align: "center", render: v => `${v}%` },
     {
       key: "status", label: "Status",
       render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
@@ -85,7 +78,6 @@ export default function ListaFormasPagamento() {
         activeTab={tab}
         onTabChange={setTab}
         pageSize={15}
-        onCellEdit={handleCellEdit}
         tableId="lista_formas_pagamento"
       />
     </AppLayout>

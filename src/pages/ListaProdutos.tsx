@@ -28,7 +28,7 @@ const initialData: Produto[] = [
 ];
 
 export default function ListaProdutos() {
-  const [allData, setAllData] = useState(initialData);
+  const [allData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
 
@@ -40,14 +40,7 @@ export default function ListaProdutos() {
   }, [tab, allData]);
 
   const bulkRemove = (indices: number[]) => {
-    const ids = indices.map(i => data[i]?.id).filter(Boolean);
-    setAllData(prev => prev.filter(d => !ids.includes(d.id)));
-    toast({ title: `${ids.length} produto(s) removido(s)`, variant: "destructive" });
-  };
-
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
+    toast({ title: `${indices.length} produto(s) removido(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
@@ -55,11 +48,11 @@ export default function ListaProdutos() {
   ];
 
   const columns: Column<Produto>[] = [
-    { key: "nome", label: "Nome", pinned: true, editable: true },
-    { key: "categoria", label: "Categoria", editable: true },
-    { key: "estoque", label: "Estoque", align: "center", editable: true, editType: "number" },
-    { key: "estoqueMinimo", label: "Estoque Mín.", align: "center", editable: true, editType: "number" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v), editable: true, editType: "currency" },
+    { key: "nome", label: "Nome", pinned: true },
+    { key: "categoria", label: "Categoria" },
+    { key: "estoque", label: "Estoque", align: "center" },
+    { key: "estoqueMinimo", label: "Estoque Mín.", align: "center" },
+    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
     {
       key: "status", label: "Status",
       render: v => <span className="font-medium" style={{ color: v === "Normal" ? "#00c5b4" : v === "Mínimo" ? "#f59e0b" : "#ff2f2f" }}>{v}</span>,
@@ -94,7 +87,6 @@ export default function ListaProdutos() {
         activeTab={tab}
         onTabChange={setTab}
         pageSize={15}
-        onCellEdit={handleCellEdit}
         tableId="lista_produtos"
       />
     </AppLayout>

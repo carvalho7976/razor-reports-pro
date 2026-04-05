@@ -21,18 +21,11 @@ const initialData: Categoria[] = [
 ];
 
 export default function ListaCategorias() {
-  const [allData, setAllData] = useState(initialData);
+  const [allData] = useState(initialData);
   const { toast } = useToast();
 
   const bulkRemove = (indices: number[]) => {
-    const ids = indices.map(i => allData[i]?.id).filter(Boolean);
-    setAllData(prev => prev.filter(d => !ids.includes(d.id)));
-    toast({ title: `${ids.length} categoria(s) removida(s)`, variant: "destructive" });
-  };
-
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
+    toast({ title: `${indices.length} categoria(s) removida(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
@@ -40,9 +33,9 @@ export default function ListaCategorias() {
   ];
 
   const columns: Column<Categoria>[] = [
-    { key: "nome", label: "Nome", pinned: true, editable: true },
+    { key: "nome", label: "Nome", pinned: true },
     { key: "qtdServicos", label: "Qtd Serviços", align: "center" },
-    { key: "descricao", label: "Descrição", editable: true },
+    { key: "descricao", label: "Descrição" },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
       render: () => <ActionsMenu items={[
@@ -63,7 +56,6 @@ export default function ListaCategorias() {
         showDateFilter={true}
         novoMenuItems={[{ label: "Nova categoria" }]}
         pageSize={15}
-        onCellEdit={handleCellEdit}
         tableId="lista_categorias"
       />
     </AppLayout>
