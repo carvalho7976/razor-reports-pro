@@ -1247,34 +1247,42 @@ export function DataTable<T extends Record<string, any>>({
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-3 sm:px-5 py-3 border-t border-border">
-            <span className="text-[10px] sm:text-xs text-muted-foreground">
-              {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
-            </span>
-            <div className="flex items-center gap-0.5 sm:gap-1">
-              <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              {Array.from({ length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) }, (_, i) => {
-                const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
-                const pageNum = totalPages <= maxVisible ? i : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
-                return (
-                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
-                    {pageNum + 1}
-                  </button>
-                );
-              })}
-              <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page === totalPages - 1} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+        <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 border-t border-border bg-table-header text-table-header-foreground rounded-b-xl">
+          <span className="text-[10px] sm:text-xs opacity-70">
+            ({page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length})
+          </span>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <button onClick={() => setPage(0)} disabled={page === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              |&lt;
+            </button>
+            <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              &lt;
+            </button>
+            {Array.from({ length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) }, (_, i) => {
+              const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+              const pageNum = totalPages <= maxVisible ? i : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
+              return (
+                <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-full text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-table-header-foreground/70 hover:text-table-header-foreground")}>
+                  {pageNum + 1}
+                </button>
+              );
+            })}
+            <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page === totalPages - 1 || totalPages === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              &gt;
+            </button>
+            <button onClick={() => setPage(totalPages - 1)} disabled={page === totalPages - 1 || totalPages === 0} className="p-1 rounded text-table-header-foreground/70 hover:text-table-header-foreground disabled:opacity-30 transition-colors text-xs">
+              &gt;|
+            </button>
+            <select
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
+              className="ml-2 h-7 px-1.5 rounded bg-table-header border border-table-header-foreground/20 text-table-header-foreground text-xs cursor-pointer focus:outline-none"
+            >
+              {[10, 15, 20, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
           </div>
-        )}
+        </div>
       </div>
-
-      {/* Record count */}
-      <p className="text-xs text-muted-foreground">{filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}</p>
     </div>
   );
 }
