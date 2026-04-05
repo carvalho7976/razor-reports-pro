@@ -95,7 +95,7 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
 
 export function ClienteLink({ nome, children }: { nome: string; children?: React.ReactNode }) {
   return (
-    <a href="/clientePesquisa" className="text-primary hover:underline font-medium">
+    <a href="/clientePesquisa" className="hover:underline font-medium text-foreground">
       {children || nome}
     </a>
   );
@@ -103,7 +103,7 @@ export function ClienteLink({ nome, children }: { nome: string; children?: React
 
 export function ProfissionalLink({ nome, children }: { nome: string; children?: React.ReactNode }) {
   return (
-    <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">
+    <a href="/funcionarioPesquisa" className="hover:underline font-medium text-foreground">
       {children || nome}
     </a>
   );
