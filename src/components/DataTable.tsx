@@ -48,6 +48,16 @@ export interface NovoMenuItem {
   onClick?: () => void;
 }
 
+export interface SummaryCard {
+  label: string;
+  value: string;
+  icon?: ReactNode;
+  /** "monetary" = movimentação style with emoji, "quantity" = relatório clientes style */
+  type?: "monetary" | "quantity";
+  /** Sentiment for emoji color: positive=blue, negative=red, neutral=black */
+  sentiment?: "positive" | "negative" | "neutral";
+}
+
 interface DataTableProps<T extends Record<string, any>> {
   data: T[];
   columns: Column<T>[];
@@ -60,7 +70,7 @@ interface DataTableProps<T extends Record<string, any>> {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   showDateFilter?: boolean;
-  summaryCards?: { label: string; value: string; icon?: ReactNode }[];
+  summaryCards?: SummaryCard[];
   pageSize?: number;
   selectable?: boolean;
   selectionActions?: SelectionAction[];
@@ -780,15 +790,52 @@ export function DataTable<T extends Record<string, any>>({
       {/* Summary Cards */}
       {summaryCards && (
         <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 sm:flex-wrap">
-          {summaryCards.map((card, i) => (
-            <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
-              {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
-              <div className="min-w-0">
-                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
-                <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
+          {summaryCards.map((card, i) => {
+            const isMonetary = card.type === "monetary";
+            const isQuantity = card.type === "quantity";
+            const sentimentColor = card.sentiment === "positive"
+              ? "text-info"
+              : card.sentiment === "negative"
+                ? "text-destructive"
+                : "text-foreground";
+            const sentimentEmoji = card.sentiment === "positive"
+              ? "🔵"
+              : card.sentiment === "negative"
+                ? "🔴"
+                : "⚫";
+
+            if (isQuantity) {
+              return (
+                <div key={i} className="flex flex-col px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm min-w-[100px]">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                  <p className="text-lg sm:text-xl font-bold text-foreground tabular-nums">{card.value}</p>
+                </div>
+              );
+            }
+
+            if (isMonetary) {
+              return (
+                <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+                  <span className="text-base sm:text-lg">{sentimentEmoji}</span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                    <p className={cn("text-sm sm:text-base font-bold tabular-nums", sentimentColor)}>{card.value}</p>
+                  </div>
+                </div>
+              );
+            }
+
+            // Default legacy style
+            return (
+              <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+                {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
+                <div className="min-w-0">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                  <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
