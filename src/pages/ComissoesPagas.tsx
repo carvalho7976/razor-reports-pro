@@ -26,8 +26,14 @@ const totalComissao = data.reduce((s, r) => s + r.comissaoPaga, 0);
 
 const columns: Column<ComissaoPaga>[] = [
   { key: "dataAcerto", label: "Data do Acerto" },
-  { key: "profissional", label: "Profissional" },
-  { key: "cliente", label: "Cliente" },
+  {
+    key: "profissional", label: "Profissional",
+    render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+  },
+  {
+    key: "cliente", label: "Cliente",
+    render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+  },
   { key: "servico", label: "Serviço" },
   { key: "dataAtendimento", label: "Data Atendimento" },
   { key: "valorComanda", label: "Valor da Comanda", align: "right", render: (v) => R$(v) },
@@ -44,6 +50,8 @@ export default function ComissoesPagas() {
         data={data}
         columns={columns}
         totalRow={{ valorComanda: R$(totalValor), descontoTaxa: "Valor Total:", comissaoPaga: R$(totalComissao) }}
+        showDateFilter={true}
+        tableId="comissoes_pagas"
       />
     </AppLayout>
   );

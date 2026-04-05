@@ -35,7 +35,10 @@ export default function ExclusaoClientes() {
 
   const columns: Column<Exclusao>[] = [
     { key: "codigo", label: "Código" },
-    { key: "cliente", label: "Cliente", pinned: true },
+    {
+      key: "cliente", label: "Cliente", pinned: true,
+      render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    },
     { key: "excluidoPor", label: "Excluído por" },
     { key: "data", label: "Data" },
   ];
@@ -46,10 +49,11 @@ export default function ExclusaoClientes() {
         title="Exclusão de Clientes"
         data={allData}
         columns={columns}
-        showDateFilter={false}
+        showDateFilter={true}
         selectable
         selectionActions={selectionActions}
         pageSize={15}
+        tableId="exclusao_clientes"
       />
     </AppLayout>
   );
