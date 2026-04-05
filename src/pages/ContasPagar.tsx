@@ -25,20 +25,8 @@ const initialData: Conta[] = [
   { id: 6, conta: "Manutenção", descricao: "Reparo cadeira", vencimento: "25/03/2026", valor: 450, status: "Pendente", dataPagamento: "" },
 ];
 
-function StatusBadge({ status }: { status: string }) {
-  const isPago = status === "Pago";
-  return (
-    <span
-      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white"
-      style={{ backgroundColor: isPago ? "#00c5b4" : "#ff2f2f" }}
-    >
-      {status}
-    </span>
-  );
-}
-
 export default function ContasPagar() {
-  const [tab, setTab] = useState("todas");
+  const [tab, setTab] = useState("pendentes");
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
@@ -90,7 +78,11 @@ export default function ContasPagar() {
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     {
       key: "status", label: "Status",
-      render: (v) => <StatusBadge status={v} />,
+      render: (v) => (
+        <span className="font-medium" style={{ color: v === "Pago" ? "#00c5b4" : "#ff2f2f" }}>
+          {v}
+        </span>
+      ),
     },
     { key: "dataPagamento", label: "Data Pagamento" },
     {
@@ -122,6 +114,13 @@ export default function ContasPagar() {
         selectionActions={selectionActions}
         novoMenuItems={[{ label: "Nova conta" }]}
         summaryCards={summaryCards}
+        tabs={[
+          { label: "Todas", value: "todas", count: allData.length },
+          { label: "Pendentes", value: "pendentes", count: allData.filter(d => d.status === "Pendente").length },
+          { label: "Pagas", value: "pagas", count: allData.filter(d => d.status === "Pago").length },
+        ]}
+        activeTab={tab}
+        onTabChange={setTab}
         pageSize={15}
       />
     </AppLayout>
