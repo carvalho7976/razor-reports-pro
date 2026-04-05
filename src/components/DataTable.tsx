@@ -884,7 +884,7 @@ export function DataTable<T extends Record<string, any>>({
                   "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
                   action.variant === "destructive"
                     ? "text-destructive hover:bg-destructive/10"
-                    : "text-primary hover:bg-primary/10"
+                    : "text-success hover:bg-success/10"
                 )}
               >
                 {action.icon}
