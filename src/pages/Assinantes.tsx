@@ -82,6 +82,7 @@ export default function Assinantes() {
         showDateFilter={false}
         summaryCards={summaryCards}
         tabs={[
+          { label: "Total", value: "total", count: totalAssinantes },
           { label: "Ativos", value: "ativo", count: allData.filter(d => d.status === "Ativo").length },
           { label: "Atrasados", value: "atrasado", count: totalAtrasados },
         ]}
