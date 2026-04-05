@@ -54,6 +54,14 @@ export default function ContasPagar() {
   const totalEmAberto = allData.filter((d) => d.status === "Pendente").reduce((s, r) => s + r.valor, 0);
   const totalPago = allData.filter((d) => d.status === "Pago").reduce((s, r) => s + r.valor, 0);
 
+  const bulkMarkPaid = (indices: number[]) => {
+    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
+    setAllData((prev) =>
+      prev.map((d) => ids.includes(d.id) ? { ...d, status: "Pago", dataPagamento: new Date().toLocaleDateString("pt-BR") } : d)
+    );
+    toast({ title: `${ids.length} conta(s) marcada(s) como paga(s)` });
+  };
+
   const bulkDelete = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
     setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
