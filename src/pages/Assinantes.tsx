@@ -1,19 +1,20 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CreditCard, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface Assinante { id: number; nome: string; plano: string; inicio: string; vencimento: string; valor: number; status: string; }
+interface Assinante { id: number; nome: string; telefone: string; plano: string; inicio: string; vencimento: string; valor: number; status: string; }
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const initialData: Assinante[] = [
-  { id: 1, nome: "CAIO CESAR DE SOUZA FERNANDES", plano: "Plano Mensal", inicio: "01/01/2026", vencimento: "01/04/2026", valor: 89.9, status: "Ativo" },
-  { id: 2, nome: "Everton", plano: "Plano Trimestral", inicio: "15/12/2025", vencimento: "15/03/2026", valor: 239.9, status: "Atrasado" },
-  { id: 3, nome: "Luis Alberto Santos", plano: "Plano Mensal", inicio: "10/02/2026", vencimento: "10/03/2026", valor: 89.9, status: "Atrasado" },
-  { id: 4, nome: "Gean", plano: "Plano Semestral", inicio: "01/11/2025", vencimento: "01/05/2026", valor: 449.9, status: "Ativo" },
-  { id: 5, nome: "Marcel Pires", plano: "Plano Mensal", inicio: "20/02/2026", vencimento: "20/03/2026", valor: 89.9, status: "Atrasado" },
-  { id: 6, nome: "Diego Almeida", plano: "Plano Mensal", inicio: "05/03/2026", vencimento: "05/04/2026", valor: 89.9, status: "Ativo" },
+  { id: 1, nome: "CAIO CESAR DE SOUZA FERNANDES", telefone: "(41) 99123-4567", plano: "Plano Mensal", inicio: "01/01/2026", vencimento: "01/04/2026", valor: 89.9, status: "Ativo" },
+  { id: 2, nome: "Everton", telefone: "(41) 99876-5432", plano: "Plano Trimestral", inicio: "15/12/2025", vencimento: "15/03/2026", valor: 239.9, status: "Atrasado" },
+  { id: 3, nome: "Luis Alberto Santos", telefone: "(41) 98432-1098", plano: "Plano Mensal", inicio: "10/02/2026", vencimento: "10/03/2026", valor: 89.9, status: "Atrasado" },
+  { id: 4, nome: "Gean", telefone: "(41) 99654-3210", plano: "Plano Semestral", inicio: "01/11/2025", vencimento: "01/05/2026", valor: 449.9, status: "Ativo" },
+  { id: 5, nome: "Marcel Pires", telefone: "(41) 99111-2233", plano: "Plano Mensal", inicio: "20/02/2026", vencimento: "20/03/2026", valor: 89.9, status: "Atrasado" },
+  { id: 6, nome: "Diego Almeida", telefone: "(41) 98765-4321", plano: "Plano Mensal", inicio: "05/03/2026", vencimento: "05/04/2026", valor: 89.9, status: "Ativo" },
 ];
 
 export default function Assinantes() {
@@ -41,7 +42,15 @@ export default function Assinantes() {
   ];
 
   const columns: Column<Assinante>[] = [
-    { key: "nome", label: "Nome", pinned: true, render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a> },
+    {
+      key: "nome", label: "Nome", pinned: true,
+      render: (v, row) => (
+        <div className="flex items-center gap-1.5">
+          <WhatsAppButton telefone={row.telefone} nome={row.nome} />
+          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
+        </div>
+      ),
+    },
     { key: "plano", label: "Plano" },
     { key: "inicio", label: "Início" },
     { key: "vencimento", label: "Vencimento" },

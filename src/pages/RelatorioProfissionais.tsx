@@ -40,7 +40,7 @@ const columns: Column<RelProf>[] = [
   },
   {
     key: "profissional", label: "Profissional", pinned: true,
-    render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    render: (v) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
   },
   { key: "funcao", label: "Função", render: (v) => <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground">{v}</span> },
   { key: "totalServicos", label: "Total em Serviços", align: "right", render: (v) => R$(v) },

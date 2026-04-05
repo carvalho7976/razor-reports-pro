@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { FolderOpen, FolderClosed, Trash2 } from "lucide-react";
+import { User, FolderOpen, FolderClosed, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Comanda {
@@ -67,13 +67,20 @@ export default function Comandas() {
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.telefone} nome={row.cliente} />
-          <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a>
+          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
         </div>
       ),
     },
     {
       key: "profissional", label: "Profissional",
-      render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+      render: (v) => (
+        <div className="flex items-center gap-1.5">
+          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3 w-3 text-muted-foreground" />
+          </div>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+        </div>
+      ),
     },
     { key: "abertura", label: "Abertura" },
     { key: "fechamento", label: "Fechamento", render: v => v || "—" },
