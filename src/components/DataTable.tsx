@@ -806,9 +806,11 @@ export function DataTable<T extends Record<string, any>>({
 
             if (isQuantity) {
               return (
-                <div key={i} className="flex flex-col px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm min-w-[100px]">
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
-                  <p className="text-lg sm:text-xl font-bold text-foreground tabular-nums">{card.value}</p>
+                <div key={i} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm">
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                    <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
+                  </div>
                 </div>
               );
             }
