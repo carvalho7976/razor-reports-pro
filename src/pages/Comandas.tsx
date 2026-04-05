@@ -1,12 +1,14 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SelectionAction } from "@/components/DataTable";
+import { DataTable, Column, SelectionAction, TabDef } from "@/components/DataTable";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { FolderOpen, FolderClosed, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Comanda {
   id: number;
   cliente: string;
+  telefone: string;
   profissional: string;
   abertura: string;
   fechamento: string;
@@ -18,12 +20,12 @@ interface Comanda {
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const initialData: Comanda[] = [
-  { id: 1, cliente: "João Silva", profissional: "Carlos", abertura: "05/04/2026 09:00", fechamento: "", valor: 120, fechadoPor: "", status: "Aberta" },
-  { id: 2, cliente: "Maria Santos", profissional: "Ana", abertura: "05/04/2026 10:30", fechamento: "", valor: 85, fechadoPor: "", status: "Aberta" },
-  { id: 3, cliente: "Pedro Oliveira", profissional: "Carlos", abertura: "04/04/2026 14:00", fechamento: "04/04/2026 15:30", valor: 150, fechadoPor: "Admin", status: "Fechada" },
-  { id: 4, cliente: "Ana Costa", profissional: "Fernanda", abertura: "04/04/2026 11:00", fechamento: "04/04/2026 12:00", valor: 200, fechadoPor: "Fernanda", status: "Fechada" },
-  { id: 5, cliente: "Lucas Almeida", profissional: "Carlos", abertura: "03/04/2026 16:00", fechamento: "03/04/2026 17:30", valor: 95, fechadoPor: "Admin", status: "Fechada" },
-  { id: 6, cliente: "Carla Dias", profissional: "Ana", abertura: "05/04/2026 08:00", fechamento: "", valor: 180, fechadoPor: "", status: "Aberta" },
+  { id: 1, cliente: "João Silva", telefone: "(41) 99123-4567", profissional: "Carlos", abertura: "05/04/2026 09:00", fechamento: "", valor: 120, fechadoPor: "", status: "Aberta" },
+  { id: 2, cliente: "Maria Santos", telefone: "(41) 98765-4321", profissional: "Ana", abertura: "05/04/2026 10:30", fechamento: "", valor: 85, fechadoPor: "", status: "Aberta" },
+  { id: 3, cliente: "Pedro Oliveira", telefone: "(41) 99876-5432", profissional: "Carlos", abertura: "04/04/2026 14:00", fechamento: "04/04/2026 15:30", valor: 150, fechadoPor: "Admin", status: "Fechada" },
+  { id: 4, cliente: "Ana Costa", telefone: "(41) 99654-3210", profissional: "Fernanda", abertura: "04/04/2026 11:00", fechamento: "04/04/2026 12:00", valor: 200, fechadoPor: "Fernanda", status: "Fechada" },
+  { id: 5, cliente: "Lucas Almeida", telefone: "(41) 98432-1098", profissional: "Carlos", abertura: "03/04/2026 16:00", fechamento: "03/04/2026 17:30", valor: 95, fechadoPor: "Admin", status: "Fechada" },
+  { id: 6, cliente: "Carla Dias", telefone: "", profissional: "Ana", abertura: "05/04/2026 08:00", fechamento: "", valor: 180, fechadoPor: "", status: "Aberta" },
 ];
 
 export default function Comandas() {
@@ -60,16 +62,33 @@ export default function Comandas() {
   ];
 
   const columns: Column<Comanda>[] = [
-    { key: "cliente", label: "Cliente", pinned: true },
-    { key: "profissional", label: "Profissional" },
+    {
+      key: "cliente", label: "Cliente", pinned: true,
+      render: (v, row) => (
+        <div className="flex items-center gap-1.5">
+          <WhatsAppButton telefone={row.telefone} nome={row.cliente} />
+          <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a>
+        </div>
+      ),
+    },
+    {
+      key: "profissional", label: "Profissional",
+      render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    },
     { key: "abertura", label: "Abertura" },
     { key: "fechamento", label: "Fechamento", render: v => v || "—" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
     { key: "fechadoPor", label: "Fechado por", render: v => v || "—" },
     {
       key: "status", label: "Status",
-      render: v => <span className="font-medium" style={{ color: v === "Aberta" ? "#00c5b4" : "#6b7280" }}>{v}</span>,
+      render: v => <span className="font-medium" style={{ color: v === "Aberta" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
     },
+  ];
+
+  const tabs: TabDef[] = [
+    { label: "Total", value: "total", count: allData.length, color: "neutral" },
+    { label: "Abertas", value: "abertas", count: allData.filter(d => d.status === "Aberta").length, color: "success" },
+    { label: "Fechadas", value: "fechadas", count: allData.filter(d => d.status === "Fechada").length, color: "destructive" },
   ];
 
   return (
@@ -80,14 +99,12 @@ export default function Comandas() {
         columns={columns}
         selectable
         selectionActions={selectionActions}
-        tabs={[
-          { label: "Total", value: "total", count: allData.length },
-          { label: "Abertas", value: "abertas", count: allData.filter(d => d.status === "Aberta").length },
-          { label: "Fechadas", value: "fechadas", count: allData.filter(d => d.status === "Fechada").length },
-        ]}
+        tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
         pageSize={15}
+        showDateFilter={true}
+        tableId="comandas"
       />
     </AppLayout>
   );
