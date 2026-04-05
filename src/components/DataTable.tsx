@@ -680,8 +680,7 @@ const tabBorderColor: Record<string, string> = {
   destructive: "border-[hsl(var(--destructive))]",
 };
 
-/* ── Hidden column keys (native, not configurable) ── */
-const NATIVE_COLUMN_KEYS = new Set(["foto", "logo", "cor"]);
+
 
 /* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
