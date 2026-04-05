@@ -41,7 +41,7 @@ const data: Cliente[] = [
 
 export default function ListaClientes() {
   const [activeTab, setActiveTab] = useState("todos");
-  const [allData, setAllData] = useState(data);
+  const [allData] = useState(data);
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
@@ -54,17 +54,9 @@ export default function ListaClientes() {
   const semiAtivos = allData.filter((c) => c.status === "semi-ativo").length;
   const inativos = allData.filter((c) => c.status === "inativo").length;
 
-  const bulkRemove = (indices: number[]) => {
-    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
-    setAllData((prev) => prev.filter((c) => !cods.includes(c.cod)));
-    toast({ title: `${cods.length} cliente(s) removido(s)`, variant: "destructive" });
-  };
+  const bulkRemove = (indices: number[]) => { toast({ title: `${indices.length} cliente(s) removido(s)`, variant: "destructive" }); };
   const bulkMerge = (indices: number[]) => { toast({ title: `Mesclar ${indices.length} clientes`, description: "Funcionalidade em desenvolvimento" }); };
-  const bulkMessage = (indices: number[]) => {
-    const clients = indices.map((i) => filteredData[i]).filter(Boolean).filter((c) => c.telefone);
-    if (clients.length === 0) { toast({ title: "Nenhum cliente com telefone", variant: "destructive" }); return; }
-    toast({ title: `Enviar mensagem para ${clients.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
-  };
+  const bulkMessage = (indices: number[]) => { toast({ title: `Enviar mensagem para ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" }); };
   const bulkTag = (indices: number[]) => { toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" }); };
 
   const selectionActions: SelectionAction[] = [
@@ -74,11 +66,6 @@ export default function ListaClientes() {
     { label: "Tag", icon: <Tag className="h-4 w-4" />, onClick: bulkTag, description: "Adiciona uma tag aos clientes selecionados" },
   ];
 
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
-  };
-
   const columns: Column<Cliente>[] = [
     { key: "cod", label: "Cod", width: "90px" },
     {
@@ -86,16 +73,16 @@ export default function ListaClientes() {
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.telefone} nome={row.nome} />
-          <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a>
+          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
         </div>
       ),
     },
-    { key: "telefone", label: "Telefone", editable: true },
-    { key: "aniversario", label: "Aniversário", editable: true },
+    { key: "telefone", label: "Telefone" },
+    { key: "aniversario", label: "Aniversário" },
     { key: "ultimaVisita", label: "Última Visita" },
     { key: "moedas", label: "Moedas", align: "center" },
     { key: "creditos", label: "Créditos", align: "center", render: (v) => v.toFixed(1) },
-    { key: "tags", label: "Tags", editable: true },
+    { key: "tags", label: "Tags" },
     {
       key: "status", label: "Status",
       render: (v: StatusCliente) => {
@@ -148,7 +135,6 @@ export default function ListaClientes() {
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onCellEdit={handleCellEdit}
         tableId="lista_clientes"
       />
     </AppLayout>

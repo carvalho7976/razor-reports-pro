@@ -57,7 +57,7 @@ export default function RelatorioClientes() {
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.celular} nome={row.cliente} />
-          <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a>
+          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
         </div>
       ),
     },

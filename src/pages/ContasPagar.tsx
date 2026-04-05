@@ -78,16 +78,11 @@ export default function ContasPagar() {
     { label: "Pago", value: R$(totalPago), icon: <CreditCard className="h-4 w-4" /> },
   ];
 
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
-  };
-
   const columns: Column<Conta>[] = [
-    { key: "conta", label: "Conta", pinned: true, editable: true },
-    { key: "descricao", label: "Descrição", editable: true },
-    { key: "vencimento", label: "Vencimento", editable: true },
-    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v), editable: true, editType: "currency" },
+    { key: "conta", label: "Conta", pinned: true },
+    { key: "descricao", label: "Descrição" },
+    { key: "vencimento", label: "Vencimento" },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     {
       key: "status", label: "Status",
       render: (v) => <span className="font-medium" style={{ color: v === "Pago" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
@@ -129,7 +124,6 @@ export default function ContasPagar() {
         onTabChange={setTab}
         pageSize={15}
         showDateFilter={true}
-        onCellEdit={handleCellEdit}
         tableId="contas_pagar"
       />
     </AppLayout>

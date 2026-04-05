@@ -1,5 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column } from "@/components/DataTable";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { User } from "lucide-react";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -7,6 +9,7 @@ interface ComissaoPaga {
   dataAcerto: string;
   profissional: string;
   cliente: string;
+  celular: string;
   servico: string;
   dataAtendimento: string;
   valorComanda: number;
@@ -16,9 +19,9 @@ interface ComissaoPaga {
 }
 
 const data: ComissaoPaga[] = [
-  { dataAcerto: "01/03/2026", profissional: "Cesar", cliente: "João Silva", servico: "Corte Masculino", dataAtendimento: "28/02/2026", valorComanda: 75, tipo: "Serviço", descontoTaxa: 2.5, comissaoPaga: 36.25 },
-  { dataAcerto: "01/03/2026", profissional: "Matheus", cliente: "Pedro Santos", servico: "Barba", dataAtendimento: "28/02/2026", valorComanda: 45, tipo: "Serviço", descontoTaxa: 1.5, comissaoPaga: 21.75 },
-  { dataAcerto: "01/03/2026", profissional: "Claudia", cliente: "Ana Costa", servico: "Hidratação", dataAtendimento: "27/02/2026", valorComanda: 120, tipo: "Serviço", descontoTaxa: 4, comissaoPaga: 58 },
+  { dataAcerto: "01/03/2026", profissional: "Cesar", cliente: "João Silva", celular: "(41) 99123-4567", servico: "Corte Masculino", dataAtendimento: "28/02/2026", valorComanda: 75, tipo: "Serviço", descontoTaxa: 2.5, comissaoPaga: 36.25 },
+  { dataAcerto: "01/03/2026", profissional: "Matheus", cliente: "Pedro Santos", celular: "(41) 99876-5432", servico: "Barba", dataAtendimento: "28/02/2026", valorComanda: 45, tipo: "Serviço", descontoTaxa: 1.5, comissaoPaga: 21.75 },
+  { dataAcerto: "01/03/2026", profissional: "Claudia", cliente: "Ana Costa", celular: "(41) 99654-3210", servico: "Hidratação", dataAtendimento: "27/02/2026", valorComanda: 120, tipo: "Serviço", descontoTaxa: 4, comissaoPaga: 58 },
 ];
 
 const totalValor = data.reduce((s, r) => s + r.valorComanda, 0);
@@ -28,11 +31,23 @@ const columns: Column<ComissaoPaga>[] = [
   { key: "dataAcerto", label: "Data do Acerto" },
   {
     key: "profissional", label: "Profissional",
-    render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    render: (v) => (
+      <div className="flex items-center gap-1.5">
+        <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
+          <User className="h-3 w-3 text-muted-foreground" />
+        </div>
+        <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+      </div>
+    ),
   },
   {
     key: "cliente", label: "Cliente",
-    render: (v) => <a href="/clientePesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+    render: (v, row) => (
+      <div className="flex items-center gap-1.5">
+        <WhatsAppButton telefone={row.celular} nome={row.cliente} />
+        <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
+      </div>
+    ),
   },
   { key: "servico", label: "Serviço" },
   { key: "dataAtendimento", label: "Data Atendimento" },

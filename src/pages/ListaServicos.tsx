@@ -26,18 +26,11 @@ const initialData: Servico[] = [
 ];
 
 export default function ListaServicos() {
-  const [allData, setAllData] = useState(initialData);
+  const [allData] = useState(initialData);
   const { toast } = useToast();
 
   const bulkRemove = (indices: number[]) => {
-    const ids = indices.map(i => allData[i]?.id).filter(Boolean);
-    setAllData(prev => prev.filter(d => !ids.includes(d.id)));
-    toast({ title: `${ids.length} serviço(s) removido(s)`, variant: "destructive" });
-  };
-
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
+    toast({ title: `${indices.length} serviço(s) removido(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
@@ -45,11 +38,11 @@ export default function ListaServicos() {
   ];
 
   const columns: Column<Servico>[] = [
-    { key: "nome", label: "Nome", pinned: true, editable: true },
-    { key: "categoria", label: "Categoria", editable: true },
-    { key: "duracao", label: "Duração", editable: true },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v), editable: true, editType: "currency" },
-    { key: "comissao", label: "Comissão %", align: "center", render: v => `${v}%`, editable: true, editType: "number" },
+    { key: "nome", label: "Nome", pinned: true },
+    { key: "categoria", label: "Categoria" },
+    { key: "duracao", label: "Duração" },
+    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
+    { key: "comissao", label: "Comissão %", align: "center", render: v => `${v}%` },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
       render: () => <ActionsMenu items={[
@@ -70,7 +63,6 @@ export default function ListaServicos() {
         showDateFilter={true}
         novoMenuItems={[{ label: "Novo serviço" }]}
         pageSize={15}
-        onCellEdit={handleCellEdit}
         tableId="lista_servicos"
       />
     </AppLayout>

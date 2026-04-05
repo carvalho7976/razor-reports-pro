@@ -26,18 +26,11 @@ const initialData: Profissional[] = [
 ];
 
 export default function ListaProfissionais() {
-  const [allData, setAllData] = useState(initialData);
+  const [allData] = useState(initialData);
   const { toast } = useToast();
 
   const bulkRemove = (indices: number[]) => {
-    const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
-    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
-    toast({ title: `${ids.length} profissional(is) removido(s)`, variant: "destructive" });
-  };
-
-  const handleCellEdit = (rowIdx: number, key: string, value: any) => {
-    setAllData(prev => prev.map((r, i) => i === rowIdx ? { ...r, [key]: value } : r));
-    toast({ title: "Campo atualizado" });
+    toast({ title: `${indices.length} profissional(is) removido(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
@@ -55,11 +48,11 @@ export default function ListaProfissionais() {
     },
     {
       key: "nome", label: "Nome", pinned: true,
-      render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+      render: (v) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
     },
-    { key: "email", label: "Email", editable: true },
-    { key: "celular", label: "Celular", editable: true },
-    { key: "aniversario", label: "Aniversário", editable: true },
+    { key: "email", label: "Email" },
+    { key: "celular", label: "Celular" },
+    { key: "aniversario", label: "Aniversário" },
     {
       key: "funcao", label: "Função",
       render: (v) => (
@@ -91,7 +84,6 @@ export default function ListaProfissionais() {
         selectionActions={selectionActions}
         novoMenuItems={[{ label: "Novo profissional" }]}
         pageSize={15}
-        onCellEdit={handleCellEdit}
         tableId="lista_profissionais"
       />
     </AppLayout>

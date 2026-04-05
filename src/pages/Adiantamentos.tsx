@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
-import { CheckCircle, Trash2, CreditCard } from "lucide-react";
+import { User, CheckCircle, Trash2, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -55,7 +55,14 @@ export default function Adiantamentos() {
     { key: "data", label: "Data" },
     {
       key: "profissional", label: "Profissional", pinned: true,
-      render: (v) => <a href="/funcionarioPesquisa" className="text-primary hover:underline font-medium">{v}</a>,
+      render: (v) => (
+        <div className="flex items-center gap-1.5">
+          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3 w-3 text-muted-foreground" />
+          </div>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+        </div>
+      ),
     },
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     {
