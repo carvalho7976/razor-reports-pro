@@ -693,7 +693,7 @@ export function DataTable<T extends Record<string, any>>({
   const storageKey = tableId || title.replace(/\s+/g, "_").toLowerCase();
   
   const [search, setSearch] = useState("");
-  const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
   const [showFilters, setShowFilters] = useState(false);
   const [columnFilterInputs, setColumnFilterInputs] = useState<Record<string, string>>({});
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
