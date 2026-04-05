@@ -77,10 +77,16 @@ export default function Assinantes() {
     <AppLayout>
       <DataTable
         title="Assinantes"
-        data={allData}
+        data={data}
         columns={columns}
         showDateFilter={false}
         summaryCards={summaryCards}
+        tabs={[
+          { label: "Ativos", value: "ativo", count: allData.filter(d => d.status === "Ativo").length },
+          { label: "Atrasados", value: "atrasado", count: totalAtrasados },
+        ]}
+        activeTab={tab}
+        onTabChange={setTab}
         selectable
         selectionActions={selectionActions}
         novoMenuItems={[{ label: "Novo assinante" }]}
