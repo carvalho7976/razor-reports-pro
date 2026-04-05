@@ -426,7 +426,7 @@ function ColumnManager<T>({
 
   const orderedColumns = useMemo(() => {
     const map = new Map(initialColumns.map((c) => [c.key, c]));
-    return columnOrder.map((k) => map.get(k)!).filter(Boolean);
+    return columnOrder.map((k) => map.get(k)!).filter(Boolean).filter(c => !NATIVE_COLUMN_KEYS.has(c.key));
   }, [initialColumns, columnOrder]);
 
   const handleDragStart = (idx: number) => { setDragIdx(idx); };
