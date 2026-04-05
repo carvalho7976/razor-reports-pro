@@ -78,7 +78,7 @@ export default function FluxoCaixa() {
 
   return (
     <AppLayout>
-      <DataTable title="Fluxo de Caixa" data={tab === "detalhado" ? initialData : resumidoData} columns={tab === "detalhado" ? columnsDetalhado : columnsResumido} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} showDateFilter={true} pageSize={15} tableId="fluxo_caixa" />
+      <DataTable title="Fluxo de Caixa" data={tab === "detalhado" ? initialData as any[] : resumidoData as any[]} columns={tab === "detalhado" ? columnsDetalhado as any : columnsResumido as any} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} showDateFilter={true} pageSize={15} tableId="fluxo_caixa" />
     </AppLayout>
   );
 }

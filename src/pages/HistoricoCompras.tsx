@@ -61,8 +61,8 @@ export default function HistoricoCompras() {
     <AppLayout>
       <DataTable
         title="Histórico de Compras"
-        data={tab === "resumido" ? resumidoData : detalhadoData}
-        columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
+        data={tab === "resumido" ? resumidoData as any[] : detalhadoData as any[]}
+        columns={tab === "resumido" ? columnsResumido as any : columnsDetalhado as any}
         summaryCards={summaryCards}
         tabs={tabs}
         activeTab={tab}

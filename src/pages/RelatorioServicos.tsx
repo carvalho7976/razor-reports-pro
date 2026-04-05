@@ -93,8 +93,8 @@ export default function RelatorioServicos() {
     <AppLayout>
       <DataTable
         title="Relatório de Serviços"
-        data={tab === "resumido" ? resumidoData : detalhadoData}
-        columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
+        data={tab === "resumido" ? resumidoData as any[] : detalhadoData as any[]}
+        columns={tab === "resumido" ? columnsResumido as any : columnsDetalhado as any}
         summaryCards={summaryCards}
         tabs={tabs}
         activeTab={tab}

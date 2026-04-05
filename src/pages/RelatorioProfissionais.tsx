@@ -145,8 +145,8 @@ export default function RelatorioProfissionais() {
     <AppLayout>
       <DataTable
         title="Relatório Profissional"
-        data={tab === "resumido" ? resumidoData : detalhadoData}
-        columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
+        data={tab === "resumido" ? resumidoData as any[] : detalhadoData as any[]}
+        columns={tab === "resumido" ? columnsResumido as any : columnsDetalhado as any}
         summaryCards={summaryCards}
         totalRow={tab === "resumido" ? totals : undefined}
         tabs={tabs}
