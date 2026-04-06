@@ -1029,8 +1029,8 @@ export function DataTable<T extends Record<string, any>>({
               return (
                 <div key={i} {...clickProps}>
                   <div className="min-w-0">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
-                    <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
+                    <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
                   </div>
                 </div>
               );
@@ -1041,7 +1041,7 @@ export function DataTable<T extends Record<string, any>>({
                 <div key={i} {...clickProps}>
                   <span className="text-base sm:text-lg">{sentimentEmoji}</span>
                   <div className="min-w-0">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
                     <p className={cn("text-sm sm:text-base font-bold tabular-nums", sentimentColor)}>{card.value}</p>
                   </div>
                 </div>
@@ -1052,8 +1052,8 @@ export function DataTable<T extends Record<string, any>>({
               <div key={i} {...clickProps}>
                 {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
                 <div className="min-w-0">
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
-                  <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
+                  <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
                 </div>
               </div>
             );
