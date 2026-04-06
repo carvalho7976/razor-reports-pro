@@ -43,7 +43,7 @@ export default function ListaProdutos() {
   const valorEstoque = allData.reduce((s, d) => s + d.estoque * d.valor, 0);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Produtos em Estoque", value: String(totalEstoque), type: "quantity", size: "compact" },
+    { label: "Produtos em Estoque", value: String(totalEstoque), type: "quantity", icon: <Package className="h-4 w-4" />, size: "compact" },
     { label: "Valor em Estoque", value: R$(valorEstoque), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 

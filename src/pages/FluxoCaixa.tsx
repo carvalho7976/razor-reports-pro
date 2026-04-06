@@ -91,9 +91,9 @@ export default function FluxoCaixa() {
     {
       key: "usuario", label: "Usuário Responsável",
       render: (v) => v ? (
-        <div className="flex items-center gap-1.5">
-          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
-            <User className="h-3 w-3 text-muted-foreground" />
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
           <span className="font-medium">{v}</span>
         </div>

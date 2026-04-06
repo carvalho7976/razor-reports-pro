@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Hash } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Cancelamento { id: number; nome: string; celular: string; plano: string; motivo: string; dataCancelamento: string; valor: number; }
@@ -16,7 +16,7 @@ const initialData: Cancelamento[] = [
 
 export default function CancelamentoAssinaturas() {
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(initialData.length), type: "quantity" },
+    { label: "Total", value: String(initialData.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
   ];
 

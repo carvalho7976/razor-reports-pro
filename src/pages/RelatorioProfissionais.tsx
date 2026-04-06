@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, CreditCard } from "lucide-react";
+import { User, CreditCard, Hash, TrendingUp } from "lucide-react";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -62,7 +62,7 @@ export default function RelatorioProfissionais() {
   const avgTicket = activeProfs.length > 0 ? activeProfs.reduce((s, r) => s + r.ticketMedio, 0) / activeProfs.length : 0;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(totalQtd), type: "quantity", size: "compact" },
+    { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     { label: "Valor", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Venda Assinantes", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Ticket Médio", value: R$(avgTicket), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
@@ -79,7 +79,14 @@ export default function RelatorioProfissionais() {
     },
     {
       key: "profissional", label: "Profissional", pinned: true,
-      render: (v) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
+      render: (v) => (
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+        </div>
+      ),
     },
     { key: "funcao", label: "Função", render: (v) => <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground">{v}</span> },
     { key: "totalServicos", label: "Total em Serviços", align: "right", render: (v) => R$(v) },
@@ -105,7 +112,14 @@ export default function RelatorioProfissionais() {
     },
     {
       key: "profissional", label: "Profissional", pinned: true,
-      render: (v) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
+      render: (v) => (
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+        </div>
+      ),
     },
     { key: "servico", label: "Serviço" },
     {
