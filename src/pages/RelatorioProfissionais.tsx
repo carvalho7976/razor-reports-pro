@@ -62,10 +62,10 @@ export default function RelatorioProfissionais() {
   const avgTicket = activeProfs.length > 0 ? activeProfs.reduce((s, r) => s + r.ticketMedio, 0) / activeProfs.length : 0;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
-    { label: "Valor", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Assinantes", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Ticket Médio", value: R$(avgTicket), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
+    { label: "Valor", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Venda Assinantes", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Ticket Médio", value: R$(avgTicket), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
   ];
 
   const columnsResumido: Column<RelProf>[] = [

@@ -36,10 +36,10 @@ export default function RelatorioServicos() {
   const totalValor = avulsoValor + assinanteValor;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total Avulso e Assinantes", value: `${totalQtd} · ${R$(totalValor)}`, icon: <Hash className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Avulso", value: `${avulsoQtd} · ${R$(avulsoValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Assinantes", value: `${assinanteQtd} · ${R$(assinanteValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Total Avulso e Assinantes", value: `${totalQtd} · ${R$(totalValor)}`, icon: <Hash className="h-4 w-4" />, size: "wide", color: "blue" },
+    { label: "Venda Avulso", value: `${avulsoQtd} · ${R$(avulsoValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Venda Assinantes", value: `${assinanteQtd} · ${R$(assinanteValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
   ];
 
   const columnsResumido: Column<ServicoResumido>[] = [

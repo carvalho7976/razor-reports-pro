@@ -70,8 +70,8 @@ export default function ListaClientes() {
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Moedas Distribuídas", value: String(totalMoedas), type: "quantity", icon: <Coins className="h-4 w-4" />, size: "compact" },
-    { label: "Créditos em Aberto", value: R$(totalCreditos), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Moedas Distribuídas", value: String(totalMoedas), type: "quantity", icon: <Coins className="h-4 w-4" />, size: "compact", color: "blue" },
+    { label: "Créditos em Aberto", value: R$(totalCreditos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
   ];
 
   const columns: Column<Cliente>[] = [

@@ -38,8 +38,8 @@ export default function HistoricoCompras() {
   const totalCompras = resumidoData.reduce((s, r) => s + r.total, 0);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Produtos Comprados", value: String(totalProdutos), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
-    { label: "Total em Compras", value: R$(totalCompras), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Produtos Comprados", value: String(totalProdutos), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
+    { label: "Total em Compras", value: R$(totalCompras), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
   ];
 
   // Resumido columns (grouped by date + funcionario)

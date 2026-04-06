@@ -16,8 +16,8 @@ const initialData: Cancelamento[] = [
 
 export default function CancelamentoAssinaturas() {
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(initialData.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
-    { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total", value: String(initialData.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
+    { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "red" },
   ];
 
   const columns: Column<Cancelamento>[] = [
