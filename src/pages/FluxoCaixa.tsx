@@ -89,7 +89,7 @@ export default function FluxoCaixa() {
 
   const columnsDetalhado: Column<FluxoItem>[] = [
     {
-      key: "usuario", label: "Usuário",
+      key: "usuario", label: "Usuário Responsável",
       render: (v) => v ? (
         <div className="flex items-center gap-1.5">
           <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
@@ -100,14 +100,21 @@ export default function FluxoCaixa() {
       ) : "—",
     },
     { key: "data", label: "Data", pinned: true },
-    { key: "tipo", label: "Tipo" },
+    {
+      key: "tipo", label: "Tipo",
+      render: (v: string) => {
+        const isSaida = tiposSaida.some(t => v.toLowerCase().includes(t.toLowerCase()));
+        const isEntrada = tiposEntrada.some(t => v.toLowerCase().includes(t.toLowerCase()));
+        return <span className={isSaida ? "text-destructive" : isEntrada ? "text-primary" : ""}>{v}</span>;
+      },
+    },
     { key: "descricao", label: "Descrição" },
-    { key: "fp", label: "FP", render: v => v || "—" },
+    { key: "fp", label: "Forma de Pagamento", render: v => v || "—" },
     { key: "comprovante", label: "Comprovante", render: v => v || "—" },
     {
       key: "valor", label: "Valor", align: "right",
       render: (v: number) => (
-        <span style={{ color: v > 0 ? "#00c5b4" : v < 0 ? "#ff2f2f" : undefined }}>
+        <span className={v > 0 ? "text-primary" : v < 0 ? "text-destructive" : ""}>
           {v >= 0 ? v.toFixed(2) : v.toFixed(2)}
         </span>
       ),
@@ -116,13 +123,13 @@ export default function FluxoCaixa() {
 
   const columnsResumido: Column<FluxoResumido>[] = [
     { key: "data", label: "Data", pinned: true },
-    { key: "abertura", label: "Abertura", align: "right", render: (v: number) => R$(v) },
-    { key: "adicao", label: "Adição", align: "right", render: (v: number) => R$(v) },
-    { key: "entrada", label: "Entrada", align: "right", render: (v: number) => <span style={{ color: "#00c5b4" }}>{R$(v)}</span> },
-    { key: "saida", label: "Saída", align: "right", render: (v: number) => <span style={{ color: "#ff2f2f" }}>{R$(v)}</span> },
-    { key: "sangria", label: "Sangria", align: "right", render: (v: number) => R$(v) },
-    { key: "fechamento", label: "Fechamento", align: "right", render: (v: number) => R$(v) },
-    { key: "saldo", label: "Saldo", align: "right", render: (v: number) => <span className="font-bold" style={{ color: v >= 0 ? "#00c5b4" : "#ff2f2f" }}>{R$(v)}</span> },
+    { key: "abertura", label: "Abertura", align: "right", render: (v: number) => <span className="text-primary">{R$(v)}</span> },
+    { key: "adicao", label: "Adição", align: "right", render: (v: number) => <span className="text-primary">{R$(v)}</span> },
+    { key: "entrada", label: "Entrada", align: "right", render: (v: number) => <span className="text-primary">{R$(v)}</span> },
+    { key: "saida", label: "Saída", align: "right", render: (v: number) => <span className="text-destructive">-{R$(v)}</span> },
+    { key: "sangria", label: "Sangria", align: "right", render: (v: number) => <span className="text-destructive">-{R$(v)}</span> },
+    { key: "fechamento", label: "Fechamento", align: "right", render: (v: number) => <span className="text-destructive">-{R$(v)}</span> },
+    { key: "saldo", label: "Saldo", align: "right", render: (v: number) => <span className={`font-bold ${v >= 0 ? "text-primary" : "text-destructive"}`}>{v < 0 ? "-" : ""}{R$(Math.abs(v))}</span> },
   ];
 
   const tabs: TabDef[] = [
