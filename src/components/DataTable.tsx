@@ -1009,9 +1009,9 @@ export function DataTable<T extends Record<string, any>>({
                 : "⚫";
 
             const isClickable = card.onFilter && card.filterValue;
-            // Two standard widths: compact (~140px) and wide (~200px)
+            // Two standard widths: compact and wide - no max-w to avoid truncation
             const isWide = isMonetary || card.size === "wide";
-            const widthClass = isWide ? "min-w-[180px] max-w-[220px]" : "min-w-[120px] max-w-[160px]";
+            const widthClass = isWide ? "min-w-[180px]" : "min-w-[120px]";
             
             const clickProps = isClickable ? {
               onClick: () => card.onFilter!(card.filterValue!),
