@@ -1009,9 +1009,9 @@ export function DataTable<T extends Record<string, any>>({
                 : "⚫";
 
             const isClickable = card.onFilter && card.filterValue;
-            // Two standard widths: compact (~140px) and wide (~200px)
+            // Two standard widths: compact and wide - no max-w to avoid truncation
             const isWide = isMonetary || card.size === "wide";
-            const widthClass = isWide ? "min-w-[180px] max-w-[220px]" : "min-w-[120px] max-w-[160px]";
+            const widthClass = isWide ? "min-w-[180px]" : "min-w-[120px]";
             
             const clickProps = isClickable ? {
               onClick: () => card.onFilter!(card.filterValue!),
@@ -1028,9 +1028,10 @@ export function DataTable<T extends Record<string, any>>({
             if (isQuantity) {
               return (
                 <div key={i} {...clickProps}>
+                  {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
                   <div className="min-w-0">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
-                    <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
+                    <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
                   </div>
                 </div>
               );
@@ -1041,7 +1042,7 @@ export function DataTable<T extends Record<string, any>>({
                 <div key={i} {...clickProps}>
                   <span className="text-base sm:text-lg">{sentimentEmoji}</span>
                   <div className="min-w-0">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
                     <p className={cn("text-sm sm:text-base font-bold tabular-nums", sentimentColor)}>{card.value}</p>
                   </div>
                 </div>
@@ -1052,8 +1053,8 @@ export function DataTable<T extends Record<string, any>>({
               <div key={i} {...clickProps}>
                 {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
                 <div className="min-w-0">
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
-                  <p className="text-xs sm:text-sm font-bold text-foreground truncate">{card.value}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
+                  <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
                 </div>
               </div>
             );
