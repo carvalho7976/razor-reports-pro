@@ -44,11 +44,13 @@ export default function RelatorioClientes() {
   const totalValor = data.reduce((s, r) => s + r.valorGasto, 0);
   const avgTicket = totalClientes > 0 ? data.reduce((s, r) => s + r.ticketMedio, 0) / totalClientes : 0;
 
+  const totalServicos = data.reduce((s, r) => s + r.totalServicos, 0);
+  const totalProdutos = data.reduce((s, r) => s + r.totalProdutos, 0);
+
   const summaryCards: SummaryCard[] = [
-    { label: "Clientes", value: String(totalClientes), type: "quantity", icon: <Users className="h-4 w-4" />, size: "compact" },
-    { label: "Frequência", value: String(totalFrequencia), type: "quantity", icon: <BarChart3 className="h-4 w-4" />, size: "compact" },
-    { label: "Valor", value: R$(totalValor), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Ticket Médio", value: R$(avgTicket), icon: <TrendingUp className="h-4 w-4" />, size: "wide" },
+    { label: "Clientes Atendidos", value: String(totalClientes), type: "quantity", icon: <Users className="h-4 w-4" />, size: "compact" },
+    { label: "Serviços", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Produtos", value: R$(totalProdutos), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 
   const columns: Column<Cliente>[] = [

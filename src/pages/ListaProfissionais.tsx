@@ -39,10 +39,10 @@ export default function ListaProfissionais() {
 
   const columns: Column<Profissional>[] = [
     {
-      key: "foto" as any, label: "", sortable: false, filterable: false, align: "center", width: "60px",
+      key: "foto" as any, label: "", sortable: false, filterable: false, align: "center", width: "48px",
       render: () => (
-        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center mx-auto">
-          <User className="h-4 w-4 text-muted-foreground" />
+        <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center mx-auto">
+          <User className="h-3.5 w-3.5 text-muted-foreground" />
         </div>
       ),
     },

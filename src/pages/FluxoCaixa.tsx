@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
-import { User, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
+import { User, CreditCard } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface FluxoItem { id: number; usuario: string; data: string; tipo: string; descricao: string; fp: string; comprovante: string; valor: number; }
@@ -32,30 +32,45 @@ const tiposEntrada = ["Entrada", "Abertura de Gaveta", "Adição", "Lançamento 
 
 function FormasPagamentoCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scroll = (dir: number) => {
-    scrollRef.current?.scrollBy({ left: dir * 200, behavior: "smooth" });
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    isDragging.current = true;
+    startX.current = e.clientX;
+    scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
+    scrollRef.current?.setPointerCapture(e.pointerId);
   };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    const dx = e.clientX - startX.current;
+    scrollRef.current.scrollLeft = scrollLeft.current - dx;
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    isDragging.current = false;
+    scrollRef.current?.releasePointerCapture(e.pointerId);
+  };
+
   return (
-    <div className="relative">
-      <div className="flex items-center gap-1">
-        <button onClick={() => scroll(-1)} className="shrink-0 p-1 rounded hover:bg-muted text-muted-foreground">
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-        <div ref={scrollRef} className="flex gap-2 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: "none" }}>
-          {formaPagCards.map((fp) => (
-            <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px] shrink-0 bg-card">
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-0.5">
-                <div className="h-2.5 w-2.5 rounded-full bg-muted" />
-                <span>{fp.label}</span>
-              </div>
-              <p className="text-sm font-medium">{fp.value}</p>
-            </div>
-          ))}
+    <div
+      ref={scrollRef}
+      className="flex gap-2 overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing select-none"
+      style={{ scrollbarWidth: "none" }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerUp}
+    >
+      {formaPagCards.map((fp) => (
+        <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px] shrink-0 bg-card">
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-0.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-muted" />
+            <span>{fp.label}</span>
+          </div>
+          <p className="text-sm font-medium">{fp.value}</p>
         </div>
-        <button onClick={() => scroll(1)} className="shrink-0 p-1 rounded hover:bg-muted text-muted-foreground">
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
+      ))}
     </div>
   );
 }

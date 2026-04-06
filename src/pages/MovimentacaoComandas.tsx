@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, FileText, Receipt } from "lucide-react";
+import { CreditCard, FileText, Receipt, Hash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -62,7 +62,10 @@ export default function MovimentacaoComandas() {
     { label: "Comprovante", icon: <Receipt className="h-4 w-4" />, onClick: bulkComprovante, description: "Gera comprovante das comandas selecionadas" },
   ];
 
+  const totalComandas = allData.length;
+
   const summaryCards: SummaryCard[] = [
+    { label: "Total de Comandas", value: String(totalComandas), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     { label: "Bruto", value: R$(totalBruto), icon: <CreditCard className="h-4 w-4" /> },
     { label: "Líquido", value: R$(totalLiquido), icon: <CreditCard className="h-4 w-4" /> },
     { label: "Taxas", value: R$(totalTaxas), icon: <CreditCard className="h-4 w-4" /> },

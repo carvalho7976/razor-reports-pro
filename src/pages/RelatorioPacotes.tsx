@@ -1,5 +1,6 @@
+import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { DataTable, Column, SummaryCard } from "@/components/DataTable";
+import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, CreditCard, Hash } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -15,14 +16,27 @@ const initialData: Pacote[] = [
 ];
 
 export default function RelatorioPacotes() {
-  const totalVendido = initialData.length;
-  const valorVendido = initialData.reduce((s, r) => s + r.valor, 0);
-  const totalDesconto = initialData.reduce((s, r) => s + r.desconto, 0);
+  const [tab, setTab] = useState("em_uso");
+
+  const data = useMemo(() => {
+    if (tab === "em_uso") return initialData.filter(d => d.restam > 0);
+    if (tab === "finalizados") return initialData.filter(d => d.restam === 0);
+    return initialData;
+  }, [tab]);
+
+  const totalVendido = data.length;
+  const valorVendido = data.reduce((s, r) => s + r.valor, 0);
+  const totalDesconto = data.reduce((s, r) => s + r.desconto, 0);
 
   const summaryCards: SummaryCard[] = [
     { label: "Total Vendido", value: String(totalVendido), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     { label: "Valor Vendido", value: R$(valorVendido), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Total de Desconto", value: R$(totalDesconto), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+  ];
+
+  const tabs: TabDef[] = [
+    { label: "Em uso", value: "em_uso", count: initialData.filter(d => d.restam > 0).length, color: "info" },
+    { label: "Finalizados", value: "finalizados", count: initialData.filter(d => d.restam === 0).length, color: "neutral" },
   ];
 
   const columns: Column<Pacote>[] = [
@@ -62,7 +76,7 @@ export default function RelatorioPacotes() {
 
   return (
     <AppLayout>
-      <DataTable title="Relatório de Pacotes" data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="relatorio_pacotes" dateField="dataVenda" />
+      <DataTable title="Relatório de Pacotes" data={data} columns={columns} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_pacotes" dateField="dataVenda" />
     </AppLayout>
   );
 }
