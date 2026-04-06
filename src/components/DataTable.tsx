@@ -669,8 +669,6 @@ export function DataTable<T extends Record<string, any>>({
   
   const [search, setSearch] = useState("");
   const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
-  const [columnFilterInputs, setColumnFilterInputs] = useState<Record<string, string>>({});
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   
