@@ -36,9 +36,9 @@ export default function RelatorioProdutos() {
   const assinanteValor = resumidoData.reduce((s, r) => s + r.vendaExtra, 0);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total Avulso e Assinantes", value: `${totalQtd} un · ${R$(totalValor)}`, icon: <Hash className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Avulso", value: `${avulsoQtd} un · ${R$(avulsoValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Assinantes", value: `${assinanteQtd} un · ${R$(assinanteValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Total Avulso e Assinantes", value: `${totalQtd} · ${R$(totalValor)}`, icon: <Hash className="h-4 w-4" />, size: "wide" },
+    { label: "Venda Avulso", value: `${avulsoQtd} · ${R$(avulsoValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Venda Assinantes", value: `${assinanteQtd} · ${R$(assinanteValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 
