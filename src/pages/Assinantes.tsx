@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, XCircle } from "lucide-react";
+import { CreditCard, XCircle, Hash, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Assinante { id: number; nome: string; telefone: string; plano: string; inicio: string; vencimento: string; valor: number; status: string; }
