@@ -38,9 +38,9 @@ export default function Avaliacoes() {
   const notaRecepcao = 8.5;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Nota Empresa", value: String(notaEmpresa), icon: <Star className="h-4 w-4" />, size: "compact" },
-    { label: "Nota Equipe", value: String(notaEquipe), icon: <Star className="h-4 w-4" />, size: "compact" },
-    { label: "Nota Recepção", value: String(notaRecepcao), icon: <Star className="h-4 w-4" />, size: "compact" },
+    { label: "NPS Empresa", value: String(notaEmpresa), icon: <Star className="h-4 w-4" />, size: "wide" },
+    { label: "Nota Equipe", value: String(notaEquipe), icon: <Star className="h-4 w-4" />, size: "wide" },
+    { label: "Nota Recepção", value: String(notaRecepcao), icon: <Star className="h-4 w-4" />, size: "wide" },
   ];
 
   const resumidoData = useMemo(() => {
