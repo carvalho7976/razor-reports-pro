@@ -27,6 +27,9 @@ const formaPagCards = [
   { label: "Debito sumup", value: "R$ 243,05" },
 ];
 
+const tiposSaida = ["Saída", "Sangria", "Conta", "Fechamento de Gaveta"];
+const tiposEntrada = ["Entrada", "Abertura de Gaveta", "Adição", "Lançamento avulso"];
+
 function FormasPagamentoCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scroll = (dir: number) => {
@@ -34,7 +37,6 @@ function FormasPagamentoCarousel() {
   };
   return (
     <div className="relative">
-      <p className="text-xs text-muted-foreground mb-1.5">Formas de pagamento</p>
       <div className="flex items-center gap-1">
         <button onClick={() => scroll(-1)} className="shrink-0 p-1 rounded hover:bg-muted text-muted-foreground">
           <ChevronLeft className="h-4 w-4" />
