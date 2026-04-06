@@ -83,9 +83,9 @@ export default function FluxoCaixa() {
   const saldo = totalEntrada - totalSaida;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Saldo", value: R$(saldo), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Entradas", value: R$(totalEntrada), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Saídas", value: R$(totalSaida), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Saldo", value: R$(saldo), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
+    { label: "Entradas", value: R$(totalEntrada), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Saídas", value: R$(totalSaida), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
   ];
 
   const resumidoData: FluxoResumido[] = useMemo(() => {
