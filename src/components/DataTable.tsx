@@ -21,6 +21,8 @@ export interface Column<T> {
   filterable?: boolean;
   pinned?: boolean;
   render?: (value: any, row: T, index: number) => ReactNode;
+  /** Custom sort value extractor — used instead of raw cell value when sorting */
+  sortValue?: (row: T) => number | string;
   width?: string;
   align?: "left" | "center" | "right";
   /** @deprecated Inline editing disabled */
@@ -846,7 +848,9 @@ export function DataTable<T extends Record<string, any>>({
     if (sortEntries.length > 0) {
       result.sort((a, b) => {
         for (const { key, dir } of sortEntries) {
-          const aVal = a[key], bVal = b[key];
+          const col = columns.find(c => c.key === key);
+          const aVal = col?.sortValue ? col.sortValue(a) : a[key];
+          const bVal = col?.sortValue ? col.sortValue(b) : b[key];
           if (aVal == null && bVal == null) continue;
           if (aVal == null) return 1;
           if (bVal == null) return -1;
