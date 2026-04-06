@@ -100,6 +100,20 @@ export default function FluxoCaixa() {
 
   return (
     <AppLayout>
+      <div className="px-4 pb-3">
+        <p className="text-sm text-muted-foreground mb-2">Formas de pagamento</p>
+        <div className="flex flex-wrap gap-2">
+          {formaPagCards.map((fp) => (
+            <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px]">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
+                <div className="h-3 w-3 rounded-full bg-muted" />
+                <span>{fp.label}</span>
+              </div>
+              <p className="text-sm font-medium">{fp.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
       <DataTable
         title="Fluxo de Caixa"
         data={tab === "detalhado" ? initialData as any[] : resumidoData as any[]}
@@ -111,23 +125,7 @@ export default function FluxoCaixa() {
         showDateFilter={true}
         pageSize={15}
         tableId="fluxo_caixa"
-      >
-        {/* Formas de pagamento section */}
-        <div className="px-4 pb-3">
-          <p className="text-sm text-muted-foreground mb-2">Formas de pagamento</p>
-          <div className="flex flex-wrap gap-2">
-            {formaPagCards.map((fp) => (
-              <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px]">
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
-                  <div className="h-3 w-3 rounded-full bg-muted" />
-                  <span>{fp.label}</span>
-                </div>
-                <p className="text-sm font-medium">{fp.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </DataTable>
+      />
     </AppLayout>
   );
 }

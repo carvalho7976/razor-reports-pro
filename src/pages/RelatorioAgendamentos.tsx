@@ -86,7 +86,6 @@ export default function RelatorioAgendamentos() {
     {
       key: "data", label: "Data / Horário",
       render: (v, row) => `${v} ${row.horario}`,
-      sortFn: (a: Agendamento, b: Agendamento) => parseDateTime(a.data, a.horario) - parseDateTime(b.data, b.horario),
     },
     { key: "origem", label: "Origem" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
