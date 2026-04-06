@@ -44,7 +44,7 @@ export default function ListaProdutos() {
 
   const summaryCards: SummaryCard[] = [
     { label: "Produtos em Estoque", value: String(totalEstoque), type: "quantity", icon: <Package className="h-4 w-4" />, size: "compact", color: "blue" },
-    { label: "Valor em Estoque", value: R$(valorEstoque), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Valor em Estoque", value: R$(valorEstoque), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
   ];
 
   const bulkRemove = (indices: number[]) => {

@@ -29,9 +29,9 @@ export default function RelatorioPacotes() {
   const totalDesconto = data.reduce((s, r) => s + r.desconto, 0);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total Vendido", value: String(totalVendido), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
-    { label: "Valor Vendido", value: R$(valorVendido), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Total de Desconto", value: R$(totalDesconto), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Total Vendido", value: String(totalVendido), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
+    { label: "Valor Vendido", value: R$(valorVendido), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Total de Desconto", value: R$(totalDesconto), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
   ];
 
   const tabs: TabDef[] = [
