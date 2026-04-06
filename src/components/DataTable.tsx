@@ -334,12 +334,12 @@ function SearchWithFilter<T>({
         value={search}
         onChange={(e) => { setSearch(e.target.value); onPageReset(); }}
         onFocus={() => setFocused(true)}
-        className="toolbar-input pl-9 pr-8 py-2 w-full"
+        className="toolbar-input pl-9 pr-8 py-2 w-full border-info/50 focus:ring-info/40 focus:border-info/60"
       />
       {(search || activeFilterCount > 0) && (
         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {activeFilterCount > 0 && (
-            <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+            <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-info text-info-foreground text-[10px] font-bold">
               {activeFilterCount}
             </span>
           )}
@@ -363,7 +363,7 @@ function SearchWithFilter<T>({
                     onClick={() => addFilter(col.key, val)}
                     className={cn(
                       "w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors truncate",
-                      isSelected ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted"
+                      isSelected ? "bg-info/10 text-info font-medium" : "hover:bg-muted"
                     )}
                   >
                     {isSelected && <span className="mr-1.5">✓</span>}{val}
@@ -922,14 +922,14 @@ export function DataTable<T extends Record<string, any>>({
           {activeFilters.map((f) => (
             <span key={f.id} className="filter-chip">
               <span className="font-semibold">{f.label}:</span> {f.value}
-              <button onClick={() => removeFilter(f.id, f.key, f.value)} className="ml-0.5 p-0.5 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors">
+              <button onClick={() => removeFilter(f.id, f.key, f.value)} className="ml-0.5 p-0.5 rounded-full hover:bg-info/20 hover:text-info transition-colors">
                 <X className="h-3 w-3" />
               </button>
             </span>
           ))}
           <button
             onClick={() => { setSearch(""); setDatePreset(null); setDateRange(undefined); setColumnFilters({}); setSortEntries([]); }}
-            className="text-xs text-destructive hover:underline font-medium ml-1"
+            className="text-xs text-info hover:underline font-medium ml-1"
           >
             Limpar
           </button>
@@ -1048,7 +1048,7 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Selection Action Bar */}
       {selectable && selectedRows.size > 0 && (
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-primary/5 border border-primary/20 rounded-xl">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-info/5 border border-info/20 rounded-xl">
           <span className="text-xs sm:text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
           <div className="h-4 w-px bg-border" />
           {selectionActions.map((action, i) => (

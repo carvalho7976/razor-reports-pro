@@ -116,8 +116,8 @@
 
   .filter-chip {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
-           bg-primary/10 text-primary border border-primary/20
-           shadow-sm hover:bg-primary/20 hover:border-primary/30 transition-all duration-150;
+           bg-[hsl(var(--info))]/10 text-[hsl(var(--info))] border border-[hsl(var(--info))]/20
+           shadow-sm hover:bg-[hsl(var(--info))]/20 hover:border-[hsl(var(--info))]/30 transition-all duration-150;
   }
 
   .table-container {
