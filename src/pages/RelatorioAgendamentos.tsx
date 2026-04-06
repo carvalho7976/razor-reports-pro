@@ -52,7 +52,7 @@ export default function RelatorioAgendamentos() {
   }, [allData]);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(allData.length), type: "quantity", size: "compact" },
+    { label: "Total", value: String(allData.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     ...Object.entries(origemCounts).map(([origem, count]) => ({
       label: origem,
       value: `${count} (${Math.round(count / allData.length * 100)}%)`,

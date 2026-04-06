@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-
+import { Users, BarChart3, CreditCard, TrendingUp } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 type TipoCliente = "avulso" | "assinatura";
@@ -45,10 +45,10 @@ export default function RelatorioClientes() {
   const avgTicket = totalClientes > 0 ? data.reduce((s, r) => s + r.ticketMedio, 0) / totalClientes : 0;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Clientes", value: String(totalClientes), type: "quantity" },
-    { label: "Frequência", value: String(totalFrequencia), type: "quantity" },
-    { label: "Valor", value: R$(totalValor), type: "quantity" },
-    { label: "Ticket Médio", value: R$(avgTicket), type: "quantity" },
+    { label: "Clientes", value: String(totalClientes), type: "quantity", icon: <Users className="h-4 w-4" />, size: "compact" },
+    { label: "Frequência", value: String(totalFrequencia), type: "quantity", icon: <BarChart3 className="h-4 w-4" />, size: "compact" },
+    { label: "Valor", value: R$(totalValor), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Ticket Médio", value: R$(avgTicket), icon: <TrendingUp className="h-4 w-4" />, size: "wide" },
   ];
 
   const columns: Column<Cliente>[] = [
