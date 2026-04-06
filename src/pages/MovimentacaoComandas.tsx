@@ -65,10 +65,10 @@ export default function MovimentacaoComandas() {
   const totalComandas = allData.length;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total de Comandas", value: String(totalComandas), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
-    { label: "Bruto", value: R$(totalBruto), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Líquido", value: R$(totalLiquido), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Taxas", value: R$(totalTaxas), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total de Comandas", value: String(totalComandas), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
+    { label: "Bruto", value: R$(totalBruto), icon: <CreditCard className="h-4 w-4" />, color: "green" },
+    { label: "Líquido", value: R$(totalLiquido), icon: <CreditCard className="h-4 w-4" />, color: "green" },
+    { label: "Taxas", value: R$(totalTaxas), icon: <CreditCard className="h-4 w-4" />, color: "red" },
   ];
 
   return (

@@ -48,8 +48,8 @@ export default function RelatorioDebitos() {
   const totalPago = allData.filter(d => d.status === "Pago").reduce((s, r) => s + r.valor, 0);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total em Aberto", value: R$(totalAberto), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Total Pago", value: R$(totalPago), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Total em Aberto", value: R$(totalAberto), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
+    { label: "Total Pago", value: R$(totalPago), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
   ];
 
   const columns: Column<Debito>[] = [

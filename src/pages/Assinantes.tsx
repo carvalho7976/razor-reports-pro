@@ -35,8 +35,8 @@ export default function Assinantes() {
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total Assinatura", value: R$(allData.filter(d => d.status === "Ativo").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
-    { label: "Total Atrasado", value: R$(allData.filter(d => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" /> },
+    { label: "Total Assinatura", value: R$(allData.filter(d => d.status === "Ativo").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "green" },
+    { label: "Total Atrasado", value: R$(allData.filter(d => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "red" },
   ];
 
   const columns: Column<Assinante>[] = [
