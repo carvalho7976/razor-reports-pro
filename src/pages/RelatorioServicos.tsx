@@ -28,12 +28,17 @@ const detalhadoData: ServicoDetalhado[] = [
 export default function RelatorioServicos() {
   const [tab, setTab] = useState("resumido");
 
-  const totalQtd = resumidoData.reduce((s, r) => s + r.quantidade, 0);
+  const avulsoQtd = resumidoData.reduce((s, r) => s + r.quantidade, 0);
+  const avulsoValor = resumidoData.reduce((s, r) => s + r.valor, 0);
+  const assinanteQtd = resumidoData.reduce((s, r) => s + r.qtdVendaExtra, 0);
+  const assinanteValor = resumidoData.reduce((s, r) => s + r.vendaExtra, 0);
+  const totalQtd = avulsoQtd + assinanteQtd;
+  const totalValor = avulsoValor + assinanteValor;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
-    { label: "Valor Total", value: R$(resumidoData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Extra", value: R$(resumidoData.reduce((s, r) => s + r.vendaExtra, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Total Avulso e Assinantes", value: `${totalQtd} un · ${R$(totalValor)}`, icon: <Hash className="h-4 w-4" />, size: "wide" },
+    { label: "Venda Avulso", value: `${avulsoQtd} un · ${R$(avulsoValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Venda Assinantes", value: `${assinanteQtd} un · ${R$(assinanteValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 
