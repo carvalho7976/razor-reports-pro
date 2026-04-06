@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Trash2 } from "lucide-react";
+import { User, Trash2, Hash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Agendamento { id: number; cliente: string; celular: string; profissional: string; servico: string; data: string; horario: string; origem: string; valor: number; status: "Aberto" | "Realizado"; }
