@@ -254,154 +254,126 @@ function DateRangePicker({
   );
 }
 
-/* ── Filter Dropdown ── */
-function FilterDropdown<T>({
-  columns, columnFilterInputs, setColumnFilterInputs, columnFilters, setColumnFilters, open, setOpen, data,
+/* ── Search with Autocomplete Filter ── */
+function SearchWithFilter<T>({
+  columns, data, search, setSearch, columnFilters, setColumnFilters, onPageReset,
 }: {
   columns: Column<T>[];
-  columnFilterInputs: Record<string, string>;
-  setColumnFilterInputs: (fn: (prev: Record<string, string>) => Record<string, string>) => void;
+  data: T[];
+  search: string;
+  setSearch: (v: string) => void;
   columnFilters: Record<string, string[]>;
   setColumnFilters: (fn: (prev: Record<string, string[]>) => Record<string, string[]>) => void;
-  open: boolean;
-  setOpen: (v: boolean) => void;
-  data: T[];
+  onPageReset: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [focused, setFocused] = useState(false);
   const filterableCols = columns.filter((c) => c.filterable !== false);
-  const [expandedCol, setExpandedCol] = useState<string | null>(null);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setFocused(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [setOpen]);
+  }, []);
 
-  const getUniqueValues = useCallback((key: string) => {
-    const values = new Set<string>();
-    (data as Record<string, any>[]).forEach((row) => {
-      const val = String(row[key] ?? "").trim();
-      if (val) values.add(val);
-    });
-    return Array.from(values).sort();
-  }, [data]);
+  const suggestions = useMemo(() => {
+    if (!search || search.length < 1) return [];
+    const s = search.toLowerCase();
+    const results: { col: Column<T>; value: string }[] = [];
+    const seen = new Set<string>();
 
-  const handleKeyDown = (key: string, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const val = columnFilterInputs[key]?.trim();
-      if (!val) return;
-      setColumnFilters((prev) => {
-        const existing = prev[key] || [];
-        if (existing.includes(val)) return prev;
-        return { ...prev, [key]: [...existing, val] };
+    for (const col of filterableCols) {
+      (data as Record<string, any>[]).forEach((row) => {
+        const val = String(row[col.key] ?? "").trim();
+        if (!val) return;
+        const uniqueKey = `${col.key}::${val}`;
+        if (seen.has(uniqueKey)) return;
+        if (val.toLowerCase().includes(s)) {
+          seen.add(uniqueKey);
+          results.push({ col, value: val });
+        }
       });
-      setColumnFilterInputs((prev) => ({ ...prev, [key]: "" }));
     }
-  };
+    return results.slice(0, 30);
+  }, [search, data, filterableCols]);
 
-  const addFilterValue = (key: string, value: string) => {
+  // Group suggestions by column
+  const grouped = useMemo(() => {
+    const map = new Map<string, { col: Column<T>; values: string[] }>();
+    for (const s of suggestions) {
+      if (!map.has(s.col.key)) map.set(s.col.key, { col: s.col, values: [] });
+      map.get(s.col.key)!.values.push(s.value);
+    }
+    return Array.from(map.values());
+  }, [suggestions]);
+
+  const addFilter = (colKey: string, value: string) => {
     setColumnFilters((prev) => {
-      const existing = prev[key] || [];
-      if (existing.includes(value)) {
-        const arr = existing.filter(v => v !== value);
-        const next = { ...prev };
-        if (arr.length === 0) delete next[key];
-        else next[key] = arr;
-        return next;
-      }
-      return { ...prev, [key]: [...existing, value] };
+      const existing = prev[colKey] || [];
+      if (existing.includes(value)) return prev;
+      return { ...prev, [colKey]: [...existing, value] };
     });
+    setSearch("");
+    onPageReset();
+    inputRef.current?.focus();
   };
 
-  const removeChip = (key: string, value: string) => {
-    setColumnFilters((prev) => {
-      const arr = (prev[key] || []).filter((v) => v !== value);
-      const next = { ...prev };
-      if (arr.length === 0) delete next[key];
-      else next[key] = arr;
-      return next;
-    });
-  };
-
-  if (!open) return null;
+  const showDropdown = focused && search.length >= 1 && grouped.length > 0;
+  const activeFilterCount = Object.values(columnFilters).flat().length;
 
   return (
-    <div ref={ref} className="dropdown-panel left-0 top-full mt-2 min-w-[280px] max-h-[400px] overflow-y-auto">
-      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">Filtrar por coluna</p>
-      <div className="space-y-1">
-        {filterableCols.map((col) => {
-          const inputVal = columnFilterInputs[col.key] || "";
-          const selectedValues = columnFilters[col.key] || [];
-          const isExpanded = expandedCol === col.key;
-
-          return (
-            <div key={col.key} className="space-y-1">
-              <button
-                onClick={() => setExpandedCol(isExpanded ? null : col.key)}
-                className={cn(
-                  "w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium rounded-lg hover:bg-muted transition-colors",
-                  isExpanded && "bg-muted",
-                  selectedValues.length > 0 && "text-primary"
-                )}
-              >
-                <span>{col.label}</span>
-                <span className="flex items-center gap-1">
-                  {selectedValues.length > 0 && (
-                    <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
-                      {selectedValues.length}
-                    </span>
-                  )}
-                  <ChevronDown className={cn("h-3 w-3 transition-transform", isExpanded && "rotate-180")} />
-                </span>
-              </button>
-              {isExpanded && (
-                <div className="pl-2 space-y-1">
-                  <input
-                    type="text"
-                    placeholder="Pesquisar..."
-                    value={inputVal}
-                    onChange={(e) => setColumnFilterInputs((prev) => ({ ...prev, [col.key]: e.target.value }))}
-                    onKeyDown={(e) => handleKeyDown(col.key, e)}
-                    className="w-full text-xs bg-background border border-border rounded-lg px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-primary/50 placeholder:text-muted-foreground/40 transition-all"
-                  />
-                  {(() => {
-                    const uniqueValues = getUniqueValues(col.key);
-                    const filteredValues = inputVal ? uniqueValues.filter(v => v.toLowerCase().includes(inputVal.toLowerCase())) : uniqueValues;
-                    return filteredValues.length > 0 ? (
-                      <div className="max-h-[120px] overflow-y-auto space-y-0.5 pt-0.5">
-                        {filteredValues.slice(0, 20).map((val) => (
-                          <button
-                            key={val}
-                            onClick={() => addFilterValue(col.key, val)}
-                            className={cn(
-                              "w-full text-left px-2 py-1 text-xs rounded-md transition-colors truncate",
-                              selectedValues.includes(val) ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted"
-                            )}
-                          >
-                            {selectedValues.includes(val) && "✓ "}{val}
-                          </button>
-                        ))}
-                      </div>
-                    ) : null;
-                  })()}
-                  {selectedValues.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-0.5">
-                      {selectedValues.map((v, i) => (
-                        <span key={i} className="filter-chip !py-0.5 !px-2 !text-[10px]">
-                          {v}
-                          <button onClick={() => removeChip(col.key, v)} className="hover:text-destructive">
-                            <X className="h-2.5 w-2.5" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+    <div className="relative flex-1 min-w-0 sm:min-w-[180px] sm:max-w-sm" ref={ref}>
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+      <input
+        ref={inputRef}
+        type="text"
+        placeholder="Pesquisar e filtrar..."
+        value={search}
+        onChange={(e) => { setSearch(e.target.value); onPageReset(); }}
+        onFocus={() => setFocused(true)}
+        className="toolbar-input pl-9 pr-8 py-2 w-full"
+      />
+      {(search || activeFilterCount > 0) && (
+        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {activeFilterCount > 0 && (
+            <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+              {activeFilterCount}
+            </span>
+          )}
+          {search && (
+            <button onClick={() => setSearch("")} className="p-0.5 rounded text-muted-foreground hover:text-foreground">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+      )}
+      {showDropdown && (
+        <div className="dropdown-panel left-0 top-full mt-1.5 w-full min-w-[280px] max-h-[320px] overflow-y-auto z-50">
+          {grouped.map(({ col, values }) => (
+            <div key={col.key}>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-2 pb-1">{col.label}</p>
+              {values.slice(0, 8).map((val) => {
+                const isSelected = (columnFilters[col.key] || []).includes(val);
+                return (
+                  <button
+                    key={val}
+                    onClick={() => addFilter(col.key, val)}
+                    className={cn(
+                      "w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors truncate",
+                      isSelected ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted"
+                    )}
+                  >
+                    {isSelected && <span className="mr-1.5">✓</span>}{val}
+                  </button>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
