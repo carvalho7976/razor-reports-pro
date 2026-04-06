@@ -64,7 +64,7 @@ export default function RelatorioProfissionais() {
   const summaryCards: SummaryCard[] = [
     { label: "Total", value: String(totalQtd), type: "quantity", size: "compact" },
     { label: "Valor", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Extra", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Venda Assinantes", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Ticket Médio", value: R$(avgTicket), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 
@@ -87,8 +87,8 @@ export default function RelatorioProfissionais() {
     { key: "ticketMedio", label: "Ticket Médio", align: "right", render: (v) => R$(v) },
     { key: "clientesAtendidos", label: "Clientes atendidos", align: "center" },
     { key: "tempoTrabalhado", label: "Tempo Trabalhado", align: "center" },
-    { key: "qtdVendaExtra", label: "Qtd Venda Extra", align: "center" },
-    { key: "vendaExtra", label: "Venda Extra", align: "right", render: (v) => R$(v) },
+    { key: "qtdVendaExtra", label: "Quantidade Assinantes", align: "center" },
+    { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: (v) => R$(v) },
     { key: "totalProdutos", label: "Total em Produtos", align: "right", render: (v) => R$(v) },
     { key: "qtdProdutos", label: "Qtd Produtos", align: "center" },
     { key: "totalAberto", label: "Total em aberto", align: "right", render: (v) => R$(v) },
@@ -118,7 +118,7 @@ export default function RelatorioProfissionais() {
       ),
     },
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
-    { key: "vendaExtra", label: "Venda Extra", align: "right", render: (v) => R$(v) },
+    { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: (v) => R$(v) },
     { key: "data", label: "Data" },
   ];
 
