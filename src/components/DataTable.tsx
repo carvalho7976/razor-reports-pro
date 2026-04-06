@@ -689,7 +689,7 @@ export function DataTable<T extends Record<string, any>>({
   tabs, activeTab, onTabChange, showDateFilter = true,
   summaryCards, pageSize = 20,
   selectable = false, selectionActions = [], novoMenuItems,
-  onCellEdit, tableId, dateField,
+  onCellEdit, tableId, dateField, slotBetweenCardsAndTabs,
 }: DataTableProps<T>) {
   const storageKey = tableId || title.replace(/\s+/g, "_").toLowerCase();
   
@@ -1060,6 +1060,9 @@ export function DataTable<T extends Record<string, any>>({
           })}
         </div>
       )}
+
+      {/* Slot between cards and tabs */}
+      {slotBetweenCardsAndTabs}
 
       {/* Tabs */}
       {tabs && (
