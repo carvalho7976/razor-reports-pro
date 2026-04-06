@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
-import { User, CreditCard } from "lucide-react";
+import { User, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface FluxoItem { id: number; usuario: string; data: string; tipo: string; descricao: string; fp: string; comprovante: string; valor: number; }
@@ -17,7 +17,6 @@ const initialData: FluxoItem[] = [
   { id: 7, usuario: "Lara", data: "03/01/2026 08:30:00", tipo: "Abertura de Gaveta", descricao: "", fp: "", comprovante: "", valor: 500 },
 ];
 
-// Payment method summary cards
 const formaPagCards = [
   { label: "Assinatura", value: "R$ 50,00" },
   { label: "Crédito", value: "R$ 706,00" },
@@ -27,6 +26,37 @@ const formaPagCards = [
   { label: "Dinheiro", value: "R$ 1.075,00" },
   { label: "Debito sumup", value: "R$ 243,05" },
 ];
+
+function FormasPagamentoCarousel() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scroll = (dir: number) => {
+    scrollRef.current?.scrollBy({ left: dir * 200, behavior: "smooth" });
+  };
+  return (
+    <div className="relative">
+      <p className="text-xs text-muted-foreground mb-1.5">Formas de pagamento</p>
+      <div className="flex items-center gap-1">
+        <button onClick={() => scroll(-1)} className="shrink-0 p-1 rounded hover:bg-muted text-muted-foreground">
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <div ref={scrollRef} className="flex gap-2 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+          {formaPagCards.map((fp) => (
+            <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px] shrink-0 bg-card">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-0.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-muted" />
+                <span>{fp.label}</span>
+              </div>
+              <p className="text-sm font-medium">{fp.value}</p>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => scroll(1)} className="shrink-0 p-1 rounded hover:bg-muted text-muted-foreground">
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function FluxoCaixa() {
   const [tab, setTab] = useState("detalhado");
@@ -100,25 +130,12 @@ export default function FluxoCaixa() {
 
   return (
     <AppLayout>
-      <div className="px-4 pb-3">
-        <p className="text-sm text-muted-foreground mb-2">Formas de pagamento</p>
-        <div className="flex flex-wrap gap-2">
-          {formaPagCards.map((fp) => (
-            <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px]">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
-                <div className="h-3 w-3 rounded-full bg-muted" />
-                <span>{fp.label}</span>
-              </div>
-              <p className="text-sm font-medium">{fp.value}</p>
-            </div>
-          ))}
-        </div>
-      </div>
       <DataTable
         title="Fluxo de Caixa"
         data={tab === "detalhado" ? initialData as any[] : resumidoData as any[]}
         columns={tab === "detalhado" ? columnsDetalhado as any : columnsResumido as any}
         summaryCards={summaryCards}
+        slotBetweenCardsAndTabs={<FormasPagamentoCarousel />}
         tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
