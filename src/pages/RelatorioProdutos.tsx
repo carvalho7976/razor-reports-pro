@@ -33,7 +33,7 @@ export default function RelatorioProdutos() {
   const summaryCards: SummaryCard[] = [
     { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     { label: "Valor Total", value: R$(resumidoData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Venda Extra", value: R$(resumidoData.reduce((s, r) => s + r.vendaExtra, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
+    { label: "Venda Extra", value: `${resumidoData.reduce((s, r) => s + r.qtdVendaExtra, 0)} un · ${R$(resumidoData.reduce((s, r) => s + r.vendaExtra, 0))}`, icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 
@@ -42,7 +42,7 @@ export default function RelatorioProdutos() {
     { key: "categoria", label: "Categoria" },
     { key: "quantidade", label: "Quantidade", align: "center" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "qtdVendaExtra", label: "Qtd Venda Extra", align: "center" },
+    { key: "qtdVendaExtra", label: "Quantidade de Venda Extra", align: "center" },
     { key: "vendaExtra", label: "Venda Extra", align: "right", render: v => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: v => R$(v) },
     { key: "data", label: "Data" },

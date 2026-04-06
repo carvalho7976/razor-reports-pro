@@ -95,6 +95,8 @@ interface DataTableProps<T extends Record<string, any>> {
   onCellEdit?: (rowIndex: number, key: string, value: any) => void;
   tableId?: string;
   dateField?: string;
+  /** Slot rendered between summary cards and tabs */
+  slotBetweenCardsAndTabs?: ReactNode;
 }
 
 /* ── Novo Button (Notion-style) ── */
