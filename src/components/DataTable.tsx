@@ -65,6 +65,8 @@ export interface SummaryCard {
   onFilter?: (value: string) => void;
   /** "compact" = ~140px, "wide" = ~200px+ (default auto) */
   size?: "compact" | "wide";
+  /** Icon color theme: blue (neutral/KPI), green (income/sales), red (expense/loss) */
+  color?: "blue" | "green" | "red";
 }
 
 export interface TabDef {
