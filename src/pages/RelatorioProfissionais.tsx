@@ -79,7 +79,14 @@ export default function RelatorioProfissionais() {
     },
     {
       key: "profissional", label: "Profissional", pinned: true,
-      render: (v) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
+      render: (v) => (
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+        </div>
+      ),
     },
     { key: "funcao", label: "Função", render: (v) => <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground">{v}</span> },
     { key: "totalServicos", label: "Total em Serviços", align: "right", render: (v) => R$(v) },
@@ -105,7 +112,14 @@ export default function RelatorioProfissionais() {
     },
     {
       key: "profissional", label: "Profissional", pinned: true,
-      render: (v) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
+      render: (v) => (
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+        </div>
+      ),
     },
     { key: "servico", label: "Serviço" },
     {
