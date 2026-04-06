@@ -1028,6 +1028,7 @@ export function DataTable<T extends Record<string, any>>({
             if (isQuantity) {
               return (
                 <div key={i} {...clickProps}>
+                  {card.icon && <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{card.icon}</div>}
                   <div className="min-w-0">
                     <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
                     <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
