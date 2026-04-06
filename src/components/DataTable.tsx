@@ -1,7 +1,7 @@
 import { useState, useMemo, ReactNode, useCallback, useRef, useEffect, KeyboardEvent } from "react";
 import {
   Search, SlidersHorizontal, ChevronUp, ChevronDown,
-  X, Pin, Eye, EyeOff, Calendar, Download, ListFilter,
+  X, Pin, Eye, EyeOff, Calendar, Download,
   ChevronLeft, ChevronRight, ArrowUpDown, MoreHorizontal,
   FileSpreadsheet, FileText, Plus, ChevronDown as ChevronDownIcon,
   GripVertical, Info, RotateCcw,
