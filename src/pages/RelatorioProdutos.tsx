@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, CreditCard } from "lucide-react";
+import { User, CreditCard, Hash } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface ProdutoResumido { id: number; nome: string; categoria: string; quantidade: number; valor: number; qtdVendaExtra: number; vendaExtra: number; desconto: number; data: string; }
@@ -28,11 +28,13 @@ const detalhadoData: ProdutoDetalhado[] = [
 export default function RelatorioProdutos() {
   const [tab, setTab] = useState("resumido");
 
+  const totalQtd = resumidoData.reduce((s, r) => s + r.quantidade, 0) + resumidoData.reduce((s, r) => s + r.qtdVendaExtra, 0);
+
   const summaryCards: SummaryCard[] = [
+    { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     { label: "Valor Total", value: R$(resumidoData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Venda Extra", value: R$(resumidoData.reduce((s, r) => s + r.vendaExtra, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Total", value: String(resumidoData.reduce((s, r) => s + r.quantidade, 0)), type: "quantity", size: "compact" },
   ];
 
   const columnsResumido: Column<ProdutoResumido>[] = [

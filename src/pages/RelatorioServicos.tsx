@@ -2,19 +2,19 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, CreditCard } from "lucide-react";
+import { User, CreditCard, Hash } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-interface ServicoResumido { id: number; nome: string; profissional: string; quantidade: number; valor: number; qtdVendaExtra: number; vendaExtra: number; desconto: number; data: string; }
+interface ServicoResumido { id: number; nome: string; quantidade: number; valor: number; qtdVendaExtra: number; vendaExtra: number; desconto: number; data: string; }
 interface ServicoDetalhado { id: number; servico: string; cliente: string; celular: string; profissional: string; valor: number; vendaExtra: number; desconto: number; data: string; }
 
 const resumidoData: ServicoResumido[] = [
-  { id: 1, nome: "Corte Masculino", profissional: "Carlos", quantidade: 45, valor: 2250, qtdVendaExtra: 5, vendaExtra: 150, desconto: 80, data: "05/04/2026" },
-  { id: 2, nome: "Escova", profissional: "Ana", quantidade: 30, valor: 2400, qtdVendaExtra: 8, vendaExtra: 200, desconto: 120, data: "05/04/2026" },
-  { id: 3, nome: "Barba", profissional: "Carlos", quantidade: 38, valor: 1330, qtdVendaExtra: 0, vendaExtra: 0, desconto: 50, data: "05/04/2026" },
-  { id: 4, nome: "Coloração", profissional: "Fernanda", quantidade: 15, valor: 3000, qtdVendaExtra: 10, vendaExtra: 500, desconto: 200, data: "05/04/2026" },
-  { id: 5, nome: "Hidratação", profissional: "Ana", quantidade: 20, valor: 2400, qtdVendaExtra: 6, vendaExtra: 300, desconto: 100, data: "05/04/2026" },
-  { id: 6, nome: "Manicure", profissional: "Fernanda", quantidade: 25, valor: 1250, qtdVendaExtra: 3, vendaExtra: 100, desconto: 60, data: "05/04/2026" },
+  { id: 1, nome: "Corte Masculino", quantidade: 45, valor: 2250, qtdVendaExtra: 5, vendaExtra: 150, desconto: 80, data: "05/04/2026" },
+  { id: 2, nome: "Escova", quantidade: 30, valor: 2400, qtdVendaExtra: 8, vendaExtra: 200, desconto: 120, data: "05/04/2026" },
+  { id: 3, nome: "Barba", quantidade: 38, valor: 1330, qtdVendaExtra: 0, vendaExtra: 0, desconto: 50, data: "05/04/2026" },
+  { id: 4, nome: "Coloração", quantidade: 15, valor: 3000, qtdVendaExtra: 10, vendaExtra: 500, desconto: 200, data: "05/04/2026" },
+  { id: 5, nome: "Hidratação", quantidade: 20, valor: 2400, qtdVendaExtra: 6, vendaExtra: 300, desconto: 100, data: "05/04/2026" },
+  { id: 6, nome: "Manicure", quantidade: 25, valor: 1250, qtdVendaExtra: 3, vendaExtra: 100, desconto: 60, data: "05/04/2026" },
 ];
 
 const detalhadoData: ServicoDetalhado[] = [
@@ -28,26 +28,17 @@ const detalhadoData: ServicoDetalhado[] = [
 export default function RelatorioServicos() {
   const [tab, setTab] = useState("resumido");
 
+  const totalQtd = resumidoData.reduce((s, r) => s + r.quantidade, 0);
+
   const summaryCards: SummaryCard[] = [
+    { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact" },
     { label: "Valor Total", value: R$(resumidoData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Venda Extra", value: R$(resumidoData.reduce((s, r) => s + r.vendaExtra, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Total", value: String(resumidoData.reduce((s, r) => s + r.quantidade, 0)), type: "quantity", size: "compact" },
   ];
 
   const columnsResumido: Column<ServicoResumido>[] = [
     { key: "nome", label: "Serviço", pinned: true },
-    {
-      key: "profissional", label: "Profissional",
-      render: (v) => (
-        <div className="flex items-center gap-1.5">
-          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
-            <User className="h-3 w-3 text-muted-foreground" />
-          </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
-        </div>
-      ),
-    },
     { key: "quantidade", label: "Quantidade", align: "center" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
     { key: "qtdVendaExtra", label: "Qtd Venda Extra", align: "center" },

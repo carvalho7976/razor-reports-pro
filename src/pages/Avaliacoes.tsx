@@ -19,9 +19,8 @@ const initialData: Avaliacao[] = [
 export default function Avaliacoes() {
   const [tab, setTab] = useState("detalhado");
 
-  const npsEmpresa = Math.round(initialData.reduce((s, r) => s + r.nota, 0) / initialData.length * 10);
+  const notaEmpresa = Math.round(initialData.reduce((s, r) => s + r.nota, 0) / initialData.length * 10) / 10;
 
-  // NPS by profissional
   const profMap = useMemo(() => {
     const map: Record<string, { total: number; count: number }> = {};
     initialData.forEach(r => {
@@ -32,23 +31,23 @@ export default function Avaliacoes() {
     return map;
   }, []);
 
-  const npsEquipe = Math.round(
-    Object.values(profMap).reduce((s, v) => s + (v.total / v.count * 10), 0) / Object.keys(profMap).length
-  );
+  const notaEquipe = Math.round(
+    Object.values(profMap).reduce((s, v) => s + (v.total / v.count), 0) / Object.keys(profMap).length * 10
+  ) / 10;
 
-  const npsRecepcao = 85; // placeholder
+  const notaRecepcao = 8.5;
 
   const summaryCards: SummaryCard[] = [
-    { label: "NPS Empresa", value: `${npsEmpresa}%`, icon: <Star className="h-4 w-4" /> },
-    { label: "NPS Equipe Profissional", value: `${npsEquipe}%`, icon: <Star className="h-4 w-4" /> },
-    { label: "NPS Recepção", value: `${npsRecepcao}%`, icon: <Star className="h-4 w-4" /> },
+    { label: "Nota Empresa", value: String(notaEmpresa), icon: <Star className="h-4 w-4" />, size: "compact" },
+    { label: "Nota Equipe", value: String(notaEquipe), icon: <Star className="h-4 w-4" />, size: "compact" },
+    { label: "Nota Recepção", value: String(notaRecepcao), icon: <Star className="h-4 w-4" />, size: "compact" },
   ];
 
   const resumidoData = useMemo(() => {
     return Object.entries(profMap).map(([nome, v], i) => ({
       id: i + 1,
       profissional: nome,
-      npsMedia: Math.round(v.total / v.count * 10),
+      notaMedia: Math.round(v.total / v.count * 10) / 10,
       totalAvaliacoes: v.count,
     }));
   }, [profMap]);
@@ -94,8 +93,8 @@ export default function Avaliacoes() {
       render: (v: string) => <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>,
     },
     {
-      key: "npsMedia", label: "NPS Média", align: "center",
-      render: (v: number) => <span className="font-bold" style={{ color: v >= 90 ? "#00c5b4" : v >= 70 ? "#f59e0b" : "#ff2f2f" }}>{v}%</span>,
+      key: "notaMedia", label: "Nota Média", align: "center",
+      render: (v: number) => <span className="font-bold" style={{ color: v >= 9 ? "#00c5b4" : v >= 7 ? "#f59e0b" : "#ff2f2f" }}>{v}</span>,
     },
     { key: "totalAvaliacoes", label: "Avaliações", align: "center" },
   ];

@@ -17,6 +17,13 @@ const initialData: Agendamento[] = [
   { id: 6, cliente: "Carla Dias", celular: "", profissional: "Ana", servico: "Hidratação", data: "05/04/2026", horario: "08:00", origem: "App", valor: 120, status: "Aberto" },
 ];
 
+// Parse "dd/MM/yyyy HH:mm" into sortable number
+function parseDateTime(data: string, horario: string): number {
+  const [d, m, y] = data.split("/").map(Number);
+  const [h, min] = horario.split(":").map(Number);
+  return new Date(y, m - 1, d, h, min).getTime();
+}
+
 export default function RelatorioAgendamentos() {
   const [allData, setAllData] = useState(initialData);
   const [tab, setTab] = useState("todos");
@@ -38,7 +45,6 @@ export default function RelatorioAgendamentos() {
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os agendamentos selecionados" },
   ];
 
-  // Origin cards with percentage
   const origemCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     allData.forEach(d => { counts[d.origem] = (counts[d.origem] || 0) + 1; });
@@ -48,7 +54,7 @@ export default function RelatorioAgendamentos() {
   const summaryCards: SummaryCard[] = [
     { label: "Total", value: String(allData.length), type: "quantity", size: "compact" },
     ...Object.entries(origemCounts).map(([origem, count]) => ({
-      label: `Origem ${origem}`,
+      label: origem,
       value: `${count} (${Math.round(count / allData.length * 100)}%)`,
       type: "quantity" as const,
       size: "compact" as const,
@@ -80,6 +86,7 @@ export default function RelatorioAgendamentos() {
     {
       key: "data", label: "Data / Horário",
       render: (v, row) => `${v} ${row.horario}`,
+      sortFn: (a: Agendamento, b: Agendamento) => parseDateTime(a.data, a.horario) - parseDateTime(b.data, b.horario),
     },
     { key: "origem", label: "Origem" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
@@ -94,7 +101,7 @@ export default function RelatorioAgendamentos() {
 
   return (
     <AppLayout>
-      <DataTable title="Relatório de Agendamentos" data={data} columns={columns} summaryCards={summaryCards} selectable selectionActions={selectionActions} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_agendamentos" />
+      <DataTable title="Agendamentos" data={data} columns={columns} summaryCards={summaryCards} selectable selectionActions={selectionActions} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_agendamentos" />
     </AppLayout>
   );
 }

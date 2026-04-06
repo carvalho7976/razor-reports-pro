@@ -1,63 +1,85 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
-import { CreditCard } from "lucide-react";
+import { User, CreditCard } from "lucide-react";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-interface FluxoItem { id: number; data: string; descricao: string; categoria: string; entrada: number; saida: number; formaPagamento: string; }
+interface FluxoItem { id: number; usuario: string; data: string; tipo: string; descricao: string; fp: string; comprovante: string; valor: number; }
 interface FluxoResumido { id: number; data: string; abertura: number; adicao: number; entrada: number; saida: number; sangria: number; fechamento: number; saldo: number; }
 
 const initialData: FluxoItem[] = [
-  { id: 1, data: "05/04/2026", descricao: "Corte Masculino - João Silva", categoria: "Serviços", entrada: 50, saida: 0, formaPagamento: "Pix" },
-  { id: 2, data: "05/04/2026", descricao: "Pomada Modeladora", categoria: "Produtos", entrada: 40, saida: 0, formaPagamento: "Cartão Crédito" },
-  { id: 3, data: "05/04/2026", descricao: "Aluguel", categoria: "Despesas Fixas", entrada: 0, saida: 3500, formaPagamento: "Transferência" },
-  { id: 4, data: "04/04/2026", descricao: "Escova - Maria Santos", categoria: "Serviços", entrada: 80, saida: 0, formaPagamento: "Cartão Débito" },
-  { id: 5, data: "04/04/2026", descricao: "Material de limpeza", categoria: "Despesas Variáveis", entrada: 0, saida: 150, formaPagamento: "Dinheiro" },
-  { id: 6, data: "04/04/2026", descricao: "Coloração - Ana Costa", categoria: "Serviços", entrada: 200, saida: 0, formaPagamento: "Pix" },
-  { id: 7, data: "03/04/2026", descricao: "Barba - Pedro Oliveira", categoria: "Serviços", entrada: 35, saida: 0, formaPagamento: "Dinheiro" },
-  { id: 8, data: "03/04/2026", descricao: "Produtos para revenda", categoria: "Estoque", entrada: 0, saida: 800, formaPagamento: "Cartão Crédito" },
-  { id: 9, data: "03/04/2026", descricao: "Hidratação - Carla Dias", categoria: "Serviços", entrada: 120, saida: 0, formaPagamento: "Pix" },
-  { id: 10, data: "02/04/2026", descricao: "Energia elétrica", categoria: "Despesas Fixas", entrada: 0, saida: 450, formaPagamento: "Débito automático" },
+  { id: 1, usuario: "Lara", data: "05/01/2026 10:22:39", tipo: "Abertura de Gaveta", descricao: "", fp: "", comprovante: "", valor: 176.55 },
+  { id: 2, usuario: "Lara", data: "05/01/2026 10:22:39", tipo: "Lançamento avulso", descricao: "", fp: "", comprovante: "", valor: 0 },
+  { id: 3, usuario: "", data: "05/01/2026 23:30:12", tipo: "Fechamento de Gaveta", descricao: "", fp: "", comprovante: "", valor: 176.55 },
+  { id: 4, usuario: "Carlos", data: "04/01/2026 09:00:00", tipo: "Entrada", descricao: "Corte Masculino - João Silva", fp: "Pix", comprovante: "", valor: 50 },
+  { id: 5, usuario: "Carlos", data: "04/01/2026 11:00:00", tipo: "Entrada", descricao: "Pomada Modeladora", fp: "Cartão Crédito", comprovante: "", valor: 40 },
+  { id: 6, usuario: "Ana", data: "04/01/2026 14:00:00", tipo: "Saída", descricao: "Material de limpeza", fp: "Dinheiro", comprovante: "", valor: -150 },
+  { id: 7, usuario: "Lara", data: "03/01/2026 08:30:00", tipo: "Abertura de Gaveta", descricao: "", fp: "", comprovante: "", valor: 500 },
+];
+
+// Payment method summary cards
+const formaPagCards = [
+  { label: "Assinatura", value: "R$ 50,00" },
+  { label: "Crédito", value: "R$ 706,00" },
+  { label: "Frizzar_Pack", value: "R$ 100,00" },
+  { label: "Débito", value: "R$ 23.250,89" },
+  { label: "PIX", value: "R$ 429,23" },
+  { label: "Dinheiro", value: "R$ 1.075,00" },
+  { label: "Debito sumup", value: "R$ 243,05" },
 ];
 
 export default function FluxoCaixa() {
   const [tab, setTab] = useState("detalhado");
 
-  const totalEntrada = initialData.reduce((s, r) => s + r.entrada, 0);
-  const totalSaida = initialData.reduce((s, r) => s + r.saida, 0);
+  const totalEntrada = initialData.filter(d => d.valor > 0).reduce((s, r) => s + r.valor, 0);
+  const totalSaida = Math.abs(initialData.filter(d => d.valor < 0).reduce((s, r) => s + r.valor, 0));
   const saldo = totalEntrada - totalSaida;
 
   const summaryCards: SummaryCard[] = [
+    { label: "Saldo", value: R$(saldo), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Entradas", value: R$(totalEntrada), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
     { label: "Saídas", value: R$(totalSaida), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
-    { label: "Saldo", value: R$(saldo), icon: <CreditCard className="h-4 w-4" />, size: "wide" },
   ];
 
   const resumidoData: FluxoResumido[] = useMemo(() => {
-    const grouped = initialData.reduce((acc, item) => {
-      const existing = acc.find(a => a.data === item.data);
-      if (existing) { existing.entrada += item.entrada; existing.saida += item.saida; }
-      else { acc.push({ id: acc.length + 1, data: item.data, entrada: item.entrada, saida: item.saida, abertura: 0, adicao: 0, sangria: 0, fechamento: 0, saldo: 0 }); }
-      return acc;
-    }, [] as FluxoResumido[]);
-    // Simulate opening/closing values
-    grouped.forEach((g, i) => {
-      g.abertura = i === 0 ? 500 : grouped[i - 1].fechamento;
-      g.adicao = 100;
-      g.sangria = 50;
-      g.saldo = g.entrada - g.saida;
-      g.fechamento = g.abertura + g.adicao + g.entrada - g.saida - g.sangria;
+    const dates = [...new Set(initialData.map(d => d.data.split(" ")[0]))];
+    return dates.map((dt, i) => {
+      const items = initialData.filter(d => d.data.startsWith(dt));
+      const entrada = items.filter(d => d.valor > 0 && d.tipo === "Entrada").reduce((s, r) => s + r.valor, 0);
+      const saida = Math.abs(items.filter(d => d.valor < 0).reduce((s, r) => s + r.valor, 0));
+      const abertura = i === 0 ? 500 : 0;
+      const adicao = 100;
+      const sangria = 50;
+      const fechamento = abertura + adicao + entrada - saida - sangria;
+      return { id: i + 1, data: dt, abertura, adicao, entrada, saida, sangria, fechamento, saldo: entrada - saida };
     });
-    return grouped;
   }, []);
 
   const columnsDetalhado: Column<FluxoItem>[] = [
-    { key: "data", label: "Data" },
-    { key: "descricao", label: "Descrição", pinned: true },
-    { key: "categoria", label: "Categoria" },
-    { key: "entrada", label: "Entrada", align: "right", render: v => v > 0 ? <span style={{ color: "#00c5b4" }}>{R$(v)}</span> : "—" },
-    { key: "saida", label: "Saída", align: "right", render: v => v > 0 ? <span style={{ color: "#ff2f2f" }}>{R$(v)}</span> : "—" },
-    { key: "formaPagamento", label: "Forma Pagamento" },
+    {
+      key: "usuario", label: "Usuário",
+      render: (v) => v ? (
+        <div className="flex items-center gap-1.5">
+          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3 w-3 text-muted-foreground" />
+          </div>
+          <span className="font-medium">{v}</span>
+        </div>
+      ) : "—",
+    },
+    { key: "data", label: "Data", pinned: true },
+    { key: "tipo", label: "Tipo" },
+    { key: "descricao", label: "Descrição" },
+    { key: "fp", label: "FP", render: v => v || "—" },
+    { key: "comprovante", label: "Comprovante", render: v => v || "—" },
+    {
+      key: "valor", label: "Valor", align: "right",
+      render: (v: number) => (
+        <span style={{ color: v > 0 ? "#00c5b4" : v < 0 ? "#ff2f2f" : undefined }}>
+          {v >= 0 ? v.toFixed(2) : v.toFixed(2)}
+        </span>
+      ),
+    },
   ];
 
   const columnsResumido: Column<FluxoResumido>[] = [
@@ -78,7 +100,34 @@ export default function FluxoCaixa() {
 
   return (
     <AppLayout>
-      <DataTable title="Fluxo de Caixa" data={tab === "detalhado" ? initialData as any[] : resumidoData as any[]} columns={tab === "detalhado" ? columnsDetalhado as any : columnsResumido as any} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} showDateFilter={true} pageSize={15} tableId="fluxo_caixa" />
+      <DataTable
+        title="Fluxo de Caixa"
+        data={tab === "detalhado" ? initialData as any[] : resumidoData as any[]}
+        columns={tab === "detalhado" ? columnsDetalhado as any : columnsResumido as any}
+        summaryCards={summaryCards}
+        tabs={tabs}
+        activeTab={tab}
+        onTabChange={setTab}
+        showDateFilter={true}
+        pageSize={15}
+        tableId="fluxo_caixa"
+      >
+        {/* Formas de pagamento section */}
+        <div className="px-4 pb-3">
+          <p className="text-sm text-muted-foreground mb-2">Formas de pagamento</p>
+          <div className="flex flex-wrap gap-2">
+            {formaPagCards.map((fp) => (
+              <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px]">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
+                  <div className="h-3 w-3 rounded-full bg-muted" />
+                  <span>{fp.label}</span>
+                </div>
+                <p className="text-sm font-medium">{fp.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </DataTable>
     </AppLayout>
   );
 }
