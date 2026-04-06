@@ -50,7 +50,7 @@ export default function RelatorioClientes() {
   const summaryCards: SummaryCard[] = [
     { label: "Clientes Atendidos", value: String(totalClientes), type: "quantity", icon: <Users className="h-4 w-4" />, size: "compact", color: "blue" },
     { label: "Serviços", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-    { label: "Produtos", value: R$(totalProdutos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    { label: "Produtos", value: R$(totalProdutos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
   ];
 
   const columns: Column<Cliente>[] = [

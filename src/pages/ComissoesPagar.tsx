@@ -54,9 +54,9 @@ export default function ComissoesPagar() {
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Em aberto", value: R$(totalEmAberto), icon: <CreditCard className="h-4 w-4" />, color: "red" },
-    { label: "Pagas", value: R$(totalPagas), icon: <CreditCard className="h-4 w-4" />, color: "green" },
-    { label: "Adiantamentos", value: R$(totalAdiantamentos), icon: <CreditCard className="h-4 w-4" />, color: "red" },
+    { label: "Em aberto", value: R$(totalEmAberto), icon: <CreditCard className="h-4 w-4" />, color: "blue" },
+    { label: "Pagas", value: R$(totalPagas), icon: <CreditCard className="h-4 w-4" />, color: "blue" },
+    { label: "Adiantamentos", value: R$(totalAdiantamentos), icon: <CreditCard className="h-4 w-4" />, color: "blue" },
   ];
 
   const columns: Column<Comissao>[] = [
