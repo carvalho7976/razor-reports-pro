@@ -45,10 +45,10 @@ export default function RelatorioProdutos() {
   const columnsResumido: Column<ProdutoResumido>[] = [
     { key: "nome", label: "Produto", pinned: true },
     { key: "categoria", label: "Categoria" },
-    { key: "quantidade", label: "Quantidade", align: "center" },
+    { key: "quantidade", label: "Quantidade Avulso", align: "center" },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "qtdVendaExtra", label: "Quantidade de Venda Extra", align: "center" },
-    { key: "vendaExtra", label: "Venda Extra", align: "right", render: v => R$(v) },
+    { key: "qtdVendaExtra", label: "Quantidade Assinantes", align: "center" },
+    { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: v => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: v => R$(v) },
     { key: "data", label: "Data" },
   ];
@@ -76,7 +76,7 @@ export default function RelatorioProdutos() {
       ),
     },
     { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "vendaExtra", label: "Venda Extra", align: "right", render: v => R$(v) },
+    { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: v => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: v => R$(v) },
     { key: "data", label: "Data" },
   ];
