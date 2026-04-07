@@ -273,7 +273,7 @@ function DateRangePicker({
 
   const displayLabel = useMemo(() => {
     if (dateRange?.from && dateRange?.to) {
-      rreturn`${format(dateRange.from, "dd/MM/yy")} – ${format(dateRange.to, "dd/MM/yy")}`;
+      return `${format(dateRange.from, "dd/MM/yy")} – ${format(dateRange.to, "dd/MM/yy")}`;
     }
     return "Período";
   }, [dateRange]);
