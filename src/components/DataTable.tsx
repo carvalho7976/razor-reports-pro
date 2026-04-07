@@ -960,11 +960,11 @@ export function DataTable<T extends Record<string, any>>({
         hoje: "Hoje",
         ontem: "Ontem",
         semana: "Esta Semana",
-        semana_passada: "Sem. Passada",
+        semana_passada: "Sem. Anterior",
         mes: "Este Mês",
-        mes_passado: "Mês Passado",
+        mes_passado: "Mês Anterior",
         ano: "Este Ano",
-        ano_passado: "Ano Passado",
+        ano_passado: "Ano Anterior",
         personalizado: "Personalizado",
       };
       filters.push({ id: "__date", key: "__date", label: "Período", value: labels[datePreset] });
