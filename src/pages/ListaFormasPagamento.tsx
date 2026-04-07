@@ -10,17 +10,51 @@ interface FormaPagamento {
   nome: string;
   tipo: string;
   taxa: number;
+  destino: string;
+  tempoParaCair: string;
   status: "Ativo" | "Desativado";
 }
 
 const initialData: FormaPagamento[] = [
-  { id: 1, nome: "Dinheiro", tipo: "Espécie", taxa: 0, status: "Ativo" },
-  { id: 2, nome: "Pix", tipo: "Digital", taxa: 0, status: "Ativo" },
-  { id: 3, nome: "Cartão Crédito", tipo: "Cartão", taxa: 3.5, status: "Ativo" },
-  { id: 4, nome: "Cartão Débito", tipo: "Cartão", taxa: 1.5, status: "Ativo" },
-  { id: 5, nome: "Transferência", tipo: "Digital", taxa: 0, status: "Ativo" },
-  { id: 6, nome: "Cheque", tipo: "Outros", taxa: 0, status: "Desativado" },
-  { id: 7, nome: "Vale Presente", tipo: "Outros", taxa: 0, status: "Desativado" },
+  { id: 1, nome: "Dinheiro", tipo: "Espécie", taxa: 0, destino: "CONTA", tempoParaCair: "Na hora", status: "Ativo" },
+  { id: 2, nome: "Pix", tipo: "Digital", taxa: 0, destino: "CONTA", tempoParaCair: "Na hora", status: "Ativo" },
+  {
+    id: 3,
+    nome: "Cartão Crédito",
+    tipo: "Cartão",
+    taxa: 3.5,
+    destino: "CONTA",
+    tempoParaCair: "Na hora",
+    status: "Ativo",
+  },
+  {
+    id: 4,
+    nome: "Cartão Débito",
+    tipo: "Cartão",
+    taxa: 1.5,
+    destino: "CAIXA",
+    tempoParaCair: "1 dia",
+    status: "Ativo",
+  },
+  {
+    id: 5,
+    nome: "Transferência",
+    tipo: "Digital",
+    taxa: 0,
+    destino: "NENHUM",
+    tempoParaCair: "Na hora",
+    status: "Ativo",
+  },
+  { id: 6, nome: "Cheque", tipo: "Outros", taxa: 0, destino: "CAIXA", tempoParaCair: "Na hora", status: "Desativado" },
+  {
+    id: 7,
+    nome: "Vale Presente",
+    tipo: "Outros",
+    taxa: 0,
+    destino: "CONTA",
+    tempoParaCair: "Na hora",
+    status: "Desativado",
+  },
 ];
 
 const logoMap: Record<string, React.ReactNode> = {
@@ -98,6 +132,8 @@ export default function ListaFormasPagamento() {
     { key: "nome", label: "Nome", pinned: true },
     { key: "tipo", label: "Tipo" },
     { key: "taxa", label: "Taxa %", align: "center", render: (v) => `${v}%` },
+    { key: "destino", label: "Destino", align: "center" },
+    { key: "tempoParaCair", label: "Tempo p/ Cair", align: "center" },
     {
       key: "status",
       label: "Status",
@@ -107,7 +143,7 @@ export default function ListaFormasPagamento() {
           <Switch
             checked={v === "Ativo"}
             onCheckedChange={(checked) => handleStatusChange(row.id, checked)}
-            className="scale-90 data-[state=checked]:bg-blue-600"
+            className="scale-90 data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300"
           />
         </div>
       ),
@@ -132,7 +168,12 @@ export default function ListaFormasPagamento() {
 
   const tabs: TabDef[] = [
     { label: "Todos", value: "todos", count: allData.length, color: "neutral" },
-    { label: "Ativos", value: "ativos", count: allData.filter((d) => d.status === "Ativo").length, color: "success" },
+    {
+      label: "Ativos",
+      value: "ativos",
+      count: allData.filter((d) => d.status === "Ativo").length,
+      color: "success",
+    },
     {
       label: "Desativados",
       value: "desativados",
