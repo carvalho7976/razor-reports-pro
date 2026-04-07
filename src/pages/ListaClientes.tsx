@@ -22,21 +22,171 @@ interface Cliente {
 }
 
 const data: Cliente[] = [
-  { cod: "745142", nome: "Abner Ferreira Chaves", telefone: "(61) 99450-9929", aniversario: "01/05/2017", ultimaVisita: "04/11/2025", moedas: 196, creditos: 0, tags: "bloquear123", status: "inativo" },
-  { cod: "1037806", nome: "Ada Naama", telefone: "(67) 99162-990", aniversario: "", ultimaVisita: "17/02/2026", moedas: 25, creditos: 0, tags: "", status: "ativo" },
-  { cod: "1037807", nome: "Adara Cerqueira", telefone: "6181627802", aniversario: "10/05/2025", ultimaVisita: "17/02/2026", moedas: 0, creditos: 0, tags: "", status: "ativo" },
-  { cod: "1037808", nome: "Adelia Maria Sales", telefone: "12981134764", aniversario: "", ultimaVisita: "26/11/2025", moedas: 4, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1167159", nome: "Adelio Marçal", telefone: "(88) 90300-0166", aniversario: "", ultimaVisita: "05/11/2025", moedas: 4, creditos: 0, tags: "", status: "inativo" },
-  { cod: "675732", nome: "Ademar Herminio", telefone: "(55) 55555-5555", aniversario: "", ultimaVisita: "01/10/2025", moedas: 397, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1069712", nome: "Adenilson", telefone: "(21) 99999-9999", aniversario: "20/01/1988", ultimaVisita: "12/08/2025", moedas: 0, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1204833", nome: "Adenilson", telefone: "(21) 99999-9999", aniversario: "20/03/1988", ultimaVisita: "11/12/2025", moedas: 4, creditos: 0, tags: "", status: "semi-ativo" },
-  { cod: "1037809", nome: "Adhara Maria", telefone: "", aniversario: "", ultimaVisita: "10/02/2026", moedas: 24, creditos: 0, tags: "", status: "ativo" },
-  { cod: "848084", nome: "Adriana", telefone: "(99) 99999-99999", aniversario: "22/03/1988", ultimaVisita: "24/06/2025", moedas: 97, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1037810", nome: "Adriana", telefone: "11993966288", aniversario: "", ultimaVisita: "", moedas: 0, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1037811", nome: "Adriana", telefone: "12982466363", aniversario: "", ultimaVisita: "", moedas: 0, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1037812", nome: "Adriana Bitencourt", telefone: "13997288558", aniversario: "", ultimaVisita: "", moedas: 0, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1037813", nome: "Adriana Cabello", telefone: "(19) 99239-3840", aniversario: "", ultimaVisita: "", moedas: 0, creditos: 0, tags: "", status: "inativo" },
-  { cod: "1037814", nome: "Adriana Cherin", telefone: "11994527149", aniversario: "", ultimaVisita: "", moedas: 0, creditos: 0, tags: "", status: "inativo" },
+  {
+    cod: "745142",
+    nome: "Abner Ferreira Chaves",
+    telefone: "(61) 99450-9929",
+    aniversario: "01/05/2017",
+    ultimaVisita: "04/11/2025",
+    moedas: 196,
+    creditos: 0,
+    tags: "bloquear123",
+    status: "inativo",
+  },
+  {
+    cod: "1037806",
+    nome: "Ada Naama",
+    telefone: "(67) 99162-990",
+    aniversario: "",
+    ultimaVisita: "17/02/2026",
+    moedas: 25,
+    creditos: 0,
+    tags: "",
+    status: "ativo",
+  },
+  {
+    cod: "1037807",
+    nome: "Adara Cerqueira",
+    telefone: "6181627802",
+    aniversario: "10/05/2025",
+    ultimaVisita: "17/02/2026",
+    moedas: 0,
+    creditos: 0,
+    tags: "",
+    status: "ativo",
+  },
+  {
+    cod: "1037808",
+    nome: "Adelia Maria Sales",
+    telefone: "12981134764",
+    aniversario: "",
+    ultimaVisita: "26/11/2025",
+    moedas: 4,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1167159",
+    nome: "Adelio Marçal",
+    telefone: "(88) 90300-0166",
+    aniversario: "",
+    ultimaVisita: "05/11/2025",
+    moedas: 4,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "675732",
+    nome: "Ademar Herminio",
+    telefone: "(55) 55555-5555",
+    aniversario: "",
+    ultimaVisita: "01/10/2025",
+    moedas: 397,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1069712",
+    nome: "Adenilson",
+    telefone: "(21) 99999-9999",
+    aniversario: "20/01/1988",
+    ultimaVisita: "12/08/2025",
+    moedas: 0,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1204833",
+    nome: "Adenilson",
+    telefone: "(21) 99999-9999",
+    aniversario: "20/03/1988",
+    ultimaVisita: "11/12/2025",
+    moedas: 4,
+    creditos: 0,
+    tags: "",
+    status: "semi-ativo",
+  },
+  {
+    cod: "1037809",
+    nome: "Adhara Maria",
+    telefone: "",
+    aniversario: "",
+    ultimaVisita: "10/02/2026",
+    moedas: 24,
+    creditos: 0,
+    tags: "",
+    status: "ativo",
+  },
+  {
+    cod: "848084",
+    nome: "Adriana",
+    telefone: "(99) 99999-99999",
+    aniversario: "22/03/1988",
+    ultimaVisita: "24/06/2025",
+    moedas: 97,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1037810",
+    nome: "Adriana",
+    telefone: "11993966288",
+    aniversario: "",
+    ultimaVisita: "",
+    moedas: 0,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1037811",
+    nome: "Adriana",
+    telefone: "12982466363",
+    aniversario: "",
+    ultimaVisita: "",
+    moedas: 0,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1037812",
+    nome: "Adriana Bitencourt",
+    telefone: "13997288558",
+    aniversario: "",
+    ultimaVisita: "",
+    moedas: 0,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1037813",
+    nome: "Adriana Cabello",
+    telefone: "(19) 99239-3840",
+    aniversario: "",
+    ultimaVisita: "",
+    moedas: 0,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
+  {
+    cod: "1037814",
+    nome: "Adriana Cherin",
+    telefone: "11994527149",
+    aniversario: "",
+    ultimaVisita: "",
+    moedas: 0,
+    creditos: 0,
+    tags: "",
+    status: "inativo",
+  },
 ];
 
 export default function ListaClientes() {
@@ -57,31 +207,80 @@ export default function ListaClientes() {
   const totalMoedas = allData.reduce((s, c) => s + c.moedas, 0);
   const totalCreditos = allData.reduce((s, c) => s + c.creditos, 0);
 
-  const bulkRemove = (indices: number[]) => { toast({ title: `${indices.length} cliente(s) removido(s)`, variant: "destructive" }); };
-  const bulkMerge = (indices: number[]) => { toast({ title: `Mesclar ${indices.length} clientes`, description: "Funcionalidade em desenvolvimento" }); };
-  const bulkMessage = (indices: number[]) => { toast({ title: `Enviar mensagem para ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" }); };
-  const bulkTag = (indices: number[]) => { toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" }); };
+  const bulkRemove = (indices: number[]) => {
+    toast({ title: `${indices.length} cliente(s) removido(s)`, variant: "destructive" });
+  };
+  const bulkMerge = (indices: number[]) => {
+    toast({ title: `Mesclar ${indices.length} clientes`, description: "Funcionalidade em desenvolvimento" });
+  };
+  const bulkMessage = (indices: number[]) => {
+    toast({
+      title: `Enviar mensagem para ${indices.length} cliente(s)`,
+      description: "Funcionalidade em desenvolvimento",
+    });
+  };
+  const bulkTag = (indices: number[]) => {
+    toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
+  };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Mesclar", icon: <Merge className="h-4 w-4" />, onClick: bulkMerge, description: "Unifica cadastros duplicados em um único registro" },
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove permanentemente os clientes selecionados da lista" },
-    { label: "Mensagem", icon: <MessageCircle className="h-4 w-4" />, onClick: bulkMessage, description: "Envia mensagem via WhatsApp para os clientes selecionados" },
-    { label: "Tag", icon: <Tag className="h-4 w-4" />, onClick: bulkTag, description: "Adiciona uma tag aos clientes selecionados" },
+    {
+      label: "Mesclar",
+      icon: <Merge className="h-4 w-4" />,
+      onClick: bulkMerge,
+      description: "Unifica cadastros duplicados em um único registro",
+    },
+    {
+      label: "Remover",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkRemove,
+      variant: "destructive",
+      description: "Remove permanentemente os clientes selecionados da lista",
+    },
+    {
+      label: "Mensagem",
+      icon: <MessageCircle className="h-4 w-4" />,
+      onClick: bulkMessage,
+      description: "Envia mensagem via WhatsApp para os clientes selecionados",
+    },
+    {
+      label: "Tag",
+      icon: <Tag className="h-4 w-4" />,
+      onClick: bulkTag,
+      description: "Adiciona uma tag aos clientes selecionados",
+    },
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Moedas Distribuídas", value: String(totalMoedas), type: "quantity", icon: <Coins className="h-4 w-4" />, size: "compact", color: "blue" },
-    { label: "Créditos em Aberto", value: R$(totalCreditos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
+    {
+      label: "Moedas Distribuídas",
+      value: String(totalMoedas),
+      type: "quantity",
+      icon: <Coins className="h-4 w-4" />,
+      size: "compact",
+      color: "blue",
+    },
+    {
+      label: "Créditos em Aberto",
+      value: R$(totalCreditos),
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "blue",
+    },
   ];
 
   const columns: Column<Cliente>[] = [
     { key: "cod", label: "Cod", width: "90px" },
     {
-      key: "nome", label: "Nome", pinned: true,
+      key: "nome",
+      label: "Nome",
+      pinned: true,
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.telefone} nome={row.nome} />
-          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/clientePesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
@@ -91,7 +290,8 @@ export default function ListaClientes() {
     { key: "creditos", label: "Créditos", align: "center", render: (v) => v.toFixed(1) },
     { key: "tags", label: "Tags" },
     {
-      key: "status", label: "Status",
+      key: "status",
+      label: "Status",
       render: (v: StatusCliente) => {
         const config: Record<StatusCliente, { label: string; color: string }> = {
           ativo: { label: "Ativo", color: "#00c5b4" },
@@ -99,18 +299,28 @@ export default function ListaClientes() {
           inativo: { label: "Inativo", color: "#ff2f2f" },
         };
         const c = config[v];
-        return <span className="font-medium" style={{ color: c.color }}>{c.label}</span>;
+        return (
+          <span className="font-medium" style={{ color: c.color }}>
+            {c.label}
+          </span>
+        );
       },
     },
     {
-      key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
+      key: "acoes" as any,
+      label: "Ações",
+      sortable: false,
+      filterable: false,
+      align: "center",
       render: () => (
-        <ActionsMenu items={[
-          { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
-          { label: "Moedas", icon: <Coins className="h-4 w-4" /> },
-          { label: "Crédito", icon: <CreditCard className="h-4 w-4" /> },
-          { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
-        ]} />
+        <ActionsMenu
+          items={[
+            { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+            { label: "Moedas", icon: <Coins className="h-4 w-4" /> },
+            { label: "Crédito", icon: <CreditCard className="h-4 w-4" /> },
+            { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+          ]}
+        />
       ),
     },
   ];
@@ -127,7 +337,10 @@ export default function ListaClientes() {
       <DataTable
         title="Lista de Clientes"
         titleIcon={
-          <button className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors" title="Assistir aula">
+          <button
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-primary text-xs font-medium hover:bg-white/20 transition-colors"
+            title="Assistir aula"
+          >
             <PlayCircle className="h-4 w-4" />
             Aula
           </button>
