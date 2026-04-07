@@ -1189,7 +1189,7 @@ export function DataTable<T extends Record<string, any>>({
               <span className="font-semibold">{f.label}:</span> {f.value}
               <button
                 onClick={() => removeFilter(f.id, f.key, f.value)}
-                className="ml-0.5 p-0.5 rounded-full hover:bg-info/20 hover:text-info transition-colors"
+                className="ml-0.5 p-0.5 rounded-full hover:bg-[#d4d4d4] hover:text-black transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
