@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
 import {
   Trash2,
   Pencil,
@@ -16,6 +15,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -33,11 +33,30 @@ interface FormaPagamento {
   destino: string;
   tempoParaCair: string;
   status: "Ativo" | "Desativado";
+  logo: "dinheiro" | "pix" | "credito" | "debito" | "transferencia" | "cheque" | "presente";
 }
 
 const initialData: FormaPagamento[] = [
-  { id: 1, nome: "Dinheiro", tipo: "Espécie", taxa: 0, destino: "CONTA", tempoParaCair: "Na hora", status: "Ativo" },
-  { id: 2, nome: "Pix", tipo: "Digital", taxa: 0, destino: "CONTA", tempoParaCair: "Na hora", status: "Ativo" },
+  {
+    id: 1,
+    nome: "Dinheiro",
+    tipo: "Espécie",
+    taxa: 0,
+    destino: "CONTA",
+    tempoParaCair: "Na hora",
+    status: "Ativo",
+    logo: "dinheiro",
+  },
+  {
+    id: 2,
+    nome: "Pix",
+    tipo: "Digital",
+    taxa: 0,
+    destino: "CONTA",
+    tempoParaCair: "Na hora",
+    status: "Ativo",
+    logo: "pix",
+  },
   {
     id: 3,
     nome: "Cartão Crédito",
@@ -46,6 +65,7 @@ const initialData: FormaPagamento[] = [
     destino: "CONTA",
     tempoParaCair: "Na hora",
     status: "Ativo",
+    logo: "credito",
   },
   {
     id: 4,
@@ -55,6 +75,7 @@ const initialData: FormaPagamento[] = [
     destino: "CAIXA",
     tempoParaCair: "1 dia",
     status: "Ativo",
+    logo: "debito",
   },
   {
     id: 5,
@@ -64,8 +85,18 @@ const initialData: FormaPagamento[] = [
     destino: "NENHUM",
     tempoParaCair: "Na hora",
     status: "Ativo",
+    logo: "transferencia",
   },
-  { id: 6, nome: "Cheque", tipo: "Outros", taxa: 0, destino: "CAIXA", tempoParaCair: "Na hora", status: "Desativado" },
+  {
+    id: 6,
+    nome: "Cheque",
+    tipo: "Outros",
+    taxa: 0,
+    destino: "CAIXA",
+    tempoParaCair: "Na hora",
+    status: "Desativado",
+    logo: "cheque",
+  },
   {
     id: 7,
     nome: "Vale Presente",
@@ -74,24 +105,21 @@ const initialData: FormaPagamento[] = [
     destino: "CONTA",
     tempoParaCair: "Na hora",
     status: "Desativado",
+    logo: "presente",
   },
 ];
 
-const logoMap: Record<string, React.ReactNode> = {
-  Dinheiro: <Banknote className="h-5 w-5 text-success" />,
-  Pix: <Smartphone className="h-5 w-5 text-info" />,
-  "Cartão Crédito": <CreditCard className="h-5 w-5 text-primary" />,
-  "Cartão Débito": <CreditCard className="h-5 w-5 text-warning" />,
-  Transferência: <ArrowRightLeft className="h-5 w-5 text-info" />,
-  Cheque: <FileText className="h-5 w-5 text-muted-foreground" />,
-  "Vale Presente": <Gift className="h-5 w-5 text-primary" />,
+const logoMap: Record<FormaPagamento["logo"], React.ReactNode> = {
+  dinheiro: <Banknote className="h-5 w-5 text-success" />,
+  pix: <Smartphone className="h-5 w-5 text-info" />,
+  credito: <CreditCard className="h-5 w-5 text-primary" />,
+  debito: <CreditCard className="h-5 w-5 text-warning" />,
+  transferencia: <ArrowRightLeft className="h-5 w-5 text-info" />,
+  cheque: <FileText className="h-5 w-5 text-muted-foreground" />,
+  presente: <Gift className="h-5 w-5 text-primary" />,
 };
 
-type ModalState =
-  | { type: "edit"; item: FormaPagamento }
-  | { type: "toggle"; item: FormaPagamento; nextStatus: "Ativo" | "Desativado" }
-  | { type: "delete"; item: FormaPagamento }
-  | null;
+type ModalState = { type: "edit"; item: FormaPagamento } | { type: "delete"; item: FormaPagamento } | null;
 
 export default function ListaFormasPagamento() {
   const [allData, setAllData] = useState(initialData);
@@ -109,10 +137,6 @@ export default function ListaFormasPagamento() {
   const openEditModal = (item: FormaPagamento) => {
     setForm({ ...item });
     setModal({ type: "edit", item });
-  };
-
-  const openToggleModal = (item: FormaPagamento, nextStatus: "Ativo" | "Desativado") => {
-    setModal({ type: "toggle", item, nextStatus });
   };
 
   const openDeleteModal = (item: FormaPagamento) => {
@@ -140,20 +164,6 @@ export default function ListaFormasPagamento() {
     setAllData((prev) => prev.map((item) => (item.id === form.id ? form : item)));
 
     toast({ title: "Forma de pagamento atualizada" });
-    closeModal();
-  };
-
-  const handleConfirmToggle = () => {
-    if (!modal || modal.type !== "toggle") return;
-
-    setAllData((prev) =>
-      prev.map((item) => (item.id === modal.item.id ? { ...item, status: modal.nextStatus } : item)),
-    );
-
-    toast({
-      title: modal.nextStatus === "Ativo" ? "Forma ativada" : "Forma desativada",
-    });
-
     closeModal();
   };
 
@@ -211,7 +221,15 @@ export default function ListaFormasPagamento() {
       key: "nome",
       label: "Nome",
       pinned: true,
-      
+      render: (v, row) => (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center">
+            {logoMap[row.logo] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
+          </div>
+          <span className="font-medium">{v}</span>
+        </div>
+      ),
+    },
     { key: "tipo", label: "Tipo" },
     { key: "taxa", label: "Taxa %", align: "center", render: (v) => `${v}%` },
     { key: "destino", label: "Destino", align: "center" },
@@ -239,18 +257,11 @@ export default function ListaFormasPagamento() {
       render: (_v, row) => (
         <ActionsMenu
           items={[
-            { label: "Editar", icon: <Pencil className="h-4 w-4" />, onClick: () => openEditModal(row) },
-            row.status === "Ativo"
-              ? {
-                  label: "Desativar",
-                  icon: <Ban className="h-4 w-4" />,
-                  onClick: () => openToggleModal(row, "Desativado"),
-                }
-              : {
-                  label: "Ativar",
-                  icon: <CheckCircle2 className="h-4 w-4" />,
-                  onClick: () => openToggleModal(row, "Ativo"),
-                },
+            {
+              label: "Editar",
+              icon: <Pencil className="h-4 w-4" />,
+              onClick: () => openEditModal(row),
+            },
             {
               label: "Excluir",
               icon: <Trash2 className="h-4 w-4" />,
@@ -304,20 +315,42 @@ export default function ListaFormasPagamento() {
           </DialogHeader>
 
           {form && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+            <div className="grid grid-cols-1 gap-4 py-2 sm:grid-cols-2">
               <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-sm font-medium">Nome</label>
                 <input
-                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   value={form.nome}
                   onChange={(e) => setForm({ ...form, nome: e.target.value })}
                 />
               </div>
 
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-sm font-medium">Logo</label>
+                <select
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.logo}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      logo: e.target.value as FormaPagamento["logo"],
+                    })
+                  }
+                >
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="pix">Pix</option>
+                  <option value="credito">Cartão Crédito</option>
+                  <option value="debito">Cartão Débito</option>
+                  <option value="transferencia">Transferência</option>
+                  <option value="cheque">Cheque</option>
+                  <option value="presente">Vale Presente</option>
+                </select>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Tipo</label>
                 <input
-                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   value={form.tipo}
                   onChange={(e) => setForm({ ...form, tipo: e.target.value })}
                 />
@@ -328,7 +361,7 @@ export default function ListaFormasPagamento() {
                 <input
                   type="number"
                   step="0.1"
-                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   value={form.taxa}
                   onChange={(e) => setForm({ ...form, taxa: Number(e.target.value) })}
                 />
@@ -337,7 +370,7 @@ export default function ListaFormasPagamento() {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Destino</label>
                 <input
-                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   value={form.destino}
                   onChange={(e) => setForm({ ...form, destino: e.target.value })}
                 />
@@ -346,7 +379,7 @@ export default function ListaFormasPagamento() {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Tempo p/ Cair</label>
                 <input
-                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   value={form.tempoParaCair}
                   onChange={(e) => setForm({ ...form, tempoParaCair: e.target.value })}
                 />
@@ -358,55 +391,16 @@ export default function ListaFormasPagamento() {
             <button
               type="button"
               onClick={closeModal}
-              className="h-10 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
+              className="h-10 rounded-xl border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
             >
               Cancelar
             </button>
             <button
               type="button"
               onClick={handleSaveEdit}
-              className="h-10 px-4 rounded-xl bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
+              className="h-10 rounded-xl bg-[hsl(var(--novo-btn))] px-4 text-sm font-medium text-[hsl(var(--novo-btn-foreground))] transition-colors hover:bg-[hsl(var(--novo-btn)/0.9)]"
             >
               Salvar
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={modal?.type === "toggle"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[480px] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {modal?.type === "toggle" && modal.nextStatus === "Ativo"
-                ? "Ativar forma de pagamento"
-                : "Desativar forma de pagamento"}
-            </DialogTitle>
-            <DialogDescription>
-              {modal?.type === "toggle" && modal.nextStatus === "Ativo"
-                ? `Deseja ativar "${modal.item.nome}"?`
-                : `Deseja desativar "${modal?.type === "toggle" ? modal.item.nome : ""}"?`}
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="h-10 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirmToggle}
-              className={cn(
-                "h-10 px-4 rounded-xl text-sm font-medium transition-colors",
-                modal?.type === "toggle" && modal.nextStatus === "Ativo"
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-              )}
-            >
-              {modal?.type === "toggle" && modal.nextStatus === "Ativo" ? "Ativar" : "Desativar"}
             </button>
           </DialogFooter>
         </DialogContent>
@@ -427,14 +421,17 @@ export default function ListaFormasPagamento() {
             <button
               type="button"
               onClick={closeModal}
-              className="h-10 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
+              className="h-10 rounded-xl border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
             >
               Cancelar
             </button>
             <button
               type="button"
               onClick={handleConfirmDelete}
-              className="h-10 px-4 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+              className={cn(
+                "h-10 rounded-xl px-4 text-sm font-medium transition-colors",
+                "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+              )}
             >
               Excluir
             </button>
