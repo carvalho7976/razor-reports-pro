@@ -296,9 +296,7 @@ function DateRangePicker({
                   onClick={() => handlePreset(p.key)}
                   className={cn(
                     "whitespace-nowrap text-left px-2.5 py-1.5 text-xs rounded-md transition-colors shrink-0",
-                    datePreset === p.key
-                      ? "bg-primary text-primary-foreground font-medium"
-                      : "text-foreground hover:bg-muted",
+                    datePreset === p.key ? "bg-[#e5e5e5] text-black font-medium" : "text-foreground hover:bg-muted",
                   )}
                 >
                   {p.label}
