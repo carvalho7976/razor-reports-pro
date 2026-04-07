@@ -17,14 +17,70 @@ interface Produto {
 }
 
 const initialData: Produto[] = [
-  { id: 1, nome: "Pomada Modeladora", categoria: "Finalizadores", estoque: 25, estoqueMinimo: 5, valor: 40, status: "Normal" },
-  { id: 2, nome: "Shampoo Anticaspa", categoria: "Shampoos", estoque: 3, estoqueMinimo: 5, valor: 35, status: "Mínimo" },
+  {
+    id: 1,
+    nome: "Pomada Modeladora",
+    categoria: "Finalizadores",
+    estoque: 25,
+    estoqueMinimo: 5,
+    valor: 40,
+    status: "Normal",
+  },
+  {
+    id: 2,
+    nome: "Shampoo Anticaspa",
+    categoria: "Shampoos",
+    estoque: 3,
+    estoqueMinimo: 5,
+    valor: 35,
+    status: "Mínimo",
+  },
   { id: 3, nome: "Óleo de Barba", categoria: "Barba", estoque: 0, estoqueMinimo: 3, valor: 40, status: "Sem estoque" },
-  { id: 4, nome: "Condicionador", categoria: "Condicionadores", estoque: 15, estoqueMinimo: 5, valor: 30, status: "Normal" },
-  { id: 5, nome: "Cera Capilar", categoria: "Finalizadores", estoque: 2, estoqueMinimo: 5, valor: 35, status: "Mínimo" },
-  { id: 6, nome: "Tônico Capilar", categoria: "Tratamento", estoque: 0, estoqueMinimo: 3, valor: 40, status: "Sem estoque" },
-  { id: 7, nome: "Gel Fixador", categoria: "Finalizadores", estoque: 18, estoqueMinimo: 5, valor: 25, status: "Normal" },
-  { id: 8, nome: "Spray Fixador", categoria: "Finalizadores", estoque: 10, estoqueMinimo: 5, valor: 30, status: "Normal" },
+  {
+    id: 4,
+    nome: "Condicionador",
+    categoria: "Condicionadores",
+    estoque: 15,
+    estoqueMinimo: 5,
+    valor: 30,
+    status: "Normal",
+  },
+  {
+    id: 5,
+    nome: "Cera Capilar",
+    categoria: "Finalizadores",
+    estoque: 2,
+    estoqueMinimo: 5,
+    valor: 35,
+    status: "Mínimo",
+  },
+  {
+    id: 6,
+    nome: "Tônico Capilar",
+    categoria: "Tratamento",
+    estoque: 0,
+    estoqueMinimo: 3,
+    valor: 40,
+    status: "Sem estoque",
+  },
+  {
+    id: 7,
+    nome: "Gel Fixador",
+    categoria: "Finalizadores",
+    estoque: 18,
+    estoqueMinimo: 5,
+    valor: 25,
+    status: "Normal",
+  },
+  {
+    id: 8,
+    nome: "Spray Fixador",
+    categoria: "Finalizadores",
+    estoque: 10,
+    estoqueMinimo: 5,
+    valor: 30,
+    status: "Normal",
+  },
 ];
 
 export default function ListaProdutos() {
@@ -34,17 +90,30 @@ export default function ListaProdutos() {
 
   const data = useMemo(() => {
     if (tab === "todos") return allData;
-    if (tab === "estoque") return allData.filter(d => d.status === "Normal");
-    if (tab === "minimo") return allData.filter(d => d.status === "Mínimo");
-    return allData.filter(d => d.status === "Sem estoque");
+    if (tab === "estoque") return allData.filter((d) => d.status === "Normal");
+    if (tab === "minimo") return allData.filter((d) => d.status === "Mínimo");
+    return allData.filter((d) => d.status === "Sem estoque");
   }, [tab, allData]);
 
   const totalEstoque = allData.reduce((s, d) => s + d.estoque, 0);
   const valorEstoque = allData.reduce((s, d) => s + d.estoque * d.valor, 0);
 
   const summaryCards: SummaryCard[] = [
-    { label: "Produtos em Estoque", value: String(totalEstoque), type: "quantity", icon: <Package className="h-4 w-4" />, size: "compact", color: "blue" },
-    { label: "Valor em Estoque", value: R$(valorEstoque), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
+    {
+      label: "Produtos em Estoque",
+      value: String(totalEstoque),
+      type: "quantity",
+      icon: <Package className="h-4 w-4" />,
+      size: "compact",
+      color: "blue",
+    },
+    {
+      label: "Valor em Estoque",
+      value: R$(valorEstoque),
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "blue",
+    },
   ];
 
   const bulkRemove = (indices: number[]) => {
@@ -52,33 +121,65 @@ export default function ListaProdutos() {
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os produtos selecionados" },
+    {
+      label: "Remover",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkRemove,
+      variant: "destructive",
+      description: "Remove os produtos selecionados",
+    },
   ];
 
   const columns: Column<Produto>[] = [
-    { key: "nome", label: "Nome", pinned: true },
+    { key: "produto", label: "Produto", pinned: true },
     { key: "categoria", label: "Categoria" },
     { key: "estoque", label: "Estoque", align: "center" },
     { key: "estoqueMinimo", label: "Estoque Mín.", align: "center" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     {
-      key: "status", label: "Status",
-      render: v => <span className="font-medium" style={{ color: v === "Normal" ? "#00c5b4" : v === "Mínimo" ? "#f59e0b" : "#ff2f2f" }}>{v}</span>,
+      key: "status",
+      label: "Status",
+      render: (v) => (
+        <span
+          className="font-medium"
+          style={{ color: v === "Normal" ? "#00c5b4" : v === "Mínimo" ? "#f59e0b" : "#ff2f2f" }}
+        >
+          {v}
+        </span>
+      ),
     },
     {
-      key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
-      render: () => <ActionsMenu items={[
-        { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
-        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
-      ]} />,
+      key: "acoes" as any,
+      label: "Ações",
+      sortable: false,
+      filterable: false,
+      align: "center",
+      render: () => (
+        <ActionsMenu
+          items={[
+            { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+            { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+          ]}
+        />
+      ),
     },
   ];
 
   const tabs: TabDef[] = [
     { label: "Todos", value: "todos", count: allData.length, color: "neutral" },
-    { label: "Estoque", value: "estoque", count: allData.filter(d => d.status === "Normal").length, color: "success" },
-    { label: "Mínimo", value: "minimo", count: allData.filter(d => d.status === "Mínimo").length, color: "warning" },
-    { label: "Sem estoque", value: "sem", count: allData.filter(d => d.status === "Sem estoque").length, color: "destructive" },
+    {
+      label: "Estoque",
+      value: "estoque",
+      count: allData.filter((d) => d.status === "Normal").length,
+      color: "success",
+    },
+    { label: "Mínimo", value: "minimo", count: allData.filter((d) => d.status === "Mínimo").length, color: "warning" },
+    {
+      label: "Sem estoque",
+      value: "sem",
+      count: allData.filter((d) => d.status === "Sem estoque").length,
+      color: "destructive",
+    },
   ];
 
   return (
