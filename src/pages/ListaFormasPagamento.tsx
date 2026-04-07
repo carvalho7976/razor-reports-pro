@@ -367,14 +367,15 @@ export default function ListaFormasPagamento() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Destino</label>
-                <input
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.destino}
-                  onChange={(e) => setForm({ ...form, destino: e.target.value })}
-                />
-              </div>
+              <select
+                className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                value={form.destino}
+                onChange={(e) => setForm({ ...form, destino: e.target.value })}
+              >
+                <option value="CONTA">Conta Bancária</option>
+                <option value="CAIXA">Caixa</option>
+                <option value="NENHUM">Nenhum (permuta)</option>
+              </select>
 
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Tempo p/ Cair</label>
