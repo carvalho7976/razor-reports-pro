@@ -218,11 +218,11 @@ function DateRangePicker({
     { key: "hoje", label: "Hoje" },
     { key: "ontem", label: "Ontem" },
     { key: "semana", label: "Esta semana" },
-    { key: "semana_passada", label: "Sem. passada" },
+    { key: "semana_passada", label: "Semana anterior" },
     { key: "mes", label: "Este mês" },
-    { key: "mes_passado", label: "Mês passado" },
+    { key: "mes_passado", label: "Mês anterior},
     { key: "ano", label: "Este ano" },
-    { key: "ano_passado", label: "Ano passado" },
+    { key: "ano_passado", label: "Ano anterior" },
   ];
 
   const handlePreset = (key: DatePreset) => {
