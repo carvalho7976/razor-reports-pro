@@ -57,8 +57,8 @@ export default function ListaPacotes() {
 
   const columns: Column<Pacote>[] = [
     { key: "nome", label: "Pacote", pinned: true },
-    { key: "servicos", label: "Serviços inclusos" },
-    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    { key: "servicos", label: "Serviços Inclusos" },
+    { key: "valor", label: "Preço", align: "right", render: (v) => R$(v) },
     { key: "validade", label: "Validade" },
     {
       key: "status",
