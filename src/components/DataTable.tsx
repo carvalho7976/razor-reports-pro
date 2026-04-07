@@ -1,14 +1,45 @@
 import { useState, useMemo, ReactNode, useCallback, useRef, useEffect, KeyboardEvent } from "react";
 import {
-  Search, SlidersHorizontal, ChevronUp, ChevronDown,
-  X, Pin, Eye, EyeOff, Calendar, Download,
-  ChevronLeft, ChevronRight, ArrowUpDown, MoreHorizontal,
-  FileSpreadsheet, FileText, Plus, ChevronDown as ChevronDownIcon,
-  GripVertical, Info, RotateCcw,
+  Search,
+  SlidersHorizontal,
+  ChevronUp,
+  ChevronDown,
+  X,
+  Pin,
+  Eye,
+  EyeOff,
+  Calendar,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpDown,
+  MoreHorizontal,
+  FileSpreadsheet,
+  FileText,
+  Plus,
+  ChevronDown as ChevronDownIcon,
+  GripVertical,
+  Info,
+  RotateCcw,
 } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { format, startOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, subWeeks, startOfYear, endOfYear, subYears, parse, isWithinInterval } from "date-fns";
+import {
+  format,
+  startOfDay,
+  subDays,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
+  subWeeks,
+  startOfYear,
+  endOfYear,
+  subYears,
+  parse,
+  isWithinInterval,
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -32,7 +63,17 @@ export interface Column<T> {
   cardWidth?: "compact" | "wide";
 }
 
-type DatePreset = "hoje" | "ontem" | "semana" | "semana_passada" | "mes" | "mes_passado" | "ano" | "ano_passado" | "personalizado" | null;
+type DatePreset =
+  | "hoje"
+  | "ontem"
+  | "semana"
+  | "semana_passada"
+  | "mes"
+  | "mes_passado"
+  | "ano"
+  | "ano_passado"
+  | "personalizado"
+  | null;
 
 interface ActiveFilter {
   id: string;
@@ -107,7 +148,9 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -116,7 +159,10 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
 
   if (items.length === 1) {
     return (
-      <button onClick={items[0].onClick} className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.85)] transition-colors shadow-sm">
+      <button
+        onClick={items[0].onClick}
+        className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.85)] transition-colors shadow-sm"
+      >
         <Plus className="h-4 w-4" />
         Novo
       </button>
@@ -138,7 +184,10 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
           {items.map((item, i) => (
             <button
               key={i}
-              onClick={() => { item.onClick?.(); setOpen(false); }}
+              onClick={() => {
+                item.onClick?.();
+                setOpen(false);
+              }}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors"
             >
               {item.icon}
@@ -153,7 +202,10 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
 
 /* ── Compact Date Range Picker ── */
 function DateRangePicker({
-  datePreset, onSelect, dateRange, onRangeChange,
+  datePreset,
+  onSelect,
+  dateRange,
+  onRangeChange,
 }: {
   datePreset: DatePreset;
   onSelect: (p: DatePreset) => void;
@@ -175,16 +227,45 @@ function DateRangePicker({
 
   const handlePreset = (key: DatePreset) => {
     const today = new Date();
-    let from: Date = today, to: Date = today;
+    let from: Date = today,
+      to: Date = today;
     switch (key) {
-      case "hoje": from = to = startOfDay(today); break;
-      case "ontem": from = to = subDays(startOfDay(today), 1); break;
-      case "semana": from = startOfWeek(today, { locale: ptBR }); to = endOfWeek(today, { locale: ptBR }); break;
-      case "semana_passada": { const pw = subWeeks(today, 1); from = startOfWeek(pw, { locale: ptBR }); to = endOfWeek(pw, { locale: ptBR }); break; }
-      case "mes": from = startOfMonth(today); to = endOfMonth(today); break;
-      case "mes_passado": { const pm = subMonths(today, 1); from = startOfMonth(pm); to = endOfMonth(pm); break; }
-      case "ano": from = startOfYear(today); to = endOfYear(today); break;
-      case "ano_passado": { const py = subYears(today, 1); from = startOfYear(py); to = endOfYear(py); break; }
+      case "hoje":
+        from = to = startOfDay(today);
+        break;
+      case "ontem":
+        from = to = subDays(startOfDay(today), 1);
+        break;
+      case "semana":
+        from = startOfWeek(today, { locale: ptBR });
+        to = endOfWeek(today, { locale: ptBR });
+        break;
+      case "semana_passada": {
+        const pw = subWeeks(today, 1);
+        from = startOfWeek(pw, { locale: ptBR });
+        to = endOfWeek(pw, { locale: ptBR });
+        break;
+      }
+      case "mes":
+        from = startOfMonth(today);
+        to = endOfMonth(today);
+        break;
+      case "mes_passado": {
+        const pm = subMonths(today, 1);
+        from = startOfMonth(pm);
+        to = endOfMonth(pm);
+        break;
+      }
+      case "ano":
+        from = startOfYear(today);
+        to = endOfYear(today);
+        break;
+      case "ano_passado": {
+        const py = subYears(today, 1);
+        from = startOfYear(py);
+        to = endOfYear(py);
+        break;
+      }
     }
     onRangeChange({ from, to });
     onSelect(key);
@@ -217,7 +298,7 @@ function DateRangePicker({
                     "whitespace-nowrap text-left px-2.5 py-1.5 text-xs rounded-md transition-colors shrink-0",
                     datePreset === p.key
                       ? "bg-primary text-primary-foreground font-medium"
-                      : "text-foreground hover:bg-muted"
+                      : "text-foreground hover:bg-muted",
                   )}
                 >
                   {p.label}
@@ -242,7 +323,11 @@ function DateRangePicker({
         {datePreset && (
           <div className="border-t border-border px-3 py-2 flex justify-end">
             <button
-              onClick={() => { onSelect(null); onRangeChange(undefined); setOpen(false); }}
+              onClick={() => {
+                onSelect(null);
+                onRangeChange(undefined);
+                setOpen(false);
+              }}
               className="text-xs text-destructive hover:underline font-medium"
             >
               Limpar
@@ -256,7 +341,13 @@ function DateRangePicker({
 
 /* ── Search with Autocomplete Filter ── */
 function SearchWithFilter<T>({
-  columns, data, search, setSearch, columnFilters, setColumnFilters, onPageReset,
+  columns,
+  data,
+  search,
+  setSearch,
+  columnFilters,
+  setColumnFilters,
+  onPageReset,
 }: {
   columns: Column<T>[];
   data: T[];
@@ -332,7 +423,10 @@ function SearchWithFilter<T>({
         type="text"
         placeholder="Pesquisar e filtrar..."
         value={search}
-        onChange={(e) => { setSearch(e.target.value); onPageReset(); }}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          onPageReset();
+        }}
         onFocus={() => setFocused(true)}
         className="toolbar-input pl-9 pr-8 py-2 w-full border-info/50 focus:ring-info/40 focus:border-info/60"
       />
@@ -354,7 +448,9 @@ function SearchWithFilter<T>({
         <div className="dropdown-panel left-0 top-full mt-1.5 w-full min-w-[280px] max-h-[320px] overflow-y-auto z-50">
           {grouped.map(({ col, values }) => (
             <div key={col.key}>
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-2 pb-1">{col.label}</p>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-2 pb-1">
+                {col.label}
+              </p>
               {values.slice(0, 8).map((val) => {
                 const isSelected = (columnFilters[col.key] || []).includes(val);
                 return (
@@ -363,10 +459,11 @@ function SearchWithFilter<T>({
                     onClick={() => addFilter(col.key, val)}
                     className={cn(
                       "w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors truncate",
-                      isSelected ? "bg-info/10 text-info font-medium" : "hover:bg-muted"
+                      isSelected ? "bg-info/10 text-info font-medium" : "hover:bg-muted",
                     )}
                   >
-                    {isSelected && <span className="mr-1.5">✓</span>}{val}
+                    {isSelected && <span className="mr-1.5">✓</span>}
+                    {val}
                   </button>
                 );
               })}
@@ -380,12 +477,22 @@ function SearchWithFilter<T>({
 
 /* ── Column Manager (with drag & drop reorder + reset) ── */
 function ColumnManager<T>({
-  initialColumns, hiddenColumns, pinnedColumns, toggleColumn, togglePin,
-  columnOrder, onReorder, onReset,
+  initialColumns,
+  hiddenColumns,
+  pinnedColumns,
+  toggleColumn,
+  togglePin,
+  columnOrder,
+  onReorder,
+  onReset,
 }: {
-  initialColumns: Column<T>[]; hiddenColumns: Set<string>; pinnedColumns: Set<string>;
-  toggleColumn: (key: string) => void; togglePin: (key: string) => void;
-  columnOrder: string[]; onReorder: (newOrder: string[]) => void;
+  initialColumns: Column<T>[];
+  hiddenColumns: Set<string>;
+  pinnedColumns: Set<string>;
+  toggleColumn: (key: string) => void;
+  togglePin: (key: string) => void;
+  columnOrder: string[];
+  onReorder: (newOrder: string[]) => void;
   onReset: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -394,7 +501,9 @@ function ColumnManager<T>({
   const [overIdx, setOverIdx] = useState<number | null>(null);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -404,8 +513,13 @@ function ColumnManager<T>({
     return columnOrder.map((k) => map.get(k)!).filter(Boolean);
   }, [initialColumns, columnOrder]);
 
-  const handleDragStart = (idx: number) => { setDragIdx(idx); };
-  const handleDragOver = (e: React.DragEvent, idx: number) => { e.preventDefault(); setOverIdx(idx); };
+  const handleDragStart = (idx: number) => {
+    setDragIdx(idx);
+  };
+  const handleDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    setOverIdx(idx);
+  };
   const handleDragEnd = () => {
     if (dragIdx !== null && overIdx !== null && dragIdx !== overIdx) {
       const newOrder = [...columnOrder];
@@ -427,8 +541,14 @@ function ColumnManager<T>({
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Colunas</p>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground">{initialColumns.length - hiddenColumns.size}/{initialColumns.length}</span>
-              <button onClick={onReset} className="text-[10px] text-destructive hover:underline font-medium" title="Resetar para padrão">
+              <span className="text-[10px] text-muted-foreground">
+                {initialColumns.length - hiddenColumns.size}/{initialColumns.length}
+              </span>
+              <button
+                onClick={onReset}
+                className="text-[10px] text-destructive hover:underline font-medium"
+                title="Resetar para padrão"
+              >
                 <RotateCcw className="h-3 w-3" />
               </button>
             </div>
@@ -450,15 +570,31 @@ function ColumnManager<T>({
                     "flex items-center gap-1.5 px-1.5 py-1.5 rounded-lg group transition-colors cursor-grab active:cursor-grabbing select-none",
                     visible ? "hover:bg-muted" : "opacity-50 hover:bg-muted/50",
                     isDragging && "opacity-40",
-                    isOver && !isDragging && "border-t-2 border-primary"
+                    isOver && !isDragging && "border-t-2 border-primary",
                   )}
                 >
                   <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0 group-hover:text-muted-foreground" />
                   <span className="flex-1 text-sm truncate">{col.label || col.key}</span>
-                  <button onClick={() => togglePin(col.key)} className={cn("p-1 rounded-md transition-colors", pinned ? "text-primary" : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100")} title={pinned ? "Desafixar" : "Fixar"}>
+                  <button
+                    onClick={() => togglePin(col.key)}
+                    className={cn(
+                      "p-1 rounded-md transition-colors",
+                      pinned
+                        ? "text-primary"
+                        : "text-muted-foreground/40 hover:text-foreground opacity-0 group-hover:opacity-100",
+                    )}
+                    title={pinned ? "Desafixar" : "Fixar"}
+                  >
                     <Pin className="h-3 w-3" />
                   </button>
-                  <button onClick={() => toggleColumn(col.key)} className={cn("p-1 rounded-md transition-colors", visible ? "text-foreground" : "text-muted-foreground/40 hover:text-foreground")} title={visible ? "Ocultar" : "Mostrar"}>
+                  <button
+                    onClick={() => toggleColumn(col.key)}
+                    className={cn(
+                      "p-1 rounded-md transition-colors",
+                      visible ? "text-foreground" : "text-muted-foreground/40 hover:text-foreground",
+                    )}
+                    title={visible ? "Ocultar" : "Mostrar"}
+                  >
                     {visible ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                   </button>
                 </div>
@@ -476,7 +612,9 @@ function ExportMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -504,19 +642,28 @@ function ExportMenu() {
 }
 
 /* ── Actions Menu (3-dot) ── */
-export function ActionsMenu({ items }: { items: { label: string; icon?: ReactNode; onClick?: () => void; variant?: "default" | "destructive" }[] }) {
+export function ActionsMenu({
+  items,
+}: {
+  items: { label: string; icon?: ReactNode; onClick?: () => void; variant?: "default" | "destructive" }[];
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   return (
     <div className="relative inline-flex" ref={ref}>
-      <button onClick={() => setOpen(!open)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+      <button
+        onClick={() => setOpen(!open)}
+        className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+      >
         <MoreHorizontal className="h-4 w-4" />
       </button>
       {open && (
@@ -524,10 +671,13 @@ export function ActionsMenu({ items }: { items: { label: string; icon?: ReactNod
           {items.map((item, i) => (
             <button
               key={i}
-              onClick={() => { item.onClick?.(); setOpen(false); }}
+              onClick={() => {
+                item.onClick?.();
+                setOpen(false);
+              }}
               className={cn(
                 "w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
-                item.variant === "destructive" && "text-destructive hover:bg-destructive/10"
+                item.variant === "destructive" && "text-destructive hover:bg-destructive/10",
               )}
             >
               {item.icon}
@@ -541,18 +691,28 @@ export function ActionsMenu({ items }: { items: { label: string; icon?: ReactNod
 }
 
 /* ── Sort Dropdown (cumulative) ── */
-interface SortEntry { key: string; dir: "asc" | "desc" }
+interface SortEntry {
+  key: string;
+  dir: "asc" | "desc";
+}
 
 function SortDropdown<T>({
-  columns, sortEntries, onToggleSort, onClear,
+  columns,
+  sortEntries,
+  onToggleSort,
+  onClear,
 }: {
-  columns: Column<T>[]; sortEntries: SortEntry[];
-  onToggleSort: (key: string) => void; onClear: () => void;
+  columns: Column<T>[];
+  sortEntries: SortEntry[];
+  onToggleSort: (key: string) => void;
+  onClear: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -562,7 +722,10 @@ function SortDropdown<T>({
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} className={cn("toolbar-btn", sortEntries.length > 0 && "toolbar-btn-active")}>
+      <button
+        onClick={() => setOpen(!open)}
+        className={cn("toolbar-btn", sortEntries.length > 0 && "toolbar-btn-active")}
+      >
         <ArrowUpDown className="h-4 w-4" />
         <span className="hidden sm:inline text-xs">
           {sortEntries.length > 0 ? `Ordenação (${sortEntries.length})` : "Ordenar"}
@@ -570,7 +733,9 @@ function SortDropdown<T>({
       </button>
       {open && (
         <div className="dropdown-panel left-0 top-full mt-2 min-w-[220px]">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">Clique para adicionar/alternar</p>
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">
+            Clique para adicionar/alternar
+          </p>
           {sortableCols.map((col) => {
             const dir = sortMap.get(col.key);
             const idx = sortEntries.findIndex((s) => s.key === col.key);
@@ -580,7 +745,7 @@ function SortDropdown<T>({
                 onClick={() => onToggleSort(col.key)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
-                  dir && "text-primary font-medium"
+                  dir && "text-primary font-medium",
                 )}
               >
                 <span className="flex items-center gap-2">
@@ -603,7 +768,10 @@ function SortDropdown<T>({
             <>
               <div className="h-px bg-border my-1" />
               <button
-                onClick={() => { onClear(); setOpen(false); }}
+                onClick={() => {
+                  onClear();
+                  setOpen(false);
+                }}
                 className="w-full px-3 py-2 text-sm text-destructive rounded-lg hover:bg-muted transition-colors text-left"
               >
                 Limpar ordenação
@@ -625,7 +793,9 @@ function parseDateBR(dateStr: string): Date | null {
     try {
       const d = parse(clean, fmt, new Date());
       if (!isNaN(d.getTime())) return d;
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
   }
   return null;
 }
@@ -658,72 +828,117 @@ const tabBorderColor: Record<string, string> = {
 
 /* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
-  data, columns: initialColumns, title, titleIcon, actions, totalRow,
+  data,
+  columns: initialColumns,
+  title,
+  titleIcon,
+  actions,
+  totalRow,
   emptyMessage = "Nenhum registro encontrado",
-  tabs, activeTab, onTabChange, showDateFilter = true,
-  summaryCards, pageSize = 20,
-  selectable = false, selectionActions = [], novoMenuItems,
-  onCellEdit, tableId, dateField, slotBetweenCardsAndTabs,
+  tabs,
+  activeTab,
+  onTabChange,
+  showDateFilter = true,
+  summaryCards,
+  pageSize = 20,
+  selectable = false,
+  selectionActions = [],
+  novoMenuItems,
+  onCellEdit,
+  tableId,
+  dateField,
+  slotBetweenCardsAndTabs,
 }: DataTableProps<T>) {
   const storageKey = tableId || title.replace(/\s+/g, "_").toLowerCase();
-  
+
   const [search, setSearch] = useState("");
   const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
-  
+
   // Persist pinned columns
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem(`col_pins_${storageKey}`);
       if (saved) return new Set(JSON.parse(saved) as string[]);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     const set = new Set<string>();
     initialColumns.forEach((c) => c.pinned && set.add(c.key));
     return set;
   });
-  
+
   const [datePreset, setDatePreset] = useState<DatePreset>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [page, setPage] = useState(0);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  
+
   const defaultOrder = useMemo(() => initialColumns.map((c) => c.key), [initialColumns]);
   const [columnOrder, setColumnOrder] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(`col_order_${storageKey}`);
       if (saved) {
         const parsed = JSON.parse(saved) as string[];
-        const validKeys = new Set(initialColumns.map(c => c.key));
-        const filtered = parsed.filter(k => validKeys.has(k));
-        initialColumns.forEach(c => { if (!filtered.includes(c.key)) filtered.push(c.key); });
+        const validKeys = new Set(initialColumns.map((c) => c.key));
+        const filtered = parsed.filter((k) => validKeys.has(k));
+        initialColumns.forEach((c) => {
+          if (!filtered.includes(c.key)) filtered.push(c.key);
+        });
         return filtered;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return initialColumns.map((c) => c.key);
   });
 
-  const saveColumnOrder = useCallback((newOrder: string[]) => {
-    setColumnOrder(newOrder);
-    try { localStorage.setItem(`col_order_${storageKey}`, JSON.stringify(newOrder)); } catch { /* ignore */ }
-  }, [storageKey]);
+  const saveColumnOrder = useCallback(
+    (newOrder: string[]) => {
+      setColumnOrder(newOrder);
+      try {
+        localStorage.setItem(`col_order_${storageKey}`, JSON.stringify(newOrder));
+      } catch {
+        /* ignore */
+      }
+    },
+    [storageKey],
+  );
 
   const resetColumnOrder = useCallback(() => {
     setColumnOrder(defaultOrder);
-    try { localStorage.removeItem(`col_order_${storageKey}`); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem(`col_order_${storageKey}`);
+    } catch {
+      /* ignore */
+    }
     // Also reset pins
     const defaultPins = new Set<string>();
     initialColumns.forEach((c) => c.pinned && defaultPins.add(c.key));
     setPinnedColumns(defaultPins);
-    try { localStorage.removeItem(`col_pins_${storageKey}`); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem(`col_pins_${storageKey}`);
+    } catch {
+      /* ignore */
+    }
   }, [defaultOrder, storageKey, initialColumns]);
 
   // Auto-detect date field
   const autoDateField = useMemo(() => {
     if (dateField) return dateField;
-    const dateKeys = ["data", "dataFechamento", "dataCancelamento", "dataExclusao", "dataVenda", "vencimento", "ultimaVisita", "aniversario", "abertura"];
+    const dateKeys = [
+      "data",
+      "dataFechamento",
+      "dataCancelamento",
+      "dataExclusao",
+      "dataVenda",
+      "vencimento",
+      "ultimaVisita",
+      "aniversario",
+      "abertura",
+    ];
     for (const key of dateKeys) {
-      if (initialColumns.some(c => c.key === key)) return key;
+      if (initialColumns.some((c) => c.key === key)) return key;
     }
     return null;
   }, [dateField, initialColumns]);
@@ -744,9 +959,15 @@ export function DataTable<T extends Record<string, any>>({
     if (search) filters.push({ id: "__search", key: "__search", label: "Pesquisa", value: search });
     if (datePreset) {
       const labels: Record<string, string> = {
-        hoje: "Hoje", ontem: "Ontem", semana: "Esta Semana",
-        semana_passada: "Sem. Passada", mes: "Este Mês",
-        mes_passado: "Mês Passado", ano: "Este Ano", ano_passado: "Ano Passado", personalizado: "Personalizado",
+        hoje: "Hoje",
+        ontem: "Ontem",
+        semana: "Esta Semana",
+        semana_passada: "Sem. Passada",
+        mes: "Este Mês",
+        mes_passado: "Mês Passado",
+        ano: "Este Ano",
+        ano_passado: "Ano Passado",
+        personalizado: "Personalizado",
       };
       filters.push({ id: "__date", key: "__date", label: "Período", value: labels[datePreset] });
     }
@@ -758,37 +979,48 @@ export function DataTable<T extends Record<string, any>>({
     });
     sortEntries.forEach((s, idx) => {
       const col = initialColumns.find((c) => c.key === s.key);
-      filters.push({ id: `__sort_${idx}`, key: "__sort", label: "Ordenar", value: `${col?.label || s.key} ${s.dir === "asc" ? "A-Z" : "Z-A"}` });
+      filters.push({
+        id: `__sort_${idx}`,
+        key: "__sort",
+        label: "Ordenar",
+        value: `${col?.label || s.key} ${s.dir === "asc" ? "A-Z" : "Z-A"}`,
+      });
     });
     return filters;
   }, [search, datePreset, columnFilters, sortEntries, initialColumns]);
 
-  const removeFilter = useCallback((id: string, key: string, value: string) => {
-    if (key === "__search") setSearch("");
-    else if (key === "__date") { setDatePreset(null); setDateRange(undefined); }
-    else if (key === "__sort") {
-      const sortLabel = value.replace(/ A-Z$| Z-A$/, "");
-      setSortEntries((prev) => prev.filter((s) => {
-        const col = initialColumns.find((c) => c.key === s.key);
-        return (col?.label || s.key) !== sortLabel;
-      }));
-    }
-    else {
-      setColumnFilters((prev) => {
-        const arr = (prev[key] || []).filter((v) => v !== value);
-        const next = { ...prev };
-        if (arr.length === 0) delete next[key];
-        else next[key] = arr;
-        return next;
-      });
-    }
-  }, [initialColumns]);
+  const removeFilter = useCallback(
+    (id: string, key: string, value: string) => {
+      if (key === "__search") setSearch("");
+      else if (key === "__date") {
+        setDatePreset(null);
+        setDateRange(undefined);
+      } else if (key === "__sort") {
+        const sortLabel = value.replace(/ A-Z$| Z-A$/, "");
+        setSortEntries((prev) =>
+          prev.filter((s) => {
+            const col = initialColumns.find((c) => c.key === s.key);
+            return (col?.label || s.key) !== sortLabel;
+          }),
+        );
+      } else {
+        setColumnFilters((prev) => {
+          const arr = (prev[key] || []).filter((v) => v !== value);
+          const next = { ...prev };
+          if (arr.length === 0) delete next[key];
+          else next[key] = arr;
+          return next;
+        });
+      }
+    },
+    [initialColumns],
+  );
 
   const handleToggleSort = useCallback((key: string) => {
     setSortEntries((prev) => {
       const idx = prev.findIndex((s) => s.key === key);
       if (idx === -1) return [...prev, { key, dir: "asc" }];
-      if (prev[idx].dir === "asc") return prev.map((s, i) => i === idx ? { ...s, dir: "desc" as const } : s);
+      if (prev[idx].dir === "asc") return prev.map((s, i) => (i === idx ? { ...s, dir: "desc" as const } : s));
       return prev.filter((_, i) => i !== idx);
     });
   }, []);
@@ -799,15 +1031,23 @@ export function DataTable<T extends Record<string, any>>({
     if (search) {
       const s = search.toLowerCase();
       result = result.filter((row) =>
-        columns.some((col) => String(row[col.key] ?? "").toLowerCase().includes(s))
+        columns.some((col) =>
+          String(row[col.key] ?? "")
+            .toLowerCase()
+            .includes(s),
+        ),
       );
     }
     const allFilterEntries = Object.entries(columnFilters).filter(([, values]) => values.length > 0);
     if (allFilterEntries.length > 0) {
       result = result.filter((row) =>
         allFilterEntries.some(([key, values]) =>
-          values.some((v) => String(row[key] ?? "").toLowerCase().includes(v.toLowerCase()))
-        )
+          values.some((v) =>
+            String(row[key] ?? "")
+              .toLowerCase()
+              .includes(v.toLowerCase()),
+          ),
+        ),
       );
     }
     // Date range filtering
@@ -822,7 +1062,7 @@ export function DataTable<T extends Record<string, any>>({
     if (sortEntries.length > 0) {
       result.sort((a, b) => {
         for (const { key, dir } of sortEntries) {
-          const col = columns.find(c => c.key === key);
+          const col = columns.find((c) => c.key === key);
           const aVal = col?.sortValue ? col.sortValue(a) : a[key];
           const bVal = col?.sortValue ? col.sortValue(b) : b[key];
           if (aVal == null && bVal == null) continue;
@@ -847,8 +1087,11 @@ export function DataTable<T extends Record<string, any>>({
   const toggleSelectAll = () => {
     setSelectedRows((prev) => {
       const next = new Set(prev);
-      if (allPageSelected) { pagedIds.forEach((id) => next.delete(id)); }
-      else { pagedIds.forEach((id) => next.add(id)); }
+      if (allPageSelected) {
+        pagedIds.forEach((id) => next.delete(id));
+      } else {
+        pagedIds.forEach((id) => next.add(id));
+      }
       return next;
     });
   };
@@ -864,12 +1107,20 @@ export function DataTable<T extends Record<string, any>>({
     setPinnedColumns((prev) => {
       const next = new Set(prev);
       next.has(key) ? next.delete(key) : next.add(key);
-      try { localStorage.setItem(`col_pins_${storageKey}`, JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+      try {
+        localStorage.setItem(`col_pins_${storageKey}`, JSON.stringify(Array.from(next)));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   };
   const toggleColumn = (key: string) => {
-    setHiddenColumns((prev) => { const next = new Set(prev); next.has(key) ? next.delete(key) : next.add(key); return next; });
+    setHiddenColumns((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
   };
 
   const activeFilterCount = Object.values(columnFilters).flat().length;
@@ -901,12 +1152,28 @@ export function DataTable<T extends Record<string, any>>({
           {showDateFilter && (
             <>
               <div className="h-5 w-px bg-border hidden sm:block" />
-              <DateRangePicker datePreset={datePreset} onSelect={(p) => { setDatePreset(p); setPage(0); }} dateRange={dateRange} onRangeChange={setDateRange} />
+              <DateRangePicker
+                datePreset={datePreset}
+                onSelect={(p) => {
+                  setDatePreset(p);
+                  setPage(0);
+                }}
+                dateRange={dateRange}
+                onRangeChange={setDateRange}
+              />
             </>
           )}
 
-          <ColumnManager initialColumns={initialColumns} hiddenColumns={hiddenColumns} pinnedColumns={pinnedColumns} toggleColumn={toggleColumn} togglePin={togglePin} columnOrder={columnOrder} onReorder={saveColumnOrder} onReset={resetColumnOrder} />
-
+          <ColumnManager
+            initialColumns={initialColumns}
+            hiddenColumns={hiddenColumns}
+            pinnedColumns={pinnedColumns}
+            toggleColumn={toggleColumn}
+            togglePin={togglePin}
+            columnOrder={columnOrder}
+            onReorder={saveColumnOrder}
+            onReset={resetColumnOrder}
+          />
 
           <div className="ml-auto flex items-center gap-2">
             <ExportMenu />
@@ -922,13 +1189,22 @@ export function DataTable<T extends Record<string, any>>({
           {activeFilters.map((f) => (
             <span key={f.id} className="filter-chip">
               <span className="font-semibold">{f.label}:</span> {f.value}
-              <button onClick={() => removeFilter(f.id, f.key, f.value)} className="ml-0.5 p-0.5 rounded-full hover:bg-info/20 hover:text-info transition-colors">
+              <button
+                onClick={() => removeFilter(f.id, f.key, f.value)}
+                className="ml-0.5 p-0.5 rounded-full hover:bg-info/20 hover:text-info transition-colors"
+              >
                 <X className="h-3 w-3" />
               </button>
             </span>
           ))}
           <button
-            onClick={() => { setSearch(""); setDatePreset(null); setDateRange(undefined); setColumnFilters({}); setSortEntries([]); }}
+            onClick={() => {
+              setSearch("");
+              setDatePreset(null);
+              setDateRange(undefined);
+              setColumnFilters({});
+              setSortEntries([]);
+            }}
             className="text-xs text-info hover:underline font-medium ml-1"
           >
             Limpar
@@ -942,38 +1218,55 @@ export function DataTable<T extends Record<string, any>>({
           {summaryCards.map((card, i) => {
             const isMonetary = card.type === "monetary";
             const isQuantity = card.type === "quantity";
-            const sentimentColor = card.sentiment === "positive"
-              ? "text-info"
-              : card.sentiment === "negative"
-                ? "text-destructive"
-                : "text-foreground";
-            const sentimentEmoji = card.sentiment === "positive"
-              ? "🔵"
-              : card.sentiment === "negative"
-                ? "🔴"
-                : "⚫";
+            const sentimentColor =
+              card.sentiment === "positive"
+                ? "text-info"
+                : card.sentiment === "negative"
+                  ? "text-destructive"
+                  : "text-foreground";
+            const sentimentEmoji = card.sentiment === "positive" ? "🔵" : card.sentiment === "negative" ? "🔴" : "⚫";
 
             const isClickable = card.onFilter && card.filterValue;
             // Two standard widths: compact and wide - no max-w to avoid truncation
             const isWide = isMonetary || card.size === "wide";
             const widthClass = isWide ? "min-w-[180px]" : "min-w-[120px]";
-            
-            const clickProps = isClickable ? {
-              onClick: () => card.onFilter!(card.filterValue!),
-              role: "button" as const,
-              className: cn(
-                "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm transition-colors",
-                "cursor-pointer hover:border-primary/30 hover:shadow-md",
-                widthClass
-              ),
-            } : {
-              className: cn("flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm", widthClass),
-            };
+
+            const clickProps = isClickable
+              ? {
+                  onClick: () => card.onFilter!(card.filterValue!),
+                  role: "button" as const,
+                  className: cn(
+                    "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm transition-colors",
+                    "cursor-pointer hover:border-primary/30 hover:shadow-md",
+                    widthClass,
+                  ),
+                }
+              : {
+                  className: cn(
+                    "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm",
+                    widthClass,
+                  ),
+                };
 
             if (isQuantity) {
               return (
                 <div key={i} {...clickProps}>
-                  {card.icon && <div className={cn("h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0", card.color === "green" ? "bg-emerald-100 text-emerald-600" : card.color === "red" ? "bg-red-100 text-red-500" : "bg-primary/10 text-primary")}>{card.icon}</div>}
+                  {card.icon && (
+                    <div
+                      className={cn(
+                        "h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0",
+                        card.color === "green"
+                          ? "bg-emerald-100 text-emerald-600"
+                          : card.color === "red"
+                            ? "bg-red-100 text-red-500"
+                            : card.color === "blue"
+                              ? "bg-blue-100 text-blue-600"
+                              : "bg-primary/10 text-primary",
+                      )}
+                    >
+                      {card.icon}
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
                     <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
@@ -996,7 +1289,22 @@ export function DataTable<T extends Record<string, any>>({
 
             return (
               <div key={i} {...clickProps}>
-                {card.icon && <div className={cn("h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0", card.color === "green" ? "bg-emerald-100 text-emerald-600" : card.color === "red" ? "bg-red-100 text-red-500" : "bg-primary/10 text-primary")}>{card.icon}</div>}
+                {card.icon && (
+                  <div
+                    className={cn(
+                      "h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0",
+                      card.color === "green"
+                        ? "bg-emerald-100 text-emerald-600"
+                        : card.color === "red"
+                          ? "bg-red-100 text-red-500"
+                          : card.color === "blue"
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-primary/10 text-primary",
+                    )}
+                  >
+                    {card.icon}
+                  </div>
+                )}
                 <div className="min-w-0">
                   <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
                   <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
@@ -1025,17 +1333,17 @@ export function DataTable<T extends Record<string, any>>({
                     "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     isActive
                       ? cn(tabBorderColor[color], "text-foreground")
-                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30",
                   )}
                 >
                   {tab.label}
                   {tab.count !== undefined && (
-                    <span className={cn(
-                      "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
-                      isActive
-                        ? tabColorMapActive[color]
-                        : tabColorMap[color]
-                    )}>
+                    <span
+                      className={cn(
+                        "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+                        isActive ? tabColorMapActive[color] : tabColorMap[color],
+                      )}
+                    >
                       {tab.count}
                     </span>
                   )}
@@ -1049,17 +1357,22 @@ export function DataTable<T extends Record<string, any>>({
       {/* Selection Action Bar */}
       {selectable && selectedRows.size > 0 && (
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-info/5 border border-info/20 rounded-xl">
-          <span className="text-xs sm:text-sm font-medium text-foreground">{selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}</span>
+          <span className="text-xs sm:text-sm font-medium text-foreground">
+            {selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}
+          </span>
           <div className="h-4 w-px bg-border" />
           {selectionActions.map((action, i) => (
             <div key={i} className="inline-flex items-center gap-0.5">
               <button
-                onClick={() => { action.onClick(Array.from(selectedRows)); setSelectedRows(new Set()); }}
+                onClick={() => {
+                  action.onClick(Array.from(selectedRows));
+                  setSelectedRows(new Set());
+                }}
                 className={cn(
                   "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
                   action.variant === "destructive"
                     ? "text-destructive hover:bg-destructive/10"
-                    : "text-success hover:bg-success/10"
+                    : "text-success hover:bg-success/10",
                 )}
               >
                 {action.icon}
@@ -1079,7 +1392,10 @@ export function DataTable<T extends Record<string, any>>({
               )}
             </div>
           ))}
-          <button onClick={() => setSelectedRows(new Set())} className="ml-auto text-xs text-muted-foreground hover:text-foreground">
+          <button
+            onClick={() => setSelectedRows(new Set())}
+            className="ml-auto text-xs text-muted-foreground hover:text-foreground"
+          >
             Limpar
           </button>
         </div>
@@ -1096,7 +1412,9 @@ export function DataTable<T extends Record<string, any>>({
                     <input
                       type="checkbox"
                       checked={allPageSelected}
-                      ref={(el) => { if (el) el.indeterminate = somePageSelected && !allPageSelected; }}
+                      ref={(el) => {
+                        if (el) el.indeterminate = somePageSelected && !allPageSelected;
+                      }}
                       onChange={toggleSelectAll}
                       className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
                     />
@@ -1115,15 +1433,26 @@ export function DataTable<T extends Record<string, any>>({
                         sortable && "cursor-pointer select-none hover:bg-table-header/80 transition-colors",
                         pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-table-header",
                         col.align === "right" && "text-right",
-                        col.align === "center" && "text-center"
+                        col.align === "center" && "text-center",
                       )}
                       style={col.width ? { width: col.width } : undefined}
                     >
                       <span className="inline-flex items-center gap-1.5">
                         {col.label}
                         {sortable && col.label && (
-                          <span className={cn("inline-flex items-center text-table-header-foreground", !sortDir && "opacity-50")}>
-                            {sortDir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : sortDir === "desc" ? <ChevronDown className="h-3.5 w-3.5" /> : <ArrowUpDown className="h-3 w-3" />}
+                          <span
+                            className={cn(
+                              "inline-flex items-center text-table-header-foreground",
+                              !sortDir && "opacity-50",
+                            )}
+                          >
+                            {sortDir === "asc" ? (
+                              <ChevronUp className="h-3.5 w-3.5" />
+                            ) : sortDir === "desc" ? (
+                              <ChevronDown className="h-3.5 w-3.5" />
+                            ) : (
+                              <ArrowUpDown className="h-3 w-3" />
+                            )}
                           </span>
                         )}
                         {sortIdx !== -1 && sortEntries.length > 1 && (
@@ -1141,7 +1470,10 @@ export function DataTable<T extends Record<string, any>>({
             <tbody>
               {pagedData.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-5 py-16 text-center text-muted-foreground">
+                  <td
+                    colSpan={columns.length + (selectable ? 1 : 0)}
+                    className="px-5 py-16 text-center text-muted-foreground"
+                  >
                     <div className="flex flex-col items-center gap-2">
                       <Search className="h-8 w-8 text-muted-foreground/20" />
                       <p className="text-sm">{emptyMessage}</p>
@@ -1153,7 +1485,13 @@ export function DataTable<T extends Record<string, any>>({
                   const globalIdx = page * pageSize + i;
                   const isSelected = selectedRows.has(globalIdx);
                   return (
-                    <tr key={i} className={cn("border-b border-border/50 hover:bg-muted/30 transition-colors", isSelected && "bg-primary/5")}>
+                    <tr
+                      key={i}
+                      className={cn(
+                        "border-b border-border/50 hover:bg-muted/30 transition-colors",
+                        isSelected && "bg-primary/5",
+                      )}
+                    >
                       {selectable && (
                         <td className="w-10 px-3 py-3.5">
                           <input
@@ -1171,7 +1509,7 @@ export function DataTable<T extends Record<string, any>>({
                             "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
                             pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
                             col.align === "right" && "text-right",
-                            col.align === "center" && "text-center"
+                            col.align === "center" && "text-center",
                           )}
                         >
                           {col.render ? col.render(row[col.key], row, i) : (row[col.key] ?? "—")}
@@ -1186,7 +1524,15 @@ export function DataTable<T extends Record<string, any>>({
                 <tr className="bg-muted/40 font-semibold border-t border-border">
                   {selectable && <td className="w-10 px-3 py-3.5" />}
                   {columns.map((col) => (
-                    <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap text-sm", pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60", col.align === "right" && "text-right", col.align === "center" && "text-center")}>
+                    <td
+                      key={col.key}
+                      className={cn(
+                        "px-5 py-3.5 whitespace-nowrap text-sm",
+                        pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-muted/60",
+                        col.align === "right" && "text-right",
+                        col.align === "center" && "text-center",
+                      )}
+                    >
                       {totalRow[col.key] ?? ""}
                     </td>
                   ))}
@@ -1203,19 +1549,42 @@ export function DataTable<T extends Record<string, any>>({
               {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
             </span>
             <div className="flex items-center gap-0.5 sm:gap-1">
-              <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
+              <button
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors"
+              >
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              {Array.from({ length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) }, (_, i) => {
-                const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
-                const pageNum = totalPages <= maxVisible ? i : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
-                return (
-                  <button key={pageNum} onClick={() => setPage(pageNum)} className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-xs font-medium transition-all", page === pageNum ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>
-                    {pageNum + 1}
-                  </button>
-                );
-              })}
-              <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page === totalPages - 1} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors">
+              {Array.from(
+                { length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) },
+                (_, i) => {
+                  const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+                  const pageNum =
+                    totalPages <= maxVisible
+                      ? i
+                      : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={cn(
+                        "h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-xs font-medium transition-all",
+                        page === pageNum
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-muted",
+                      )}
+                    >
+                      {pageNum + 1}
+                    </button>
+                  );
+                },
+              )}
+              <button
+                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                disabled={page === totalPages - 1}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors"
+              >
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -1224,7 +1593,9 @@ export function DataTable<T extends Record<string, any>>({
       </div>
 
       {/* Record count */}
-      <p className="text-xs text-muted-foreground">{filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}</p>
+      <p className="text-xs text-muted-foreground">
+        {filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}
+      </p>
     </div>
   );
 }
