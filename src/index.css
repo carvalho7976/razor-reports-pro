@@ -138,7 +138,7 @@
   }
 
   .toolbar-btn-active {
-    @apply bg-[#ffbaba] text-black border-[#d4d4d4] shadow-sm;
+    @apply bg-[#e5e5e5] text-black border-[#d4d4d4] shadow-sm;
   }
 
   .dropdown-panel {
