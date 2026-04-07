@@ -25,104 +25,138 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+type StatusFormaPagamento = "Ativo" | "Desativado";
+type DestinoFormaPagamento = "CAIXA" | "CONTA" | "NENHUM";
+type DiasReceber = "Imediato" | "1 Dia" | "2 Dias" | "15 Dias" | "30 Dias";
+
+type BandeiraMaquina =
+  | "sumup"
+  | "elo"
+  | "rede"
+  | "stone"
+  | "cielo"
+  | "getnet"
+  | "pagseguro"
+  | "mercado_pago"
+  | "nenhum";
+
 interface FormaPagamento {
   id: number;
   nome: string;
-  tipo: string;
+  tipo: BandeiraMaquina;
   taxa: number;
-  destino: string;
-  tempoParaCair: string;
-  status: "Ativo" | "Desativado";
-  logo: "dinheiro" | "pix" | "credito" | "debito" | "transferencia" | "cheque" | "presente";
+  destino: DestinoFormaPagamento;
+  tempoParaCair: DiasReceber;
+  status: StatusFormaPagamento;
+  logo: BandeiraMaquina;
 }
 
 const initialData: FormaPagamento[] = [
   {
     id: 1,
-    nome: "Dinheiro",
-    tipo: "Espécie",
+    nome: "Pix",
+    tipo: "nenhum",
     taxa: 0,
     destino: "CONTA",
-    tempoParaCair: "Na hora",
+    tempoParaCair: "Imediato",
     status: "Ativo",
-    logo: "dinheiro",
+    logo: "nenhum",
   },
   {
     id: 2,
-    nome: "Pix",
-    tipo: "Digital",
-    taxa: 0,
+    nome: "Cartão Crédito SumUp",
+    tipo: "sumup",
+    taxa: 3.5,
     destino: "CONTA",
-    tempoParaCair: "Na hora",
+    tempoParaCair: "30 Dias",
     status: "Ativo",
-    logo: "pix",
+    logo: "sumup",
   },
   {
     id: 3,
-    nome: "Cartão Crédito",
-    tipo: "Cartão",
-    taxa: 3.5,
-    destino: "CONTA",
-    tempoParaCair: "Na hora",
+    nome: "Cartão Débito Rede",
+    tipo: "rede",
+    taxa: 1.99,
+    destino: "CAIXA",
+    tempoParaCair: "1 Dia",
     status: "Ativo",
-    logo: "credito",
+    logo: "rede",
   },
   {
     id: 4,
-    nome: "Cartão Débito",
-    tipo: "Cartão",
-    taxa: 1.5,
-    destino: "CAIXA",
-    tempoParaCair: "1 dia",
-    status: "Ativo",
-    logo: "debito",
-  },
-  {
-    id: 5,
-    nome: "Transferência",
-    tipo: "Digital",
+    nome: "Permuta",
+    tipo: "nenhum",
     taxa: 0,
     destino: "NENHUM",
-    tempoParaCair: "Na hora",
-    status: "Ativo",
-    logo: "transferencia",
-  },
-  {
-    id: 6,
-    nome: "Cheque",
-    tipo: "Outros",
-    taxa: 0,
-    destino: "CAIXA",
-    tempoParaCair: "Na hora",
+    tempoParaCair: "Imediato",
     status: "Desativado",
-    logo: "cheque",
-  },
-  {
-    id: 7,
-    nome: "Vale Presente",
-    tipo: "Outros",
-    taxa: 0,
-    destino: "CONTA",
-    tempoParaCair: "Na hora",
-    status: "Desativado",
-    logo: "presente",
+    logo: "nenhum",
   },
 ];
 
-const logoMap: Record<FormaPagamento["logo"], React.ReactNode> = {
-  dinheiro: <Banknote className="h-5 w-5 text-success" />,
-  pix: <Smartphone className="h-5 w-5 text-info" />,
-  credito: <CreditCard className="h-5 w-5 text-primary" />,
-  debito: <CreditCard className="h-5 w-5 text-warning" />,
-  transferencia: <ArrowRightLeft className="h-5 w-5 text-info" />,
-  cheque: <FileText className="h-5 w-5 text-muted-foreground" />,
-  presente: <Gift className="h-5 w-5 text-primary" />,
+const bandeiraOptions: { value: BandeiraMaquina; label: string }[] = [
+  { value: "sumup", label: "SumUp" },
+  { value: "elo", label: "Elo" },
+  { value: "rede", label: "Rede" },
+  { value: "stone", label: "Stone" },
+  { value: "cielo", label: "Cielo" },
+  { value: "getnet", label: "Getnet" },
+  { value: "pagseguro", label: "PagSeguro" },
+  { value: "mercado_pago", label: "Mercado Pago" },
+  { value: "nenhum", label: "Nenhum" },
+];
+
+const destinoOptions: { value: DestinoFormaPagamento; label: string }[] = [
+  { value: "CAIXA", label: "Caixa" },
+  { value: "CONTA", label: "Conta" },
+  { value: "NENHUM", label: "Nenhum (Permuta)" },
+];
+
+const diasReceberOptions: { value: DiasReceber; label: string }[] = [
+  { value: "Imediato", label: "Imediato" },
+  { value: "1 Dia", label: "1 Dia" },
+  { value: "2 Dias", label: "2 Dias" },
+  { value: "15 Dias", label: "15 Dias" },
+  { value: "30 Dias", label: "30 Dias" },
+];
+
+const getBandeiraLabel = (value: BandeiraMaquina) =>
+  bandeiraOptions.find((item) => item.value === value)?.label || "Nenhum";
+
+const getDestinoLabel = (value: DestinoFormaPagamento) =>
+  destinoOptions.find((item) => item.value === value)?.label || value;
+
+const logoMap: Record<BandeiraMaquina, React.ReactNode> = {
+  sumup: <CreditCard className="h-5 w-5 text-primary" />,
+  elo: <CreditCard className="h-5 w-5 text-success" />,
+  rede: <CreditCard className="h-5 w-5 text-warning" />,
+  stone: <CreditCard className="h-5 w-5 text-info" />,
+  cielo: <CreditCard className="h-5 w-5 text-primary" />,
+  getnet: <CreditCard className="h-5 w-5 text-destructive" />,
+  pagseguro: <Smartphone className="h-5 w-5 text-success" />,
+  mercado_pago: <ArrowRightLeft className="h-5 w-5 text-info" />,
+  nenhum: <Banknote className="h-5 w-5 text-muted-foreground" />,
 };
 
-type ModalState = { type: "edit"; item: FormaPagamento } | { type: "delete"; item: FormaPagamento } | null;
+type ModalState =
+  | { type: "new" }
+  | { type: "edit"; item: FormaPagamento }
+  | { type: "delete"; item: FormaPagamento }
+  | null;
+
+const createEmptyForm = (): FormaPagamento => ({
+  id: 0,
+  nome: "",
+  tipo: "nenhum",
+  taxa: 0,
+  destino: "CAIXA",
+  tempoParaCair: "Imediato",
+  status: "Ativo",
+  logo: "nenhum",
+});
 
 export default function ListaFormasPagamento() {
-  const [allData, setAllData] = useState(initialData);
+  const [allData, setAllData] = useState<FormaPagamento[]>(initialData);
   const [tab, setTab] = useState("todos");
   const [modal, setModal] = useState<ModalState>(null);
   const [form, setForm] = useState<FormaPagamento | null>(null);
@@ -133,6 +167,11 @@ export default function ListaFormasPagamento() {
     if (tab === "ativos") return allData.filter((d) => d.status === "Ativo");
     return allData.filter((d) => d.status === "Desativado");
   }, [tab, allData]);
+
+  const openNewModal = () => {
+    setForm(createEmptyForm());
+    setModal({ type: "new" });
+  };
 
   const openEditModal = (item: FormaPagamento) => {
     setForm({ ...item });
@@ -158,13 +197,47 @@ export default function ListaFormasPagamento() {
     });
   };
 
-  const handleSaveEdit = () => {
+  const handleBandeiraChange = (value: BandeiraMaquina) => {
+    if (!form) return;
+    setForm({
+      ...form,
+      tipo: value,
+      logo: value,
+    });
+  };
+
+  const handleSave = () => {
     if (!form) return;
 
-    setAllData((prev) => prev.map((item) => (item.id === form.id ? form : item)));
+    if (!form.nome.trim()) {
+      toast({
+        title: "Preencha o nome",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    toast({ title: "Forma de pagamento atualizada" });
-    closeModal();
+    if (modal?.type === "new") {
+      const nextId = allData.length ? Math.max(...allData.map((item) => item.id)) + 1 : 1;
+
+      setAllData((prev) => [
+        {
+          ...form,
+          id: nextId,
+        },
+        ...prev,
+      ]);
+
+      toast({ title: "Forma de pagamento cadastrada" });
+      closeModal();
+      return;
+    }
+
+    if (modal?.type === "edit") {
+      setAllData((prev) => prev.map((item) => (item.id === form.id ? form : item)));
+      toast({ title: "Forma de pagamento atualizada" });
+      closeModal();
+    }
   };
 
   const handleConfirmDelete = () => {
@@ -183,13 +256,13 @@ export default function ListaFormasPagamento() {
 
   const bulkDesativar = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
-    setAllData((prev) => prev.map((d) => (ids.includes(d.id) ? { ...d, status: "Desativado" as const } : d)));
+    setAllData((prev) => prev.map((d) => (ids.includes(d.id) ? { ...d, status: "Desativado" } : d)));
     toast({ title: `${ids.length} forma(s) desativada(s)` });
   };
 
   const bulkAtivar = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
-    setAllData((prev) => prev.map((d) => (ids.includes(d.id) ? { ...d, status: "Ativo" as const } : d)));
+    setAllData((prev) => prev.map((d) => (ids.includes(d.id) ? { ...d, status: "Ativo" } : d)));
     toast({ title: `${ids.length} forma(s) ativada(s)` });
   };
 
@@ -219,7 +292,7 @@ export default function ListaFormasPagamento() {
   const columns: Column<FormaPagamento>[] = [
     {
       key: "nome",
-      label: "Nome",
+      label: "Forma de Pagamento",
       pinned: true,
       render: (v, row) => (
         <div className="flex items-center gap-3">
@@ -230,10 +303,28 @@ export default function ListaFormasPagamento() {
         </div>
       ),
     },
-    { key: "tipo", label: "Tipo" },
-    { key: "taxa", label: "Taxa %", align: "center", render: (v) => `${v}%` },
-    { key: "destino", label: "Destino", align: "center" },
-    { key: "tempoParaCair", label: "Tempo p/ Cair", align: "center" },
+    {
+      key: "tipo",
+      label: "Bandeira da Máquina",
+      render: (v) => getBandeiraLabel(v as BandeiraMaquina),
+    },
+    {
+      key: "taxa",
+      label: "Taxa %",
+      align: "center",
+      render: (v) => `${Number(v).toFixed(2)}%`,
+    },
+    {
+      key: "destino",
+      label: "Destino",
+      align: "center",
+      render: (v) => getDestinoLabel(v as DestinoFormaPagamento),
+    },
+    {
+      key: "tempoParaCair",
+      label: "Dias para Receber",
+      align: "center",
+    },
     {
       key: "status",
       label: "Status",
@@ -299,7 +390,12 @@ export default function ListaFormasPagamento() {
         selectable
         selectionActions={selectionActions}
         showDateFilter={true}
-        novoMenuItems={[{ label: "Nova forma de pagamento" }]}
+        novoMenuItems={[
+          {
+            label: "Nova forma de pagamento",
+            onClick: openNewModal,
+          },
+        ]}
         tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
@@ -307,11 +403,15 @@ export default function ListaFormasPagamento() {
         tableId="lista_formas_pagamento"
       />
 
-      <Dialog open={modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
+      <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="sm:max-w-[560px] rounded-2xl">
           <DialogHeader>
-            <DialogTitle>Editar forma de pagamento</DialogTitle>
-            <DialogDescription>Atualize os dados da forma de pagamento.</DialogDescription>
+            <DialogTitle>{modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}</DialogTitle>
+            <DialogDescription>
+              {modal?.type === "new"
+                ? "Preencha os dados para cadastrar uma nova forma de pagamento."
+                : "Atualize os dados da forma de pagamento."}
+            </DialogDescription>
           </DialogHeader>
 
           {form && (
@@ -322,72 +422,67 @@ export default function ListaFormasPagamento() {
                   className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   value={form.nome}
                   onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                  placeholder="Digite a forma de pagamento"
                 />
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-sm font-medium">Logo</label>
+                <label className="text-sm font-medium">Bandeira da Máquina</label>
                 <select
                   className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.logo}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      logo: e.target.value as FormaPagamento["logo"],
-                    })
-                  }
+                  value={form.tipo}
+                  onChange={(e) => handleBandeiraChange(e.target.value as BandeiraMaquina)}
                 >
-                  <option value="dinheiro">Dinheiro</option>
-                  <option value="pix">Pix</option>
-                  <option value="credito">Cartão Crédito</option>
-                  <option value="debito">Cartão Débito</option>
-                  <option value="transferencia">Transferência</option>
-                  <option value="cheque">Cheque</option>
-                  <option value="presente">Vale Presente</option>
+                  {bandeiraOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Tipo</label>
-                <input
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.tipo}
-                  onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Taxa %</label>
+                <label className="text-sm font-medium">Taxa</label>
                 <input
                   type="number"
-                  step="0.1"
+                  step="0.01"
                   className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
                   value={form.taxa}
                   onChange={(e) => setForm({ ...form, taxa: Number(e.target.value) })}
+                  placeholder="0.00"
                 />
               </div>
 
-              <select
-                className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                value={form.destino}
-                onChange={(e) => setForm({ ...form, destino: e.target.value })}
-              >
-                <option value="CONTA">Conta Bancária</option>
-                <option value="CAIXA">Caixa</option>
-                <option value="NENHUM">Nenhum (permuta)</option>
-              </select>
-
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Tempo p/ Cair</label>
-               <select
-  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-  value={form.tempoParaCair}
-  onChange={(e) => setForm({ ...form, tempoParaCair: e.target.value })}
->
-  <option value="Na hora">Na hora (D+0)</option>
-  <option value="D+1">D+1</option>
-  <option value="D+30">D+30</option>
-</select>
+                <label className="text-sm font-medium">Destino</label>
+                <select
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.destino}
+                  onChange={(e) => setForm({ ...form, destino: e.target.value as DestinoFormaPagamento })}
+                >
+                  {destinoOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-sm font-medium">Dias para Receber</label>
+                <select
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.tempoParaCair}
+                  onChange={(e) => setForm({ ...form, tempoParaCair: e.target.value as DiasReceber })}
+                >
+                  {diasReceberOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           )}
 
           <DialogFooter className="gap-2 sm:gap-0">
@@ -400,7 +495,7 @@ export default function ListaFormasPagamento() {
             </button>
             <button
               type="button"
-              onClick={handleSaveEdit}
+              onClick={handleSave}
               className="h-10 rounded-xl bg-[hsl(var(--novo-btn))] px-4 text-sm font-medium text-[hsl(var(--novo-btn-foreground))] transition-colors hover:bg-[hsl(var(--novo-btn)/0.9)]"
             >
               Salvar
