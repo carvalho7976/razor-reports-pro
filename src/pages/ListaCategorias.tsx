@@ -107,7 +107,6 @@ export default function ListaCategorias() {
       ),
     },
     { key: "qtdServicos", label: "Quantidade de Serviços", align: "center" },
-    { key: "descricao", label: "Descrição" },
     {
       key: "acoes" as any,
       label: "Ações",
