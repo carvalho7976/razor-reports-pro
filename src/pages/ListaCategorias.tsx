@@ -6,9 +6,21 @@ import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const PALETTE = [
-  "#ff2f2f", "#ff6b35", "#f59e0b", "#84cc16", "#00c5b4",
-  "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6", "#a855f7",
-  "#d946ef", "#ec4899", "#f43f5e", "#78716c", "#334155",
+  "#ff2f2f",
+  "#ff6b35",
+  "#f59e0b",
+  "#84cc16",
+  "#00c5b4",
+  "#06b6d4",
+  "#3b82f6",
+  "#6366f1",
+  "#8b5cf6",
+  "#a855f7",
+  "#d946ef",
+  "#ec4899",
+  "#f43f5e",
+  "#78716c",
+  "#334155",
   "#000000",
 ];
 
@@ -17,12 +29,23 @@ function ColorCell({ color, onChange }: { color: string; onChange: (c: string) =
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="h-6 w-6 rounded-full border border-border shadow-sm hover:scale-110 transition-transform" style={{ backgroundColor: color }} />
+        <button
+          className="h-6 w-6 rounded-full border border-border shadow-sm hover:scale-110 transition-transform"
+          style={{ backgroundColor: color }}
+        />
       </PopoverTrigger>
       <PopoverContent className="w-auto p-3" align="start">
         <div className="grid grid-cols-4 gap-2">
           {PALETTE.map((c) => (
-            <button key={c} onClick={() => { onChange(c); setOpen(false); }} className="h-7 w-7 rounded-full border border-border hover:scale-110 transition-transform" style={{ backgroundColor: c }}>
+            <button
+              key={c}
+              onClick={() => {
+                onChange(c);
+                setOpen(false);
+              }}
+              className="h-7 w-7 rounded-full border border-border hover:scale-110 transition-transform"
+              style={{ backgroundColor: c }}
+            >
               {c === color && <span className="text-white text-xs">✓</span>}
             </button>
           ))}
@@ -54,7 +77,7 @@ export default function ListaCategorias() {
   const { toast } = useToast();
 
   const handleColorChange = (id: number, newColor: string) => {
-    setAllData(prev => prev.map(c => c.id === id ? { ...c, cor: newColor } : c));
+    setAllData((prev) => prev.map((c) => (c.id === id ? { ...c, cor: newColor } : c)));
   };
 
   const bulkRemove = (indices: number[]) => {
@@ -62,23 +85,43 @@ export default function ListaCategorias() {
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove as categorias selecionadas" },
+    {
+      label: "Remover",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkRemove,
+      variant: "destructive",
+      description: "Remove as categorias selecionadas",
+    },
   ];
 
   const columns: Column<Categoria>[] = [
     {
-      key: "cor" as any, label: "", sortable: false, filterable: false, width: "50px", align: "center",
-      render: (_v: any, row: Categoria) => <ColorCell color={row.cor} onChange={(c) => handleColorChange(row.id, c)} />,
+      key: "nome",
+      label: "Nome",
+      pinned: true,
+      render: (v, row) => (
+        <div className="flex items-center gap-3">
+          <ColorCell color={row.cor} onChange={(c) => handleColorChange(row.id, c)} />
+          <span className="font-medium">{v}</span>
+        </div>
+      ),
     },
-    { key: "nome", label: "Nome", pinned: true },
     { key: "qtdServicos", label: "Qtd Serviços", align: "center" },
     { key: "descricao", label: "Descrição" },
     {
-      key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
-      render: () => <ActionsMenu items={[
-        { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
-        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
-      ]} />,
+      key: "acoes" as any,
+      label: "Ações",
+      sortable: false,
+      filterable: false,
+      align: "center",
+      render: () => (
+        <ActionsMenu
+          items={[
+            { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+            { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+          ]}
+        />
+      ),
     },
   ];
 
