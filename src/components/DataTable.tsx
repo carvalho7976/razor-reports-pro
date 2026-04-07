@@ -1203,7 +1203,7 @@ export function DataTable<T extends Record<string, any>>({
               setColumnFilters({});
               setSortEntries([]);
             }}
-            className="text-xs text-info hover:underline font-medium ml-1"
+            className="text-xs text-red-500 hover:text-red-600 font-medium ml-1"
           >
             Limpar
           </button>
