@@ -379,13 +379,15 @@ export default function ListaFormasPagamento() {
 
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Tempo p/ Cair</label>
-                <input
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.tempoParaCair}
-                  onChange={(e) => setForm({ ...form, tempoParaCair: e.target.value })}
-                />
-              </div>
-            </div>
+               <select
+  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+  value={form.tempoParaCair}
+  onChange={(e) => setForm({ ...form, tempoParaCair: e.target.value })}
+>
+  <option value="Na hora">Na hora (D+0)</option>
+  <option value="D+1">D+1</option>
+  <option value="D+30">D+30</option>
+</select>
           )}
 
           <DialogFooter className="gap-2 sm:gap-0">
