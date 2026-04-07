@@ -211,15 +211,7 @@ export default function ListaFormasPagamento() {
       key: "nome",
       label: "Nome",
       pinned: true,
-      render: (v, row) => (
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center">
-            {logoMap[row.nome] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
-          </div>
-          <span className="font-medium">{v}</span>
-        </div>
-      ),
-    },
+      
     { key: "tipo", label: "Tipo" },
     { key: "taxa", label: "Taxa %", align: "center", render: (v) => `${v}%` },
     { key: "destino", label: "Destino", align: "center" },
