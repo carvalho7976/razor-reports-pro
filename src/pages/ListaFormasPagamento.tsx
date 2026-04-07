@@ -1,29 +1,11 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Switch } from "@/components/ui/switch";
-import {
-  Trash2,
-  Pencil,
-  Ban,
-  CreditCard,
-  Banknote,
-  Smartphone,
-  ArrowRightLeft,
-  Gift,
-  FileText,
-  CheckCircle2,
-} from "lucide-react";
+import { Trash2, Pencil, Ban, CreditCard, Banknote, Smartphone, ArrowRightLeft, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 type StatusFormaPagamento = "Ativo" | "Desativado";
 type DestinoFormaPagamento = "CAIXA" | "CONTA" | "NENHUM";
@@ -144,6 +126,8 @@ type ModalState =
   | { type: "delete"; item: FormaPagamento }
   | null;
 
+type DropdownOption = { value: string; label: string };
+
 const createEmptyForm = (): FormaPagamento => ({
   id: 0,
   nome: "",
@@ -155,11 +139,130 @@ const createEmptyForm = (): FormaPagamento => ({
   logo: "nenhum",
 });
 
+function FakeLogo({ label, dark = true }: { label: string; dark?: boolean }) {
+  return (
+    <div
+      className={[
+        "flex h-6 w-6 items-center justify-center rounded-md text-[11px] font-bold",
+        dark ? "bg-neutral-900 text-white" : "bg-white/10 text-white",
+      ].join(" ")}
+    >
+      {label?.[0] || "?"}
+    </div>
+  );
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="mt-2 text-xs font-medium text-red-500">{message}</p>;
+}
+
+function Dropdown({
+  label,
+  value,
+  setValue,
+  options,
+  searchable = false,
+  withLogo = false,
+  error,
+}: {
+  label: string;
+  value: string;
+  setValue: (value: string) => void;
+  options: DropdownOption[];
+  searchable?: boolean;
+  withLogo?: boolean;
+  error?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  const selected = options.find((o) => o.value === value);
+
+  const filtered = useMemo(() => {
+    if (!searchable) return options;
+    return options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()));
+  }, [options, search, searchable]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={wrapperRef}>
+      <label className="mb-2 block text-sm font-semibold text-neutral-900">{label}</label>
+
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={[
+          "flex h-12 w-full items-center justify-between rounded-lg border bg-white px-4 text-sm transition-all",
+          error ? "border-red-300 focus:ring-red-100" : "border-neutral-200 focus:ring-neutral-200",
+          "hover:border-neutral-400 focus:border-neutral-900",
+        ].join(" ")}
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          {withLogo && <FakeLogo label={selected?.label || "?"} />}
+          <span className="truncate">{selected?.label}</span>
+        </div>
+        <span className="text-neutral-400">⌄</span>
+      </button>
+
+      <FieldError message={error} />
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl">
+          {searchable && (
+            <div className="border-b p-3">
+              <input
+                placeholder="Buscar..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm outline-none focus:border-neutral-900"
+              />
+            </div>
+          )}
+
+          <div className="max-h-60 overflow-auto">
+            {filtered.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  setValue(option.value);
+                  setOpen(false);
+                  setSearch("");
+                }}
+                className={`flex w-full items-center gap-3 px-4 py-3 text-sm transition ${
+                  option.value === value ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
+                }`}
+              >
+                {withLogo && <FakeLogo label={option.label} dark={option.value !== value} />}
+                <span className="truncate">{option.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ListaFormasPagamento() {
   const [allData, setAllData] = useState<FormaPagamento[]>(initialData);
   const [tab, setTab] = useState("todos");
   const [modal, setModal] = useState<ModalState>(null);
   const [form, setForm] = useState<FormaPagamento | null>(null);
+  const [showErrors, setShowErrors] = useState(false);
   const { toast } = useToast();
 
   const data = useMemo(() => {
@@ -168,13 +271,20 @@ export default function ListaFormasPagamento() {
     return allData.filter((d) => d.status === "Desativado");
   }, [tab, allData]);
 
+  const errors = {
+    nome: !form?.nome?.trim() ? "Informe o nome da forma de pagamento." : "",
+    taxa: form === null || Number.isNaN(Number(form.taxa)) ? "Informe uma taxa válida." : "",
+  };
+
   const openNewModal = () => {
     setForm(createEmptyForm());
+    setShowErrors(false);
     setModal({ type: "new" });
   };
 
   const openEditModal = (item: FormaPagamento) => {
     setForm({ ...item });
+    setShowErrors(false);
     setModal({ type: "edit", item });
   };
 
@@ -185,6 +295,7 @@ export default function ListaFormasPagamento() {
   const closeModal = () => {
     setModal(null);
     setForm(null);
+    setShowErrors(false);
   };
 
   const handleStatusChange = (id: number, checked: boolean) => {
@@ -209,13 +320,10 @@ export default function ListaFormasPagamento() {
   const handleSave = () => {
     if (!form) return;
 
-    if (!form.nome.trim()) {
-      toast({
-        title: "Preencha o nome",
-        variant: "destructive",
-      });
-      return;
-    }
+    setShowErrors(true);
+
+    if (!form.nome.trim()) return;
+    if (Number.isNaN(Number(form.taxa))) return;
 
     if (modal?.type === "new") {
       const nextId = allData.length ? Math.max(...allData.map((item) => item.id)) + 1 : 1;
@@ -310,7 +418,7 @@ export default function ListaFormasPagamento() {
     },
     {
       key: "taxa",
-      label: "Taxa %",
+      label: "Taxa",
       align: "center",
       render: (v) => `${Number(v).toFixed(2)}%`,
     },
@@ -404,136 +512,181 @@ export default function ListaFormasPagamento() {
       />
 
       <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[560px] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>{modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}</DialogTitle>
-            <DialogDescription>
-              {modal?.type === "new"
-                ? "Preencha os dados para cadastrar uma nova forma de pagamento."
-                : "Atualize os dados da forma de pagamento."}
-            </DialogDescription>
-          </DialogHeader>
-
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none">
           {form && (
-            <div className="grid grid-cols-1 gap-4 py-2 sm:grid-cols-2">
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-sm font-medium">Nome</label>
-                <input
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.nome}
-                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  placeholder="Digite a forma de pagamento"
-                />
-              </div>
+            <div className="flex min-h-screen items-end justify-center bg-black/60 p-3 sm:items-center sm:p-8">
+              <div className="w-full max-w-md overflow-visible rounded-2xl bg-white shadow-2xl sm:max-w-2xl">
+                <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-5 py-5 sm:px-8 sm:py-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h1 className="text-2xl font-semibold text-neutral-900">
+                        {modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}
+                      </h1>
+                      <p className="mt-1 text-sm text-neutral-500">Escolha e configure uma forma de pagamento.</p>
+                    </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-sm font-medium">Bandeira da Máquina</label>
-                <select
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.tipo}
-                  onChange={(e) => handleBandeiraChange(e.target.value as BandeiraMaquina)}
-                >
-                  {bandeiraOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                    <button
+                      type="button"
+                      aria-label="Fechar"
+                      onClick={closeModal}
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Taxa</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.taxa}
-                  onChange={(e) => setForm({ ...form, taxa: Number(e.target.value) })}
-                  placeholder="0.00"
-                />
-              </div>
+                <div className="space-y-6 px-5 py-5 sm:px-8 sm:py-7">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-neutral-900">Nome</label>
+                    <input
+                      value={form.nome}
+                      onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                      placeholder="Digite a forma de pagamento"
+                      className={[
+                        "h-12 w-full rounded-lg border px-4 text-sm outline-none transition-all bg-white",
+                        showErrors && errors.nome
+                          ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
+                          : "border-neutral-200 focus:border-neutral-900 focus:ring-4 focus:ring-neutral-200",
+                      ].join(" ")}
+                    />
+                    <FieldError message={showErrors ? errors.nome : ""} />
+                  </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Destino</label>
-                <select
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.destino}
-                  onChange={(e) => setForm({ ...form, destino: e.target.value as DestinoFormaPagamento })}
-                >
-                  {destinoOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <Dropdown
+                    label="Bandeira da Máquina"
+                    value={form.tipo}
+                    setValue={(value) => handleBandeiraChange(value as BandeiraMaquina)}
+                    options={bandeiraOptions}
+                    searchable
+                    withLogo
+                  />
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-sm font-medium">Dias para Receber</label>
-                <select
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  value={form.tempoParaCair}
-                  onChange={(e) => setForm({ ...form, tempoParaCair: e.target.value as DiasReceber })}
-                >
-                  {diasReceberOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-neutral-900">Taxa</label>
+                      <input
+                        value={String(form.taxa)}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            taxa: Number(e.target.value.replace(",", ".")),
+                          })
+                        }
+                        placeholder="0,00"
+                        className={[
+                          "h-12 w-full rounded-lg border px-4 text-sm outline-none transition-all bg-white",
+                          showErrors && errors.taxa
+                            ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
+                            : "border-neutral-200 focus:border-neutral-900 focus:ring-4 focus:ring-neutral-200",
+                        ].join(" ")}
+                      />
+                      <FieldError message={showErrors ? errors.taxa : ""} />
+                    </div>
+
+                    <Dropdown
+                      label="Destino"
+                      value={form.destino}
+                      setValue={(value) =>
+                        setForm({
+                          ...form,
+                          destino: value as DestinoFormaPagamento,
+                        })
+                      }
+                      options={destinoOptions}
+                    />
+                  </div>
+
+                  <Dropdown
+                    label="Dias para Receber"
+                    value={form.tempoParaCair}
+                    setValue={(value) =>
+                      setForm({
+                        ...form,
+                        tempoParaCair: value as DiasReceber,
+                      })
+                    }
+                    options={diasReceberOptions}
+                  />
+                </div>
+
+                <div className="border-t px-5 py-5 sm:px-8 sm:py-5">
+                  <div className="flex flex-col gap-3">
+                    <button
+                      type="button"
+                      onClick={closeModal}
+                      className="h-11 w-full rounded-lg border border-neutral-300 px-5 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-400 hover:bg-neutral-100 active:scale-[0.98]"
+                    >
+                      Cancelar
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 active:scale-[0.98]"
+                    >
+                      Salvar
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="h-10 rounded-xl border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="h-10 rounded-xl bg-[hsl(var(--novo-btn))] px-4 text-sm font-medium text-[hsl(var(--novo-btn-foreground))] transition-colors hover:bg-[hsl(var(--novo-btn)/0.9)]"
-            >
-              Salvar
-            </button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="sm:max-w-[480px] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>Excluir forma de pagamento</DialogTitle>
-            <DialogDescription>
-              {modal?.type === "delete"
-                ? `Deseja excluir "${modal.item.nome}"? Essa ação não poderá ser desfeita.`
-                : ""}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none">
+          <div className="flex min-h-screen items-end justify-center bg-black/60 p-3 sm:items-center sm:p-8">
+            <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
+              <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-5 py-5 sm:px-8 sm:py-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h1 className="text-2xl font-semibold text-neutral-900">Excluir forma de pagamento</h1>
+                    <p className="mt-1 text-sm text-neutral-500">Essa ação não poderá ser desfeita.</p>
+                  </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="h-10 rounded-xl border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirmDelete}
-              className={cn(
-                "h-10 rounded-xl px-4 text-sm font-medium transition-colors",
-                "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-              )}
-            >
-              Excluir
-            </button>
-          </DialogFooter>
+                  <button
+                    type="button"
+                    aria-label="Fechar"
+                    onClick={closeModal}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              <div className="px-5 py-5 sm:px-8 sm:py-7">
+                <p className="text-sm text-neutral-700">
+                  {modal?.type === "delete" ? `Deseja excluir "${modal.item.nome}"?` : ""}
+                </p>
+              </div>
+
+              <div className="border-t px-5 py-5 sm:px-8 sm:py-5">
+                <div className="flex flex-col gap-3">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="h-11 w-full rounded-lg border border-neutral-300 px-5 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-400 hover:bg-neutral-100 active:scale-[0.98]"
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleConfirmDelete}
+                    className={cn(
+                      "inline-flex h-11 w-full items-center justify-center rounded-lg px-6 text-sm font-semibold text-white transition-colors active:scale-[0.98]",
+                      "bg-destructive hover:bg-destructive/90",
+                    )}
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </AppLayout>
