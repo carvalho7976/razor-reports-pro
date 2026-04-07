@@ -2,8 +2,27 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Switch } from "@/components/ui/switch";
-import { Trash2, Pencil, Ban, CreditCard, Banknote, Smartphone, ArrowRightLeft, Gift, FileText } from "lucide-react";
+import {
+  Trash2,
+  Pencil,
+  Ban,
+  CreditCard,
+  Banknote,
+  Smartphone,
+  ArrowRightLeft,
+  Gift,
+  FileText,
+  CheckCircle2,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface FormaPagamento {
   id: number;
@@ -67,9 +86,17 @@ const logoMap: Record<string, React.ReactNode> = {
   "Vale Presente": <Gift className="h-5 w-5 text-primary" />,
 };
 
+type ModalState =
+  | { type: "edit"; item: FormaPagamento }
+  | { type: "toggle"; item: FormaPagamento; nextStatus: "Ativo" | "Desativado" }
+  | { type: "delete"; item: FormaPagamento }
+  | null;
+
 export default function ListaFormasPagamento() {
   const [allData, setAllData] = useState(initialData);
   const [tab, setTab] = useState("todos");
+  const [modal, setModal] = useState<ModalState>(null);
+  const [form, setForm] = useState<FormaPagamento | null>(null);
   const { toast } = useToast();
 
   const data = useMemo(() => {
@@ -77,6 +104,24 @@ export default function ListaFormasPagamento() {
     if (tab === "ativos") return allData.filter((d) => d.status === "Ativo");
     return allData.filter((d) => d.status === "Desativado");
   }, [tab, allData]);
+
+  const openEditModal = (item: FormaPagamento) => {
+    setForm({ ...item });
+    setModal({ type: "edit", item });
+  };
+
+  const openToggleModal = (item: FormaPagamento, nextStatus: "Ativo" | "Desativado") => {
+    setModal({ type: "toggle", item, nextStatus });
+  };
+
+  const openDeleteModal = (item: FormaPagamento) => {
+    setModal({ type: "delete", item });
+  };
+
+  const closeModal = () => {
+    setModal(null);
+    setForm(null);
+  };
 
   const handleStatusChange = (id: number, checked: boolean) => {
     setAllData((prev) =>
@@ -88,8 +133,41 @@ export default function ListaFormasPagamento() {
     });
   };
 
+  const handleSaveEdit = () => {
+    if (!form) return;
+
+    setAllData((prev) => prev.map((item) => (item.id === form.id ? form : item)));
+
+    toast({ title: "Forma de pagamento atualizada" });
+    closeModal();
+  };
+
+  const handleConfirmToggle = () => {
+    if (!modal || modal.type !== "toggle") return;
+
+    setAllData((prev) =>
+      prev.map((item) => (item.id === modal.item.id ? { ...item, status: modal.nextStatus } : item)),
+    );
+
+    toast({
+      title: modal.nextStatus === "Ativo" ? "Forma ativada" : "Forma desativada",
+    });
+
+    closeModal();
+  };
+
+  const handleConfirmDelete = () => {
+    if (!modal || modal.type !== "delete") return;
+
+    setAllData((prev) => prev.filter((item) => item.id !== modal.item.id));
+    toast({ title: "Forma de pagamento removida", variant: "destructive" });
+    closeModal();
+  };
+
   const bulkRemove = (indices: number[]) => {
-    toast({ title: `${indices.length} forma(s) removida(s)`, variant: "destructive" });
+    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
+    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
+    toast({ title: `${ids.length} forma(s) removida(s)`, variant: "destructive" });
   };
 
   const bulkDesativar = (indices: number[]) => {
@@ -98,7 +176,19 @@ export default function ListaFormasPagamento() {
     toast({ title: `${ids.length} forma(s) desativada(s)` });
   };
 
+  const bulkAtivar = (indices: number[]) => {
+    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
+    setAllData((prev) => prev.map((d) => (ids.includes(d.id) ? { ...d, status: "Ativo" as const } : d)));
+    toast({ title: `${ids.length} forma(s) ativada(s)` });
+  };
+
   const selectionActions: SelectionAction[] = [
+    {
+      label: "Ativar",
+      icon: <CheckCircle2 className="h-4 w-4" />,
+      onClick: bulkAtivar,
+      description: "Ativa as formas de pagamento selecionadas",
+    },
     {
       label: "Desativar",
       icon: <Ban className="h-4 w-4" />,
@@ -117,19 +207,18 @@ export default function ListaFormasPagamento() {
 
   const columns: Column<FormaPagamento>[] = [
     {
-      key: "logo" as any,
-      label: "",
-      sortable: false,
-      filterable: false,
-      width: "50px",
-      align: "center",
-      render: (_v: any, row: FormaPagamento) => (
-        <div className="flex items-center justify-center">
-          {logoMap[row.nome] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
+      key: "nome",
+      label: "Nome",
+      pinned: true,
+      render: (v, row) => (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center">
+            {logoMap[row.nome] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
+          </div>
+          <span className="font-medium">{v}</span>
         </div>
       ),
     },
-    { key: "nome", label: "Nome", pinned: true },
     { key: "tipo", label: "Tipo" },
     { key: "taxa", label: "Taxa %", align: "center", render: (v) => `${v}%` },
     { key: "destino", label: "Destino", align: "center" },
@@ -154,12 +243,27 @@ export default function ListaFormasPagamento() {
       sortable: false,
       filterable: false,
       align: "center",
-      render: () => (
+      render: (_v, row) => (
         <ActionsMenu
           items={[
-            { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
-            { label: "Desativar", icon: <Ban className="h-4 w-4" /> },
-            { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+            { label: "Editar", icon: <Pencil className="h-4 w-4" />, onClick: () => openEditModal(row) },
+            row.status === "Ativo"
+              ? {
+                  label: "Desativar",
+                  icon: <Ban className="h-4 w-4" />,
+                  onClick: () => openToggleModal(row, "Desativado"),
+                }
+              : {
+                  label: "Ativar",
+                  icon: <CheckCircle2 className="h-4 w-4" />,
+                  onClick: () => openToggleModal(row, "Ativo"),
+                },
+            {
+              label: "Excluir",
+              icon: <Trash2 className="h-4 w-4" />,
+              variant: "destructive",
+              onClick: () => openDeleteModal(row),
+            },
           ]}
         />
       ),
@@ -198,6 +302,152 @@ export default function ListaFormasPagamento() {
         pageSize={15}
         tableId="lista_formas_pagamento"
       />
+
+      <Dialog open={modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="sm:max-w-[560px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar forma de pagamento</DialogTitle>
+            <DialogDescription>Atualize os dados da forma de pagamento.</DialogDescription>
+          </DialogHeader>
+
+          {form && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-sm font-medium">Nome</label>
+                <input
+                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.nome}
+                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Tipo</label>
+                <input
+                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.tipo}
+                  onChange={(e) => setForm({ ...form, tipo: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Taxa %</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.taxa}
+                  onChange={(e) => setForm({ ...form, taxa: Number(e.target.value) })}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Destino</label>
+                <input
+                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.destino}
+                  onChange={(e) => setForm({ ...form, destino: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Tempo p/ Cair</label>
+                <input
+                  className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={form.tempoParaCair}
+                  onChange={(e) => setForm({ ...form, tempoParaCair: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="h-10 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveEdit}
+              className="h-10 px-4 rounded-xl bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] text-sm font-medium hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
+            >
+              Salvar
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={modal?.type === "toggle"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="sm:max-w-[480px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {modal?.type === "toggle" && modal.nextStatus === "Ativo"
+                ? "Ativar forma de pagamento"
+                : "Desativar forma de pagamento"}
+            </DialogTitle>
+            <DialogDescription>
+              {modal?.type === "toggle" && modal.nextStatus === "Ativo"
+                ? `Deseja ativar "${modal.item.nome}"?`
+                : `Deseja desativar "${modal?.type === "toggle" ? modal.item.nome : ""}"?`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="h-10 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmToggle}
+              className={cn(
+                "h-10 px-4 rounded-xl text-sm font-medium transition-colors",
+                modal?.type === "toggle" && modal.nextStatus === "Ativo"
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+              )}
+            >
+              {modal?.type === "toggle" && modal.nextStatus === "Ativo" ? "Ativar" : "Desativar"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="sm:max-w-[480px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Excluir forma de pagamento</DialogTitle>
+            <DialogDescription>
+              {modal?.type === "delete"
+                ? `Deseja excluir "${modal.item.nome}"? Essa ação não poderá ser desfeita.`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="h-10 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              className="h-10 px-4 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+            >
+              Excluir
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
