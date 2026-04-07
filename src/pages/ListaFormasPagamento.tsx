@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
+import { Switch } from "@/components/ui/switch";
 import { Trash2, Pencil, Ban, CreditCard, Banknote, Smartphone, ArrowRightLeft, Gift, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,12 +24,12 @@ const initialData: FormaPagamento[] = [
 ];
 
 const logoMap: Record<string, React.ReactNode> = {
-  "Dinheiro": <Banknote className="h-5 w-5 text-success" />,
-  "Pix": <Smartphone className="h-5 w-5 text-info" />,
+  Dinheiro: <Banknote className="h-5 w-5 text-success" />,
+  Pix: <Smartphone className="h-5 w-5 text-info" />,
   "Cartão Crédito": <CreditCard className="h-5 w-5 text-primary" />,
   "Cartão Débito": <CreditCard className="h-5 w-5 text-warning" />,
-  "Transferência": <ArrowRightLeft className="h-5 w-5 text-info" />,
-  "Cheque": <FileText className="h-5 w-5 text-muted-foreground" />,
+  Transferência: <ArrowRightLeft className="h-5 w-5 text-info" />,
+  Cheque: <FileText className="h-5 w-5 text-muted-foreground" />,
   "Vale Presente": <Gift className="h-5 w-5 text-primary" />,
 };
 
@@ -39,27 +40,55 @@ export default function ListaFormasPagamento() {
 
   const data = useMemo(() => {
     if (tab === "todos") return allData;
-    if (tab === "ativos") return allData.filter(d => d.status === "Ativo");
-    return allData.filter(d => d.status === "Desativado");
+    if (tab === "ativos") return allData.filter((d) => d.status === "Ativo");
+    return allData.filter((d) => d.status === "Desativado");
   }, [tab, allData]);
+
+  const handleStatusChange = (id: number, checked: boolean) => {
+    setAllData((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, status: checked ? "Ativo" : "Desativado" } : item)),
+    );
+
+    toast({
+      title: checked ? "Forma ativada" : "Forma desativada",
+    });
+  };
 
   const bulkRemove = (indices: number[]) => {
     toast({ title: `${indices.length} forma(s) removida(s)`, variant: "destructive" });
   };
+
   const bulkDesativar = (indices: number[]) => {
-    const ids = indices.map(i => data[i]?.id).filter(Boolean);
-    setAllData(prev => prev.map(d => ids.includes(d.id) ? { ...d, status: "Desativado" as const } : d));
+    const ids = indices.map((i) => data[i]?.id).filter(Boolean);
+    setAllData((prev) => prev.map((d) => (ids.includes(d.id) ? { ...d, status: "Desativado" as const } : d)));
     toast({ title: `${ids.length} forma(s) desativada(s)` });
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Desativar", icon: <Ban className="h-4 w-4" />, onClick: bulkDesativar, variant: "destructive", description: "Desativa as formas de pagamento selecionadas" },
-    { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove as formas de pagamento selecionadas" },
+    {
+      label: "Desativar",
+      icon: <Ban className="h-4 w-4" />,
+      onClick: bulkDesativar,
+      variant: "destructive",
+      description: "Desativa as formas de pagamento selecionadas",
+    },
+    {
+      label: "Remover",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkRemove,
+      variant: "destructive",
+      description: "Remove as formas de pagamento selecionadas",
+    },
   ];
 
   const columns: Column<FormaPagamento>[] = [
     {
-      key: "logo" as any, label: "", sortable: false, filterable: false, width: "50px", align: "center",
+      key: "logo" as any,
+      label: "",
+      sortable: false,
+      filterable: false,
+      width: "50px",
+      align: "center",
       render: (_v: any, row: FormaPagamento) => (
         <div className="flex items-center justify-center">
           {logoMap[row.nome] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
@@ -68,25 +97,47 @@ export default function ListaFormasPagamento() {
     },
     { key: "nome", label: "Nome", pinned: true },
     { key: "tipo", label: "Tipo" },
-    { key: "taxa", label: "Taxa %", align: "center", render: v => `${v}%` },
+    { key: "taxa", label: "Taxa %", align: "center", render: (v) => `${v}%` },
     {
-      key: "status", label: "Status",
-      render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
+      key: "status",
+      label: "Status",
+      align: "center",
+      render: (v, row) => (
+        <div className="flex items-center justify-center gap-2">
+          <Switch checked={v === "Ativo"} onCheckedChange={(checked) => handleStatusChange(row.id, checked)} />
+          <span className="text-sm font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>
+            {v}
+          </span>
+        </div>
+      ),
     },
     {
-      key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
-      render: () => <ActionsMenu items={[
-        { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
-        { label: "Desativar", icon: <Ban className="h-4 w-4" /> },
-        { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
-      ]} />,
+      key: "acoes" as any,
+      label: "Ações",
+      sortable: false,
+      filterable: false,
+      align: "center",
+      render: () => (
+        <ActionsMenu
+          items={[
+            { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+            { label: "Desativar", icon: <Ban className="h-4 w-4" /> },
+            { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive" },
+          ]}
+        />
+      ),
     },
   ];
 
   const tabs: TabDef[] = [
     { label: "Todos", value: "todos", count: allData.length, color: "neutral" },
-    { label: "Ativos", value: "ativos", count: allData.filter(d => d.status === "Ativo").length, color: "success" },
-    { label: "Desativados", value: "desativados", count: allData.filter(d => d.status === "Desativado").length, color: "destructive" },
+    { label: "Ativos", value: "ativos", count: allData.filter((d) => d.status === "Ativo").length, color: "success" },
+    {
+      label: "Desativados",
+      value: "desativados",
+      count: allData.filter((d) => d.status === "Desativado").length,
+      color: "destructive",
+    },
   ];
 
   return (
