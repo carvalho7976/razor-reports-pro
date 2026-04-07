@@ -270,7 +270,7 @@ export default function ListaClientes() {
   ];
 
   const columns: Column<Cliente>[] = [
-    { key: "cod", label: "Cod", width: "90px" },
+    { key: "cod", label: "ID", width: "90px" },
     {
       key: "nome",
       label: "Nome",
