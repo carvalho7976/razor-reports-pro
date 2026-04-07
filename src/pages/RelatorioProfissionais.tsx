@@ -359,7 +359,7 @@ export default function RelatorioProfissionais() {
         onTabChange={setTab}
         pageSize={15}
         showDateFilter={true}
-        tableId="relatorio_profissionais"
+        tableId={tab === "resumido" ? "relatorio_profissionais_resumido" : "relatorio_profissionais_detalhado"}
       />
     </AppLayout>
   );
