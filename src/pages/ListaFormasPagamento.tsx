@@ -103,11 +103,12 @@ export default function ListaFormasPagamento() {
       label: "Status",
       align: "center",
       render: (v, row) => (
-        <div className="flex items-center justify-center gap-2">
-          <Switch checked={v === "Ativo"} onCheckedChange={(checked) => handleStatusChange(row.id, checked)} />
-          <span className="text-sm font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>
-            {v}
-          </span>
+        <div className="flex justify-center">
+          <Switch
+            checked={v === "Ativo"}
+            onCheckedChange={(checked) => handleStatusChange(row.id, checked)}
+            className="scale-90 data-[state=checked]:bg-blue-600"
+          />
         </div>
       ),
     },
