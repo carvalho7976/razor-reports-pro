@@ -131,7 +131,7 @@ export default function ListaProdutos() {
   ];
 
   const columns: Column<Produto>[] = [
-    { key: "produto", label: "Produto", pinned: true },
+    { key: "nome", label: "Produto", pinned: true },
     { key: "categoria", label: "Categoria" },
     { key: "estoque", label: "Estoque", align: "center" },
     { key: "estoqueMinimo", label: "Estoque Mín.", align: "center" },
