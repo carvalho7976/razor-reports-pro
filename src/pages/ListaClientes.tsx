@@ -338,7 +338,7 @@ export default function ListaClientes() {
         title="Lista de Clientes"
         titleIcon={
           <button
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f7f7f7]/10 text-primary text-xs font-medium hover:bg-[#eaeaea]/20 transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffffff]/10 text-primary text-xs font-medium hover:bg-[#d4d4d4]/20 transition-colors"
             title="Assistir aula"
           >
             <PlayCircle className="h-4 w-4" />
