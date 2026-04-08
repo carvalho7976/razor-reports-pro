@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Switch } from "@/components/ui/switch";
@@ -22,9 +22,11 @@ type BandeiraMaquina =
   | "mercado_pago"
   | "nenhum";
 
+type NomeFormaPagamento = "debito" | "credito" | "permuta";
+
 interface FormaPagamento {
   id: number;
-  nome: string;
+  nome: NomeFormaPagamento;
   tipo: BandeiraMaquina;
   taxa: number;
   destino: DestinoFormaPagamento;
@@ -36,7 +38,7 @@ interface FormaPagamento {
 const initialData: FormaPagamento[] = [
   {
     id: 1,
-    nome: "Pix",
+    nome: "debito",
     tipo: "nenhum",
     taxa: 0,
     destino: "CONTA",
@@ -46,7 +48,7 @@ const initialData: FormaPagamento[] = [
   },
   {
     id: 2,
-    nome: "Cartão Crédito SumUp",
+    nome: "credito",
     tipo: "sumup",
     taxa: 3.5,
     destino: "CONTA",
@@ -56,7 +58,7 @@ const initialData: FormaPagamento[] = [
   },
   {
     id: 3,
-    nome: "Cartão Débito Rede",
+    nome: "debito",
     tipo: "rede",
     taxa: 1.99,
     destino: "CAIXA",
@@ -66,7 +68,7 @@ const initialData: FormaPagamento[] = [
   },
   {
     id: 4,
-    nome: "Permuta",
+    nome: "permuta",
     tipo: "nenhum",
     taxa: 0,
     destino: "NENHUM",
@@ -74,6 +76,12 @@ const initialData: FormaPagamento[] = [
     status: "Desativado",
     logo: "nenhum",
   },
+];
+
+const nomeOptions: { value: NomeFormaPagamento; label: string }[] = [
+  { value: "debito", label: "Débito" },
+  { value: "credito", label: "Crédito" },
+  { value: "permuta", label: "Permuta" },
 ];
 
 const bandeiraOptions: { value: BandeiraMaquina; label: string }[] = [
@@ -102,13 +110,15 @@ const diasReceberOptions: { value: DiasReceber; label: string }[] = [
   { value: "30 Dias", label: "30 Dias" },
 ];
 
+const getNomeLabel = (value: NomeFormaPagamento) => nomeOptions.find((item) => item.value === value)?.label || value;
+
 const getBandeiraLabel = (value: BandeiraMaquina) =>
   bandeiraOptions.find((item) => item.value === value)?.label || "Nenhum";
 
 const getDestinoLabel = (value: DestinoFormaPagamento) =>
   destinoOptions.find((item) => item.value === value)?.label || value;
 
-const logoMap: Record<BandeiraMaquina, React.ReactNode> = {
+const logoMap: Record<BandeiraMaquina, ReactNode> = {
   sumup: <CreditCard className="h-5 w-5 text-primary" />,
   elo: <CreditCard className="h-5 w-5 text-success" />,
   rede: <CreditCard className="h-5 w-5 text-warning" />,
@@ -133,7 +143,7 @@ type DropdownOption = {
 
 const createEmptyForm = (): FormaPagamento => ({
   id: 0,
-  nome: "",
+  nome: "debito",
   tipo: "nenhum",
   taxa: 0,
   destino: "CAIXA",
@@ -156,8 +166,41 @@ function FakeLogo({ label, dark = true }: { label: string; dark?: boolean }) {
 }
 
 function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <p className="mt-2 text-xs font-medium text-red-500">{message}</p>;
+  return (
+    <div className="min-h-[12px] pt-1">{message && <p className="text-xs font-medium text-red-500">{message}</p>}</div>
+  );
+}
+
+function TextField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  error,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  error?: string;
+}) {
+  return (
+    <div className="grid gap-1">
+      <label className="text-sm font-semibold text-neutral-900">{label}</label>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={[
+          "h-11 w-full rounded-lg border px-3.5 text-sm outline-none transition-all bg-white",
+          error
+            ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
+            : "border-neutral-200 focus:border-neutral-900 focus:ring-4 focus:ring-neutral-200",
+        ].join(" ")}
+      />
+      <FieldError message={error} />
+    </div>
+  );
 }
 
 function Dropdown({
@@ -201,66 +244,109 @@ function Dropdown({
   }, []);
 
   return (
-    <div className="relative">
-      <div ref={wrapperRef}>
-        <label className="mb-2 block text-sm font-semibold text-neutral-900">{label}</label>
+    <div className="relative grid gap-1" ref={wrapperRef}>
+      <label className="text-sm font-semibold text-neutral-900">{label}</label>
 
-        <button
-          type="button"
-          onClick={() => setOpen((prev) => !prev)}
-          className={[
-            "flex h-12 w-full items-center justify-between rounded-lg border bg-white px-4 text-sm transition-all",
-            error ? "border-red-300 focus:ring-red-100" : "border-neutral-200 focus:ring-neutral-200",
-            "hover:border-neutral-400 focus:border-neutral-900",
-          ].join(" ")}
-        >
-          <div className="flex min-w-0 items-center gap-3">
-            {withLogo && <FakeLogo label={selected?.label || "?"} />}
-            <span className="truncate">{selected?.label}</span>
-          </div>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={[
+          "flex h-11 w-full items-center justify-between rounded-lg border bg-white px-3.5 text-sm transition-all",
+          error ? "border-red-300 focus:ring-red-100" : "border-neutral-200 focus:ring-neutral-200",
+          "hover:border-neutral-400 focus:border-neutral-900",
+        ].join(" ")}
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          {withLogo && <FakeLogo label={selected?.label || "?"} />}
+          <span className="truncate">{selected?.label}</span>
+        </div>
+        <svg className="h-4 w-4 text-neutral-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
 
-          <span className="text-neutral-400">⌄</span>
-        </button>
+      <FieldError message={error} />
 
-        <FieldError message={error} />
-
-        {open && (
-          <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl">
-            {searchable && (
-              <div className="border-b p-3">
-                <input
-                  placeholder="Buscar..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm outline-none focus:border-neutral-900"
-                />
-              </div>
-            )}
-
-            <div className="max-h-60 overflow-auto">
-              {filtered.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => {
-                    setValue(option.value);
-                    setOpen(false);
-                    setSearch("");
-                  }}
-                  className={`flex w-full items-center gap-3 px-4 py-3 text-sm transition ${
-                    option.value === value ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
-                  }`}
-                >
-                  {withLogo && <FakeLogo label={option.label} dark={option.value !== value} />}
-                  <span className="truncate">{option.label}</span>
-                </button>
-              ))}
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl">
+          {searchable && (
+            <div className="border-b p-3">
+              <input
+                placeholder="Buscar..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm outline-none focus:border-neutral-900"
+              />
             </div>
+          )}
+
+          <div className="max-h-60 overflow-auto">
+            {filtered.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  setValue(option.value);
+                  setOpen(false);
+                  setSearch("");
+                }}
+                className={`flex w-full items-center gap-3 px-4 py-3 text-sm transition ${
+                  option.value === value ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
+                }`}
+              >
+                {withLogo && <FakeLogo label={option.label} dark={option.value !== value} />}
+                <span className="truncate">{option.label}</span>
+              </button>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function FormModal({
+  title,
+  subtitle,
+  children,
+  footer,
+  onClose,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  footer: ReactNode;
+  onClose: () => void;
+}) {
+  return (
+    <div className="w-full max-w-xl overflow-visible rounded-2xl bg-white shadow-2xl">
+      <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-6 py-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-900">{title}</h1>
+            {subtitle && <p className="mt-0.5 text-sm text-neutral-500">{subtitle}</p>}
+          </div>
+
+          <button
+            type="button"
+            aria-label="Fechar"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div className="grid gap-2 px-6 pt-6 pb-8">{children}</div>
+
+      <div className="border-t px-6 py-4">{footer}</div>
+    </div>
+  );
+}
+
+function FormRow({ children, cols = 2 }: { children: ReactNode; cols?: 2 | 3 }) {
+  return <div className={`grid gap-1.5 ${cols === 3 ? "grid-cols-3" : "grid-cols-2"}`}>{children}</div>;
 }
 
 export default function ListaFormasPagamento() {
@@ -278,7 +364,7 @@ export default function ListaFormasPagamento() {
   }, [tab, allData]);
 
   const errors = {
-    nome: !form?.nome?.trim() ? "Informe o nome da forma de pagamento." : "",
+    nome: !form?.nome ? "Informe o nome da forma de pagamento." : "",
     taxa: form === null || Number.isNaN(Number(form.taxa)) ? "Informe uma taxa válida." : "",
   };
 
@@ -329,7 +415,7 @@ export default function ListaFormasPagamento() {
 
     setShowErrors(true);
 
-    if (!form.nome.trim()) return;
+    if (!form.nome) return;
     if (Number.isNaN(Number(form.taxa))) return;
 
     if (modal?.type === "new") {
@@ -409,19 +495,19 @@ export default function ListaFormasPagamento() {
       key: "nome",
       label: "Nome",
       pinned: true,
-      render: (v, row) => (
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center">
-            {logoMap[row.logo] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
-          </div>
-          <span className="font-medium">{v}</span>
-        </div>
-      ),
+      render: (v) => <span className="font-medium">{getNomeLabel(v as NomeFormaPagamento)}</span>,
     },
     {
       key: "tipo",
       label: "Bandeira da Máquina",
-      render: (v) => getBandeiraLabel(v as BandeiraMaquina),
+      render: (v, row) => (
+        <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center">
+            {logoMap[row.logo] || <CreditCard className="h-5 w-5 text-muted-foreground" />}
+          </div>
+          <span>{getBandeiraLabel(v as BandeiraMaquina)}</span>
+        </div>
+      ),
     },
     {
       key: "taxa",
@@ -519,170 +605,120 @@ export default function ListaFormasPagamento() {
       />
 
       <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="w-full max-w-none border-0 bg-transparent p-0 shadow-none">
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none">
           {form && (
-            <div className="flex items-end justify-center p-3 sm:items-center sm:p-8">
-              <div className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-w-3xl max-h-[calc(100vh-24px)] sm:max-h-[calc(100vh-64px)]">
-                <div className="relative shrink-0 border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-5 py-5 sm:px-8 sm:py-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h1 className="text-2xl font-semibold text-neutral-900">
-                        {modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}
-                      </h1>
-                      <p className="mt-1 text-sm text-neutral-500">Escolha e configure uma forma de pagamento.</p>
-                    </div>
-
-                    <button
-                      type="button"
-                      aria-label="Fechar"
-                      onClick={closeModal}
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
-                    >
-                      ✕
-                    </button>
-                  </div>
+            <FormModal
+              title={modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}
+              subtitle="Escolha e configure uma forma de pagamento."
+              onClose={closeModal}
+              footer={
+                <div className="flex">
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 active:scale-[0.98]"
+                  >
+                    Salvar
+                  </button>
                 </div>
+              }
+            >
+              <Dropdown
+                label="Nome"
+                value={form.nome}
+                setValue={(value) =>
+                  setForm({
+                    ...form,
+                    nome: value as NomeFormaPagamento,
+                  })
+                }
+                options={nomeOptions}
+                error={showErrors ? errors.nome : ""}
+              />
 
-                <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-7">
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-neutral-900">Nome</label>
-                      <input
-                        value={form.nome}
-                        onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                        placeholder="Digite a forma de pagamento"
-                        className={[
-                          "h-12 w-full rounded-lg border px-4 text-sm outline-none transition-all bg-white",
-                          showErrors && errors.nome
-                            ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
-                            : "border-neutral-200 focus:border-neutral-900 focus:ring-4 focus:ring-neutral-200",
-                        ].join(" ")}
-                      />
-                      <FieldError message={showErrors ? errors.nome : ""} />
-                    </div>
+              <Dropdown
+                label="Bandeira da Máquina"
+                value={form.tipo}
+                setValue={(value) => handleBandeiraChange(value as BandeiraMaquina)}
+                options={bandeiraOptions}
+                searchable
+                withLogo
+              />
 
-                    <Dropdown
-                      label="Bandeira da Máquina"
-                      value={form.tipo}
-                      setValue={(value) => handleBandeiraChange(value as BandeiraMaquina)}
-                      options={bandeiraOptions}
-                      searchable
-                      withLogo
-                    />
+              <FormRow cols={3}>
+                <TextField
+                  label="Taxa"
+                  value={Number.isNaN(form.taxa) ? "" : String(form.taxa)}
+                  onChange={(value) => {
+                    const raw = value.replace(",", ".");
+                    setForm({
+                      ...form,
+                      taxa: raw === "" ? Number.NaN : Number(raw),
+                    });
+                  }}
+                  placeholder="0,00"
+                  error={showErrors ? errors.taxa : ""}
+                />
 
-                    <div className="space-y-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-neutral-900">Taxa</label>
-                        <input
-                          value={Number.isNaN(form.taxa) ? "" : String(form.taxa)}
-                          onChange={(e) => {
-                            const raw = e.target.value.replace(",", ".");
-                            setForm({
-                              ...form,
-                              taxa: raw === "" ? Number.NaN : Number(raw),
-                            });
-                          }}
-                          placeholder="0,00"
-                          className={[
-                            "h-12 w-full rounded-lg border px-4 text-sm outline-none transition-all bg-white",
-                            showErrors && errors.taxa
-                              ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
-                              : "border-neutral-200 focus:border-neutral-900 focus:ring-4 focus:ring-neutral-200",
-                          ].join(" ")}
-                        />
-                        <FieldError message={showErrors ? errors.taxa : ""} />
-                      </div>
+                <Dropdown
+                  label="Destino"
+                  value={form.destino}
+                  setValue={(value) =>
+                    setForm({
+                      ...form,
+                      destino: value as DestinoFormaPagamento,
+                    })
+                  }
+                  options={destinoOptions}
+                />
 
-                      <Dropdown
-                        label="Destino"
-                        value={form.destino}
-                        setValue={(value) =>
-                          setForm({
-                            ...form,
-                            destino: value as DestinoFormaPagamento,
-                          })
-                        }
-                        options={destinoOptions}
-                      />
-                    </div>
-
-                    <Dropdown
-                      label="Dias para Receber"
-                      value={form.tempoParaCair}
-                      setValue={(value) =>
-                        setForm({
-                          ...form,
-                          tempoParaCair: value as DiasReceber,
-                        })
-                      }
-                      options={diasReceberOptions}
-                    />
-                  </div>
-                </div>
-
-                <div className="shrink-0 border-t px-5 py-5 sm:px-8 sm:py-5">
-                  <div className="flex flex-col gap-3">
-                    <button
-                      type="button"
-                      onClick={closeModal}
-                      className="h-11 w-full rounded-lg border border-neutral-300 px-5 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-400 hover:bg-neutral-100 active:scale-[0.98]"
-                    >
-                      Cancelar
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleSave}
-                      className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 active:scale-[0.98]"
-                    >
-                      Salvar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+                <Dropdown
+                  label="Dias para Receber"
+                  value={form.tempoParaCair}
+                  setValue={(value) =>
+                    setForm({
+                      ...form,
+                      tempoParaCair: value as DiasReceber,
+                    })
+                  }
+                  options={diasReceberOptions}
+                />
+              </FormRow>
+            </FormModal>
           )}
         </DialogContent>
       </Dialog>
 
       <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="w-full max-w-none border-0 bg-transparent p-0 shadow-none">
-          <div className="flex items-end justify-center p-3 sm:items-center sm:p-8">
-            <div className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-w-xl max-h-[calc(100vh-24px)] sm:max-h-[calc(100vh-64px)]">
-              <div className="shrink-0 border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-5 py-5 sm:px-8 sm:py-6">
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none">
+          <div className="flex min-h-screen items-center justify-center bg-neutral-950/95 p-5">
+            <div className="w-full max-w-xl overflow-visible rounded-2xl bg-white shadow-2xl">
+              <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-6 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h1 className="text-2xl font-semibold text-neutral-900">Excluir forma de pagamento</h1>
-                    <p className="mt-1 text-sm text-neutral-500">Essa ação não poderá ser desfeita.</p>
+                    <p className="mt-0.5 text-sm text-neutral-500">Essa ação não poderá ser desfeita.</p>
                   </div>
 
                   <button
                     type="button"
                     aria-label="Fechar"
                     onClick={closeModal}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
                   >
                     ✕
                   </button>
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-7">
+              <div className="grid gap-2 px-6 pt-6 pb-8">
                 <p className="text-sm text-neutral-700">
-                  {modal?.type === "delete" ? `Deseja excluir "${modal.item.nome}"?` : ""}
+                  {modal?.type === "delete" ? `Deseja excluir "${getNomeLabel(modal.item.nome)}"?` : ""}
                 </p>
               </div>
 
-              <div className="shrink-0 border-t px-5 py-5 sm:px-8 sm:py-5">
-                <div className="flex flex-col gap-3">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="h-11 w-full rounded-lg border border-neutral-300 px-5 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-400 hover:bg-neutral-100 active:scale-[0.98]"
-                  >
-                    Cancelar
-                  </button>
-
+              <div className="border-t px-6 py-4">
+                <div className="flex">
                   <button
                     type="button"
                     onClick={handleConfirmDelete}
