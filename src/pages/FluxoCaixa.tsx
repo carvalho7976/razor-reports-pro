@@ -241,19 +241,19 @@ export default function FluxoCaixa() {
       key: "abertura",
       label: "Abertura",
       align: "right",
-      render: (v: number) => <span className="text-primary">{R$(v)}</span>,
+      render: (v: number) => <span className="text-blue-600">{R$(v)}</span>,
     },
     {
       key: "adicao",
       label: "Adição",
       align: "right",
-      render: (v: number) => <span className="text-primary">{R$(v)}</span>,
+      render: (v: number) => <span className="text-blue-600">{R$(v)}</span>,
     },
     {
       key: "entrada",
       label: "Entrada",
       align: "right",
-      render: (v: number) => <span className="text-primary">{R$(v)}</span>,
+      render: (v: number) => <span className="text-blue-600">{R$(v)}</span>,
     },
     {
       key: "saida",
@@ -278,7 +278,7 @@ export default function FluxoCaixa() {
       label: "Saldo",
       align: "right",
       render: (v: number) => (
-        <span className={`font-bold ${v >= 0 ? "text-primary" : "text-destructive"}`}>
+        <span className={`font-bold ${v > 0 ? "text-blue-600" : v < 0 ? "text-destructive" : "text-muted-foreground"}`}>
           {v < 0 ? "-" : ""}
           {R$(Math.abs(v))}
         </span>
