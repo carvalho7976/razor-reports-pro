@@ -909,6 +909,7 @@ export default function ListaFormasPagamento() {
     <AppLayout>
       <DataTable
         title="Formas de Pagamento"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={data}
         columns={columns}
         selectable
