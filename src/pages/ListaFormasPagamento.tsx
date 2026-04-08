@@ -933,8 +933,7 @@ export default function ListaFormasPagamento() {
           {form && (
             <FormModal
               title={modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}
-              subtitleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
-        title="Escolha e configure uma forma de pagamento."
+              subtitle="Escolha e configure uma forma de pagamento."
               onClose={closeModal}
               footer={
                 <div className="flex">
