@@ -79,6 +79,8 @@
     --accent-foreground: 0 0% 8%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 100%;
+    --novo-btn: 0 0% 90%;
+    --novo-btn-foreground: 0 0% 8%;
     --border: 0 0% 18%;
     --input: 0 0% 18%;
     --ring: 0 78% 55%;
@@ -92,6 +94,12 @@
     --sidebar-ring: 0 78% 55%;
     --header-bg: 0 0% 4%;
     --header-fg: 0 0% 90%;
+    --success: 145 55% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 207 85% 50%;
+    --info-foreground: 0 0% 100%;
     --table-header: 0 0% 20%;
     --table-header-foreground: 0 0% 90%;
     --table-row-hover: 0 0% 8%;
