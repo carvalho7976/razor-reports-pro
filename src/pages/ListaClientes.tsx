@@ -193,6 +193,7 @@ const data: Cliente[] = [
 export default function ListaClientes() {
   const [activeTab, setActiveTab] = useState("todos");
   const [allData] = useState(data);
+  const [aulaOpen, setAulaOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
