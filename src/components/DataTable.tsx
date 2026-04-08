@@ -1313,7 +1313,8 @@ export function DataTable<T extends Record<string, any>>({
             );
           })}
         </div>
-      )}
+        );
+      })()}
 
       {/* Slot between cards and tabs */}
       {slotBetweenCardsAndTabs}
