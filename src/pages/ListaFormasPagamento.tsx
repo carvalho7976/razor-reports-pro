@@ -1010,8 +1010,8 @@ export default function ListaFormasPagamento() {
       </Dialog>
 
       <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none">
-          <div className="flex min-h-screen items-center justify-center bg-neutral-950/95 p-5">
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <div className="flex min-h-screen items-center justify-center p-5">
             <div className="w-full max-w-xl overflow-visible rounded-2xl bg-white shadow-2xl">
               <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-6 py-4">
                 <div className="flex items-start justify-between gap-4">
