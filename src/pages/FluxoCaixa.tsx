@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { User, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface FluxoItem {
@@ -188,7 +186,6 @@ function FormasPagamentoCarousel() {
 }
 
 export default function FluxoCaixa() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("detalhado");
 
   const totalEntrada = initialData.filter((d) => d.valor > 0).reduce((s, r) => s + r.valor, 0);
@@ -325,7 +322,6 @@ export default function FluxoCaixa() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Fluxo de Caixa"
         data={tab === "detalhado" ? (initialData as any[]) : (resumidoData as any[])}
         columns={tab === "detalhado" ? (columnsDetalhado as any) : (columnsResumido as any)}
@@ -338,7 +334,6 @@ export default function FluxoCaixa() {
         pageSize={15}
         tableId="fluxo_caixa"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

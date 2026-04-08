@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, CreditCard, Hash } from "lucide-react";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface ProdutoResumido { id: number; nome: string; categoria: string; quantidade: number; valor: number; qtdVendaExtra: number; vendaExtra: number; desconto: number; data: string; }
@@ -28,7 +26,6 @@ const detalhadoData: ProdutoDetalhado[] = [
 ];
 
 export default function RelatorioProdutos() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("resumido");
 
   const totalQtd = resumidoData.reduce((s, r) => s + r.quantidade, 0) + resumidoData.reduce((s, r) => s + r.qtdVendaExtra, 0);
@@ -92,7 +89,6 @@ export default function RelatorioProdutos() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Relatório de Produtos"
         data={tab === "resumido" ? resumidoData as any[] : detalhadoData as any[]}
         columns={tab === "resumido" ? columnsResumido as any : columnsDetalhado as any}
@@ -104,7 +100,6 @@ export default function RelatorioProdutos() {
         showDateFilter={true}
         tableId="relatorio_produtos"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

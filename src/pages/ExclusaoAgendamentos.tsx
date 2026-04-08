@@ -4,8 +4,6 @@ import { DataTable, Column, SelectionAction } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 interface Exclusao {
   id: number;
@@ -26,7 +24,6 @@ const initialData: Exclusao[] = [
 ];
 
 export default function ExclusaoAgendamentos() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
@@ -69,9 +66,7 @@ export default function ExclusaoAgendamentos() {
 
   return (
     <AppLayout>
-      <DataTable titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
-        title="Exclusão de Agendamentos" data={allData} columns={columns} showDateFilter={true} selectable selectionActions={selectionActions} pageSize={15} tableId="exclusao_agendamentos" />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
+      <DataTable title="Exclusão de Agendamentos" data={allData} columns={columns} showDateFilter={true} selectable selectionActions={selectionActions} pageSize={15} tableId="exclusao_agendamentos" />
     </AppLayout>
   );
 }

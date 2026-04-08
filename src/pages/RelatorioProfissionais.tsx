@@ -3,7 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, CreditCard, Hash } from "lucide-react";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -13,7 +12,10 @@ interface RelProf {
   totalServicos: number;
   qtdServicos: number;
   ticketMedio: number;
+  clientesAtendidos: number;
   tempoTrabalhado: string;
+  totalProdutos: number;
+  qtdProdutos: number;
   qtdVendaExtra: number;
   vendaExtra: number;
   totalAberto: number;
@@ -28,99 +30,300 @@ interface ProfDetalhado {
   valor: number;
   vendaExtra: number;
   data: string;
-  clientesAtendidos: number;
-  totalProdutos: number;
-  qtdProdutos: number;
 }
 
 const resumidoData: RelProf[] = [
-  { profissional: "Cesar", funcao: "Gerente", totalServicos: 895, qtdServicos: 16, ticketMedio: 55.94, tempoTrabalhado: "575 min", qtdVendaExtra: 2, vendaExtra: 80, totalAberto: 641.25 },
-  { profissional: "Claudia", funcao: "Profissional", totalServicos: 922, qtdServicos: 20, ticketMedio: 46.1, tempoTrabalhado: "990 min", qtdVendaExtra: 5, vendaExtra: 200, totalAberto: 448.55 },
-  { profissional: "Fila de espera", funcao: "Recepção", totalServicos: 0, qtdServicos: 0, ticketMedio: 0, tempoTrabalhado: "0 min", qtdVendaExtra: 0, vendaExtra: 0, totalAberto: 0 },
-  { profissional: "Henrique", funcao: "Recepção", totalServicos: 0, qtdServicos: 0, ticketMedio: 0, tempoTrabalhado: "0 min", qtdVendaExtra: 0, vendaExtra: 0, totalAberto: 0 },
-  { profissional: "Lara", funcao: "Frizzar", totalServicos: 0, qtdServicos: 0, ticketMedio: 0, tempoTrabalhado: "0 min", qtdVendaExtra: 0, vendaExtra: 0, totalAberto: 0 },
-  { profissional: "Marcia Silva", funcao: "Assistente", totalServicos: 510, qtdServicos: 9, ticketMedio: 56.67, tempoTrabalhado: "300 min", qtdVendaExtra: 1, vendaExtra: 30, totalAberto: 200 },
-  { profissional: "Matheus", funcao: "Profissional", totalServicos: 290, qtdServicos: 6, ticketMedio: 48.33, tempoTrabalhado: "210 min", qtdVendaExtra: 0, vendaExtra: 0, totalAberto: 330 },
-  { profissional: "Ramon", funcao: "Caixa", totalServicos: 0, qtdServicos: 0, ticketMedio: 0, tempoTrabalhado: "0 min", qtdVendaExtra: 0, vendaExtra: 0, totalAberto: 0 },
-  { profissional: "Vini", funcao: "Auxiliar", totalServicos: 0, qtdServicos: 0, ticketMedio: 0, tempoTrabalhado: "0 min", qtdVendaExtra: 0, vendaExtra: 0, totalAberto: 360.72 },
+  {
+    profissional: "Cesar",
+    funcao: "Gerente",
+    totalServicos: 895,
+    qtdServicos: 16,
+    ticketMedio: 55.94,
+    clientesAtendidos: 7,
+    tempoTrabalhado: "575 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 2,
+    vendaExtra: 80,
+    totalAberto: 641.25,
+  },
+  {
+    profissional: "Claudia",
+    funcao: "Profissional",
+    totalServicos: 922,
+    qtdServicos: 20,
+    ticketMedio: 46.1,
+    clientesAtendidos: 9,
+    tempoTrabalhado: "990 min",
+    totalProdutos: 920.6,
+    qtdProdutos: 41,
+    qtdVendaExtra: 5,
+    vendaExtra: 200,
+    totalAberto: 448.55,
+  },
+  {
+    profissional: "Fila de espera",
+    funcao: "Recepção",
+    totalServicos: 0,
+    qtdServicos: 0,
+    ticketMedio: 0,
+    clientesAtendidos: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+  },
+  {
+    profissional: "Henrique",
+    funcao: "Recepção",
+    totalServicos: 0,
+    qtdServicos: 0,
+    ticketMedio: 0,
+    clientesAtendidos: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+  },
+  {
+    profissional: "Lara",
+    funcao: "Frizzar",
+    totalServicos: 0,
+    qtdServicos: 0,
+    ticketMedio: 0,
+    clientesAtendidos: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+  },
+  {
+    profissional: "Marcia Silva",
+    funcao: "Assistente",
+    totalServicos: 510,
+    qtdServicos: 9,
+    ticketMedio: 56.67,
+    clientesAtendidos: 3,
+    tempoTrabalhado: "300 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 1,
+    vendaExtra: 30,
+    totalAberto: 200,
+  },
+  {
+    profissional: "Matheus",
+    funcao: "Profissional",
+    totalServicos: 290,
+    qtdServicos: 6,
+    ticketMedio: 48.33,
+    clientesAtendidos: 2,
+    tempoTrabalhado: "210 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 0,
+    vendaExtra: 0,
+    totalAberto: 330,
+  },
+  {
+    profissional: "Ramon",
+    funcao: "Caixa",
+    totalServicos: 0,
+    qtdServicos: 0,
+    ticketMedio: 0,
+    clientesAtendidos: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+  },
+  {
+    profissional: "Vini",
+    funcao: "Auxiliar",
+    totalServicos: 0,
+    qtdServicos: 0,
+    ticketMedio: 0,
+    clientesAtendidos: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    qtdProdutos: 0,
+    qtdVendaExtra: 0,
+    vendaExtra: 0,
+    totalAberto: 360.72,
+  },
 ];
 
 const detalhadoData: ProfDetalhado[] = [
-  { id: 1, profissional: "Cesar", servico: "Corte Masculino", cliente: "João Silva", celular: "(41) 99123-4567", valor: 50, vendaExtra: 10, data: "05/04/2026", clientesAtendidos: 7, totalProdutos: 0, qtdProdutos: 0 },
-  { id: 2, profissional: "Claudia", servico: "Escova", cliente: "Maria Santos", celular: "(41) 98765-4321", valor: 80, vendaExtra: 20, data: "05/04/2026", clientesAtendidos: 9, totalProdutos: 920.6, qtdProdutos: 41 },
-  { id: 3, profissional: "Cesar", servico: "Barba", cliente: "Pedro Oliveira", celular: "(41) 99876-5432", valor: 35, vendaExtra: 0, data: "04/04/2026", clientesAtendidos: 7, totalProdutos: 0, qtdProdutos: 0 },
-  { id: 4, profissional: "Claudia", servico: "Coloração", cliente: "Ana Costa", celular: "(41) 99654-3210", valor: 200, vendaExtra: 50, data: "04/04/2026", clientesAtendidos: 9, totalProdutos: 920.6, qtdProdutos: 41 },
-  { id: 5, profissional: "Marcia Silva", servico: "Hidratação", cliente: "Carla Dias", celular: "", valor: 120, vendaExtra: 30, data: "03/04/2026", clientesAtendidos: 3, totalProdutos: 0, qtdProdutos: 0 },
+  {
+    id: 1,
+    profissional: "Cesar",
+    servico: "Corte Masculino",
+    cliente: "João Silva",
+    celular: "(41) 99123-4567",
+    valor: 50,
+    vendaExtra: 10,
+    data: "05/04/2026",
+  },
+  {
+    id: 2,
+    profissional: "Claudia",
+    servico: "Escova",
+    cliente: "Maria Santos",
+    celular: "(41) 98765-4321",
+    valor: 80,
+    vendaExtra: 20,
+    data: "05/04/2026",
+  },
+  {
+    id: 3,
+    profissional: "Cesar",
+    servico: "Barba",
+    cliente: "Pedro Oliveira",
+    celular: "(41) 99876-5432",
+    valor: 35,
+    vendaExtra: 0,
+    data: "04/04/2026",
+  },
+  {
+    id: 4,
+    profissional: "Claudia",
+    servico: "Coloração",
+    cliente: "Ana Costa",
+    celular: "(41) 99654-3210",
+    valor: 200,
+    vendaExtra: 50,
+    data: "04/04/2026",
+  },
+  {
+    id: 5,
+    profissional: "Marcia Silva",
+    servico: "Hidratação",
+    cliente: "Carla Dias",
+    celular: "",
+    valor: 120,
+    vendaExtra: 30,
+    data: "03/04/2026",
+  },
 ];
 
 export default function RelatorioProfissionais() {
   const [tab, setTab] = useState("resumido");
-  const [aulaOpen, setAulaOpen] = useState(false);
 
   const totalServicos = resumidoData.reduce((s, r) => s + r.totalServicos, 0);
   const totalQtd = resumidoData.reduce((s, r) => s + r.qtdServicos, 0);
   const totalVendaExtra = resumidoData.reduce((s, r) => s + r.vendaExtra, 0);
   const activeProfs = resumidoData.filter((d) => d.qtdServicos > 0);
-  const avgTicket = activeProfs.length > 0 ? activeProfs.reduce((s, r) => s + r.ticketMedio, 0) / activeProfs.length : 0;
+  const avgTicket =
+    activeProfs.length > 0 ? activeProfs.reduce((s, r) => s + r.ticketMedio, 0) / activeProfs.length : 0;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(totalQtd), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
-    { label: "Ticket Médio", value: R$(avgTicket), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
-    { label: "Valor", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-    { label: "Venda Assinantes", value: R$(totalVendaExtra), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    {
+      label: "Total",
+      value: String(totalQtd),
+      type: "quantity",
+      icon: <Hash className="h-4 w-4" />,
+      size: "compact",
+      color: "blue",
+    },
+    {
+      label: "Ticket Médio",
+      value: R$(avgTicket),
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "blue",
+    },
+    {
+      label: "Valor",
+      value: R$(totalServicos),
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "green",
+    },
+    {
+      label: "Venda Assinantes",
+      value: R$(totalVendaExtra),
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "green",
+    },
   ];
 
-  // Resumido: overview columns (no clientes atendidos, no produtos)
   const columnsResumido: Column<RelProf>[] = [
     {
-      key: "profissional", label: "Nome", pinned: true,
+      key: "profissional",
+      label: "Nome",
+      pinned: true,
       render: (v) => (
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
-    { key: "funcao", label: "Função", render: (v) => <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground">{v}</span> },
+    {
+      key: "funcao",
+      label: "Função",
+      render: (v) => (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground">
+          {v}
+        </span>
+      ),
+    },
     { key: "totalServicos", label: "Total em Serviços", align: "right", render: (v) => R$(v) },
     { key: "qtdServicos", label: "Quantidade", align: "center" },
     { key: "ticketMedio", label: "Ticket Médio", align: "right", render: (v) => R$(v) },
+    { key: "clientesAtendidos", label: "Clientes atendidos", align: "center" },
     { key: "tempoTrabalhado", label: "Tempo Trabalhado", align: "center" },
     { key: "qtdVendaExtra", label: "Quantidade Assinantes", align: "center" },
     { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: (v) => R$(v) },
+    { key: "totalProdutos", label: "Total em Produtos", align: "right", render: (v) => R$(v) },
+    { key: "qtdProdutos", label: "Qtd Produtos", align: "center" },
     { key: "totalAberto", label: "Total em aberto", align: "right", render: (v) => R$(v) },
   ];
 
-  // Detalhado: individual transactions with clientes atendidos & produtos
   const columnsDetalhado: Column<ProfDetalhado>[] = [
     {
-      key: "profissional", label: "Profissional", pinned: true,
+      key: "profissional",
+      label: "Profissional",
+      pinned: true,
       render: (v) => (
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
     { key: "servico", label: "Serviço" },
     {
-      key: "cliente", label: "Cliente",
+      key: "cliente",
+      label: "Cliente",
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.celular} nome={row.cliente} />
-          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/clientePesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
-    { key: "clientesAtendidos", label: "Clientes Atendidos", align: "center" },
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: (v) => R$(v) },
-    { key: "totalProdutos", label: "Total em Produtos", align: "right", render: (v) => R$(v) },
-    { key: "qtdProdutos", label: "Qtd Produtos", align: "center" },
     { key: "data", label: "Data" },
   ];
 
@@ -129,9 +332,12 @@ export default function RelatorioProfissionais() {
     totalServicos: R$(totalServicos),
     qtdServicos: totalQtd,
     ticketMedio: R$(avgTicket),
+    clientesAtendidos: resumidoData.reduce((s, r) => s + r.clientesAtendidos, 0),
     tempoTrabalhado: `${resumidoData.reduce((s, r) => s + parseInt(r.tempoTrabalhado), 0)} min`,
     qtdVendaExtra: resumidoData.reduce((s, r) => s + r.qtdVendaExtra, 0),
     vendaExtra: R$(totalVendaExtra),
+    totalProdutos: R$(resumidoData.reduce((s, r) => s + r.totalProdutos, 0)),
+    qtdProdutos: resumidoData.reduce((s, r) => s + r.qtdProdutos, 0),
     totalAberto: R$(resumidoData.reduce((s, r) => s + r.totalAberto, 0)),
   };
 
@@ -144,7 +350,6 @@ export default function RelatorioProfissionais() {
     <AppLayout>
       <DataTable
         title="Relatório Profissional"
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         data={tab === "resumido" ? (resumidoData as any[]) : (detalhadoData as any[])}
         columns={tab === "resumido" ? (columnsResumido as any) : (columnsDetalhado as any)}
         summaryCards={summaryCards}
@@ -156,7 +361,6 @@ export default function RelatorioProfissionais() {
         showDateFilter={true}
         tableId={tab === "resumido" ? "relatorio_profissionais_resumido" : "relatorio_profissionais_detalhado"}
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

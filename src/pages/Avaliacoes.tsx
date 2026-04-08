@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, Star } from "lucide-react";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 interface Avaliacao { id: number; cliente: string; celular: string; profissional: string; servico: string; nota: number; comentario: string; data: string; }
 
@@ -19,7 +17,6 @@ const initialData: Avaliacao[] = [
 ];
 
 export default function Avaliacoes() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("detalhado");
 
   const notaEmpresa = Math.round(initialData.reduce((s, r) => s + r.nota, 0) / initialData.length * 10) / 10;
@@ -117,7 +114,6 @@ export default function Avaliacoes() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Avaliações"
         data={tab === "resumido" ? resumidoData : initialData}
         columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
@@ -129,7 +125,6 @@ export default function Avaliacoes() {
         pageSize={15}
         tableId="avaliacoes"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

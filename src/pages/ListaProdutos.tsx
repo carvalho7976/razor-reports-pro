@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef, SummaryCard } from "@/components/DataTable";
 import { Trash2, Pencil, Package, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -86,7 +84,6 @@ const initialData: Produto[] = [
 ];
 
 export default function ListaProdutos() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
@@ -188,7 +185,6 @@ export default function ListaProdutos() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Produtos"
         data={data}
         columns={columns}
@@ -203,7 +199,6 @@ export default function ListaProdutos() {
         pageSize={15}
         tableId="lista_produtos"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

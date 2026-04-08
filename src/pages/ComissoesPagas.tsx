@@ -1,10 +1,7 @@
-import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User } from "lucide-react";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -61,11 +58,9 @@ const columns: Column<ComissaoPaga>[] = [
 ];
 
 export default function ComissoesPagas() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Comissões Pagas"
         data={data}
         columns={columns}
@@ -73,7 +68,6 @@ export default function ComissoesPagas() {
         showDateFilter={true}
         tableId="comissoes_pagas"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

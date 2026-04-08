@@ -4,8 +4,6 @@ import { DataTable, Column, SelectionAction, ActionsMenu } from "@/components/Da
 import { Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 const PALETTE = [
   "#ff2f2f",
@@ -75,7 +73,6 @@ const initialData: Categoria[] = [
 ];
 
 export default function ListaCategorias() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
@@ -130,7 +127,6 @@ export default function ListaCategorias() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Categorias"
         data={allData}
         columns={columns}
@@ -141,7 +137,6 @@ export default function ListaCategorias() {
         pageSize={15}
         tableId="lista_categorias"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

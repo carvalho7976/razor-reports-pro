@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
 import { Lock, Pencil, Trash2, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 interface Profissional {
   id: number;
@@ -42,7 +40,6 @@ const initialData: Profissional[] = [
 ];
 
 export default function ListaProfissionais() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData] = useState(initialData);
   const { toast } = useToast();
 
@@ -109,7 +106,6 @@ export default function ListaProfissionais() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Profissionais"
         data={allData}
         columns={columns}
@@ -120,7 +116,6 @@ export default function ListaProfissionais() {
         pageSize={15}
         tableId="lista_profissionais"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

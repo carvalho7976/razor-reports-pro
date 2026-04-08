@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { CheckCircle, XCircle, Pencil, Trash2, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -76,7 +74,6 @@ const initialData: Conta[] = [
 ];
 
 export default function ContasPagar() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("pendentes");
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
@@ -207,7 +204,6 @@ export default function ContasPagar() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Contas a Pagar"
         data={data}
         columns={columns}
@@ -223,7 +219,6 @@ export default function ContasPagar() {
         showDateFilter={true}
         tableId="contas_pagar"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

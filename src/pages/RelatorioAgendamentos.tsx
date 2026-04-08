@@ -4,8 +4,6 @@ import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/compo
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, Trash2, Hash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 interface Agendamento { id: number; cliente: string; celular: string; profissional: string; servico: string; data: string; horario: string; origem: string; valor: number; status: "Aberto" | "Realizado"; }
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -27,7 +25,6 @@ function parseDateTime(data: string, horario: string): number {
 }
 
 export default function RelatorioAgendamentos() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
@@ -104,9 +101,7 @@ export default function RelatorioAgendamentos() {
 
   return (
     <AppLayout>
-      <DataTable titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
-        title="Agendamentos" data={data} columns={columns} summaryCards={summaryCards} selectable selectionActions={selectionActions} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_agendamentos" />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
+      <DataTable title="Agendamentos" data={data} columns={columns} summaryCards={summaryCards} selectable selectionActions={selectionActions} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_agendamentos" />
     </AppLayout>
   );
 }

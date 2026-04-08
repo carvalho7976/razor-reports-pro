@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, CreditCard, Hash } from "lucide-react";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface ServicoResumido { id: number; nome: string; quantidade: number; valor: number; qtdVendaExtra: number; vendaExtra: number; desconto: number; data: string; }
@@ -28,7 +26,6 @@ const detalhadoData: ServicoDetalhado[] = [
 ];
 
 export default function RelatorioServicos() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("resumido");
 
   const avulsoQtd = resumidoData.reduce((s, r) => s + r.quantidade, 0);
@@ -91,7 +88,6 @@ export default function RelatorioServicos() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Relatório de Serviços"
         data={tab === "resumido" ? resumidoData as any[] : detalhadoData as any[]}
         columns={tab === "resumido" ? columnsResumido as any : columnsDetalhado as any}
@@ -103,7 +99,6 @@ export default function RelatorioServicos() {
         showDateFilter={true}
         tableId="relatorio_servicos"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

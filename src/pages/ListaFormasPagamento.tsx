@@ -7,8 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { createPortal } from "react-dom";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 type StatusFormaPagamento = "Ativo" | "Desativado";
 type DestinoFormaPagamento = "CAIXA" | "CONTA" | "NENHUM";
@@ -155,7 +153,7 @@ function FakeLogo({ label, dark = true }: { label: string; dark?: boolean }) {
     <div
       className={[
         "flex h-6 w-6 items-center justify-center rounded-md text-[11px] font-bold",
-        dark ? "bg-foreground text-background" : "bg-card/10 text-white",
+        dark ? "bg-neutral-900 text-white" : "bg-white/10 text-white",
       ].join(" ")}
     >
       {label?.[0] || "?"}
@@ -184,16 +182,16 @@ function TextField({
 }) {
   return (
     <div className="grid gap-1">
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+      <label className="text-sm font-semibold text-neutral-900">{label}</label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={[
-          "h-11 w-full rounded-lg border px-3.5 text-sm outline-none transition-all bg-card",
+          "h-11 w-full rounded-lg border px-3.5 text-sm outline-none transition-all bg-white",
           error
             ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
-            : "border-border focus:border-foreground focus:ring-4 focus:ring-border",
+            : "border-neutral-200 focus:border-neutral-900 focus:ring-4 focus:ring-neutral-200",
         ].join(" ")}
       />
       <FieldError message={error} />
@@ -243,22 +241,22 @@ function Dropdown({
 
   return (
     <div className="relative grid gap-1" ref={wrapperRef}>
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+      <label className="text-sm font-semibold text-neutral-900">{label}</label>
 
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className={[
-          "flex h-11 w-full items-center justify-between rounded-lg border bg-card px-3.5 text-sm transition-all",
-          error ? "border-red-300 focus:ring-red-100" : "border-border focus:ring-border",
-          "hover:border-neutral-400 focus:border-foreground",
+          "flex h-11 w-full items-center justify-between rounded-lg border bg-white px-3.5 text-sm transition-all",
+          error ? "border-red-300 focus:ring-red-100" : "border-neutral-200 focus:ring-neutral-200",
+          "hover:border-neutral-400 focus:border-neutral-900",
         ].join(" ")}
       >
         <div className="flex min-w-0 items-center gap-3">
           {withLogo && <FakeLogo label={selected?.label || "?"} />}
           <span className="truncate">{selected?.label}</span>
         </div>
-        <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg className="h-4 w-4 text-neutral-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
@@ -266,14 +264,14 @@ function Dropdown({
       <FieldError message={error} />
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl">
           {searchable && (
             <div className="border-b p-3">
               <input
                 placeholder="Buscar..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-10 w-full rounded-lg border border-border px-3 text-sm outline-none focus:border-foreground"
+                className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm outline-none focus:border-neutral-900"
               />
             </div>
           )}
@@ -289,7 +287,7 @@ function Dropdown({
                   setSearch("");
                 }}
                 className={`flex w-full items-center gap-3 px-4 py-3 text-sm transition ${
-                  option.value === value ? "bg-foreground text-background" : "hover:bg-muted"
+                  option.value === value ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"
                 }`}
               >
                 {withLogo && <FakeLogo label={option.label} dark={option.value !== value} />}
@@ -317,19 +315,19 @@ function FormModal({
   onClose: () => void;
 }) {
   return (
-    <div className="w-full max-w-xl overflow-visible rounded-2xl bg-card shadow-2xl">
-      <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted to-card px-6 py-4">
+    <div className="w-full max-w-xl overflow-visible rounded-2xl bg-white shadow-2xl">
+      <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
-            {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
+            <h1 className="text-2xl font-semibold text-neutral-900">{title}</h1>
+            {subtitle && <p className="mt-0.5 text-sm text-neutral-500">{subtitle}</p>}
           </div>
 
           <button
             type="button"
             aria-label="Fechar"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
           >
             ✕
           </button>
@@ -385,7 +383,7 @@ function InlineTextInput({
         if (e.key === "Enter") commit();
         if (e.key === "Escape") onCancel();
       }}
-      className="h-9 w-full rounded-md border border-border bg-card px-2.5 text-sm outline-none focus:border-foreground"
+      className="h-9 w-full rounded-md border border-neutral-300 bg-white px-2.5 text-sm outline-none focus:border-neutral-900"
     />
   );
 }
@@ -485,12 +483,12 @@ function InlineSelect({
             onCancel();
           }
         }}
-        className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-card px-3 text-sm text-foreground outline-none transition-colors hover:border-neutral-400 focus:border-foreground"
+        className="flex h-9 w-full items-center justify-between rounded-md border border-neutral-300 bg-white px-3 text-sm text-neutral-900 outline-none transition-colors hover:border-neutral-400 focus:border-neutral-900"
       >
         <span className="truncate">{selected?.label}</span>
 
         <svg
-          className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")}
+          className={cn("h-4 w-4 text-neutral-400 transition-transform", open && "rotate-180")}
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
@@ -504,7 +502,7 @@ function InlineSelect({
         createPortal(
           <div
             style={menuStyle}
-            className="overflow-hidden rounded-md border border-border bg-card shadow-[0_12px_32px_rgba(0,0,0,0.14)]"
+            className="overflow-hidden rounded-md border border-neutral-200 bg-white shadow-[0_12px_32px_rgba(0,0,0,0.14)]"
           >
             <div className="py-1">
               {options.map((option) => {
@@ -524,7 +522,7 @@ function InlineSelect({
                     }}
                     className={cn(
                       "flex w-full items-center px-3 py-2 text-left text-sm transition-colors",
-                      active ? "bg-foreground text-background" : "text-foreground hover:bg-muted",
+                      active ? "bg-neutral-900 text-white" : "text-neutral-800 hover:bg-neutral-100",
                     )}
                   >
                     {option.label}
@@ -540,7 +538,6 @@ function InlineSelect({
 }
 
 export default function ListaFormasPagamento() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState<FormaPagamento[]>(initialData);
   const [tab, setTab] = useState("todos");
   const [modal, setModal] = useState<ModalState>(null);
@@ -908,7 +905,6 @@ export default function ListaFormasPagamento() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Formas de Pagamento"
         data={data}
         columns={columns}
@@ -940,7 +936,7 @@ export default function ListaFormasPagamento() {
                   <button
                     type="button"
                     onClick={handleSave}
-                    className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-foreground/90 active:scale-[0.98]"
+                    className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 active:scale-[0.98]"
                   >
                     Salvar
                   </button>
@@ -1016,19 +1012,19 @@ export default function ListaFormasPagamento() {
       <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <div className="flex min-h-screen items-center justify-center p-5">
-            <div className="w-full max-w-xl overflow-visible rounded-2xl bg-card shadow-2xl">
-              <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted to-card px-6 py-4">
+            <div className="w-full max-w-xl overflow-visible rounded-2xl bg-white shadow-2xl">
+              <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-6 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl font-semibold text-foreground">Excluir forma de pagamento</h1>
-                    <p className="mt-0.5 text-sm text-muted-foreground">Essa ação não poderá ser desfeita.</p>
+                    <h1 className="text-2xl font-semibold text-neutral-900">Excluir forma de pagamento</h1>
+                    <p className="mt-0.5 text-sm text-neutral-500">Essa ação não poderá ser desfeita.</p>
                   </div>
 
                   <button
                     type="button"
                     aria-label="Fechar"
                     onClick={closeModal}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
                   >
                     ✕
                   </button>
@@ -1036,7 +1032,7 @@ export default function ListaFormasPagamento() {
               </div>
 
               <div className="grid gap-2 px-6 pt-6 pb-8">
-                <p className="text-sm text-foreground">
+                <p className="text-sm text-neutral-700">
                   {modal?.type === "delete" ? `Deseja excluir "${getNomeLabel(modal.item.nome)}"?` : ""}
                 </p>
               </div>
@@ -1059,7 +1055,6 @@ export default function ListaFormasPagamento() {
           </div>
         </DialogContent>
       </Dialog>
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

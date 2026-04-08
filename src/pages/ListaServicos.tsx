@@ -3,8 +3,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu } from "@/components/DataTable";
 import { Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-
 
 interface Servico {
   id: number;
@@ -28,7 +26,6 @@ const initialData: Servico[] = [
 ];
 
 export default function ListaServicos() {
-  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData] = useState(initialData);
   const { toast } = useToast();
 
@@ -58,7 +55,6 @@ export default function ListaServicos() {
   return (
     <AppLayout>
       <DataTable
-        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Serviços"
         data={allData}
         columns={columns}
@@ -69,7 +65,6 @@ export default function ListaServicos() {
         pageSize={15}
         tableId="lista_servicos"
       />
-      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }
