@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { User, CreditCard } from "lucide-react";
+import { cn } from "@/lib/utils";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface FluxoItem {
