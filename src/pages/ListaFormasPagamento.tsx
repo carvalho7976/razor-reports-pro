@@ -1059,6 +1059,12 @@ export default function ListaFormasPagamento() {
           </div>
         </DialogContent>
       </Dialog>
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Formas de Pagamento"
+      />
     </AppLayout>
   );
 }
