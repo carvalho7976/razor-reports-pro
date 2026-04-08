@@ -26,6 +26,23 @@ interface FluxoResumido {
   saldo: number;
 }
 
+const bandeiraMap: Record<string, string> = {
+  credito: "bg-blue-600",
+  debito: "bg-green-600",
+  pix: "bg-emerald-500",
+  dinheiro: "bg-neutral-500",
+  assinatura: "bg-purple-600",
+  frizzar_pack: "bg-orange-500",
+};
+
+function normalizeFP(label: string) {
+  return label
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+}
+
 const initialData: FluxoItem[] = [
   {
     id: 1,
@@ -147,7 +164,15 @@ function FormasPagamentoCarousel() {
       {formaPagCards.map((fp) => (
         <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px] shrink-0 bg-card">
           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-0.5">
-            <div className="h-2.5 w-2.5 rounded-full bg-muted" />
+            <div
+              className={cn(
+                "flex h-5 w-5 items-center justify-center rounded-md text-[10px] font-bold text-white",
+                bandeiraMap[normalizeFP(fp.label)] || "bg-neutral-400",
+              )}
+            >
+              {fp.label?.[0]}
+            </div>
+
             <span>{fp.label}</span>
           </div>
           <p className="text-sm font-medium">{fp.value}</p>
