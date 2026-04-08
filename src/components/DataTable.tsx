@@ -129,7 +129,7 @@ interface DataTableProps<T extends Record<string, any>> {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   showDateFilter?: boolean;
-  summaryCards?: SummaryCard[];
+  summaryCards?: SummaryCard[] | ((filteredData: T[]) => SummaryCard[]);
   pageSize?: number;
   selectable?: boolean;
   selectionActions?: SelectionAction[];
