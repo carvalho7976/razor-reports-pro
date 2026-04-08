@@ -16,23 +16,44 @@ interface Adiantamento {
 }
 
 const initialData: Adiantamento[] = [
-  { id: 1, data: "03/02/2026", profissional: "Cesar", valor: 100, status: "Em aberto", observacao: "Balm - Qtd: 1 - R$ 100.00 desconto" },
+  {
+    id: 1,
+    data: "03/02/2026",
+    profissional: "Cesar",
+    valor: 100,
+    status: "Em aberto",
+    observacao: "Balm - Qtd: 1 - R$ 100.00 desconto",
+  },
   { id: 2, data: "10/02/2026", profissional: "Claudia", valor: 20, status: "Devolvido", observacao: "Vale transporte" },
-  { id: 3, data: "15/02/2026", profissional: "Lara", valor: 100, status: "Em aberto", observacao: "Adiantamento salarial" },
+  {
+    id: 3,
+    data: "15/02/2026",
+    profissional: "Lara",
+    valor: 100,
+    status: "Em aberto",
+    observacao: "Adiantamento salarial",
+  },
   { id: 4, data: "20/02/2026", profissional: "Ramon", valor: 150, status: "Devolvido", observacao: "Vale alimentação" },
-  { id: 5, data: "01/03/2026", profissional: "Fila de espera", valor: 60, status: "Em aberto", observacao: "Produto desconto" },
+  {
+    id: 5,
+    data: "01/03/2026",
+    profissional: "Fila de espera",
+    valor: 60,
+    status: "Em aberto",
+    observacao: "Produto desconto",
+  },
 ];
 
 export default function Adiantamentos() {
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
-  const totalEmAberto = allData.filter(d => d.status === "Em aberto").reduce((s, r) => s + r.valor, 0);
-  const totalDevolvido = allData.filter(d => d.status === "Devolvido").reduce((s, r) => s + r.valor, 0);
+  const totalEmAberto = allData.filter((d) => d.status === "Em aberto").reduce((s, r) => s + r.valor, 0);
+  const totalDevolvido = allData.filter((d) => d.status === "Devolvido").reduce((s, r) => s + r.valor, 0);
 
   const bulkQuitar = (indices: number[]) => {
     const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
-    setAllData((prev) => prev.map((d) => ids.includes(d.id) ? { ...d, status: "Devolvido" } : d));
+    setAllData((prev) => prev.map((d) => (ids.includes(d.id) ? { ...d, status: "Devolvido" } : d)));
     toast({ title: `${ids.length} adiantamento(s) quitado(s)` });
   };
   const bulkDelete = (indices: number[]) => {
@@ -42,8 +63,19 @@ export default function Adiantamentos() {
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Quitar", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkQuitar, description: "Marca os adiantamentos selecionados como devolvidos" },
-    { label: "Deletar", icon: <Trash2 className="h-4 w-4" />, onClick: bulkDelete, variant: "destructive", description: "Remove permanentemente os adiantamentos selecionados" },
+    {
+      label: "Quitar",
+      icon: <CheckCircle className="h-4 w-4" />,
+      onClick: bulkQuitar,
+      description: "Marca os adiantamentos selecionados como devolvidos",
+    },
+    {
+      label: "Deletar",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkDelete,
+      variant: "destructive",
+      description: "Remove permanentemente os adiantamentos selecionados",
+    },
   ];
 
   const summaryCards: SummaryCard[] = [
@@ -54,20 +86,29 @@ export default function Adiantamentos() {
   const columns: Column<Adiantamento>[] = [
     { key: "data", label: "Data" },
     {
-      key: "profissional", label: "Profissional", pinned: true,
+      key: "profissional",
+      label: "Profissional",
+      pinned: true,
       render: (v) => (
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
-    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    { key: "valor", label: "Valor Adiantado", align: "right", render: (v) => R$(v) },
     {
-      key: "status", label: "Status",
-      render: (v) => <span className="font-medium" style={{ color: v === "Devolvido" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
+      key: "status",
+      label: "Status",
+      render: (v) => (
+        <span className="font-medium" style={{ color: v === "Devolvido" ? "#00c5b4" : "#ff2f2f" }}>
+          {v}
+        </span>
+      ),
     },
     { key: "observacao", label: "Observação" },
   ];
