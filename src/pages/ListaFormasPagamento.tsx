@@ -499,7 +499,7 @@ export default function ListaFormasPagamento() {
     },
     {
       key: "tipo",
-      label: "Bandeira da Máquina",
+      label: "Bandeira",
       render: (v, row) => (
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center">
@@ -638,7 +638,7 @@ export default function ListaFormasPagamento() {
               />
 
               <Dropdown
-                label="Bandeira da Máquina"
+                label="Bandeira"
                 value={form.tipo}
                 setValue={(value) => handleBandeiraChange(value as BandeiraMaquina)}
                 options={bandeiraOptions}
