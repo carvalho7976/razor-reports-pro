@@ -605,7 +605,8 @@ export default function ListaFormasPagamento() {
       />
 
       <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none">
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          {" "}
           {form && (
             <FormModal
               title={modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}
