@@ -72,9 +72,19 @@ export default function ComissoesPagar() {
     [tab, allData],
   );
 
-  const totalEmAberto = allData.filter((d) => d.status === "Em aberto").reduce((s, r) => s + r.totalPagar, 0);
-  const totalPagas = allData.filter((d) => d.status === "Pago").reduce((s, r) => s + r.totalComissoes, 0);
-  const totalAdiantamentos = allData.reduce((s, r) => s + r.totalAdiantamentos, 0);
+  const totalComissoesEmAberto = allData
+    .filter((d) => d.status === "Em aberto")
+    .reduce((s, r) => s + r.totalComissoes, 0);
+
+  const totalComissoesPagas = allData.filter((d) => d.status === "Pago").reduce((s, r) => s + r.totalComissoes, 0);
+
+  const totalAdiantamentosEmAberto = allData
+    .filter((d) => d.status === "Em aberto")
+    .reduce((s, r) => s + r.totalAdiantamentos, 0);
+
+  const totalAdiantamentosPagos = allData
+    .filter((d) => d.status === "Pago")
+    .reduce((s, r) => s + r.totalAdiantamentos, 0);
 
   const bulkPagar = (indices: number[]) => {
     const ids = indices.map((i) => data[i]?.id).filter(Boolean);
