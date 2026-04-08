@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { createPortal } from "react-dom";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+
 
 type StatusFormaPagamento = "Ativo" | "Desativado";
 type DestinoFormaPagamento = "CAIXA" | "CONTA" | "NENHUM";
@@ -538,6 +540,7 @@ function InlineSelect({
 }
 
 export default function ListaFormasPagamento() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState<FormaPagamento[]>(initialData);
   const [tab, setTab] = useState("todos");
   const [modal, setModal] = useState<ModalState>(null);
@@ -905,6 +908,7 @@ export default function ListaFormasPagamento() {
   return (
     <AppLayout>
       <DataTable
+        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Formas de Pagamento"
         data={data}
         columns={columns}
@@ -929,7 +933,8 @@ export default function ListaFormasPagamento() {
           {form && (
             <FormModal
               title={modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}
-              subtitle="Escolha e configure uma forma de pagamento."
+              subtitleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
+        title="Escolha e configure uma forma de pagamento."
               onClose={closeModal}
               footer={
                 <div className="flex">
@@ -1055,6 +1060,7 @@ export default function ListaFormasPagamento() {
           </div>
         </DialogContent>
       </Dialog>
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

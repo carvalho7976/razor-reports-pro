@@ -3,6 +3,8 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { User, CheckCircle, Printer, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -63,6 +65,7 @@ const initialData: Comissao[] = [
 ];
 
 export default function ComissoesPagar() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("em_aberto");
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
@@ -185,6 +188,7 @@ export default function ComissoesPagar() {
   return (
     <AppLayout>
       <DataTable
+        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Comissões"
         data={data}
         columns={columns}
@@ -199,6 +203,7 @@ export default function ComissoesPagar() {
         showDateFilter={true}
         tableId="comissoes_pagar"
       />
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

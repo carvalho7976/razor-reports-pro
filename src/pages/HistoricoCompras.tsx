@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
 import { User, CreditCard, Hash } from "lucide-react";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Produto {
@@ -60,6 +62,7 @@ const resumidoData: CompraResumida[] = [
 ];
 
 export default function HistoricoCompras() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("resumido");
 
   const totalProdutos = resumidoData.reduce((s, r) => s + r.produtos.reduce((ps, p) => ps + p.quantidade, 0), 0);
@@ -157,6 +160,7 @@ export default function HistoricoCompras() {
   return (
     <AppLayout>
       <DataTable
+        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Histórico de Compras"
         data={tab === "resumido" ? resumidoData : detalhadoData}
         columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
@@ -168,6 +172,7 @@ export default function HistoricoCompras() {
         showDateFilter={true}
         tableId="historico_compras"
       />
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }
