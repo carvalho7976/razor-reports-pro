@@ -3,6 +3,8 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, CreditCard, Hash } from "lucide-react";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Pacote { id: number; nome: string; cliente: string; celular: string; totalPacote: number; restam: number; valor: number; desconto: number; dataVenda: string; profissional: string; }
@@ -16,6 +18,7 @@ const initialData: Pacote[] = [
 ];
 
 export default function RelatorioPacotes() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("em_uso");
 
   const data = useMemo(() => {
@@ -76,7 +79,9 @@ export default function RelatorioPacotes() {
 
   return (
     <AppLayout>
-      <DataTable title="Relatório de Pacotes" data={data} columns={columns} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_pacotes" dateField="dataVenda" />
+      <DataTable titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
+        title="Relatório de Pacotes" data={data} columns={columns} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_pacotes" dateField="dataVenda" />
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

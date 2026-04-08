@@ -1,8 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction, TabDef, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Trash2, Merge, PlayCircle, Tag, MessageCircle, Pencil, Coins, CreditCard } from "lucide-react";
+import { Trash2, Merge, Tag, MessageCircle, Pencil, Coins, CreditCard } from "lucide-react";
 import { useState, useMemo } from "react";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { useToast } from "@/hooks/use-toast";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -192,6 +193,7 @@ const data: Cliente[] = [
 export default function ListaClientes() {
   const [activeTab, setActiveTab] = useState("todos");
   const [allData] = useState(data);
+  const [aulaOpen, setAulaOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
@@ -336,15 +338,7 @@ export default function ListaClientes() {
     <AppLayout>
       <DataTable
         title="Lista de Clientes"
-        titleIcon={
-          <button
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffffff]/10 text-primary text-xs font-medium hover:bg-[#b6b6b6]/20 border border-red-300 transition-colors"
-            title="Assistir aula"
-          >
-            <PlayCircle className="h-4 w-4" />
-            Aula
-          </button>
-        }
+        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         data={filteredData}
         columns={columns}
         summaryCards={summaryCards}
@@ -358,6 +352,7 @@ export default function ListaClientes() {
         onTabChange={setActiveTab}
         tableId="lista_clientes"
       />
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

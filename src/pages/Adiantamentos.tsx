@@ -3,6 +3,8 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
 import { User, CheckCircle, Trash2, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -45,6 +47,7 @@ const initialData: Adiantamento[] = [
 ];
 
 export default function Adiantamentos() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
 
@@ -118,6 +121,7 @@ export default function Adiantamentos() {
   return (
     <AppLayout>
       <DataTable
+        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         title="Adiantamentos"
         data={allData}
         columns={columns}
@@ -130,6 +134,7 @@ export default function Adiantamentos() {
         showDateFilter={true}
         tableId="adiantamentos"
       />
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }

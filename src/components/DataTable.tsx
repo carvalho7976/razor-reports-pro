@@ -129,7 +129,7 @@ interface DataTableProps<T extends Record<string, any>> {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   showDateFilter?: boolean;
-  summaryCards?: SummaryCard[];
+  summaryCards?: SummaryCard[] | ((filteredData: T[]) => SummaryCard[]);
   pageSize?: number;
   selectable?: boolean;
   selectionActions?: SelectionAction[];
@@ -296,7 +296,7 @@ function DateRangePicker({
                   onClick={() => handlePreset(p.key)}
                   className={cn(
                     "whitespace-nowrap text-left px-2.5 py-1.5 text-xs rounded-md transition-colors shrink-0",
-                    datePreset === p.key ? "bg-[#e5e5e5] text-black font-medium" : "text-foreground hover:bg-muted",
+                    datePreset === p.key ? "bg-secondary text-secondary-foreground font-medium" : "text-foreground hover:bg-muted",
                   )}
                 >
                   {p.label}
@@ -1189,7 +1189,7 @@ export function DataTable<T extends Record<string, any>>({
               <span className="font-semibold">{f.label}:</span> {f.value}
               <button
                 onClick={() => removeFilter(f.id, f.key, f.value)}
-                className="ml-0.5 p-0.5 rounded-full hover:bg-[#d4d4d4] hover:text-black transition-colors"
+                className="ml-0.5 p-0.5 rounded-full hover:bg-secondary transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -1211,9 +1211,11 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Summary Cards - 2 standard widths */}
-      {summaryCards && (
+      {summaryCards && (() => {
+        const resolvedCards = typeof summaryCards === 'function' ? summaryCards(filteredData) : summaryCards;
+        return (
         <div className="flex flex-wrap gap-2 sm:gap-3">
-          {summaryCards.map((card, i) => {
+          {resolvedCards.map((card, i) => {
             const isMonetary = card.type === "monetary";
             const isQuantity = card.type === "quantity";
             const sentimentColor =
@@ -1311,7 +1313,8 @@ export function DataTable<T extends Record<string, any>>({
             );
           })}
         </div>
-      )}
+        );
+      })()}
 
       {/* Slot between cards and tabs */}
       {slotBetweenCardsAndTabs}
@@ -1326,7 +1329,11 @@ export function DataTable<T extends Record<string, any>>({
               return (
                 <button
                   key={tab.value}
-                  onClick={() => onTabChange?.(tab.value)}
+                  onClick={() => {
+                    onTabChange?.(tab.value);
+                    setSelectedRows(new Set());
+                    setPage(0);
+                  }}
                   className={cn(
                     "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     isActive

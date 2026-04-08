@@ -1,5 +1,6 @@
 import { Scissors, Bell, Heart, CreditCard, Grid3X3, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface AppHeaderBarProps {
   onMenuToggle?: () => void;
@@ -33,6 +34,7 @@ export function AppHeaderBar({ onMenuToggle }: AppHeaderBarProps) {
         </button>
 
         <div className="flex items-center gap-2 ml-1 sm:ml-2">
+          <ThemeToggle />
           <button className="relative p-1.5 hover:bg-header-foreground/10 rounded">
             <Bell className="h-4 w-4" />
             <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center">3</span>

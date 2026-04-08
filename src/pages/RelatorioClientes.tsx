@@ -1,8 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Users, BarChart3, CreditCard, TrendingUp } from "lucide-react";
+import { Users, CreditCard, BarChart3 } from "lucide-react";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 type TipoCliente = "avulso" | "assinatura";
@@ -32,26 +34,7 @@ const allData: Cliente[] = [
 
 export default function RelatorioClientes() {
   const [tab, setTab] = useState("total");
-
-  const data = useMemo(() => {
-    if (tab === "total") return allData;
-    if (tab === "avulso") return allData.filter(c => c.tipo === "avulso");
-    return allData.filter(c => c.tipo === "assinatura");
-  }, [tab]);
-
-  const totalClientes = data.length;
-  const totalFrequencia = data.reduce((s, r) => s + r.frequencia, 0);
-  const totalValor = data.reduce((s, r) => s + r.valorGasto, 0);
-  const avgTicket = totalClientes > 0 ? data.reduce((s, r) => s + r.ticketMedio, 0) / totalClientes : 0;
-
-  const totalServicos = data.reduce((s, r) => s + r.totalServicos, 0);
-  const totalProdutos = data.reduce((s, r) => s + r.totalProdutos, 0);
-
-  const summaryCards: SummaryCard[] = [
-    { label: "Clientes Atendidos", value: String(totalClientes), type: "quantity", icon: <Users className="h-4 w-4" />, size: "compact", color: "blue" },
-    { label: "Serviços", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-    { label: "Produtos", value: R$(totalProdutos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-  ];
+  const [aulaOpen, setAulaOpen] = useState(false);
 
   const columns: Column<Cliente>[] = [
     {
@@ -76,13 +59,30 @@ export default function RelatorioClientes() {
     { label: "Assinatura", value: "assinatura", count: allData.filter(c => c.tipo === "assinatura").length, color: "success" },
   ];
 
+  const data = tab === "total" ? allData : tab === "avulso" ? allData.filter(c => c.tipo === "avulso") : allData.filter(c => c.tipo === "assinatura");
+
+  const buildSummaryCards = (filtered: Cliente[]): SummaryCard[] => {
+    const totalClientes = filtered.length;
+    const totalServicos = filtered.reduce((s, r) => s + r.totalServicos, 0);
+    const totalProdutos = filtered.reduce((s, r) => s + r.totalProdutos, 0);
+    const avgFrequencia = totalClientes > 0 ? filtered.reduce((s, r) => s + r.frequencia, 0) / totalClientes : 0;
+
+    return [
+      { label: "Clientes Atendidos", value: String(totalClientes), type: "quantity", icon: <Users className="h-4 w-4" />, size: "compact", color: "blue" },
+      { label: "Frequência Média", value: avgFrequencia.toFixed(1), type: "quantity", icon: <BarChart3 className="h-4 w-4" />, size: "compact", color: "blue" },
+      { label: "Serviços", value: R$(totalServicos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+      { label: "Produtos", value: R$(totalProdutos), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+    ];
+  };
+
   return (
     <AppLayout>
       <DataTable
         title="Relatório de Clientes"
+        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         data={data}
         columns={columns}
-        summaryCards={summaryCards}
+        summaryCards={buildSummaryCards}
         tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
@@ -90,6 +90,7 @@ export default function RelatorioClientes() {
         showDateFilter={true}
         tableId="relatorio_clientes"
       />
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }
