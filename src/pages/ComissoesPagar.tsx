@@ -96,7 +96,7 @@ export default function ComissoesPagar() {
       description: "Marca as comissões selecionadas como pagas",
     },
     {
-      label: "Imprimir Funcionário",
+      label: "Imprimir Relatório",
       icon: <Printer className="h-4 w-4" />,
       onClick: bulkPrint,
       description: "Imprime o relatório de comissões dos funcionários selecionados",
