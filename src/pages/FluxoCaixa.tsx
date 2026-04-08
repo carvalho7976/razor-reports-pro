@@ -223,11 +223,15 @@ export default function FluxoCaixa() {
       key: "valor",
       label: "Valor",
       align: "right",
-      render: (v: number) => (
-        <span className={v > 0 ? "text-primary" : v < 0 ? "text-destructive" : ""}>
-          {v >= 0 ? v.toFixed(2) : v.toFixed(2)}
-        </span>
-      ),
+      render: (v: number) => {
+        const valor = Number(v);
+
+        return (
+          <span className={valor > 0 ? "text-primary" : valor < 0 ? "text-destructive" : "text-muted-foreground"}>
+            {valor.toFixed(2)}
+          </span>
+        );
+      },
     },
   ];
 
