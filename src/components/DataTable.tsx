@@ -1329,7 +1329,11 @@ export function DataTable<T extends Record<string, any>>({
               return (
                 <button
                   key={tab.value}
-                  onClick={() => onTabChange?.(tab.value)}
+                  onClick={() => {
+                    onTabChange?.(tab.value);
+                    setSelectedRows(new Set());
+                    setPage(0);
+                  }}
                   className={cn(
                     "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     isActive
