@@ -338,15 +338,7 @@ export default function ListaClientes() {
     <AppLayout>
       <DataTable
         title="Lista de Clientes"
-        titleIcon={
-          <button
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffffff]/10 text-primary text-xs font-medium hover:bg-[#b6b6b6]/20 border border-red-300 transition-colors"
-            title="Assistir aula"
-          >
-            <PlayCircle className="h-4 w-4" />
-            Aula
-          </button>
-        }
+        titleIcon={<AulaButton onClick={() => setAulaOpen(true)} />}
         data={filteredData}
         columns={columns}
         summaryCards={summaryCards}
@@ -360,6 +352,7 @@ export default function ListaClientes() {
         onTabChange={setActiveTab}
         tableId="lista_clientes"
       />
+      <YouTubeModal open={aulaOpen} onOpenChange={setAulaOpen} />
     </AppLayout>
   );
 }
