@@ -120,11 +120,11 @@ const initialData: FluxoItem[] = [
 const formaPagCards = [
   { label: "Assinatura", value: "R$ 50,00" },
   { label: "Crédito", value: "R$ 706,00" },
-  { label: "Frizzar_Pack", value: "R$ 100,00" },
   { label: "Débito", value: "R$ 23.250,89" },
-  { label: "PIX", value: "R$ 429,23" },
-  { label: "Dinheiro", value: "R$ 1.075,00" },
   { label: "Debito sumup", value: "R$ 243,05" },
+  { label: "Dinheiro", value: "R$ 1.075,00" },
+  { label: "Frizzar_Pack", value: "R$ 100,00" },
+  { label: "PIX", value: "R$ 429,23" },
 ];
 
 const tiposSaida = ["Saída", "Sangria", "Conta", "Fechamento de Gaveta"];
