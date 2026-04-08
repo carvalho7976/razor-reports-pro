@@ -400,45 +400,83 @@ function InlineSelect({
   onCancel: () => void;
   options: DropdownOption[];
 }) {
-  const ref = useRef<HTMLSelectElement | null>(null);
-  const saveLockRef = useRef(false);
+  const [open, setOpen] = useState(true);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  const selected = options.find((option) => option.value === value);
 
   useEffect(() => {
-    ref.current?.focus();
-  }, []);
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+        onSave();
+      }
+    }
 
-  const commit = () => {
-    if (saveLockRef.current) return;
-    saveLockRef.current = true;
-    onSave();
-    setTimeout(() => {
-      saveLockRef.current = false;
-    }, 0);
-  };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onSave]);
 
   return (
-    <select
-      ref={ref}
-      value={value}
-      onChange={(e) => {
-        onChange(e.target.value);
-        setTimeout(() => {
-          commit();
-        }, 0);
-      }}
-      onBlur={commit}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") commit();
-        if (e.key === "Escape") onCancel();
-      }}
-      className="h-9 w-full rounded-md border border-neutral-300 bg-white px-2.5 text-sm outline-none focus:border-neutral-900"
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative min-w-[160px]" ref={wrapperRef}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setOpen(false);
+            onSave();
+          }
+          if (e.key === "Escape") {
+            setOpen(false);
+            onCancel();
+          }
+        }}
+        className="flex h-9 w-full items-center justify-between rounded-md border border-neutral-300 bg-white px-3 text-sm text-neutral-900 outline-none transition-colors hover:border-neutral-400 focus:border-neutral-900"
+      >
+        <span className="truncate">{selected?.label}</span>
+
+        <svg
+          className={cn("h-4 w-4 text-neutral-400 transition-transform", open && "rotate-180")}
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-[80] mt-1 min-w-full overflow-hidden rounded-md border border-neutral-200 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+          <div className="py-1">
+            {options.map((option) => {
+              const active = option.value === value;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(option.value);
+                    setOpen(false);
+                    setTimeout(() => {
+                      onSave();
+                    }, 0);
+                  }}
+                  className={cn(
+                    "flex w-full items-center px-3 py-2 text-left text-sm transition-colors",
+                    active ? "bg-neutral-900 text-white" : "text-neutral-800 hover:bg-neutral-100",
+                  )}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
