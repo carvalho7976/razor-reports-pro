@@ -6,6 +6,7 @@ import { Trash2, Pencil, Ban, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { createPortal } from "react-dom";
 
 type StatusFormaPagamento = "Ativo" | "Desativado";
 type DestinoFormaPagamento = "CAIXA" | "CONTA" | "NENHUM";
@@ -400,33 +401,83 @@ function InlineSelect({
   onCancel: () => void;
   options: DropdownOption[];
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const saveLockRef = useRef(false);
 
   const selected = options.find((option) => option.value === value);
 
   useEffect(() => {
+    buttonRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    function updatePosition() {
+      if (!buttonRef.current) return;
+      const rect = buttonRef.current.getBoundingClientRect();
+
+      setMenuStyle({
+        position: "fixed",
+        top: rect.bottom + 6,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+
+    if (open) {
+      updatePosition();
+      window.addEventListener("resize", updatePosition);
+      window.addEventListener("scroll", updatePosition, true);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open]);
+
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setOpen(false);
-        onSave();
+        if (open) {
+          setOpen(false);
+          commitSave();
+        }
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onSave]);
+  }, [open]);
+
+  const commitSave = () => {
+    if (saveLockRef.current) return;
+    saveLockRef.current = true;
+    onSave();
+    setTimeout(() => {
+      saveLockRef.current = false;
+    }, 0);
+  };
 
   return (
-    <div className="relative min-w-[160px]" ref={wrapperRef}>
+    <div ref={wrapperRef} className="relative min-w-[140px]">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            setOpen(false);
-            onSave();
+            if (open) {
+              setOpen(false);
+              commitSave();
+            } else {
+              setOpen(true);
+            }
           }
+
           if (e.key === "Escape") {
             setOpen(false);
             onCancel();
@@ -447,35 +498,41 @@ function InlineSelect({
         </svg>
       </button>
 
-      {open && (
-        <div className="absolute left-0 top-full z-[80] mt-1 min-w-full overflow-hidden rounded-md border border-neutral-200 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
-          <div className="py-1">
-            {options.map((option) => {
-              const active = option.value === value;
+      {open &&
+        createPortal(
+          <div
+            style={menuStyle}
+            className="overflow-hidden rounded-md border border-neutral-200 bg-white shadow-[0_12px_32px_rgba(0,0,0,0.14)]"
+          >
+            <div className="py-1">
+              {options.map((option) => {
+                const active = option.value === value;
 
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => {
-                    onChange(option.value);
-                    setOpen(false);
-                    setTimeout(() => {
-                      onSave();
-                    }, 0);
-                  }}
-                  className={cn(
-                    "flex w-full items-center px-3 py-2 text-left text-sm transition-colors",
-                    active ? "bg-neutral-900 text-white" : "text-neutral-800 hover:bg-neutral-100",
-                  )}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      onChange(option.value);
+                      setOpen(false);
+                      setTimeout(() => {
+                        commitSave();
+                      }, 0);
+                    }}
+                    className={cn(
+                      "flex w-full items-center px-3 py-2 text-left text-sm transition-colors",
+                      active ? "bg-neutral-900 text-white" : "text-neutral-800 hover:bg-neutral-100",
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
