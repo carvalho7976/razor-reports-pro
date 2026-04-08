@@ -160,7 +160,7 @@ export default function ContasPagar() {
         </span>
       ),
     },
-    { key: "dataPagamento", label: "Data Pagamento" },
+    { key: "dataPagamento", label: "Data do Pagamento" },
     {
       key: "acoes" as any,
       label: "Ações",
