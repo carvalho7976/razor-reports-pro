@@ -3,6 +3,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Trash2, Eye, Power, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 interface Pacote {
   id: number;
@@ -31,6 +32,7 @@ const initialData: Pacote[] = [
 ];
 
 export default function ListaPacotes() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
@@ -102,6 +104,7 @@ export default function ListaPacotes() {
     <AppLayout>
       <DataTable
         title="Pacotes"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={data}
         columns={columns}
         selectable
@@ -113,6 +116,12 @@ export default function ListaPacotes() {
         onTabChange={setTab}
         pageSize={15}
         tableId="lista_pacotes"
+      />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Pacotes"
       />
     </AppLayout>
   );

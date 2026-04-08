@@ -2,6 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User } from "lucide-react";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -58,15 +59,23 @@ const columns: Column<ComissaoPaga>[] = [
 ];
 
 export default function ComissoesPagas() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   return (
     <AppLayout>
       <DataTable
         title="Comissões Pagas"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={data}
         columns={columns}
         totalRow={{ valorComanda: R$(totalValor), descontoTaxa: "Valor Total:", comissaoPaga: R$(totalComissao) }}
         showDateFilter={true}
         tableId="comissoes_pagas"
+      />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Comissões Pagas"
       />
     </AppLayout>
   );

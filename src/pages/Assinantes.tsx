@@ -4,6 +4,7 @@ import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/compo
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CreditCard, XCircle, Hash, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 interface Assinante {
   id: number;
@@ -81,6 +82,7 @@ const initialData: Assinante[] = [
 ];
 
 export default function Assinantes() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
   const [tab, setTab] = useState("total");
@@ -168,6 +170,7 @@ export default function Assinantes() {
     <AppLayout>
       <DataTable
         title="Assinantes"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={data}
         columns={columns}
         showDateFilter={true}
@@ -179,6 +182,12 @@ export default function Assinantes() {
         selectionActions={selectionActions}
         pageSize={15}
         tableId="assinantes"
+      />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Assinantes"
       />
     </AppLayout>
   );

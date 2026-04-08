@@ -4,6 +4,7 @@ import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/Da
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CreditCard, FileText, Receipt, Hash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -131,6 +132,7 @@ const columns: Column<Comanda>[] = [
 ];
 
 export default function MovimentacaoComandas() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const { toast } = useToast();
 
   const totalBruto = allData.filter((d) => d.tipo === "Entrada").reduce((s, r) => s + r.valorPago, 0);
@@ -186,6 +188,7 @@ export default function MovimentacaoComandas() {
     <AppLayout>
       <DataTable
         title="Movimentação de Comandas"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={allData}
         columns={columns}
         totalRow={{ cliente: "Total:", valorPago: R$(total) }}
@@ -196,6 +199,12 @@ export default function MovimentacaoComandas() {
         showDateFilter={true}
         tableId="movimentacao_comandas"
         dateField="dataFechamento"
+      />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Movimentação de Comandas"
       />
     </AppLayout>
   );

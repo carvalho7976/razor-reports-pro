@@ -4,6 +4,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Trash2, Merge, PlayCircle, Tag, MessageCircle, Pencil, Coins, CreditCard } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -190,6 +191,7 @@ const data: Cliente[] = [
 ];
 
 export default function ListaClientes() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("todos");
   const [allData] = useState(data);
   const { toast } = useToast();
@@ -357,6 +359,12 @@ export default function ListaClientes() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tableId="lista_clientes"
+      />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Lista de Clientes"
       />
     </AppLayout>
   );
