@@ -162,23 +162,25 @@ function FormasPagamentoCarousel() {
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
     >
-      {formaPagCards.map((fp) => (
-        <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px] shrink-0 bg-card">
-          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-0.5">
-            <div
-              className={cn(
-                "flex h-5 w-5 items-center justify-center rounded-md text-[10px] font-bold text-white",
-                bandeiraMap[normalizeFP(fp.label)] || "bg-neutral-400",
-              )}
-            >
-              {fp.label?.[0]}
-            </div>
+      {[...formaPagCards]
+        .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"))
+        .map((fp) => (
+          <div key={fp.label} className="border rounded-lg px-3 py-2 min-w-[120px] shrink-0 bg-card">
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-0.5">
+              <div
+                className={cn(
+                  "flex h-5 w-5 items-center justify-center rounded-md text-[10px] font-bold text-white",
+                  bandeiraMap[normalizeFP(fp.label)] || "bg-neutral-400",
+                )}
+              >
+                {fp.label?.[0]}
+              </div>
 
-            <span>{fp.label}</span>
+              <span>{fp.label}</span>
+            </div>
+            <p className="text-sm font-medium">{fp.value}</p>
           </div>
-          <p className="text-sm font-medium">{fp.value}</p>
-        </div>
-      ))}
+        ))}
     </div>
   );
 }
