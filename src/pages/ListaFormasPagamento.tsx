@@ -500,29 +500,31 @@ export default function ListaFormasPagamento() {
     {
       key: "tipo",
       label: "Bandeira",
-      render: (v, row) => (
-  <div className="flex items-center gap-2">
-    <div
-      className={cn(
-        "flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold text-white",
-        {
-          "bg-blue-600": row.tipo === "sumup",
-          "bg-yellow-500": row.tipo === "elo",
-          "bg-red-500": row.tipo === "rede",
-          "bg-green-600": row.tipo === "stone",
-          "bg-sky-500": row.tipo === "cielo",
-          "bg-neutral-400": row.tipo === "nenhum",
-        }
-      }
-    >
-      {getBandeiraLabel(row.tipo)?.[0]}
-    </div>
+   {
+  key: "tipo",
+  label: "Bandeira",
+  render: (_v, row) => (
+    <div className="flex items-center gap-2">
+      <div
+        className={cn(
+          "flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold text-white",
+          {
+            "bg-blue-600": row.tipo === "sumup",
+            "bg-yellow-500": row.tipo === "elo",
+            "bg-red-500": row.tipo === "rede",
+            "bg-green-600": row.tipo === "stone",
+            "bg-sky-500": row.tipo === "cielo",
+            "bg-neutral-400": row.tipo === "nenhum",
+          }
+        )}
+      >
+        {getBandeiraLabel(row.tipo)?.[0]}
+      </div>
 
-    <span>{getBandeiraLabel(row.tipo)}</span>
-  </div>
-),
-      ),
-    },
+      <span>{getBandeiraLabel(row.tipo)}</span>
+    </div>
+  ),
+},
     {
       key: "taxa",
       label: "Taxa",
