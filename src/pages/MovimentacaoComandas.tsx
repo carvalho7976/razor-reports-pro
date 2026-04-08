@@ -177,8 +177,8 @@ export default function MovimentacaoComandas() {
       size: "compact",
       color: "blue",
     },
-    { label: "Bruto", value: R$(totalBruto), icon: <CreditCard className="h-4 w-4" />, color: "green" },
-    { label: "Líquido", value: R$(totalLiquido), icon: <CreditCard className="h-4 w-4" />, color: "green" },
+    { label: "Valor Bruto", value: R$(totalBruto), icon: <CreditCard className="h-4 w-4" />, color: "green" },
+    { label: "Valor Líquido", value: R$(totalLiquido), icon: <CreditCard className="h-4 w-4" />, color: "green" },
     { label: "Taxas", value: R$(totalTaxas), icon: <CreditCard className="h-4 w-4" />, color: "red" },
   ];
 
