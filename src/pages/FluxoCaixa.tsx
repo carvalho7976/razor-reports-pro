@@ -273,7 +273,7 @@ export default function FluxoCaixa() {
     },
     {
       key: "adicao",
-      label: "Lançamento",
+      label: "Lançamento Avulso",
       align: "right",
       render: (v: number) => <span className="text-blue-600">{R$(v)}</span>,
     },
