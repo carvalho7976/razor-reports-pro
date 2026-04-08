@@ -113,7 +113,7 @@ const allData: Comanda[] = [
 
 const columns: Column<Comanda>[] = [
   { key: "dataFechamento", label: "Data de Fechamento", pinned: true },
-  { key: "usuarioFechamento", label: "Usuário" },
+  { key: "usuarioFechamento", label: "Usuário Responsável" },
   {
     key: "cliente",
     label: "Cliente",
