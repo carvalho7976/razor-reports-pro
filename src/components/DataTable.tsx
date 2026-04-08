@@ -296,7 +296,7 @@ function DateRangePicker({
                   onClick={() => handlePreset(p.key)}
                   className={cn(
                     "whitespace-nowrap text-left px-2.5 py-1.5 text-xs rounded-md transition-colors shrink-0",
-                    datePreset === p.key ? "bg-[#e5e5e5] text-black font-medium" : "text-foreground hover:bg-muted",
+                    datePreset === p.key ? "bg-secondary text-secondary-foreground font-medium" : "text-foreground hover:bg-muted",
                   )}
                 >
                   {p.label}
@@ -1189,7 +1189,7 @@ export function DataTable<T extends Record<string, any>>({
               <span className="font-semibold">{f.label}:</span> {f.value}
               <button
                 onClick={() => removeFilter(f.id, f.key, f.value)}
-                className="ml-0.5 p-0.5 rounded-full hover:bg-[#d4d4d4] hover:text-black transition-colors"
+                className="ml-0.5 p-0.5 rounded-full hover:bg-secondary transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
