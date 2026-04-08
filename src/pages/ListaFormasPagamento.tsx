@@ -513,7 +513,7 @@ export default function ListaFormasPagamento() {
           "bg-sky-500": row.tipo === "cielo",
           "bg-neutral-400": row.tipo === "nenhum",
         }
-      )}
+      }
     >
       {getBandeiraLabel(row.tipo)?.[0]}
     </div>
