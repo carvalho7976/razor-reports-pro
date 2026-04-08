@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Switch } from "@/components/ui/switch";
-import { Trash2, Pencil, Ban, CreditCard, Banknote, Smartphone, ArrowRightLeft, CheckCircle2 } from "lucide-react";
+import { Trash2, Pencil, Ban, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -118,18 +118,6 @@ const getBandeiraLabel = (value: BandeiraMaquina) =>
 const getDestinoLabel = (value: DestinoFormaPagamento) =>
   destinoOptions.find((item) => item.value === value)?.label || value;
 
-const logoMap: Record<BandeiraMaquina, ReactNode> = {
-  sumup: <CreditCard className="h-5 w-5 text-primary" />,
-  elo: <CreditCard className="h-5 w-5 text-success" />,
-  rede: <CreditCard className="h-5 w-5 text-warning" />,
-  stone: <CreditCard className="h-5 w-5 text-info" />,
-  cielo: <CreditCard className="h-5 w-5 text-primary" />,
-  getnet: <CreditCard className="h-5 w-5 text-destructive" />,
-  pagseguro: <Smartphone className="h-5 w-5 text-success" />,
-  mercado_pago: <ArrowRightLeft className="h-5 w-5 text-info" />,
-  nenhum: <Banknote className="h-5 w-5 text-muted-foreground" />,
-};
-
 type ModalState =
   | { type: "new" }
   | { type: "edit"; item: FormaPagamento }
@@ -140,6 +128,13 @@ type DropdownOption = {
   value: string;
   label: string;
 };
+
+type EditableField = "nome" | "tipo" | "taxa" | "destino" | "tempoParaCair";
+
+type EditingCell = {
+  id: number;
+  field: EditableField;
+} | null;
 
 const createEmptyForm = (): FormaPagamento => ({
   id: 0,
@@ -349,12 +344,112 @@ function FormRow({ children, cols = 2 }: { children: ReactNode; cols?: 2 | 3 }) 
   return <div className={`grid gap-1.5 ${cols === 3 ? "grid-cols-3" : "grid-cols-2"}`}>{children}</div>;
 }
 
+function InlineTextInput({
+  value,
+  onChange,
+  onSave,
+  onCancel,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const ref = useRef<HTMLInputElement | null>(null);
+  const saveLockRef = useRef(false);
+
+  useEffect(() => {
+    ref.current?.focus();
+    ref.current?.select();
+  }, []);
+
+  const commit = () => {
+    if (saveLockRef.current) return;
+    saveLockRef.current = true;
+    onSave();
+    setTimeout(() => {
+      saveLockRef.current = false;
+    }, 0);
+  };
+
+  return (
+    <input
+      ref={ref}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") commit();
+        if (e.key === "Escape") onCancel();
+      }}
+      className="h-9 w-full rounded-md border border-neutral-300 bg-white px-2.5 text-sm outline-none focus:border-neutral-900"
+    />
+  );
+}
+
+function InlineSelect({
+  value,
+  onChange,
+  onSave,
+  onCancel,
+  options,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  options: DropdownOption[];
+}) {
+  const ref = useRef<HTMLSelectElement | null>(null);
+  const saveLockRef = useRef(false);
+
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
+
+  const commit = () => {
+    if (saveLockRef.current) return;
+    saveLockRef.current = true;
+    onSave();
+    setTimeout(() => {
+      saveLockRef.current = false;
+    }, 0);
+  };
+
+  return (
+    <select
+      ref={ref}
+      value={value}
+      onChange={(e) => {
+        onChange(e.target.value);
+        setTimeout(() => {
+          commit();
+        }, 0);
+      }}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") commit();
+        if (e.key === "Escape") onCancel();
+      }}
+      className="h-9 w-full rounded-md border border-neutral-300 bg-white px-2.5 text-sm outline-none focus:border-neutral-900"
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 export default function ListaFormasPagamento() {
   const [allData, setAllData] = useState<FormaPagamento[]>(initialData);
   const [tab, setTab] = useState("todos");
   const [modal, setModal] = useState<ModalState>(null);
   const [form, setForm] = useState<FormaPagamento | null>(null);
   const [showErrors, setShowErrors] = useState(false);
+  const [editingCell, setEditingCell] = useState<EditingCell>(null);
+  const [draftValue, setDraftValue] = useState("");
   const { toast } = useToast();
 
   const data = useMemo(() => {
@@ -467,6 +562,59 @@ export default function ListaFormasPagamento() {
     toast({ title: `${ids.length} forma(s) ativada(s)` });
   };
 
+  const startEditing = (row: FormaPagamento, field: EditableField) => {
+    setEditingCell({ id: row.id, field });
+    setDraftValue(String(row[field] ?? ""));
+  };
+
+  const cancelEditing = () => {
+    setEditingCell(null);
+    setDraftValue("");
+  };
+
+  const saveEditing = () => {
+    if (!editingCell) return;
+
+    setAllData((prev) =>
+      prev.map((item) => {
+        if (item.id !== editingCell.id) return item;
+
+        const updated = { ...item };
+
+        if (editingCell.field === "taxa") {
+          const parsed = Number(String(draftValue).replace(",", "."));
+          if (Number.isNaN(parsed)) return item;
+          updated.taxa = parsed;
+        }
+
+        if (editingCell.field === "nome") {
+          updated.nome = draftValue as NomeFormaPagamento;
+        }
+
+        if (editingCell.field === "tipo") {
+          updated.tipo = draftValue as BandeiraMaquina;
+          updated.logo = draftValue as BandeiraMaquina;
+        }
+
+        if (editingCell.field === "destino") {
+          updated.destino = draftValue as DestinoFormaPagamento;
+        }
+
+        if (editingCell.field === "tempoParaCair") {
+          updated.tempoParaCair = draftValue as DiasReceber;
+        }
+
+        return updated;
+      }),
+    );
+
+    setEditingCell(null);
+    setDraftValue("");
+    toast({ title: "Campo atualizado" });
+  };
+
+  const isEditing = (rowId: number, field: EditableField) => editingCell?.id === rowId && editingCell?.field === field;
+
   const selectionActions: SelectionAction[] = [
     {
       label: "Ativar",
@@ -495,47 +643,113 @@ export default function ListaFormasPagamento() {
       key: "nome",
       label: "Nome",
       pinned: true,
-      render: (v) => <span className="font-medium">{getNomeLabel(v as NomeFormaPagamento)}</span>,
+      render: (v, row) =>
+        isEditing(row.id, "nome") ? (
+          <InlineSelect
+            value={draftValue}
+            onChange={setDraftValue}
+            onSave={saveEditing}
+            onCancel={cancelEditing}
+            options={nomeOptions}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => startEditing(row, "nome")}
+            className="text-left font-medium hover:underline"
+          >
+            {getNomeLabel(v as NomeFormaPagamento)}
+          </button>
+        ),
     },
-
     {
       key: "tipo",
       label: "Bandeira",
-      render: (_v, row) => (
-        <div className="flex items-center gap-2">
-          <div
-            className={cn("flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold text-white", {
-              "bg-blue-600": row.tipo === "sumup",
-              "bg-yellow-500": row.tipo === "elo",
-              "bg-red-500": row.tipo === "rede",
-              "bg-green-600": row.tipo === "stone",
-              "bg-sky-500": row.tipo === "cielo",
-              "bg-neutral-400": row.tipo === "nenhum",
-            })}
+      render: (_v, row) =>
+        isEditing(row.id, "tipo") ? (
+          <InlineSelect
+            value={draftValue}
+            onChange={setDraftValue}
+            onSave={saveEditing}
+            onCancel={cancelEditing}
+            options={bandeiraOptions}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => startEditing(row, "tipo")}
+            className="flex items-center gap-2 text-left hover:opacity-80"
           >
-            {getBandeiraLabel(row.tipo)?.[0]}
-          </div>
+            <div
+              className={cn("flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold text-white", {
+                "bg-blue-600": row.tipo === "sumup",
+                "bg-yellow-500": row.tipo === "elo",
+                "bg-red-500": row.tipo === "rede",
+                "bg-green-600": row.tipo === "stone",
+                "bg-sky-500": row.tipo === "cielo",
+                "bg-neutral-400": row.tipo === "nenhum",
+                "bg-emerald-600": row.tipo === "getnet",
+                "bg-violet-600": row.tipo === "pagseguro",
+                "bg-cyan-700": row.tipo === "mercado_pago",
+              })}
+            >
+              {getBandeiraLabel(row.tipo)?.[0]}
+            </div>
 
-          <span>{getBandeiraLabel(row.tipo)}</span>
-        </div>
-      ),
+            <span>{getBandeiraLabel(row.tipo)}</span>
+          </button>
+        ),
     },
     {
       key: "taxa",
       label: "Taxa",
       align: "center",
-      render: (v) => `${Number(v).toFixed(2)}%`,
+      render: (v, row) =>
+        isEditing(row.id, "taxa") ? (
+          <InlineTextInput value={draftValue} onChange={setDraftValue} onSave={saveEditing} onCancel={cancelEditing} />
+        ) : (
+          <button type="button" onClick={() => startEditing(row, "taxa")} className="hover:underline">
+            {Number(v).toFixed(2)}%
+          </button>
+        ),
     },
     {
       key: "destino",
       label: "Destino",
       align: "center",
-      render: (v) => getDestinoLabel(v as DestinoFormaPagamento),
+      render: (v, row) =>
+        isEditing(row.id, "destino") ? (
+          <InlineSelect
+            value={draftValue}
+            onChange={setDraftValue}
+            onSave={saveEditing}
+            onCancel={cancelEditing}
+            options={destinoOptions}
+          />
+        ) : (
+          <button type="button" onClick={() => startEditing(row, "destino")} className="hover:underline">
+            {getDestinoLabel(v as DestinoFormaPagamento)}
+          </button>
+        ),
     },
     {
       key: "tempoParaCair",
       label: "Dias para Receber",
       align: "center",
+      render: (v, row) =>
+        isEditing(row.id, "tempoParaCair") ? (
+          <InlineSelect
+            value={draftValue}
+            onChange={setDraftValue}
+            onSave={saveEditing}
+            onCancel={cancelEditing}
+            options={diasReceberOptions}
+          />
+        ) : (
+          <button type="button" onClick={() => startEditing(row, "tempoParaCair")} className="hover:underline">
+            {v}
+          </button>
+        ),
     },
     {
       key: "status",
@@ -617,7 +831,6 @@ export default function ListaFormasPagamento() {
 
       <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          {" "}
           {form && (
             <FormModal
               title={modal?.type === "new" ? "Nova forma de pagamento" : "Editar forma de pagamento"}
