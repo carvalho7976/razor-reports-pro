@@ -79,7 +79,7 @@ export default function Adiantamentos() {
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Em aberto", value: R$(totalEmAberto), icon: <CreditCard className="h-4 w-4" />, color: "red" },
+    { label: "Em Aberto", value: R$(totalEmAberto), icon: <CreditCard className="h-4 w-4" />, color: "red" },
     { label: "Devolvido", value: R$(totalDevolvido), icon: <CreditCard className="h-4 w-4" />, color: "green" },
   ];
 
