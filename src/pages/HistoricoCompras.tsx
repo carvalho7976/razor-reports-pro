@@ -79,7 +79,7 @@ export default function HistoricoCompras() {
       value: R$(totalCompras),
       icon: <CreditCard className="h-4 w-4" />,
       size: "wide",
-      color: "red",
+      color: "blue",
     },
   ];
 
