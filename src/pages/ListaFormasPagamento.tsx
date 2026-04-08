@@ -546,6 +546,7 @@ export default function ListaFormasPagamento() {
   const [form, setForm] = useState<FormaPagamento | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [editingCell, setEditingCell] = useState<EditingCell>(null);
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [draftValue, setDraftValue] = useState("");
   const { toast } = useToast();
 
@@ -1014,19 +1015,19 @@ export default function ListaFormasPagamento() {
       <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <div className="flex min-h-screen items-center justify-center p-5">
-            <div className="w-full max-w-xl overflow-visible rounded-2xl bg-white shadow-2xl">
-              <div className="relative rounded-t-2xl border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white px-6 py-4">
+            <div className="w-full max-w-xl overflow-visible rounded-2xl bg-card shadow-2xl">
+              <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted/50 to-card px-6 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl font-semibold text-neutral-900">Excluir forma de pagamento</h1>
-                    <p className="mt-0.5 text-sm text-neutral-500">Essa ação não poderá ser desfeita.</p>
+                    <h1 className="text-2xl font-semibold text-foreground">Excluir forma de pagamento</h1>
+                    <p className="mt-0.5 text-sm text-muted-foreground">Essa ação não poderá ser desfeita.</p>
                   </div>
 
                   <button
                     type="button"
                     aria-label="Fechar"
                     onClick={closeModal}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
                   >
                     ✕
                   </button>
@@ -1034,18 +1035,18 @@ export default function ListaFormasPagamento() {
               </div>
 
               <div className="grid gap-2 px-6 pt-6 pb-8">
-                <p className="text-sm text-neutral-700">
+                <p className="text-sm text-foreground/80">
                   {modal?.type === "delete" ? `Deseja excluir "${getNomeLabel(modal.item.nome)}"?` : ""}
                 </p>
               </div>
 
-              <div className="border-t px-6 py-4">
+              <div className="border-t border-border px-6 py-4">
                 <div className="flex">
                   <button
                     type="button"
                     onClick={handleConfirmDelete}
                     className={cn(
-                      "inline-flex h-11 w-full items-center justify-center rounded-lg px-6 text-sm font-semibold text-white transition-colors active:scale-[0.98]",
+                      "inline-flex h-11 w-full items-center justify-center rounded-lg px-6 text-sm font-semibold text-destructive-foreground transition-colors active:scale-[0.98]",
                       "bg-destructive hover:bg-destructive/90",
                     )}
                   >
