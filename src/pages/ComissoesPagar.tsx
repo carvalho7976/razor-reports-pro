@@ -118,7 +118,7 @@ export default function ComissoesPagar() {
       label: "Comissões em Aberto",
       value: R$(totalComissoesEmAberto),
       icon: <CreditCard className="h-4 w-4" />,
-      color: "blue",
+      color: "red",
     },
     {
       label: "Comissões Pagas",
@@ -130,7 +130,7 @@ export default function ComissoesPagar() {
       label: "Adiantamento em Aberto",
       value: R$(totalAdiantamentosEmAberto),
       icon: <CreditCard className="h-4 w-4" />,
-      color: "blue",
+      color: "red",
     },
     {
       label: "Adiantamento Pago",
