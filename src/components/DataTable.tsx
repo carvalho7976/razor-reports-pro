@@ -1211,9 +1211,11 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Summary Cards - 2 standard widths */}
-      {summaryCards && (
+      {summaryCards && (() => {
+        const resolvedCards = typeof summaryCards === 'function' ? summaryCards(filteredData) : summaryCards;
+        return (
         <div className="flex flex-wrap gap-2 sm:gap-3">
-          {summaryCards.map((card, i) => {
+          {resolvedCards.map((card, i) => {
             const isMonetary = card.type === "monetary";
             const isQuantity = card.type === "quantity";
             const sentimentColor =
