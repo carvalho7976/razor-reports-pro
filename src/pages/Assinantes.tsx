@@ -111,7 +111,7 @@ export default function Assinantes() {
 
   const summaryCards: SummaryCard[] = [
     {
-      label: "Total Assinatura",
+      label: "Total em Dia",
       value: R$(allData.filter((d) => d.status === "Ativo").reduce((s, r) => s + r.valor, 0)),
       icon: <CreditCard className="h-4 w-4" />,
       color: "green",
