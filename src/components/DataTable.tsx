@@ -129,7 +129,7 @@ interface DataTableProps<T extends Record<string, any>> {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   showDateFilter?: boolean;
-  summaryCards?: SummaryCard[];
+  summaryCards?: SummaryCard[] | ((filteredData: T[]) => SummaryCard[]);
   pageSize?: number;
   selectable?: boolean;
   selectionActions?: SelectionAction[];
@@ -1211,9 +1211,11 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Summary Cards - 2 standard widths */}
-      {summaryCards && (
+      {summaryCards && (() => {
+        const resolvedCards = typeof summaryCards === 'function' ? summaryCards(filteredData) : summaryCards;
+        return (
         <div className="flex flex-wrap gap-2 sm:gap-3">
-          {summaryCards.map((card, i) => {
+          {resolvedCards.map((card, i) => {
             const isMonetary = card.type === "monetary";
             const isQuantity = card.type === "quantity";
             const sentimentColor =
@@ -1311,7 +1313,8 @@ export function DataTable<T extends Record<string, any>>({
             );
           })}
         </div>
-      )}
+        );
+      })()}
 
       {/* Slot between cards and tabs */}
       {slotBetweenCardsAndTabs}
@@ -1326,7 +1329,7 @@ export function DataTable<T extends Record<string, any>>({
               return (
                 <button
                   key={tab.value}
-                  onClick={() => onTabChange?.(tab.value)}
+                  onClick={() => { setSelectedRows(new Set()); onTabChange?.(tab.value); }}
                   className={cn(
                     "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     isActive

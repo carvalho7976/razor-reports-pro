@@ -4,6 +4,7 @@ import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/compo
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CreditCard, CheckCircle, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Debito {
@@ -95,6 +96,7 @@ const initialData: Debito[] = [
 ];
 
 export default function RelatorioDebitos() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const [tab, setTab] = useState("todos");
   const { toast } = useToast();
@@ -200,6 +202,7 @@ export default function RelatorioDebitos() {
     <AppLayout>
       <DataTable
         title="Relatório de Débitos"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={data}
         columns={columns}
         summaryCards={summaryCards}
@@ -211,6 +214,12 @@ export default function RelatorioDebitos() {
         pageSize={15}
         showDateFilter={true}
         tableId="relatorio_debitos"
+      />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Relatório de Débitos"
       />
     </AppLayout>
   );

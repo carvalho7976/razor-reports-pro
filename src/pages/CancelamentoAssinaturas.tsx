@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CreditCard, Hash } from "lucide-react";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Cancelamento { id: number; nome: string; celular: string; plano: string; motivo: string; dataCancelamento: string; valor: number; }
@@ -15,6 +17,7 @@ const initialData: Cancelamento[] = [
 ];
 
 export default function CancelamentoAssinaturas() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const summaryCards: SummaryCard[] = [
     { label: "Total", value: String(initialData.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
     { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "red" },
@@ -38,7 +41,14 @@ export default function CancelamentoAssinaturas() {
 
   return (
     <AppLayout>
-      <DataTable title="Cancelamento de Assinaturas" data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="cancelamento_assinaturas" />
+      <DataTable title="Cancelamento de Assinaturas"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />} data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="cancelamento_assinaturas" />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Cancelamento de Assinaturas"
+      />
     </AppLayout>
   );
 }

@@ -4,6 +4,7 @@ import { DataTable, Column, SelectionAction, TabDef } from "@/components/DataTab
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, FolderOpen, FolderClosed, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 interface Comanda {
   id: number;
@@ -89,6 +90,7 @@ const initialData: Comanda[] = [
 ];
 
 export default function Comandas() {
+  const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const [tab, setTab] = useState("total");
   const { toast } = useToast();
@@ -208,6 +210,7 @@ export default function Comandas() {
     <AppLayout>
       <DataTable
         title="Comandas"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={data}
         columns={columns}
         selectable
@@ -218,6 +221,12 @@ export default function Comandas() {
         pageSize={15}
         showDateFilter={true}
         tableId="comandas"
+      />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Comandas"
       />
     </AppLayout>
   );
