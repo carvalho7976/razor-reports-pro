@@ -124,8 +124,8 @@
 
   .filter-chip {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
-           bg-[#e5e5e5] text-black border border-[#d4d4d4]
-shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
+           bg-secondary text-secondary-foreground border border-border
+           shadow-sm hover:bg-secondary/80 transition-all duration-150;
   }
 
   .table-container {
