@@ -177,7 +177,6 @@ export default function Assinantes() {
         onTabChange={setTab}
         selectable
         selectionActions={selectionActions}
-        novoMenuItems={[{ label: "Novo assinante" }]}
         pageSize={15}
         tableId="assinantes"
       />
