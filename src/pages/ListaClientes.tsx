@@ -1,8 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction, TabDef, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Trash2, Merge, PlayCircle, Tag, MessageCircle, Pencil, Coins, CreditCard } from "lucide-react";
+import { Trash2, Merge, Tag, MessageCircle, Pencil, Coins, CreditCard } from "lucide-react";
 import { useState, useMemo } from "react";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { useToast } from "@/hooks/use-toast";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
