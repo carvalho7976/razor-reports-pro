@@ -564,14 +564,6 @@ export default function HistoricoCompras() {
                       setValue={setDebitoTipo}
                       options={debitoOptions}
                     />
-
-                    <div className="grid gap-1.5">
-                      <label className="text-sm font-medium text-foreground">XML anexado</label>
-                      <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
-                        {xmlFile ? "Arquivo XML selecionado" : "Nenhum XML enviado"}
-                      </div>
-                    </div>
-
                     <div className="rounded-lg border border-border bg-card px-4 py-4">
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>Subtotal</span>
