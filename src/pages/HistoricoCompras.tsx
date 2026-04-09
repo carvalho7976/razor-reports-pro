@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
-import { User, CreditCard, Hash, Plus, Trash2, PackagePlus } from "lucide-react";
+import { User, CreditCard, Hash, Trash2 } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { FormModal, TextField, Dropdown, FormRow, SaveButton } from "@/components/FormModal";
@@ -105,25 +105,12 @@ function fromDateInputValue(isoDate: string) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-function matchesDateFilter(itemDateBR: string, dateFrom?: string, dateTo?: string) {
-  if (!dateFrom && !dateTo) return true;
-
-  const current = toDateInputValue(itemDateBR);
-  if (!current) return true;
-
-  if (dateFrom && current < dateFrom) return false;
-  if (dateTo && current > dateTo) return false;
-
-  return true;
-}
-
 export default function HistoricoCompras() {
   const { toast } = useToast();
 
   const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState<"resumido" | "detalhado">("resumido");
   const [compras, setCompras] = useState<CompraResumida[]>(initialData);
-
   const [modalOpen, setModalOpen] = useState(false);
   const [detalhadoDataFiltro, setDetalhadoDataFiltro] = useState<string | null>(null);
 
@@ -367,26 +354,11 @@ export default function HistoricoCompras() {
     });
   };
 
-  const titleActions = (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        onClick={openNew}
-        className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-      >
-        <Plus className="h-4 w-4" />
-        Novo
-      </button>
-
-      <AulaButton onOpen={() => setAulaOpen(true)} />
-    </div>
-  );
-
   return (
     <AppLayout>
       <DataTable
         title="Histórico de Compras"
-        titleIcon={titleActions}
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={tab === "resumido" ? compras : detalhadoData}
         columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
         summaryCards={summaryCards}
@@ -399,6 +371,7 @@ export default function HistoricoCompras() {
         pageSize={15}
         showDateFilter={true}
         tableId="historico_compras"
+        novoMenuItems={[{ label: "Nova compra", onClick: openNew }]}
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
@@ -409,29 +382,24 @@ export default function HistoricoCompras() {
             onClose={closeModal}
             footer={<SaveButton onClick={handleSalvarCompra} />}
           >
-            <FormRow>
-              <TextField
-                label="Data da compra"
-                value={dataCompra}
-                onChange={setDataCompra}
-                type="date"
-                error={showErrors ? errors.dataCompra : ""}
-              />
-              <Dropdown
-                label="Usuário responsável"
-                value={funcionario}
-                setValue={setFuncionario}
-                options={usuariosOptions}
-              />
-            </FormRow>
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <div className="space-y-4">
+                <FormRow>
+                  <TextField
+                    label="Data da compra"
+                    value={dataCompra}
+                    onChange={setDataCompra}
+                    type="date"
+                    error={showErrors ? errors.dataCompra : ""}
+                  />
+                  <Dropdown
+                    label="Usuário responsável"
+                    value={funcionario}
+                    setValue={setFuncionario}
+                    options={usuariosOptions}
+                  />
+                </FormRow>
 
-            <div className="rounded-2xl border border-border bg-card/50 p-4">
-              <div className="mb-3 flex items-center gap-2">
-                <PackagePlus className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">Adicionar produto</h3>
-              </div>
-
-              <div className="space-y-3">
                 <FormRow>
                   <Dropdown
                     label="Produto"
@@ -457,94 +425,92 @@ export default function HistoricoCompras() {
                   <button
                     type="button"
                     onClick={handleAdicionarItem}
-                    className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
                   >
-                    <Plus className="h-4 w-4" />
                     Adicionar
                   </button>
                 </div>
+
+                <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
+
+                <label className="flex items-center gap-3 text-sm font-medium text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={debitarCaixa}
+                    onChange={(e) => setDebitarCaixa(e.target.checked)}
+                    className="h-4 w-4 rounded border-border"
+                  />
+                  Debitar do caixa
+                </label>
               </div>
-            </div>
 
-            <div className="overflow-hidden rounded-2xl border border-border">
-              <table className="w-full border-collapse">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor Unitário</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
-                    <th className="w-20 px-4 py-3 text-center text-sm font-semibold text-foreground">Ação</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {itensCompra.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                        Nenhum produto adicionado.
-                      </td>
-                    </tr>
-                  ) : (
-                    itensCompra.map((item) => {
-                      const valor = toNumberBR(item.valor);
-                      const quantidade = Number(item.quantidade) || 0;
-                      const total = valor * quantidade;
-
-                      return (
-                        <tr key={item.id} className="border-t border-border bg-card">
-                          <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
-                          <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
-                          <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
-                          <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
-                            {formatBRL(total)}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <button
-                              type="button"
-                              onClick={() => handleRemoverItem(item.id)}
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-destructive/10 text-destructive transition hover:bg-destructive/20"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-lg border border-border">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
+                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                        <th className="w-16 px-4 py-3 text-center text-sm font-semibold text-foreground" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {itensCompra.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                            Nenhum produto adicionado.
                           </td>
                         </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
+                      ) : (
+                        itensCompra.map((item) => {
+                          const valor = toNumberBR(item.valor);
+                          const quantidade = Number(item.quantidade) || 0;
+                          const total = valor * quantidade;
 
-            {showErrors && errors.itensCompra ? <p className="text-sm text-destructive">{errors.itensCompra}</p> : null}
-
-            <div className="flex items-center justify-between rounded-2xl border border-border bg-card/50 p-4">
-              <label className="flex items-center gap-3 text-sm font-medium text-foreground">
-                <input
-                  type="checkbox"
-                  checked={debitarCaixa}
-                  onChange={(e) => setDebitarCaixa(e.target.checked)}
-                  className="h-4 w-4 rounded border-border"
-                />
-                Debitar do caixa
-              </label>
-
-              <div className="space-y-1 text-right">
-                <div className="text-sm text-muted-foreground">
-                  Total: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                          return (
+                            <tr key={item.id} className="border-t border-border bg-card">
+                              <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                              <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                              <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                              <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                                {formatBRL(total)}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoverItem(item.id)}
+                                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
-                </div>
-                <div className="text-base font-semibold text-foreground">
-                  Total c/ desconto: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+
+                {showErrors && errors.itensCompra ? (
+                  <p className="text-sm text-destructive">{errors.itensCompra}</p>
+                ) : null}
+
+                <div className="space-y-1 rounded-lg border border-border bg-card px-4 py-3 text-right">
+                  <div className="text-sm text-muted-foreground">
+                    Total: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
+                  </div>
+                  <div className="text-base font-semibold text-foreground">
+                    Total c/ desconto: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <FormRow>
-              <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
-              <div />
-            </FormRow>
           </FormModal>
         </DialogContent>
       </Dialog>
