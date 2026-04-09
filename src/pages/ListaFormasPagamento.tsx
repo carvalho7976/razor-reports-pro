@@ -335,15 +335,15 @@ function FormModal({
         </div>
       </div>
 
-      <div className="grid gap-2 px-6 pt-6 pb-8">{children}</div>
+      <div className="grid gap-1 px-6 pt-5 pb-6">{children}</div>
 
-      <div className="border-t border-border px-6 py-4">{footer}</div>
+      <div className="border-t border-border px-6 py-3">{footer}</div>
     </div>
   );
 }
 
 function FormRow({ children, cols = 2 }: { children: ReactNode; cols?: 2 | 3 }) {
-  return <div className={`grid gap-1.5 ${cols === 3 ? "grid-cols-3" : "grid-cols-2"}`}>{children}</div>;
+  return <div className={`grid gap-3 ${cols === 3 ? "grid-cols-3" : "grid-cols-2"}`}>{children}</div>;
 }
 
 function InlineTextInput({
