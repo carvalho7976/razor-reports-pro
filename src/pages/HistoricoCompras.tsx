@@ -377,8 +377,7 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="left-1/2 top-1/2 w-[min(1080px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
+className="left-1/2 top-1/2 w-[min(1080px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden"          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
