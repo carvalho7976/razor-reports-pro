@@ -596,10 +596,9 @@ export default function HistoricoCompras() {
                     )}
                   </div>
 
-                    {showErrors && errors.itensCompra ? (
-                      <p className="text-sm text-destructive">{errors.itensCompra}</p>
-                    ) : null}
-                  </div>
+                  {showErrors && errors.itensCompra ? (
+                    <p className="text-sm text-destructive">{errors.itensCompra}</p>
+                  ) : null}
                 </div>
               </div>
             ) : (
