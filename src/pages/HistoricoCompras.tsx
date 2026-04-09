@@ -288,6 +288,8 @@ export default function HistoricoCompras() {
       return;
     }
 
+    const produtoLabel = produtosOptions.find((p) => p.value === produtoSelecionado)?.label || produtoSelecionado;
+
     setItensCompra((prev) => [
       ...prev,
       {
@@ -301,6 +303,11 @@ export default function HistoricoCompras() {
     setProdutoSelecionado("");
     setValorItem("");
     setQuantidadeItem("1");
+
+    toast({
+      title: "Item adicionado",
+      description: produtoLabel,
+    });
   };
 
   const handleRemoverItem = (id: number) => {
@@ -380,6 +387,8 @@ export default function HistoricoCompras() {
             <div className="px-6 py-5">
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
                 <div className="space-y-4">
+                  <p className="text-sm font-semibold text-foreground">Novo item</p>
+
                   <div className="grid grid-cols-2 gap-4">
                     <Dropdown
                       label="Produto"
@@ -387,7 +396,7 @@ export default function HistoricoCompras() {
                       setValue={setProdutoSelecionado}
                       options={produtosOptions}
                     />
-                    <TextField label="Custo do item" value={valorItem} onChange={setValorItem} placeholder="0,00" />
+                    <TextField label="Custo unitário" value={valorItem} onChange={setValorItem} placeholder="0,00" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -401,18 +410,25 @@ export default function HistoricoCompras() {
                     <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="flex justify-end pt-2">
                     <button
                       type="button"
                       onClick={handleAdicionarItem}
-                      className="text-sm font-semibold text-primary transition-colors hover:text-primary/80"
+                      className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
                     >
-                      Adicionar
+                      Adicionar item
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-foreground">Itens da entrada</p>
+                    <p className="text-xs text-muted-foreground">
+                      {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
+                    </p>
+                  </div>
+
                   <div className="overflow-hidden rounded-lg border border-border bg-card">
                     <table className="w-full border-collapse">
                       <thead className="bg-muted/40">
@@ -428,7 +444,7 @@ export default function HistoricoCompras() {
                         {itensCompra.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                              Nenhum produto adicionado.
+                              Adicione um produto para montar esta entrada.
                             </td>
                           </tr>
                         ) : (
@@ -462,32 +478,46 @@ export default function HistoricoCompras() {
                     </table>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
-                    <Dropdown label="Débito" value={debitoTipo} setValue={setDebitoTipo} options={debitoOptions} />
-                  </div>
+                  <div className="space-y-4">
+                    <p className="text-sm font-semibold text-foreground">Resumo financeiro</p>
 
-                  <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
-                    <div className="text-sm text-muted-foreground">
-                      Total: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                    <div className="grid grid-cols-2 gap-4">
+                      <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
+                      <Dropdown
+                        label="Origem do pagamento"
+                        value={debitoTipo}
+                        setValue={setDebitoTipo}
+                        options={debitoOptions}
+                      />
                     </div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
-                    </div>
-                    <div className="mt-2 text-[16px] font-semibold text-foreground">
-                      Total c/ desconto: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
-                    </div>
-                  </div>
 
-                  {showErrors && errors.itensCompra ? (
-                    <p className="text-sm text-destructive">{errors.itensCompra}</p>
-                  ) : null}
+                    <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
+                      <div className="text-sm text-muted-foreground">
+                        Subtotal: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                      </div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
+                      </div>
+                      <div className="mt-2 text-[16px] font-semibold text-foreground">
+                        Total final: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+                      </div>
+                    </div>
+
+                    {showErrors && errors.itensCompra ? (
+                      <p className="text-sm text-destructive">{errors.itensCompra}</p>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="border-t border-border px-6 py-4">
-              <SaveButton onClick={handleSalvarCompra} />
+              <div
+                className={itensCompra.length === 0 ? "pointer-events-none opacity-50" : ""}
+                aria-disabled={itensCompra.length === 0}
+              >
+                <SaveButton onClick={handleSalvarCompra} />
+              </div>
             </div>
           </div>
         </DialogContent>
