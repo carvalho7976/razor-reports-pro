@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -16,61 +16,45 @@ const initialData: Pacote[] = [
   { id: 5, nome: "Pacote Barba + Corte 4x", cliente: "Lucas Almeida", celular: "(41) 98432-1098", totalPacote: 4, restam: 0, valor: 160, desconto: 10, dataVenda: "05/03/2026", profissional: "Carlos" },
 ];
 
+const tabFilter = (row: Pacote, tab: string) => {
+  if (tab === "em_uso") return row.restam > 0;
+  return row.restam === 0;
+};
+
+const buildCards = (filtered: Pacote[]): SummaryCard[] => [
+  { label: "Total Vendido", value: String(filtered.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
+  { label: "Valor Vendido", value: R$(filtered.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
+  { label: "Total de Desconto", value: R$(filtered.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
+];
+
 export default function RelatorioPacotes() {
   const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState("em_uso");
 
-  const data = useMemo(() => {
-    if (tab === "em_uso") return initialData.filter(d => d.restam > 0);
-    if (tab === "finalizados") return initialData.filter(d => d.restam === 0);
-    return initialData;
-  }, [tab]);
-
-  const totalVendido = data.length;
-  const valorVendido = data.reduce((s, r) => s + r.valor, 0);
-  const totalDesconto = data.reduce((s, r) => s + r.desconto, 0);
-
-  const summaryCards: SummaryCard[] = [
-    { label: "Total Vendido", value: String(totalVendido), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
-    { label: "Valor Vendido", value: R$(valorVendido), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-    { label: "Total de Desconto", value: R$(totalDesconto), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
-  ];
-
   const tabs: TabDef[] = [
-    { label: "Em uso", value: "em_uso", count: initialData.filter(d => d.restam > 0).length, color: "info" },
-    { label: "Finalizados", value: "finalizados", count: initialData.filter(d => d.restam === 0).length, color: "neutral" },
+    { label: "Em uso", value: "em_uso", color: "info" },
+    { label: "Finalizados", value: "finalizados", color: "neutral" },
   ];
 
   const columns: Column<Pacote>[] = [
     { key: "nome", label: "Pacote", pinned: true },
-    {
-      key: "cliente", label: "Cliente",
-      render: (v, row) => (
-        <div className="flex items-center gap-1.5">
-          <WhatsAppButton telefone={row.celular} nome={row.cliente} />
-          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
-        </div>
-      ),
-    },
-    {
-      key: "profissional", label: "Profissional",
-      render: (v) => (
-        <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
-            <User className="h-3.5 w-3.5 text-muted-foreground" />
-          </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
-        </div>
-      ),
-    },
-    {
-      key: "restam" as any, label: "Restam", align: "center",
-      render: (_v: any, row: Pacote) => {
-        const ratio = row.restam / row.totalPacote;
-        const color = ratio <= 0 ? "#ff2f2f" : ratio <= 0.25 ? "#f59e0b" : "#00c5b4";
-        return <span className="font-medium" style={{ color }}>{row.restam} / {row.totalPacote}</span>;
-      },
-    },
+    { key: "cliente", label: "Cliente", render: (v, row) => (
+      <div className="flex items-center gap-1.5">
+        <WhatsAppButton telefone={row.celular} nome={row.cliente} />
+        <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
+      </div>
+    )},
+    { key: "profissional", label: "Profissional", render: v => (
+      <div className="flex items-center gap-2">
+        <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center"><User className="h-3.5 w-3.5 text-muted-foreground" /></div>
+        <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+      </div>
+    )},
+    { key: "restam" as any, label: "Restam", align: "center", render: (_v: any, row: Pacote) => {
+      const ratio = row.restam / row.totalPacote;
+      const color = ratio <= 0 ? "#ff2f2f" : ratio <= 0.25 ? "#f59e0b" : "#00c5b4";
+      return <span className="font-medium" style={{ color }}>{row.restam} / {row.totalPacote}</span>;
+    }},
     { key: "valor", label: "Preço", align: "right", render: v => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: v => R$(v) },
     { key: "dataVenda", label: "Data Venda" },
@@ -79,13 +63,20 @@ export default function RelatorioPacotes() {
   return (
     <AppLayout>
       <DataTable title="Relatório de Pacotes"
-        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />} data={data} columns={columns} summaryCards={summaryCards} tabs={tabs} activeTab={tab} onTabChange={setTab} pageSize={15} showDateFilter={true} tableId="relatorio_pacotes" dateField="dataVenda" />
-      <YouTubeModal
-        open={aulaOpen}
-        onClose={() => setAulaOpen(false)}
-        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        title="Aula - Relatório de Pacotes"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
+        data={initialData}
+        columns={columns}
+        summaryCards={buildCards}
+        tabs={tabs}
+        activeTab={tab}
+        onTabChange={setTab}
+        tabFilterFn={tabFilter}
+        pageSize={15}
+        showDateFilter={true}
+        tableId="relatorio_pacotes"
+        dateField="dataVenda"
       />
+      <YouTubeModal open={aulaOpen} onClose={() => setAulaOpen(false)} videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Aula - Pacotes" />
     </AppLayout>
   );
 }

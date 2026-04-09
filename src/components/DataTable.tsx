@@ -128,6 +128,11 @@ interface DataTableProps<T extends Record<string, any>> {
   tabs?: TabDef[];
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  /** When provided, DataTable handles tab filtering internally.
+   *  Pass ALL data (unfiltered by tab) and this function to determine tab membership.
+   *  Tab counts will react to search/date filters automatically.
+   *  Return true if `row` belongs to the given `tabValue`. */
+  tabFilterFn?: (row: T, tabValue: string) => boolean;
   showDateFilter?: boolean;
   summaryCards?: SummaryCard[] | ((filteredData: T[]) => SummaryCard[]);
   pageSize?: number;
@@ -836,6 +841,7 @@ export function DataTable<T extends Record<string, any>>({
   tabs,
   activeTab,
   onTabChange,
+  tabFilterFn,
   showDateFilter = true,
   summaryCards,
   pageSize = 20,
@@ -1024,7 +1030,8 @@ export function DataTable<T extends Record<string, any>>({
   }, []);
   const clearSort = useCallback(() => setSortEntries([]), []);
 
-  const filteredData = useMemo(() => {
+  // Base filtering: search + column filters + date range (NO tab filter)
+  const baseFilteredData = useMemo(() => {
     let result = [...data];
     if (search) {
       const s = search.toLowerCase();
@@ -1057,7 +1064,27 @@ export function DataTable<T extends Record<string, any>>({
         return isWithinInterval(d, { start: startOfDay(dateRange.from!), end: startOfDay(dateRange.to!) });
       });
     }
+    return result;
+  }, [data, search, columnFilters, columns, dateRange, autoDateField]);
+
+  // Dynamic tab counts (based on base filtered data)
+  const dynamicTabCounts = useMemo(() => {
+    if (!tabFilterFn || !tabs) return null;
+    const counts: Record<string, number> = {};
+    for (const tab of tabs) {
+      counts[tab.value] = baseFilteredData.filter((row) => tabFilterFn(row, tab.value)).length;
+    }
+    return counts;
+  }, [tabFilterFn, tabs, baseFilteredData]);
+
+  // Full filtered data: base + tab filter + sorting
+  const filteredData = useMemo(() => {
+    let result = tabFilterFn && activeTab
+      ? baseFilteredData.filter((row) => tabFilterFn(row, activeTab))
+      : [...baseFilteredData];
+
     if (sortEntries.length > 0) {
+      result = [...result];
       result.sort((a, b) => {
         for (const { key, dir } of sortEntries) {
           const col = columns.find((c) => c.key === key);
@@ -1073,7 +1100,7 @@ export function DataTable<T extends Record<string, any>>({
       });
     }
     return result;
-  }, [data, search, columnFilters, sortEntries, columns, dateRange, autoDateField]);
+  }, [baseFilteredData, tabFilterFn, activeTab, sortEntries, columns]);
 
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
@@ -1323,13 +1350,14 @@ export function DataTable<T extends Record<string, any>>({
       {tabs && (
         <div className="border-b border-border">
           <div className="flex gap-0 flex-wrap">
-            {tabs.map((tab) => {
-              const color = tab.color || "neutral";
-              const isActive = activeTab === tab.value;
+            {tabs.map((tabDef) => {
+              const color = tabDef.color || "neutral";
+              const isActive = activeTab === tabDef.value;
+              const count = dynamicTabCounts ? dynamicTabCounts[tabDef.value] : tabDef.count;
               return (
                 <button
-                  key={tab.value}
-                  onClick={() => { setSelectedRows(new Set()); onTabChange?.(tab.value); }}
+                  key={tabDef.value}
+                  onClick={() => { setSelectedRows(new Set()); onTabChange?.(tabDef.value); }}
                   className={cn(
                     "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     isActive
@@ -1337,15 +1365,15 @@ export function DataTable<T extends Record<string, any>>({
                       : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30",
                   )}
                 >
-                  {tab.label}
-                  {tab.count !== undefined && (
+                  {tabDef.label}
+                  {count !== undefined && (
                     <span
                       className={cn(
                         "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
                         isActive ? tabColorMapActive[color] : tabColorMap[color],
                       )}
                     >
-                      {tab.count}
+                      {count}
                     </span>
                   )}
                 </button>
