@@ -377,7 +377,7 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="left-1/2 top-1/2 w-[min(1080px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="left-1/2 top-1/2 w-[min(980px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
@@ -414,10 +414,8 @@ export default function HistoricoCompras() {
 
             {etapaModal === 1 ? (
               <div className="px-6 py-5">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
                   <div className="space-y-4 self-start">
-                    <p className="text-sm font-semibold text-foreground">Adicionar item</p>
-
                     <Dropdown
                       label="Produto"
                       value={produtoSelecionado}
@@ -437,33 +435,29 @@ export default function HistoricoCompras() {
 
                     <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
 
-                    <div className="grid gap-3">
-                      <div className="grid gap-1.5">
-                        <label className="text-sm font-medium text-foreground">Upload XML</label>
+                    <div className="flex items-end gap-3 pt-1">
+                      <div className="min-w-[170px]">
+                        <label className="mb-2 block text-sm font-medium text-foreground">XML</label>
                         <input
                           type="file"
                           accept=".xml,text/xml,application/xml"
                           onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
-                          className="block w-full text-sm text-foreground file:mr-3 file:rounded-lg file:border file:border-border file:bg-card file:px-3 file:py-2 file:text-sm file:font-medium"
+                          className="block w-full text-sm text-foreground file:rounded-lg file:border file:border-border file:bg-card file:px-3 file:py-2 file:text-sm file:font-medium"
                         />
-                        {xmlFile ? <p className="text-xs text-muted-foreground">{xmlFile.name}</p> : null}
                       </div>
 
-                      <div className="pt-1">
-                        <button
-                          type="button"
-                          onClick={handleAdicionarItem}
-                          className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
-                        >
-                          Adicionar item
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAdicionarItem}
+                        className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                      >
+                        Adicionar item
+                      </button>
                     </div>
                   </div>
 
                   <div className="space-y-4 self-start">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-foreground">Itens da entrada</p>
+                    <div className="flex justify-end">
                       <p className="text-xs text-muted-foreground">
                         {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
                       </p>
@@ -531,10 +525,9 @@ export default function HistoricoCompras() {
               </div>
             ) : (
               <div className="px-6 py-5">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-foreground">Resumo da compra</p>
                       <p className="text-xs text-muted-foreground">
                         {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
                       </p>
@@ -585,8 +578,6 @@ export default function HistoricoCompras() {
                   </div>
 
                   <div className="space-y-4 self-start">
-                    <p className="text-sm font-semibold text-foreground">Fechamento</p>
-
                     <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
 
                     <Dropdown
@@ -599,7 +590,7 @@ export default function HistoricoCompras() {
                     <div className="grid gap-1.5">
                       <label className="text-sm font-medium text-foreground">XML anexado</label>
                       <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
-                        {xmlFile ? xmlFile.name : "Nenhum arquivo enviado"}
+                        {xmlFile ? "Arquivo XML selecionado" : "Nenhum XML enviado"}
                       </div>
                     </div>
                   </div>
