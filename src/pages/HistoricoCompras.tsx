@@ -369,143 +369,121 @@ export default function HistoricoCompras() {
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="max-w-none border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <FormModal
-            title="Entrada de Produtos"
-            subtitle="Cadastre uma nova compra de produto no estoque."
-            onClose={closeModal}
-            footer={<SaveButton onClick={handleSalvarCompra} />}
-            size="xl"
-          >
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-              {" "}
-              <div className="space-y-4">
-                <FormRow>
-                  <TextField
-                    label="Data da compra"
-                    value={dataCompra}
-                    onChange={setDataCompra}
-                    type="date"
-                    error={showErrors ? errors.dataCompra : ""}
-                  />
-                  <Dropdown
-                    label="Usuário responsável"
-                    value={funcionario}
-                    setValue={setFuncionario}
-                    options={usuariosOptions}
-                  />
-                </FormRow>
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+            <div className="space-y-3">
+              <FormRow>
+                <Dropdown
+                  label="Produto"
+                  value={produtoSelecionado}
+                  setValue={setProdutoSelecionado}
+                  options={produtosOptions}
+                />
+                <TextField label="Custo do item" value={valorItem} onChange={setValorItem} placeholder="0,00" />
+              </FormRow>
 
-                <FormRow>
-                  <Dropdown
-                    label="Produto"
-                    value={produtoSelecionado}
-                    setValue={setProdutoSelecionado}
-                    options={produtosOptions}
-                  />
-                  <TextField label="Custo do item" value={valorItem} onChange={setValorItem} placeholder="0,00" />
-                </FormRow>
+              <FormRow>
+                <TextField
+                  label="Quantidade"
+                  value={quantidadeItem}
+                  onChange={setQuantidadeItem}
+                  type="number"
+                  placeholder="1"
+                />
+                <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
+              </FormRow>
 
-                <FormRow>
-                  <TextField
-                    label="Quantidade"
-                    value={quantidadeItem}
-                    onChange={setQuantidadeItem}
-                    type="number"
-                    placeholder="1"
-                  />
-                  <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
-                </FormRow>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleAdicionarItem}
+                  className="text-sm font-semibold text-primary transition-colors hover:text-primary/80"
+                >
+                  Adicionar
+                </button>
+              </div>
 
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleAdicionarItem}
-                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-                  >
-                    Adicionar
-                  </button>
-                </div>
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <input
+                  type="checkbox"
+                  checked={debitarCaixa}
+                  onChange={(e) => setDebitarCaixa(e.target.checked)}
+                  className="h-4 w-4 rounded border-border"
+                />
+                Debitar do caixa
+              </label>
+            </div>
 
+            <div className="space-y-3">
+              <div className="overflow-hidden rounded-lg border border-border">
+                <table className="w-full border-collapse">
+                  <thead className="bg-muted/40">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                      <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                      <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                      <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {itensCompra.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                          Nenhum produto adicionado.
+                        </td>
+                      </tr>
+                    ) : (
+                      itensCompra.map((item) => {
+                        const valor = toNumberBR(item.valor);
+                        const quantidade = Number(item.quantidade) || 0;
+                        const total = valor * quantidade;
+
+                        return (
+                          <tr key={item.id} className="border-t border-border bg-card">
+                            <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                            <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                            <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                            <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                              {formatBRL(total)}
+                            </td>
+                            <td className="px-2 py-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoverItem(item.id)}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid grid-cols-[180px_1fr] items-start gap-4">
                 <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
 
-                <label className="flex items-center gap-3 text-sm font-medium text-foreground">
-                  <input
-                    type="checkbox"
-                    checked={debitarCaixa}
-                    onChange={(e) => setDebitarCaixa(e.target.checked)}
-                    className="h-4 w-4 rounded border-border"
-                  />
-                  Debitar do caixa
-                </label>
-              </div>
-              <div className="space-y-4">
-                <div className="overflow-hidden rounded-lg border border-border">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-muted/50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
-                        <th className="w-16 px-4 py-3 text-center text-sm font-semibold text-foreground" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {itensCompra.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                            Nenhum produto adicionado.
-                          </td>
-                        </tr>
-                      ) : (
-                        itensCompra.map((item) => {
-                          const valor = toNumberBR(item.valor);
-                          const quantidade = Number(item.quantidade) || 0;
-                          const total = valor * quantidade;
-
-                          return (
-                            <tr key={item.id} className="border-t border-border bg-card">
-                              <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
-                              <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
-                              <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
-                              <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
-                                {formatBRL(total)}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoverItem(item.id)}
-                                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {showErrors && errors.itensCompra ? (
-                  <p className="text-sm text-destructive">{errors.itensCompra}</p>
-                ) : null}
-
-                <div className="space-y-1 rounded-lg border border-border bg-card px-4 py-3 text-right">
+                <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
                   <div className="text-sm text-muted-foreground">
                     Total: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="mt-1 text-sm text-muted-foreground">
                     Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
                   </div>
-                  <div className="text-base font-semibold text-foreground">
+                  <div className="mt-2 text-base font-semibold text-foreground">
                     Total c/ desconto: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
                   </div>
                 </div>
               </div>
+
+              {showErrors && errors.itensCompra ? (
+                <p className="text-sm text-destructive">{errors.itensCompra}</p>
+              ) : null}
             </div>
-          </FormModal>
+          </div>
         </DialogContent>
       </Dialog>
 
