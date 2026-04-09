@@ -618,7 +618,6 @@ export default function HistoricoCompras() {
                     {showErrors && errors.itensCompra ? (
                       <p className="text-sm text-destructive">{errors.itensCompra}</p>
                     ) : null}
-                  </div>
                 </div>
               </div>
             ) : (
