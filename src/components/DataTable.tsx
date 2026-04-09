@@ -841,6 +841,7 @@ export function DataTable<T extends Record<string, any>>({
   tabs,
   activeTab,
   onTabChange,
+  tabFilterFn,
   showDateFilter = true,
   summaryCards,
   pageSize = 20,
