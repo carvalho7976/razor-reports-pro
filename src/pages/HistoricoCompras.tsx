@@ -566,36 +566,40 @@ export default function HistoricoCompras() {
                       </table>
                     </div>
 
-                    <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
-                      <div className="text-sm text-muted-foreground">
-                        Subtotal: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
-                      </div>
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
-                      </div>
-                      <div className="mt-3 border-t border-border pt-3 text-[16px] font-semibold text-foreground">
-                        Total final: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
-                      </div>
-                    </div>
-                  </div>
+                        <div className="space-y-4 self-start">
+  <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
 
-                  <div className="space-y-4 self-start">
-                    <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
+  <Dropdown
+    label="Origem do pagamento"
+    value={debitoTipo}
+    setValue={setDebitoTipo}
+    options={debitoOptions}
+  />
 
-                    <Dropdown
-                      label="Origem do pagamento"
-                      value={debitoTipo}
-                      setValue={setDebitoTipo}
-                      options={debitoOptions}
-                    />
+  <div className="grid gap-1.5">
+    <label className="text-sm font-medium text-foreground">XML anexado</label>
+    <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+      {xmlFile ? "Arquivo XML selecionado" : "Nenhum XML enviado"}
+    </div>
+  </div>
 
-                    <div className="grid gap-1.5">
-                      <label className="text-sm font-medium text-foreground">XML anexado</label>
-                      <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
-                        {xmlFile ? "Arquivo XML selecionado" : "Nenhum XML enviado"}
-                      </div>
-                    </div>
-                  </div>
+  <div className="rounded-lg border border-border bg-card px-4 py-4">
+    <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <span>Subtotal</span>
+      <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+    </div>
+
+    <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
+      <span>Desconto</span>
+      <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
+    </div>
+
+    <div className="mt-3 border-t border-border pt-3 flex items-center justify-between text-[16px] font-semibold text-foreground">
+      <span>Total final</span>
+      <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+    </div>
+  </div>
+</div>
                 </div>
               </div>
             )}
