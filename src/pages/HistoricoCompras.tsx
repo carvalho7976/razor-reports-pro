@@ -92,7 +92,24 @@ const initialData: CompraResumida[] = [
 
 function toNumberBR(value: string) {
   if (!value) return 0;
-  return Number(value.replace(/\./g, "").replace(",", ".")) || 0;
+  const cleaned = value.replace(/[^\d,]/g, "");
+  return Number(cleaned.replace(/\./g, "").replace(",", ".")) || 0;
+}
+
+function formatCurrencyInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return "R$ 0,00";
+
+  const numberValue = Number(digits) / 100;
+  return numberValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function sanitizeQuantity(value: string) {
+  const digits = value.replace(/\D/g, "");
+  return digits || "1";
 }
 
 export default function HistoricoCompras() {
@@ -105,9 +122,9 @@ export default function HistoricoCompras() {
   const [detalhadoDataFiltro, setDetalhadoDataFiltro] = useState<string | null>(null);
 
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
-  const [valorItem, setValorItem] = useState("");
+  const [valorItem, setValorItem] = useState("R$ 0,00");
   const [quantidadeItem, setQuantidadeItem] = useState("1");
-  const [desconto, setDesconto] = useState("0,00");
+  const [desconto, setDesconto] = useState("R$ 0,00");
   const [debitoTipo, setDebitoTipo] = useState("caixa");
   const [itensCompra, setItensCompra] = useState<ItemCompraForm[]>([]);
   const [showErrors, setShowErrors] = useState(false);
@@ -116,9 +133,9 @@ export default function HistoricoCompras() {
 
   const resetForm = () => {
     setProdutoSelecionado("");
-    setValorItem("");
+    setValorItem("R$ 0,00");
     setQuantidadeItem("1");
-    setDesconto("0,00");
+    setDesconto("R$ 0,00");
     setDebitoTipo("caixa");
     setItensCompra([]);
     setShowErrors(false);
@@ -305,7 +322,7 @@ export default function HistoricoCompras() {
     ]);
 
     setProdutoSelecionado("");
-    setValorItem("");
+    setValorItem("R$ 0,00");
     setQuantidadeItem("1");
 
     toast({
@@ -378,7 +395,7 @@ export default function HistoricoCompras() {
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="left-1/2 top-1/2 w-[min(980px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <div className="flex h-[520px] w-full flex-col overflow-hidden rounded-2xl bg-card shadow-2xl">
+          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -413,7 +430,7 @@ export default function HistoricoCompras() {
             </div>
 
             {etapaModal === 1 ? (
-              <div className="flex-1 overflow-auto px-6 py-5">
+              <div className="px-6 py-5">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
                   <div className="space-y-4 self-start">
                     <Dropdown
@@ -423,37 +440,52 @@ export default function HistoricoCompras() {
                       options={produtosOptions}
                     />
 
-                    <TextField label="Custo unitário" value={valorItem} onChange={setValorItem} placeholder="0,00" />
+                    <TextField
+                      label="Custo unitário"
+                      value={valorItem}
+                      onChange={(value) => setValorItem(formatCurrencyInput(value))}
+                      placeholder="R$ 0,00"
+                    />
 
                     <TextField
                       label="Quantidade"
                       value={quantidadeItem}
-                      onChange={setQuantidadeItem}
-                      type="number"
+                      onChange={(value) => setQuantidadeItem(sanitizeQuantity(value))}
+                      type="text"
                       placeholder="1"
                     />
 
                     <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
 
-                    <div className="flex items-end gap-3 pt-1">
-                      <label className="cursor-pointer">
-                        <input
-                          type="file"
-                          accept=".xml,text/xml,application/xml"
-                          onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
-                          className="hidden"
-                        />
-                        <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
-                          Importar XML
-                        </span>
-                      </label>
+                    <div className="flex items-center justify-between gap-3 pt-1">
+                      <div className="flex items-end gap-3">
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept=".xml,text/xml,application/xml"
+                            onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
+                            Importar XML
+                          </span>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={handleAdicionarItem}
+                          className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                        >
+                          Adicionar item
+                        </button>
+                      </div>
 
                       <button
                         type="button"
-                        onClick={handleAdicionarItem}
-                        className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                        onClick={handleAvancarFechamento}
+                        className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
                       >
-                        Adicionar item
+                        Avançar para fechamento
                       </button>
                     </div>
                   </div>
@@ -520,10 +552,10 @@ export default function HistoricoCompras() {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 overflow-auto px-6 py-5">
+              <div className="px-6 py-5">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
                   <div className="space-y-4">
-                    <div className="overflow-hidden rounded-lg border border-border bg-card">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card min-h-[233px]">
                       <table className="w-full border-collapse">
                         <thead className="bg-muted/40">
                           <tr>
@@ -556,7 +588,12 @@ export default function HistoricoCompras() {
                   </div>
 
                   <div className="space-y-4 self-start">
-                    <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
+                    <TextField
+                      label="Desconto total"
+                      value={desconto}
+                      onChange={(value) => setDesconto(formatCurrencyInput(value))}
+                      placeholder="R$ 0,00"
+                    />
 
                     <Dropdown
                       label="Origem do pagamento"
@@ -588,35 +625,27 @@ export default function HistoricoCompras() {
 
             <div className="border-t border-border px-6 py-4">
               <div className="flex items-center justify-between gap-3">
-                {etapaModal === 1 ? (
-                  <div />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setEtapaModal(1)}
-                    className="inline-flex h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Voltar
-                  </button>
-                )}
+                {etapaModal === 2 ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setEtapaModal(1)}
+                      className="inline-flex h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Voltar
+                    </button>
 
-                {etapaModal === 1 ? (
-                  <button
-                    type="button"
-                    onClick={handleAvancarFechamento}
-                    className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-                  >
-                    Avançar para fechamento
-                  </button>
+                    <button
+                      type="button"
+                      onClick={handleSalvarCompra}
+                      className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                    >
+                      Concluir compra
+                    </button>
+                  </>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={handleSalvarCompra}
-                    className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-                  >
-                    Concluir compra
-                  </button>
+                  <div className="h-11" />
                 )}
               </div>
             </div>
