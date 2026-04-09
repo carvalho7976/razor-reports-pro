@@ -150,6 +150,18 @@ export default function HistoricoCompras() {
   const [showErrors, setShowErrors] = useState(false);
   const [etapaModal, setEtapaModal] = useState<1 | 2>(1);
   const [xmlFile, setXmlFile] = useState<File | null>(null);
+  const [localNotice, setLocalNotice] = useState<{
+    title: string;
+    description?: string;
+  } | null>(null);
+
+  const showLocalNotice = (title: string, description?: string) => {
+    setLocalNotice({ title, description });
+
+    window.setTimeout(() => {
+      setLocalNotice(null);
+    }, 2200);
+  };
 
   const resetForm = () => {
     setProdutoSelecionado("");
@@ -213,7 +225,7 @@ export default function HistoricoCompras() {
         <button
           type="button"
           onClick={() => abrirDetalhadoPorData(v)}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-black underline hover:text-black"
         >
           {v}
         </button>
@@ -341,11 +353,7 @@ export default function HistoricoCompras() {
     const quantidade = Number(quantidadeItem) || 0;
 
     if (!produtoSelecionado || valor <= 0 || quantidade <= 0) {
-      toast({
-        title: "Preencha o item corretamente",
-        description: "Selecione o produto, informe valor e quantidade válidos.",
-        variant: "destructive",
-      });
+      showLocalNotice("Preencha o item corretamente", "Selecione o produto, informe valor e quantidade válidos.");
       return;
     }
 
@@ -365,10 +373,7 @@ export default function HistoricoCompras() {
     setValorItemDigits("");
     setQuantidadeItem("1");
 
-    toast({
-      title: "Item adicionado",
-      description: produtoLabel,
-    });
+    showLocalNotice("Item adicionado", produtoLabel);
   };
 
   const handleRemoverItem = (id: number) => {
@@ -415,6 +420,17 @@ export default function HistoricoCompras() {
 
   return (
     <AppLayout>
+      {localNotice ? (
+        <div className="pointer-events-none fixed bottom-4 right-4 z-[120]">
+          <div className="min-w-[240px] max-w-[320px] rounded-[8px] border border-[#d7dde5] bg-[#f8fafc] px-4 py-3 shadow-none">
+            <p className="text-sm font-semibold text-foreground">{localNotice.title}</p>
+            {localNotice.description ? (
+              <p className="mt-1 text-sm text-muted-foreground">{localNotice.description}</p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       <DataTable
         title="Histórico de Compras"
         titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
