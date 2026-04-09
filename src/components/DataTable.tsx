@@ -1350,13 +1350,14 @@ export function DataTable<T extends Record<string, any>>({
       {tabs && (
         <div className="border-b border-border">
           <div className="flex gap-0 flex-wrap">
-            {tabs.map((tab) => {
-              const color = tab.color || "neutral";
-              const isActive = activeTab === tab.value;
+            {tabs.map((tabDef) => {
+              const color = tabDef.color || "neutral";
+              const isActive = activeTab === tabDef.value;
+              const count = dynamicTabCounts ? dynamicTabCounts[tabDef.value] : tabDef.count;
               return (
                 <button
-                  key={tab.value}
-                  onClick={() => { setSelectedRows(new Set()); onTabChange?.(tab.value); }}
+                  key={tabDef.value}
+                  onClick={() => { setSelectedRows(new Set()); onTabChange?.(tabDef.value); }}
                   className={cn(
                     "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     isActive
@@ -1364,8 +1365,8 @@ export function DataTable<T extends Record<string, any>>({
                       : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30",
                   )}
                 >
-                  {tab.label}
-                  {tab.count !== undefined && (
+                  {tabDef.label}
+                  {count !== undefined && (
                     <span
                       className={cn(
                         "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
