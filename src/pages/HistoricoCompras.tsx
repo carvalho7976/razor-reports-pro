@@ -114,8 +114,6 @@ export default function HistoricoCompras() {
   const [modalOpen, setModalOpen] = useState(false);
   const [detalhadoDataFiltro, setDetalhadoDataFiltro] = useState<string | null>(null);
 
-  const [dataCompra, setDataCompra] = useState("2026-04-08");
-  const [funcionario, setFuncionario] = useState("Lara");
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
   const [valorItem, setValorItem] = useState("");
   const [quantidadeItem, setQuantidadeItem] = useState("1");
@@ -125,8 +123,6 @@ export default function HistoricoCompras() {
   const [showErrors, setShowErrors] = useState(false);
 
   const resetForm = () => {
-    setDataCompra("2026-04-08");
-    setFuncionario("Lara");
     setProdutoSelecionado("");
     setValorItem("");
     setQuantidadeItem("1");
@@ -332,8 +328,8 @@ export default function HistoricoCompras() {
 
     const novaCompra: CompraResumida = {
       id: Math.max(0, ...compras.map((item) => item.id)) + 1,
-      data: fromDateInputValue(dataCompra),
-      funcionario,
+      data: new Date().toLocaleDateString("pt-BR"),
+      funcionario: "Lara",
       valor: subtotalCompra,
       desconto: descontoCompra,
       total: totalCompra,
@@ -375,7 +371,7 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="w-[96vw] max-w-7xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="max-w-none border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Entrada de Produtos"
             subtitle="Cadastre uma nova compra de produto no estoque."
