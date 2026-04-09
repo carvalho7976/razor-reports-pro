@@ -165,11 +165,10 @@ export function FormModal({
         "w-full overflow-visible rounded-2xl bg-card shadow-2xl",
         size === "sm" && "max-w-md",
         size === "md" && "max-w-xl",
-        size === "lg" && "max-w-3xl",
+        size === "lg" && "max-w-4xl",
         size === "xl" && "max-w-5xl",
       )}
     >
-      {" "}
       <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted/50 to-card px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
