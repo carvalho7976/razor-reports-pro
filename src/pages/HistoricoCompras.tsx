@@ -193,7 +193,7 @@ export default function HistoricoCompras() {
         <button
           type="button"
           onClick={() => abrirDetalhadoPorData(v)}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-foreground underline hover:text-foreground"
         >
           {v}
         </button>
