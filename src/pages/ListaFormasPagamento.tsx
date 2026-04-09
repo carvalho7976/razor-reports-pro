@@ -163,9 +163,8 @@ function FakeLogo({ label, dark = true }: { label: string; dark?: boolean }) {
 }
 
 function FieldError({ message }: { message?: string }) {
-  return (
-    <div className="min-h-[12px] pt-1">{message && <p className="text-xs font-medium text-destructive">{message}</p>}</div>
-  );
+  if (!message) return null;
+  return <p className="text-xs font-medium text-destructive mt-0.5">{message}</p>;
 }
 
 function TextField({
@@ -182,14 +181,14 @@ function TextField({
   error?: string;
 }) {
   return (
-    <div className="grid gap-1">
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+    <div className="grid gap-0.5">
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "h-11 w-full rounded-lg border px-3.5 text-sm outline-none transition-all bg-card text-foreground",
+          "h-10 w-full rounded-lg border px-3 text-sm outline-none transition-all bg-card text-foreground",
           error
             ? "border-destructive/50 focus:border-destructive focus:ring-4 focus:ring-destructive/10"
             : "border-border focus:border-foreground focus:ring-4 focus:ring-muted",
@@ -241,14 +240,14 @@ function Dropdown({
   }, []);
 
   return (
-    <div className="relative grid gap-1" ref={wrapperRef}>
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+    <div className="relative grid gap-0.5" ref={wrapperRef}>
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
 
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "flex h-11 w-full items-center justify-between rounded-lg border bg-card px-3.5 text-sm transition-all text-foreground",
+          "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm transition-all text-foreground",
           error ? "border-destructive/50 focus:ring-destructive/10" : "border-border focus:ring-muted",
           "hover:border-muted-foreground focus:border-foreground",
         )}
@@ -336,15 +335,15 @@ function FormModal({
         </div>
       </div>
 
-      <div className="grid gap-2 px-6 pt-6 pb-8">{children}</div>
+      <div className="grid gap-1 px-6 pt-5 pb-6">{children}</div>
 
-      <div className="border-t border-border px-6 py-4">{footer}</div>
+      <div className="border-t border-border px-6 py-3">{footer}</div>
     </div>
   );
 }
 
 function FormRow({ children, cols = 2 }: { children: ReactNode; cols?: 2 | 3 }) {
-  return <div className={`grid gap-1.5 ${cols === 3 ? "grid-cols-3" : "grid-cols-2"}`}>{children}</div>;
+  return <div className={`grid gap-3 ${cols === 3 ? "grid-cols-3" : "grid-cols-2"}`}>{children}</div>;
 }
 
 function InlineTextInput({
@@ -1035,13 +1034,13 @@ export default function ListaFormasPagamento() {
                 </div>
               </div>
 
-              <div className="grid gap-2 px-6 pt-6 pb-8">
+              <div className="grid gap-1 px-6 pt-5 pb-6">
                 <p className="text-sm text-foreground/80">
                   {modal?.type === "delete" ? `Deseja excluir "${getNomeLabel(modal.item.nome)}"?` : ""}
                 </p>
               </div>
 
-              <div className="border-t border-border px-6 py-4">
+              <div className="border-t border-border px-6 py-3">
                 <div className="flex">
                   <button
                     type="button"

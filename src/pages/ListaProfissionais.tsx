@@ -161,13 +161,15 @@ export default function ListaProfissionais() {
               onClose={closeModal}
               footer={<SaveButton onClick={handleSave} />}
             >
-              <TextField label="Nome" value={form.nome} onChange={v => setForm({ ...form, nome: v })} error={showErrors ? errors.nome : ""} />
-              <TextField label="Email" value={form.email} onChange={v => setForm({ ...form, email: v })} error={showErrors ? errors.email : ""} />
               <FormRow>
+                <TextField label="Nome" value={form.nome} onChange={v => setForm({ ...form, nome: v })} error={showErrors ? errors.nome : ""} />
+                <TextField label="Email" value={form.email} onChange={v => setForm({ ...form, email: v })} error={showErrors ? errors.email : ""} />
+              </FormRow>
+              <FormRow cols={3}>
                 <TextField label="Celular" value={form.celular} onChange={v => setForm({ ...form, celular: v })} placeholder="(00) 00000-0000" />
                 <TextField label="Aniversário" value={form.aniversario} onChange={v => setForm({ ...form, aniversario: v })} placeholder="DD/MM/AAAA" />
+                <Dropdown label="Função" value={form.funcao} setValue={v => setForm({ ...form, funcao: v })} options={funcaoOptions} />
               </FormRow>
-              <Dropdown label="Função" value={form.funcao} setValue={v => setForm({ ...form, funcao: v })} options={funcaoOptions} />
             </FormModal>
           )}
         </DialogContent>
