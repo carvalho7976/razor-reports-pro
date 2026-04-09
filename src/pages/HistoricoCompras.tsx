@@ -457,35 +457,25 @@ export default function HistoricoCompras() {
 
                     <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
 
-                    <div className="flex items-center justify-between gap-3 pt-1">
-                      <div className="flex items-end gap-3">
-                        <label className="cursor-pointer">
-                          <input
-                            type="file"
-                            accept=".xml,text/xml,application/xml"
-                            onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
-                            className="hidden"
-                          />
-                          <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
-                            Importar XML
-                          </span>
-                        </label>
-
-                        <button
-                          type="button"
-                          onClick={handleAdicionarItem}
-                          className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
-                        >
-                          Adicionar item
-                        </button>
-                      </div>
+                    <div className="flex items-end gap-3 pt-1">
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept=".xml,text/xml,application/xml"
+                          onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
+                          className="hidden"
+                        />
+                        <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
+                          Importar XML
+                        </span>
+                      </label>
 
                       <button
                         type="button"
-                        onClick={handleAvancarFechamento}
-                        className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                        onClick={handleAdicionarItem}
+                        className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
                       >
-                        Avançar para fechamento
+                        Adicionar item
                       </button>
                     </div>
                   </div>
@@ -625,27 +615,35 @@ export default function HistoricoCompras() {
 
             <div className="border-t border-border px-6 py-4">
               <div className="flex items-center justify-between gap-3">
-                {etapaModal === 2 ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setEtapaModal(1)}
-                      className="inline-flex h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Voltar
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleSalvarCompra}
-                      className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-                    >
-                      Concluir compra
-                    </button>
-                  </>
+                {etapaModal === 1 ? (
+                  <div />
                 ) : (
-                  <div className="h-11" />
+                  <button
+                    type="button"
+                    onClick={() => setEtapaModal(1)}
+                    className="inline-flex h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Voltar
+                  </button>
+                )}
+
+                {etapaModal === 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleAvancarFechamento}
+                    className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                  >
+                    Avançar para fechamento
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSalvarCompra}
+                    className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                  >
+                    Concluir compra
+                  </button>
                 )}
               </div>
             </div>
