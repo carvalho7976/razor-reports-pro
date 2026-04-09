@@ -47,21 +47,20 @@ export default function RelatorioAgendamentos() {
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os agendamentos selecionados" },
   ];
 
-  const origemCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    allData.forEach(d => { counts[d.origem] = (counts[d.origem] || 0) + 1; });
-    return counts;
-  }, [allData]);
 
-  const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(allData.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
-    ...Object.entries(origemCounts).map(([origem, count]) => ({
-      label: origem,
-      value: `${count} (${Math.round(count / allData.length * 100)}%)`,
-      type: "quantity" as const,
-      size: "compact" as const,
-    })),
-  ];
+  const buildCards = (filtered: Agendamento[]): SummaryCard[] => {
+    const counts: Record<string, number> = {};
+    filtered.forEach(d => { counts[d.origem] = (counts[d.origem] || 0) + 1; });
+    return [
+      { label: "Total", value: String(filtered.length), type: "quantity" as const, icon: <Hash className="h-4 w-4" />, size: "compact" as const, color: "blue" as const },
+      ...Object.entries(counts).map(([origem, count]) => ({
+        label: origem,
+        value: `${count} (${filtered.length ? Math.round(count / filtered.length * 100) : 0}%)`,
+        type: "quantity" as const,
+        size: "compact" as const,
+      })),
+    ];
+  };
 
   const columns: Column<Agendamento>[] = [
     {
