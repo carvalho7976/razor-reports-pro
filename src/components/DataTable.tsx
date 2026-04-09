@@ -128,6 +128,11 @@ interface DataTableProps<T extends Record<string, any>> {
   tabs?: TabDef[];
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  /** When provided, DataTable handles tab filtering internally.
+   *  Pass ALL data (unfiltered by tab) and this function to determine tab membership.
+   *  Tab counts will react to search/date filters automatically.
+   *  Return true if `row` belongs to the given `tabValue`. */
+  tabFilterFn?: (row: T, tabValue: string) => boolean;
   showDateFilter?: boolean;
   summaryCards?: SummaryCard[] | ((filteredData: T[]) => SummaryCard[]);
   pageSize?: number;
