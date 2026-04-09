@@ -378,7 +378,7 @@ export default function HistoricoCompras() {
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="left-1/2 top-1/2 w-[min(980px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
+          <div className="flex h-[520px] w-full flex-col overflow-hidden rounded-2xl bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -413,7 +413,7 @@ export default function HistoricoCompras() {
             </div>
 
             {etapaModal === 1 ? (
-              <div className="px-6 py-5">
+              <div className="flex-1 overflow-auto px-6 py-5">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
                   <div className="space-y-4 self-start">
                     <Dropdown
@@ -520,10 +520,10 @@ export default function HistoricoCompras() {
                 </div>
               </div>
             ) : (
-              <div className="px-6 py-5 min-h-[430px]">
-                <div className="grid min-h-[430px] grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-                  <div className="space-y-4 h-full">
-                    <div className="overflow-hidden rounded-lg border border-border bg-card min-h-[260px]">
+              <div className="flex-1 overflow-auto px-6 py-5">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+                  <div className="space-y-4">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card">
                       <table className="w-full border-collapse">
                         <thead className="bg-muted/40">
                           <tr>
@@ -564,6 +564,7 @@ export default function HistoricoCompras() {
                       setValue={setDebitoTipo}
                       options={debitoOptions}
                     />
+
                     <div className="rounded-lg border border-border bg-card px-4 py-4">
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>Subtotal</span>
@@ -575,7 +576,7 @@ export default function HistoricoCompras() {
                         <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
                       </div>
 
-                      <div className="mt-3 border-t border-border pt-3 flex items-center justify-between text-[16px] font-semibold text-foreground">
+                      <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-[16px] font-semibold text-foreground">
                         <span>Total final</span>
                         <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
                       </div>
