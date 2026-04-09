@@ -103,7 +103,7 @@ export default function RelatorioAgendamentos() {
   return (
     <AppLayout>
       <DataTable title="Agendamentos"
-        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />} data={allData} columns={columns} summaryCards={summaryCards} selectable selectionActions={selectionActions} tabs={tabs} activeTab={tab} onTabChange={setTab} tabFilterFn={tabFilter} pageSize={15} showDateFilter={true} tableId="relatorio_agendamentos" />
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />} data={allData} columns={columns} summaryCards={buildCards} selectable selectionActions={selectionActions} tabs={tabs} activeTab={tab} onTabChange={setTab} tabFilterFn={tabFilter} pageSize={15} showDateFilter={true} tableId="relatorio_agendamentos" />
       <YouTubeModal
         open={aulaOpen}
         onClose={() => setAulaOpen(false)}
