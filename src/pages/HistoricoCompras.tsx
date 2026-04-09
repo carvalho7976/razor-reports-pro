@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
-import { User, CreditCard, Hash, Trash2, ChevronLeft, Check } from "lucide-react";
+import { User, CreditCard, Hash, Trash2, ChevronLeft } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { TextField, Dropdown } from "@/components/FormModal";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -100,19 +100,12 @@ function formatCurrencyInput(value: string) {
   const digits = value.replace(/\D/g, "");
   if (!digits) return "R$ 0,00";
 
-  const n = digits.length;
-  let numberValue: number;
-  if (n === 1) {
-    numberValue = Number(digits);
-  } else if (n === 2) {
-    numberValue = Number(digits) / 10;
-  } else {
-    numberValue = Number(digits) / 100;
-  }
-
+  const numberValue = Number(digits) / 10;
   return numberValue.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
 }
 
@@ -122,6 +115,7 @@ function sanitizeQuantity(value: string) {
 }
 
 export default function HistoricoCompras() {
+  const { toast } = useToast();
 
   const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState<"resumido" | "detalhado">("resumido");
@@ -138,7 +132,6 @@ export default function HistoricoCompras() {
   const [showErrors, setShowErrors] = useState(false);
   const [etapaModal, setEtapaModal] = useState<1 | 2>(1);
   const [xmlFile, setXmlFile] = useState<File | null>(null);
-  const [itemAdicionado, setItemAdicionado] = useState<string | null>(null);
 
   const resetForm = () => {
     setProdutoSelecionado("");
@@ -150,7 +143,6 @@ export default function HistoricoCompras() {
     setShowErrors(false);
     setEtapaModal(1);
     setXmlFile(null);
-    setItemAdicionado(null);
   };
 
   const openNew = () => {
@@ -203,7 +195,7 @@ export default function HistoricoCompras() {
         <button
           type="button"
           onClick={() => abrirDetalhadoPorData(v)}
-          className="font-medium text-foreground hover:underline"
+          className="font-medium text-primary hover:underline"
         >
           {v}
         </button>
@@ -230,14 +222,6 @@ export default function HistoricoCompras() {
       label: "Total",
       align: "right",
       render: (v: number) => <span className="font-medium text-emerald-600">{formatBRL(v)}</span>,
-    },
-    {
-      key: "debitoTipo",
-      label: "Origem do Pagamento",
-      render: (v: string) => {
-        const map: Record<string, string> = { caixa: "Retirar do Caixa", conta: "Retirar da Conta", parcelar: "Parcelar" };
-        return map[v] || v || "—";
-      },
     },
   ];
 
@@ -319,8 +303,10 @@ export default function HistoricoCompras() {
     const quantidade = Number(quantidadeItem) || 0;
 
     if (!produtoSelecionado || valor <= 0 || quantidade <= 0) {
-      toast.error("Preencha o item corretamente", {
+      toast({
+        title: "Preencha o item corretamente",
         description: "Selecione o produto, informe valor e quantidade válidos.",
+        variant: "destructive",
       });
       return;
     }
@@ -341,8 +327,10 @@ export default function HistoricoCompras() {
     setValorItem("R$ 0,00");
     setQuantidadeItem("1");
 
-    setItemAdicionado(produtoLabel);
-    setTimeout(() => setItemAdicionado(null), 3000);
+    toast({
+      title: "Item adicionado",
+      description: produtoLabel,
+    });
   };
 
   const handleRemoverItem = (id: number) => {
@@ -381,7 +369,8 @@ export default function HistoricoCompras() {
     setCompras((prev) => [novaCompra, ...prev]);
     closeModal();
 
-    toast.success("Compra registrada", {
+    toast({
+      title: "Compra registrada",
       description: "A entrada de produtos foi salva com sucesso.",
     });
   };
@@ -547,14 +536,6 @@ export default function HistoricoCompras() {
                         </table>
                       </div>
                     </div>
-
-                    {itemAdicionado && (
-                      <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">
-                        <Check className="h-4 w-4" />
-                        <span className="font-medium">{itemAdicionado}</span>
-                        <span className="text-emerald-600/70 dark:text-emerald-500/70">adicionado</span>
-                      </div>
-                    )}
 
                     {showErrors && errors.itensCompra ? (
                       <p className="text-sm text-destructive">{errors.itensCompra}</p>
