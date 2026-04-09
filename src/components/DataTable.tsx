@@ -1030,7 +1030,8 @@ export function DataTable<T extends Record<string, any>>({
   }, []);
   const clearSort = useCallback(() => setSortEntries([]), []);
 
-  const filteredData = useMemo(() => {
+  // Base filtering: search + column filters + date range (NO tab filter)
+  const baseFilteredData = useMemo(() => {
     let result = [...data];
     if (search) {
       const s = search.toLowerCase();
@@ -1063,7 +1064,27 @@ export function DataTable<T extends Record<string, any>>({
         return isWithinInterval(d, { start: startOfDay(dateRange.from!), end: startOfDay(dateRange.to!) });
       });
     }
+    return result;
+  }, [data, search, columnFilters, columns, dateRange, autoDateField]);
+
+  // Dynamic tab counts (based on base filtered data)
+  const dynamicTabCounts = useMemo(() => {
+    if (!tabFilterFn || !tabs) return null;
+    const counts: Record<string, number> = {};
+    for (const tab of tabs) {
+      counts[tab.value] = baseFilteredData.filter((row) => tabFilterFn(row, tab.value)).length;
+    }
+    return counts;
+  }, [tabFilterFn, tabs, baseFilteredData]);
+
+  // Full filtered data: base + tab filter + sorting
+  const filteredData = useMemo(() => {
+    let result = tabFilterFn && activeTab
+      ? baseFilteredData.filter((row) => tabFilterFn(row, activeTab))
+      : [...baseFilteredData];
+
     if (sortEntries.length > 0) {
+      result = [...result];
       result.sort((a, b) => {
         for (const { key, dir } of sortEntries) {
           const col = columns.find((c) => c.key === key);
@@ -1079,7 +1100,7 @@ export function DataTable<T extends Record<string, any>>({
       });
     }
     return result;
-  }, [data, search, columnFilters, sortEntries, columns, dateRange, autoDateField]);
+  }, [baseFilteredData, tabFilterFn, activeTab, sortEntries, columns]);
 
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
