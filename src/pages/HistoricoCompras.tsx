@@ -421,12 +421,17 @@ export default function HistoricoCompras() {
   return (
     <AppLayout>
       {localNotice ? (
-        <div className="pointer-events-none fixed bottom-4 right-4 z-[120]">
-          <div className="min-w-[240px] max-w-[320px] rounded-[8px] border border-[#d7dde5] bg-[#f8fafc] px-4 py-3 shadow-none">
-            <p className="text-sm font-semibold text-foreground">{localNotice.title}</p>
-            {localNotice.description ? (
-              <p className="mt-1 text-sm text-muted-foreground">{localNotice.description}</p>
-            ) : null}
+        <div className="pointer-events-none absolute bottom-[78px] left-6 z-[120]">
+          <div className="flex min-h-[44px] items-center overflow-hidden rounded-[8px] border border-[#bfd7f2] bg-[#eef4fb] text-sm shadow-none">
+            <div className="px-4 py-3 font-medium text-[#1f2937]">1 selecionado</div>
+
+            <div className="h-6 w-px bg-[#d7e5f5]" />
+
+            <div className="flex items-center gap-5 px-4 py-3">
+              <span className="font-medium text-[#16a34a]">{localNotice.title}</span>
+
+              {localNotice.description ? <span className="text-[#374151]">{localNotice.description}</span> : null}
+            </div>
           </div>
         </div>
       ) : null}
@@ -451,7 +456,7 @@ export default function HistoricoCompras() {
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="left-1/2 top-1/2 w-[min(980px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
+          <div className="relative w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
