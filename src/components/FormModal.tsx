@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <p className="text-xs font-medium text-destructive mt-0.5">{message}</p>;
+  return <p className="mt-0.5 text-xs font-medium text-destructive">{message}</p>;
 }
 
 export function TextField({
@@ -13,13 +13,15 @@ export function TextField({
   placeholder,
   error,
   type = "text",
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   error?: string;
-  type?: "text" | "number";
+  type?: "text" | "number" | "date";
+  disabled?: boolean;
 }) {
   return (
     <div className="grid gap-0.5">
@@ -29,8 +31,10 @@ export function TextField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         type={type}
+        disabled={disabled}
         className={cn(
           "h-10 w-full rounded-lg border px-3 text-sm outline-none transition-all bg-card text-foreground",
+          disabled && "cursor-default opacity-100",
           error
             ? "border-destructive/50 focus:border-destructive focus:ring-4 focus:ring-destructive/10"
             : "border-border focus:border-foreground focus:ring-4 focus:ring-muted",
@@ -90,7 +94,7 @@ export function Dropdown({
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm transition-all text-foreground",
+          "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm text-foreground transition-all",
           error ? "border-destructive/50 focus:ring-destructive/10" : "border-border focus:ring-muted",
           "hover:border-muted-foreground focus:border-foreground",
         )}
