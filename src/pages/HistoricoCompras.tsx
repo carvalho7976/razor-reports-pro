@@ -4,7 +4,7 @@ import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
 import { User, CreditCard, Hash, Trash2 } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { FormModal, TextField, Dropdown, SaveButton } from "@/components/FormModal";
+import { TextField, Dropdown, SaveButton } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -357,127 +357,139 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="left-1/2 top-1/2 w-[min(1100px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <FormModal
-            title="Entrada de Produtos"
-            subtitle="Cadastre uma nova compra de produto no estoque."
-            onClose={closeModal}
-            footer={<SaveButton onClick={handleSalvarCompra} />}
-            size="xl"
-          >
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <Dropdown
-                    label="Produto"
-                    value={produtoSelecionado}
-                    setValue={setProdutoSelecionado}
-                    options={produtosOptions}
-                  />
-                  <TextField label="Custo do item" value={valorItem} onChange={setValorItem} placeholder="0,00" />
+        <DialogContent className="left-1/2 top-1/2 w-[min(1020px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
+            <div className="relative border-b border-border px-6 py-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-[20px] font-semibold text-foreground">Entrada de Produtos</h1>
+                  <p className="mt-1 text-sm text-muted-foreground">Cadastre uma nova compra de produto no estoque.</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    label="Quantidade"
-                    value={quantidadeItem}
-                    onChange={setQuantidadeItem}
-                    type="number"
-                    placeholder="1"
-                  />
-                  <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleAdicionarItem}
-                    className="text-sm font-semibold text-primary transition-colors hover:text-primary/80"
-                  >
-                    Adicionar
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  aria-label="Fechar"
+                  onClick={closeModal}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  ✕
+                </button>
               </div>
+            </div>
 
-              <div>
-                <div className="overflow-hidden rounded-lg border border-border bg-card">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-muted/40">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
-                        <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {itensCompra.length === 0 ? (
+            <div className="px-6 py-5">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Dropdown
+                      label="Produto"
+                      value={produtoSelecionado}
+                      setValue={setProdutoSelecionado}
+                      options={produtosOptions}
+                    />
+                    <TextField label="Custo do item" value={valorItem} onChange={setValorItem} placeholder="0,00" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <TextField
+                      label="Quantidade"
+                      value={quantidadeItem}
+                      onChange={setQuantidadeItem}
+                      type="number"
+                      placeholder="1"
+                    />
+                    <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleAdicionarItem}
+                      className="text-sm font-semibold text-primary transition-colors hover:text-primary/80"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="overflow-hidden rounded-lg border border-border bg-card">
+                    <table className="w-full border-collapse">
+                      <thead className="bg-muted/40">
                         <tr>
-                          <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                            Nenhum produto adicionado.
-                          </td>
+                          <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                          <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
+                          <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                          <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                          <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
                         </tr>
-                      ) : (
-                        itensCompra.map((item) => {
-                          const valor = toNumberBR(item.valor);
-                          const quantidade = Number(item.quantidade) || 0;
-                          const total = valor * quantidade;
+                      </thead>
+                      <tbody>
+                        {itensCompra.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                              Nenhum produto adicionado.
+                            </td>
+                          </tr>
+                        ) : (
+                          itensCompra.map((item) => {
+                            const valor = toNumberBR(item.valor);
+                            const quantidade = Number(item.quantidade) || 0;
+                            const total = valor * quantidade;
 
-                          return (
-                            <tr key={item.id} className="border-t border-border bg-card">
-                              <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
-                              <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
-                              <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
-                              <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
-                                {formatBRL(total)}
-                              </td>
-                              <td className="px-2 py-3 text-center">
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoverItem(item.id)}
-                                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
+                            return (
+                              <tr key={item.id} className="border-t border-border bg-card">
+                                <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                                <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                                <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                                <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                                  {formatBRL(total)}
+                                </td>
+                                <td className="px-2 py-3 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoverItem(item.id)}
+                                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
+                    <Dropdown label="Débito" value={debitoTipo} setValue={setDebitoTipo} options={debitoOptions} />
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
+                    <div className="text-sm text-muted-foreground">
+                      Total: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
+                    </div>
+                    <div className="mt-2 text-[16px] font-semibold text-foreground">
+                      Total c/ desconto: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+                    </div>
+                  </div>
+
+                  {showErrors && errors.itensCompra ? (
+                    <p className="text-sm text-destructive">{errors.itensCompra}</p>
+                  ) : null}
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
-              <div />
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
-                  <Dropdown label="Débito" value={debitoTipo} setValue={setDebitoTipo} options={debitoOptions} />
-                </div>
-
-                <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
-                  <div className="text-sm text-muted-foreground">
-                    Total: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
-                  </div>
-                  <div className="mt-1 text-sm text-muted-foreground">
-                    Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
-                  </div>
-                  <div className="mt-2 text-base font-semibold text-foreground">
-                    Total c/ desconto: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
-                  </div>
-                </div>
-
-                {showErrors && errors.itensCompra ? (
-                  <p className="text-sm text-destructive">{errors.itensCompra}</p>
-                ) : null}
-              </div>
+            <div className="border-t border-border px-6 py-4">
+              <SaveButton onClick={handleSalvarCompra} />
             </div>
-          </FormModal>
+          </div>
         </DialogContent>
       </Dialog>
 
