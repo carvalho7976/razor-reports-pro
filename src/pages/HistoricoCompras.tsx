@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
-import { User, CreditCard, Hash, Trash2 } from "lucide-react";
+import { User, CreditCard, Hash, Trash2, ChevronLeft } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { TextField, Dropdown, SaveButton } from "@/components/FormModal";
+import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -111,6 +111,7 @@ export default function HistoricoCompras() {
   const [debitoTipo, setDebitoTipo] = useState("caixa");
   const [itensCompra, setItensCompra] = useState<ItemCompraForm[]>([]);
   const [showErrors, setShowErrors] = useState(false);
+  const [etapaModal, setEtapaModal] = useState<1 | 2>(1);
 
   const resetForm = () => {
     setProdutoSelecionado("");
@@ -120,6 +121,7 @@ export default function HistoricoCompras() {
     setDebitoTipo("caixa");
     setItensCompra([]);
     setShowErrors(false);
+    setEtapaModal(1);
   };
 
   const openNew = () => {
@@ -294,7 +296,7 @@ export default function HistoricoCompras() {
       ...prev,
       {
         id: Date.now(),
-        produto: produtoSelecionado,
+        produto: produtoLabel,
         valor: valorItem,
         quantidade: quantidadeItem,
       },
@@ -314,10 +316,19 @@ export default function HistoricoCompras() {
     setItensCompra((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const handleAvancarFechamento = () => {
+    setShowErrors(true);
+    if (errors.itensCompra) return;
+    setEtapaModal(2);
+  };
+
   const handleSalvarCompra = () => {
     setShowErrors(true);
 
-    if (errors.itensCompra) return;
+    if (errors.itensCompra) {
+      setEtapaModal(1);
+      return;
+    }
 
     const novaCompra: CompraResumida = {
       id: Math.max(0, ...compras.map((item) => item.id)) + 1,
@@ -370,7 +381,11 @@ export default function HistoricoCompras() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-[20px] font-semibold text-foreground">Entrada de Produtos</h1>
-                  <p className="mt-1 text-sm text-muted-foreground">Cadastre uma nova compra de produto no estoque.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {etapaModal === 1
+                      ? "Monte a lista de itens da compra."
+                      : "Revise e conclua o fechamento da compra."}
+                  </p>
                 </div>
 
                 <button
@@ -384,44 +399,121 @@ export default function HistoricoCompras() {
               </div>
             </div>
 
-            <div className="px-6 py-5">
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
-                <div className="space-y-4 self-start">
-                  <p className="text-sm font-semibold text-foreground">Adicionar item</p>
+            <div className="border-b border-border px-6 py-3">
+              <div className="flex items-center gap-6 text-sm">
+                <div className={etapaModal === 1 ? "font-semibold text-foreground" : "text-muted-foreground"}>
+                  1. Itens
+                </div>
+                <div className={etapaModal === 2 ? "font-semibold text-foreground" : "text-muted-foreground"}>
+                  2. Fechamento
+                </div>
+              </div>
+            </div>
 
-                  <Dropdown
-                    label="Produto"
-                    value={produtoSelecionado}
-                    setValue={setProdutoSelecionado}
-                    options={produtosOptions}
-                  />
+            {etapaModal === 1 ? (
+              <div className="px-6 py-5">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
+                  <div className="space-y-4 self-start">
+                    <p className="text-sm font-semibold text-foreground">Adicionar item</p>
 
-                  <TextField label="Custo unitário" value={valorItem} onChange={setValorItem} placeholder="0,00" />
+                    <Dropdown
+                      label="Produto"
+                      value={produtoSelecionado}
+                      setValue={setProdutoSelecionado}
+                      options={produtosOptions}
+                    />
 
-                  <TextField
-                    label="Quantidade"
-                    value={quantidadeItem}
-                    onChange={setQuantidadeItem}
-                    type="number"
-                    placeholder="1"
-                  />
+                    <TextField label="Custo unitário" value={valorItem} onChange={setValorItem} placeholder="0,00" />
 
-                  <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
+                    <TextField
+                      label="Quantidade"
+                      value={quantidadeItem}
+                      onChange={setQuantidadeItem}
+                      type="number"
+                      placeholder="1"
+                    />
 
-                  <div className="pt-1">
-                    <button
-                      type="button"
-                      onClick={handleAdicionarItem}
-                      className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
-                    >
-                      Adicionar item
-                    </button>
+                    <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
+
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={handleAdicionarItem}
+                        className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                      >
+                        Adicionar item
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-foreground">Itens da entrada</p>
+                      <p className="text-xs text-muted-foreground">
+                        {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
+                      </p>
+                    </div>
+
+                    <div className="overflow-hidden rounded-lg border border-border bg-card">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-muted/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                            <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itensCompra.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="px-4 py-20 text-center text-sm text-muted-foreground">
+                                Adicione um produto para montar esta entrada.
+                              </td>
+                            </tr>
+                          ) : (
+                            itensCompra.map((item) => {
+                              const valor = toNumberBR(item.valor);
+                              const quantidade = Number(item.quantidade) || 0;
+                              const total = valor * quantidade;
+
+                              return (
+                                <tr key={item.id} className="border-t border-border bg-card">
+                                  <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                                  <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                                  <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                                  <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                                    {formatBRL(total)}
+                                  </td>
+                                  <td className="px-2 py-3 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoverItem(item.id)}
+                                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {showErrors && errors.itensCompra ? (
+                      <p className="text-sm text-destructive">{errors.itensCompra}</p>
+                    ) : null}
                   </div>
                 </div>
-
-                <div className="space-y-4">
+              </div>
+            ) : (
+              <div className="px-6 py-5">
+                <div className="mx-auto max-w-3xl space-y-5">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-foreground">Itens da entrada</p>
+                    <p className="text-sm font-semibold text-foreground">Resumo da compra</p>
                     <p className="text-xs text-muted-foreground">
                       {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
                     </p>
@@ -435,48 +527,30 @@ export default function HistoricoCompras() {
                           <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
                           <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
                           <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
-                          <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
                         </tr>
                       </thead>
                       <tbody>
-                        {itensCompra.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">
-                              Adicione um produto para montar esta entrada.
-                            </td>
-                          </tr>
-                        ) : (
-                          itensCompra.map((item) => {
-                            const valor = toNumberBR(item.valor);
-                            const quantidade = Number(item.quantidade) || 0;
-                            const total = valor * quantidade;
+                        {itensCompra.map((item) => {
+                          const valor = toNumberBR(item.valor);
+                          const quantidade = Number(item.quantidade) || 0;
+                          const total = valor * quantidade;
 
-                            return (
-                              <tr key={item.id} className="border-t border-border bg-card">
-                                <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
-                                <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
-                                <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
-                                <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
-                                  {formatBRL(total)}
-                                </td>
-                                <td className="px-2 py-3 text-center">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoverItem(item.id)}
-                                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                </td>
-                              </tr>
-                            );
-                          })
-                        )}
+                          return (
+                            <tr key={item.id} className="border-t border-border bg-card">
+                              <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                              <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                              <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                              <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                                {formatBRL(total)}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
                     <Dropdown
                       label="Origem do pagamento"
@@ -497,20 +571,42 @@ export default function HistoricoCompras() {
                       Total final: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
                     </div>
                   </div>
-
-                  {showErrors && errors.itensCompra ? (
-                    <p className="text-sm text-destructive">{errors.itensCompra}</p>
-                  ) : null}
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="border-t border-border px-6 py-4">
-              <div
-                className={itensCompra.length === 0 ? "pointer-events-none opacity-50" : ""}
-                aria-disabled={itensCompra.length === 0}
-              >
-                <SaveButton onClick={handleSalvarCompra} />
+              <div className="flex items-center justify-between gap-3">
+                {etapaModal === 1 ? (
+                  <div />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setEtapaModal(1)}
+                    className="inline-flex h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Voltar
+                  </button>
+                )}
+
+                {etapaModal === 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleAvancarFechamento}
+                    className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                  >
+                    Avançar para fechamento
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSalvarCompra}
+                    className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                  >
+                    Concluir compra
+                  </button>
+                )}
               </div>
             </div>
           </div>
