@@ -163,9 +163,8 @@ function FakeLogo({ label, dark = true }: { label: string; dark?: boolean }) {
 }
 
 function FieldError({ message }: { message?: string }) {
-  return (
-    <div className="min-h-[12px] pt-1">{message && <p className="text-xs font-medium text-destructive">{message}</p>}</div>
-  );
+  if (!message) return null;
+  return <p className="text-xs font-medium text-destructive mt-0.5">{message}</p>;
 }
 
 function TextField({
@@ -182,14 +181,14 @@ function TextField({
   error?: string;
 }) {
   return (
-    <div className="grid gap-1">
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+    <div className="grid gap-0.5">
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "h-11 w-full rounded-lg border px-3.5 text-sm outline-none transition-all bg-card text-foreground",
+          "h-10 w-full rounded-lg border px-3 text-sm outline-none transition-all bg-card text-foreground",
           error
             ? "border-destructive/50 focus:border-destructive focus:ring-4 focus:ring-destructive/10"
             : "border-border focus:border-foreground focus:ring-4 focus:ring-muted",
