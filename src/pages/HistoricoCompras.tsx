@@ -138,6 +138,7 @@ export default function HistoricoCompras() {
   const [showErrors, setShowErrors] = useState(false);
   const [etapaModal, setEtapaModal] = useState<1 | 2>(1);
   const [xmlFile, setXmlFile] = useState<File | null>(null);
+  const [itemAdicionado, setItemAdicionado] = useState<string | null>(null);
 
   const resetForm = () => {
     setProdutoSelecionado("");
@@ -149,6 +150,7 @@ export default function HistoricoCompras() {
     setShowErrors(false);
     setEtapaModal(1);
     setXmlFile(null);
+    setItemAdicionado(null);
   };
 
   const openNew = () => {
@@ -339,17 +341,8 @@ export default function HistoricoCompras() {
     setValorItem("R$ 0,00");
     setQuantidadeItem("1");
 
-    toast.success(`${produtoLabel}`, {
-      description: "Item adicionado à compra",
-      icon: <Check className="h-4 w-4" />,
-      style: {
-        background: "hsl(142, 71%, 45%)",
-        color: "white",
-        border: "none",
-        borderRadius: "9999px",
-      },
-      duration: 2000,
-    });
+    setItemAdicionado(produtoLabel);
+    setTimeout(() => setItemAdicionado(null), 3000);
   };
 
   const handleRemoverItem = (id: number) => {
@@ -554,6 +547,14 @@ export default function HistoricoCompras() {
                         </table>
                       </div>
                     </div>
+
+                    {itemAdicionado && (
+                      <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">
+                        <Check className="h-4 w-4" />
+                        <span className="font-medium">{itemAdicionado}</span>
+                        <span className="text-emerald-600/70 dark:text-emerald-500/70">adicionado</span>
+                      </div>
+                    )}
 
                     {showErrors && errors.itensCompra ? (
                       <p className="text-sm text-destructive">{errors.itensCompra}</p>
