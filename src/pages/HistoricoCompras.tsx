@@ -183,7 +183,18 @@ export default function HistoricoCompras() {
     setDetalhadoDataFiltro(data);
     setTab("detalhado");
   };
-
+  const getDebitoLabel = (tipo?: string) => {
+    switch (tipo) {
+      case "caixa":
+        return "Caixa";
+      case "conta":
+        return "Conta";
+      case "parcelar":
+        return "Parcelado";
+      default:
+        return "-";
+    }
+  };
   const columnsResumido: Column<any>[] = [
     {
       key: "data",
@@ -220,6 +231,11 @@ export default function HistoricoCompras() {
       label: "Total",
       align: "right",
       render: (v: number) => <span className="font-medium text-emerald-600">{formatBRL(v)}</span>,
+    },
+    {
+      key: "debitoTipo",
+      label: "Origem do pagamento",
+      render: (_: any, row: any) => <span className="text-sm text-foreground">{getDebitoLabel(row.debitoTipo)}</span>,
     },
   ];
 
