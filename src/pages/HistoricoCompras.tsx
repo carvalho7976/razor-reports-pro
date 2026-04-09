@@ -357,7 +357,7 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="w-[95vw] max-w-[1200px] border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="left-1/2 top-1/2 w-[min(1100px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Entrada de Produtos"
             subtitle="Cadastre uma nova compra de produto no estoque."
@@ -365,7 +365,7 @@ export default function HistoricoCompras() {
             footer={<SaveButton onClick={handleSalvarCompra} />}
             size="xl"
           >
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <Dropdown
@@ -399,7 +399,7 @@ export default function HistoricoCompras() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div>
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                   <table className="w-full border-collapse">
                     <thead className="bg-muted/40">
@@ -448,7 +448,13 @@ export default function HistoricoCompras() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
 
+            <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
+              <div />
+
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
                   <Dropdown label="Débito" value={debitoTipo} setValue={setDebitoTipo} options={debitoOptions} />
