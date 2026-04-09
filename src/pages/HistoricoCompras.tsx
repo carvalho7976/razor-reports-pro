@@ -377,142 +377,260 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-className="left-1/2 top-1/2 w-[min(1080px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden"          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
+        <DialogContent className="left-1/2 top-1/2 w-[min(1080px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-[20px] font-semibold text-foreground">Entrada de Produtos</h1>
                   <p className="mt-1 text-sm text-muted-foreground">
-                  {etapaModal === 1 ? (
-  <div className="px-6 py-5">
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
-      <div className="space-y-4 self-start">
-        <p className="text-sm font-semibold text-foreground">Adicionar item</p>
+                    {etapaModal === 1
+                      ? "Monte a lista de itens da compra."
+                      : "Revise e conclua o fechamento da compra."}
+                  </p>
+                </div>
 
-        <Dropdown
-          label="Produto"
-          value={produtoSelecionado}
-          setValue={setProdutoSelecionado}
-          options={produtosOptions}
-        />
+                <button
+                  type="button"
+                  aria-label="Fechar"
+                  onClick={closeModal}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
 
-        <TextField
-          label="Custo unitário"
-          value={valorItem}
-          onChange={setValorItem}
-          placeholder="0,00"
-        />
+            <div className="border-b border-border px-6 py-3">
+              <div className="flex items-center gap-6 text-sm">
+                <div className={etapaModal === 1 ? "font-semibold text-foreground" : "text-muted-foreground"}>
+                  1. Itens
+                </div>
+                <div className={etapaModal === 2 ? "font-semibold text-foreground" : "text-muted-foreground"}>
+                  2. Fechamento
+                </div>
+              </div>
+            </div>
 
-        <TextField
-          label="Quantidade"
-          value={quantidadeItem}
-          onChange={setQuantidadeItem}
-          type="number"
-          placeholder="1"
-        />
+            {etapaModal === 1 ? (
+              <div className="px-6 py-5">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
+                  <div className="space-y-4 self-start">
+                    <p className="text-sm font-semibold text-foreground">Adicionar item</p>
 
-        <TextField
-          label="Custo total"
-          value={formatBRL(itemPreviewTotal)}
-          onChange={() => {}}
-          disabled
-        />
+                    <Dropdown
+                      label="Produto"
+                      value={produtoSelecionado}
+                      setValue={setProdutoSelecionado}
+                      options={produtosOptions}
+                    />
 
-        <div className="grid gap-3">
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-foreground">Upload XML</label>
-            <input
-              type="file"
-              accept=".xml,text/xml,application/xml"
-              onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
-              className="block w-full text-sm text-foreground file:mr-3 file:rounded-lg file:border file:border-border file:bg-card file:px-3 file:py-2 file:text-sm file:font-medium"
-            />
-            {xmlFile ? (
-              <p className="text-xs text-muted-foreground">{xmlFile.name}</p>
-            ) : null}
-          </div>
+                    <TextField label="Custo unitário" value={valorItem} onChange={setValorItem} placeholder="0,00" />
 
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={handleAdicionarItem}
-              className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
-            >
-              Adicionar item
-            </button>
-          </div>
-        </div>
-      </div>
+                    <TextField
+                      label="Quantidade"
+                      value={quantidadeItem}
+                      onChange={setQuantidadeItem}
+                      type="number"
+                      placeholder="1"
+                    />
 
-      <div className="space-y-4 self-start">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-foreground">Itens da entrada</p>
-          <p className="text-xs text-muted-foreground">
-            {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
-          </p>
-        </div>
+                    <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
 
-        <div className="overflow-hidden rounded-lg border border-border bg-card">
-          <table className="w-full border-collapse">
-            <thead className="bg-muted/40">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
-                <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
-                <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
-              </tr>
-            </thead>
-          </table>
+                    <div className="grid gap-3">
+                      <div className="grid gap-1.5">
+                        <label className="text-sm font-medium text-foreground">Upload XML</label>
+                        <input
+                          type="file"
+                          accept=".xml,text/xml,application/xml"
+                          onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
+                          className="block w-full text-sm text-foreground file:mr-3 file:rounded-lg file:border file:border-border file:bg-card file:px-3 file:py-2 file:text-sm file:font-medium"
+                        />
+                        {xmlFile ? <p className="text-xs text-muted-foreground">{xmlFile.name}</p> : null}
+                      </div>
 
-          <div className="max-h-[260px] overflow-y-auto">
-            <table className="w-full border-collapse">
-              <tbody>
-                {itensCompra.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">
-                      Adicione um produto para montar esta entrada.
-                    </td>
-                  </tr>
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={handleAdicionarItem}
+                          className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                        >
+                          Adicionar item
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 self-start">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-foreground">Itens da entrada</p>
+                      <p className="text-xs text-muted-foreground">
+                        {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
+                      </p>
+                    </div>
+
+                    <div className="overflow-hidden rounded-lg border border-border bg-card">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-muted/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                            <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
+                          </tr>
+                        </thead>
+                      </table>
+
+                      <div className="max-h-[260px] overflow-y-auto">
+                        <table className="w-full border-collapse">
+                          <tbody>
+                            {itensCompra.length === 0 ? (
+                              <tr>
+                                <td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                                  Adicione um produto para montar esta entrada.
+                                </td>
+                              </tr>
+                            ) : (
+                              itensCompra.map((item) => {
+                                const valor = toNumberBR(item.valor);
+                                const quantidade = Number(item.quantidade) || 0;
+                                const total = valor * quantidade;
+
+                                return (
+                                  <tr key={item.id} className="border-t border-border bg-card">
+                                    <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                                    <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                                    <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                                    <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                                      {formatBRL(total)}
+                                    </td>
+                                    <td className="px-2 py-3 text-center">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoverItem(item.id)}
+                                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {showErrors && errors.itensCompra ? (
+                      <p className="text-sm text-destructive">{errors.itensCompra}</p>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="px-6 py-5">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-foreground">Resumo da compra</p>
+                      <p className="text-xs text-muted-foreground">
+                        {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
+                      </p>
+                    </div>
+
+                    <div className="overflow-hidden rounded-lg border border-border bg-card">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-muted/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itensCompra.map((item) => {
+                            const valor = toNumberBR(item.valor);
+                            const quantidade = Number(item.quantidade) || 0;
+                            const total = valor * quantidade;
+
+                            return (
+                              <tr key={item.id} className="border-t border-border bg-card">
+                                <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                                <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                                <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                                <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                                  {formatBRL(total)}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
+                      <div className="text-sm text-muted-foreground">
+                        Subtotal: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                      </div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
+                      </div>
+                      <div className="mt-3 border-t border-border pt-3 text-[16px] font-semibold text-foreground">
+                        Total final: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 self-start">
+                    <p className="text-sm font-semibold text-foreground">Fechamento</p>
+
+                    <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
+
+                    <Dropdown
+                      label="Origem do pagamento"
+                      value={debitoTipo}
+                      setValue={setDebitoTipo}
+                      options={debitoOptions}
+                    />
+
+                    <div className="grid gap-1.5">
+                      <label className="text-sm font-medium text-foreground">XML anexado</label>
+                      <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+                        {xmlFile ? xmlFile.name : "Nenhum arquivo enviado"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="border-t border-border px-6 py-4">
+              <div className="flex items-center justify-between gap-3">
+                {etapaModal === 1 ? (
+                  <div />
                 ) : (
-                  itensCompra.map((item) => {
-                    const valor = toNumberBR(item.valor);
-                    const quantidade = Number(item.quantidade) || 0;
-                    const total = valor * quantidade;
-
-                    return (
-                      <tr key={item.id} className="border-t border-border bg-card">
-                        <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
-                        <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
-                        <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
-                        <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
-                          {formatBRL(total)}
-                        </td>
-                        <td className="px-2 py-3 text-center">
-                          <button
-                            type="button"
-                            onClick={() => handleRemoverItem(item.id)}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
+                  <button
+                    type="button"
+                    onClick={() => setEtapaModal(1)}
+                    className="inline-flex h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Voltar
+                  </button>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        {showErrors && errors.itensCompra ? (
-          <p className="text-sm text-destructive">{errors.itensCompra}</p>
-        ) : null}
-      </div>
-    </div>
-  </div>
-) : (
+                {etapaModal === 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleAvancarFechamento}
+                    className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                  >
+                    Avançar para fechamento
+                  </button>
+                ) : (
                   <button
                     type="button"
                     onClick={handleSalvarCompra}
