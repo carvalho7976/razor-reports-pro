@@ -547,51 +547,19 @@ export default function HistoricoCompras() {
                     </div>
                   </div>
 
-                 <div className="space-y-4 self-start">
-  <div className="overflow-hidden rounded-lg border border-border bg-card">
-    <table className="w-full border-collapse">
-      <thead className="bg-muted/40">
-        <tr>
-          <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
-          <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
-          <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
-          <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
-          <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
-        </tr>
-      </thead>
-
-      <tbody>
-        {/* seus itens */}
-      </tbody>
-    </table>
-  </div>
-
-  {/* 🔥 AQUI ENTRA A PASTILHA */}
-  {localNotice && etapaModal === 1 && (
-    <div className="animate-fade-in-up">
-      <div className="flex min-h-[44px] items-center overflow-hidden rounded-[8px] border border-[#bfd7f2] bg-[#eef4fb] text-sm">
-        <div className="px-4 py-3 font-medium text-[#1f2937]">
-          1 selecionado
-        </div>
-
-        <div className="h-6 w-px bg-[#d7e5f5]" />
-
-        <div className="flex items-center gap-4 px-4 py-3">
-          <span className="font-medium text-[#16a34a]">
-            {localNotice.title}
-          </span>
-
-          {localNotice.description && (
-            <span className="text-[#374151]">
-              {localNotice.description}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  )}
-</div>
-
+                  <div className="space-y-4 self-start">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-muted/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                            <th className="w-14 px-2 py-3 text-center text-sm font-semibold text-foreground" />
+                          </tr>
+                        </thead>
+                      </table>
                       <div className="max-h-[260px] overflow-y-auto">
                         <table className="w-full border-collapse">
                           <tbody>
@@ -606,7 +574,6 @@ export default function HistoricoCompras() {
                                 const valor = toNumberBR(item.valor);
                                 const quantidade = Number(item.quantidade) || 0;
                                 const total = valor * quantidade;
-
                                 return (
                                   <tr key={item.id} className="border-t border-border bg-card">
                                     <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
@@ -632,11 +599,25 @@ export default function HistoricoCompras() {
                         </table>
                       </div>
                     </div>
+                    {localNotice && etapaModal === 1 && (
+                      <div className="animate-fade-in-up">
+                        <div className="flex min-h-[44px] items-center overflow-hidden rounded-[8px] border border-[#bfd7f2] bg-[#eef4fb] text-sm">
+                          <div className="px-4 py-3 font-medium text-[#1f2937]">1 selecionado</div>
+                          <div className="h-6 w-px bg-[#d7e5f5]" />
+                          <div className="flex items-center gap-4 px-4 py-3">
+                            <span className="font-medium text-[#16a34a]">{localNotice.title}</span>
+                            {localNotice.description && (
+                              <span className="text-[#374151]">{localNotice.description}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                     {showErrors && errors.itensCompra ? (
                       <p className="text-sm text-destructive">{errors.itensCompra}</p>
                     ) : null}
-                  </div>
                 </div>
               </div>
             ) : (
