@@ -381,6 +381,7 @@ export default function HistoricoCompras() {
             subtitle="Cadastre uma nova compra de produto no estoque."
             onClose={closeModal}
             footer={<SaveButton onClick={handleSalvarCompra} />}
+            size="xl"
           >
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
               {" "}
