@@ -284,8 +284,6 @@ export default function HistoricoCompras() {
   }, [subtotalCompra, descontoCompra]);
 
   const errors = {
-    dataCompra: !dataCompra ? "Informe a data." : "",
-    funcionario: !funcionario ? "Selecione o responsável." : "",
     itensCompra: itensCompra.length === 0 ? "Adicione pelo menos um produto." : "",
   };
 
@@ -324,8 +322,7 @@ export default function HistoricoCompras() {
   const handleSalvarCompra = () => {
     setShowErrors(true);
 
-    if (errors.dataCompra || errors.funcionario || errors.itensCompra) return;
-
+    if (errors.itensCompra) return;
     const novaCompra: CompraResumida = {
       id: Math.max(0, ...compras.map((item) => item.id)) + 1,
       data: new Date().toLocaleDateString("pt-BR"),
