@@ -138,7 +138,7 @@ export default function ListaPacotes() {
       <DataTable
         title="Pacotes"
         titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
-        data={data}
+        data={allData}
         columns={columns}
         selectable
         selectionActions={selectionActions}
