@@ -459,12 +459,6 @@ export default function HistoricoCompras() {
                   </div>
 
                   <div className="space-y-4 self-start">
-                    <div className="flex justify-end">
-                      <p className="text-xs text-muted-foreground">
-                        {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
-                      </p>
-                    </div>
-
                     <div className="overflow-hidden rounded-lg border border-border bg-card">
                       <table className="w-full border-collapse">
                         <thead className="bg-muted/40">
