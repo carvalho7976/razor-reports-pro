@@ -388,8 +388,7 @@ export default function HistoricoCompras() {
     setCompras((prev) => [novaCompra, ...prev]);
     closeModal();
 
-    toast({
-      title: "Compra registrada",
+    toast.success("Compra registrada", {
       description: "A entrada de produtos foi salva com sucesso.",
     });
   };
