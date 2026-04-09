@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
 import { User, CreditCard, Hash, Trash2, ChevronLeft } from "lucide-react";
@@ -100,18 +100,36 @@ function formatCurrencyInput(value: string) {
   const digits = value.replace(/\D/g, "");
   if (!digits) return "R$ 0,00";
 
-  const numberValue = Number(digits) / 10;
+  const numberValue = Number(digits) / 100;
   return numberValue.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
   });
 }
 
 function sanitizeQuantity(value: string) {
   const digits = value.replace(/\D/g, "");
   return digits || "1";
+}
+
+function digitsToMoneyNumber(digits: string) {
+  if (!digits) return 0;
+  if (digits.length === 1) return Number(`${digits}.0`);
+  return Number(`${digits.slice(0, -1)}.${digits.slice(-1)}`);
+}
+
+function formatCurrencyFromDigits(digits: string) {
+  if (!digits) return "R$ 0,00";
+
+  if (digits.length === 1) {
+    return `R$ ${digits},00`;
+  }
+
+  const inteiro = digits.slice(0, -1).replace(/^0+/, "") || "0";
+  const decimal1 = digits.slice(-1);
+  const inteiroFormatado = Number(inteiro).toLocaleString("pt-BR");
+
+  return `R$ ${inteiroFormatado},${decimal1}0`;
 }
 
 export default function HistoricoCompras() {
@@ -124,7 +142,7 @@ export default function HistoricoCompras() {
   const [detalhadoDataFiltro, setDetalhadoDataFiltro] = useState<string | null>(null);
 
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
-  const [valorItem, setValorItem] = useState("R$ 0,00");
+  const [valorItemDigits, setValorItemDigits] = useState("");
   const [quantidadeItem, setQuantidadeItem] = useState("1");
   const [desconto, setDesconto] = useState("R$ 0,00");
   const [debitoTipo, setDebitoTipo] = useState("caixa");
@@ -135,7 +153,7 @@ export default function HistoricoCompras() {
 
   const resetForm = () => {
     setProdutoSelecionado("");
-    setValorItem("R$ 0,00");
+    setValorItemDigits("");
     setQuantidadeItem("1");
     setDesconto("R$ 0,00");
     setDebitoTipo("caixa");
@@ -274,10 +292,10 @@ export default function HistoricoCompras() {
   ];
 
   const itemPreviewTotal = useMemo(() => {
-    const valor = toNumberBR(valorItem);
+    const valor = digitsToMoneyNumber(valorItemDigits);
     const quantidade = Number(quantidadeItem) || 0;
     return valor * quantidade;
-  }, [valorItem, quantidadeItem]);
+  }, [valorItemDigits, quantidadeItem]);
 
   const subtotalCompra = useMemo(() => {
     return itensCompra.reduce((acc, item) => {
@@ -298,8 +316,28 @@ export default function HistoricoCompras() {
     itensCompra: itensCompra.length === 0 ? "Adicione pelo menos um produto." : "",
   };
 
+  const handleValorItemKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    const allowedControlKeys = ["Tab", "Shift", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+
+    if (allowedControlKeys.includes(e.key)) return;
+
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      setValorItemDigits((prev) => prev.slice(0, -1));
+      return;
+    }
+
+    if (/^\d$/.test(e.key)) {
+      e.preventDefault();
+      setValorItemDigits((prev) => (prev + e.key).replace(/^0+(?=\d)/, ""));
+      return;
+    }
+
+    e.preventDefault();
+  };
+
   const handleAdicionarItem = () => {
-    const valor = toNumberBR(valorItem);
+    const valor = digitsToMoneyNumber(valorItemDigits);
     const quantidade = Number(quantidadeItem) || 0;
 
     if (!produtoSelecionado || valor <= 0 || quantidade <= 0) {
@@ -318,13 +356,13 @@ export default function HistoricoCompras() {
       {
         id: Date.now(),
         produto: produtoLabel,
-        valor: valorItem,
+        valor: formatCurrencyFromDigits(valorItemDigits),
         quantidade: quantidadeItem,
       },
     ]);
 
     setProdutoSelecionado("");
-    setValorItem("R$ 0,00");
+    setValorItemDigits("");
     setQuantidadeItem("1");
 
     toast({
@@ -442,12 +480,18 @@ export default function HistoricoCompras() {
                       options={produtosOptions}
                     />
 
-                    <TextField
-                      label="Custo unitário"
-                      value={valorItem}
-                      onChange={(value) => setValorItem(formatCurrencyInput(value))}
-                      placeholder="R$ 0,00"
-                    />
+                    <div className="grid gap-1.5">
+                      <label className="text-sm font-medium text-foreground">Custo unitário</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={formatCurrencyFromDigits(valorItemDigits)}
+                        onKeyDown={handleValorItemKeyDown}
+                        onChange={() => {}}
+                        placeholder="R$ 0,00"
+                        className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
 
                     <TextField
                       label="Quantidade"
