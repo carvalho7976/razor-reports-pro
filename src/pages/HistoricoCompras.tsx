@@ -520,8 +520,8 @@ export default function HistoricoCompras() {
                 </div>
               </div>
             ) : (
-              <div className="px-6 py-5">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="px-6 py-5 min-h-[320px]">
+                <div className="grid min-h-[320px] grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
                   <div className="space-y-4">
                     <div className="overflow-hidden rounded-lg border border-border bg-card">
                       <table className="w-full border-collapse">
