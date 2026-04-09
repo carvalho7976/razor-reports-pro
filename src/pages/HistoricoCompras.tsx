@@ -112,6 +112,7 @@ export default function HistoricoCompras() {
   const [itensCompra, setItensCompra] = useState<ItemCompraForm[]>([]);
   const [showErrors, setShowErrors] = useState(false);
   const [etapaModal, setEtapaModal] = useState<1 | 2>(1);
+  const [xmlFile, setXmlFile] = useState<File | null>(null);
 
   const resetForm = () => {
     setProdutoSelecionado("");
@@ -122,6 +123,7 @@ export default function HistoricoCompras() {
     setItensCompra([]);
     setShowErrors(false);
     setEtapaModal(1);
+    setXmlFile(null);
   };
 
   const openNew = () => {
