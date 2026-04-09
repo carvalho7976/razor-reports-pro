@@ -240,14 +240,14 @@ function Dropdown({
   }, []);
 
   return (
-    <div className="relative grid gap-1" ref={wrapperRef}>
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+    <div className="relative grid gap-0.5" ref={wrapperRef}>
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
 
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "flex h-11 w-full items-center justify-between rounded-lg border bg-card px-3.5 text-sm transition-all text-foreground",
+          "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm transition-all text-foreground",
           error ? "border-destructive/50 focus:ring-destructive/10" : "border-border focus:ring-muted",
           "hover:border-muted-foreground focus:border-foreground",
         )}
