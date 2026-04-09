@@ -100,7 +100,17 @@ function formatCurrencyInput(value: string) {
   const digits = value.replace(/\D/g, "");
   if (!digits) return "R$ 0,00";
 
-  const numberValue = Number(digits) / 100;
+  let numberValue: number;
+  if (digits.length === 1) {
+    numberValue = Number(digits);
+  } else if (digits.length === 2) {
+    numberValue = Number(digits[0]) + Number(digits[1]) * 0.1;
+  } else {
+    const intPart = digits.slice(0, -2);
+    const decPart = digits.slice(-2);
+    numberValue = Number(intPart) + Number(decPart) / 100;
+  }
+
   return numberValue.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -193,7 +203,7 @@ export default function HistoricoCompras() {
         <button
           type="button"
           onClick={() => abrirDetalhadoPorData(v)}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-foreground hover:underline"
         >
           {v}
         </button>
@@ -220,6 +230,14 @@ export default function HistoricoCompras() {
       label: "Total",
       align: "right",
       render: (v: number) => <span className="font-medium text-emerald-600">{formatBRL(v)}</span>,
+    },
+    {
+      key: "debitoTipo",
+      label: "Origem do Pagamento",
+      render: (v: string) => {
+        const map: Record<string, string> = { caixa: "Retirar do Caixa", conta: "Retirar da Conta", parcelar: "Parcelar" };
+        return map[v] || v || "—";
+      },
     },
   ];
 
