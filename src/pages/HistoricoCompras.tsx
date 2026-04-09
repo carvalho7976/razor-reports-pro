@@ -420,14 +420,14 @@ export default function HistoricoCompras() {
 
   return (
     <AppLayout>
-      {localNotice ? (
-        <div className="pointer-events-none absolute bottom-[78px] left-6 z-[120]">
+      {localNotice && etapaModal === 1 ? (
+        <div className="pointer-events-none absolute left-[585px] top-[478px] z-[120]">
           <div className="flex min-h-[44px] items-center overflow-hidden rounded-[8px] border border-[#bfd7f2] bg-[#eef4fb] text-sm shadow-none">
             <div className="px-4 py-3 font-medium text-[#1f2937]">1 selecionado</div>
 
             <div className="h-6 w-px bg-[#d7e5f5]" />
 
-            <div className="flex items-center gap-5 px-4 py-3">
+            <div className="flex items-center gap-4 px-4 py-3">
               <span className="font-medium text-[#16a34a]">{localNotice.title}</span>
 
               {localNotice.description ? <span className="text-[#374151]">{localNotice.description}</span> : null}
