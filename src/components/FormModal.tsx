@@ -208,10 +208,10 @@ export function DeleteModal({
           </button>
         </div>
       </div>
-      <div className="grid gap-2 px-6 pt-6 pb-8">
+      <div className="grid gap-1 px-6 pt-5 pb-6">
         <p className="text-sm text-foreground/80">{message}</p>
       </div>
-      <div className="border-t border-border px-6 py-4">
+      <div className="border-t border-border px-6 py-3">
         <div className="flex">
           <button
             type="button"
