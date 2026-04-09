@@ -99,14 +99,7 @@ function toNumberBR(value: string) {
 function formatCurrencyInput(value: string) {
   const digits = value.replace(/\D/g, "");
   if (!digits) return "R$ 0,00";
-
-  function formatCurrencyInput(value: string) {
-  const digits = value.replace(/\D/g, "");
-
-  if (!digits) return "R$ 0,00";
-
   const numberValue = Number(digits) / 10;
-
   return numberValue.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
