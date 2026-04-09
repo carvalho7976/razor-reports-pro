@@ -357,7 +357,7 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="w-[95vw] max-w-[1200px] border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Entrada de Produtos"
             subtitle="Cadastre uma nova compra de produto no estoque."
