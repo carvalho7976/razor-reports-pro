@@ -364,7 +364,7 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="left-1/2 top-1/2 w-[min(1020px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="left-1/2 top-1/2 w-[min(1080px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
@@ -385,32 +385,30 @@ export default function HistoricoCompras() {
             </div>
 
             <div className="px-6 py-5">
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
-                <div className="space-y-4">
-                  <p className="text-sm font-semibold text-foreground">Novo item</p>
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
+                <div className="space-y-4 self-start">
+                  <p className="text-sm font-semibold text-foreground">Adicionar item</p>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <Dropdown
-                      label="Produto"
-                      value={produtoSelecionado}
-                      setValue={setProdutoSelecionado}
-                      options={produtosOptions}
-                    />
-                    <TextField label="Custo unitário" value={valorItem} onChange={setValorItem} placeholder="0,00" />
-                  </div>
+                  <Dropdown
+                    label="Produto"
+                    value={produtoSelecionado}
+                    setValue={setProdutoSelecionado}
+                    options={produtosOptions}
+                  />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <TextField
-                      label="Quantidade"
-                      value={quantidadeItem}
-                      onChange={setQuantidadeItem}
-                      type="number"
-                      placeholder="1"
-                    />
-                    <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
-                  </div>
+                  <TextField label="Custo unitário" value={valorItem} onChange={setValorItem} placeholder="0,00" />
 
-                  <div className="flex justify-end pt-2">
+                  <TextField
+                    label="Quantidade"
+                    value={quantidadeItem}
+                    onChange={setQuantidadeItem}
+                    type="number"
+                    placeholder="1"
+                  />
+
+                  <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
+
+                  <div className="pt-1">
                     <button
                       type="button"
                       onClick={handleAdicionarItem}
@@ -443,7 +441,7 @@ export default function HistoricoCompras() {
                       <tbody>
                         {itensCompra.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                            <td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">
                               Adicione um produto para montar esta entrada.
                             </td>
                           </tr>
@@ -478,35 +476,31 @@ export default function HistoricoCompras() {
                     </table>
                   </div>
 
-                  <div className="space-y-4">
-                    <p className="text-sm font-semibold text-foreground">Resumo financeiro</p>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
-                      <Dropdown
-                        label="Origem do pagamento"
-                        value={debitoTipo}
-                        setValue={setDebitoTipo}
-                        options={debitoOptions}
-                      />
-                    </div>
-
-                    <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
-                      <div className="text-sm text-muted-foreground">
-                        Subtotal: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
-                      </div>
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
-                      </div>
-                      <div className="mt-2 text-[16px] font-semibold text-foreground">
-                        Total final: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
-                      </div>
-                    </div>
-
-                    {showErrors && errors.itensCompra ? (
-                      <p className="text-sm text-destructive">{errors.itensCompra}</p>
-                    ) : null}
+                  <div className="grid grid-cols-2 gap-4">
+                    <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
+                    <Dropdown
+                      label="Origem do pagamento"
+                      value={debitoTipo}
+                      setValue={setDebitoTipo}
+                      options={debitoOptions}
+                    />
                   </div>
+
+                  <div className="rounded-lg border border-border bg-card px-4 py-4 text-right">
+                    <div className="text-sm text-muted-foreground">
+                      Subtotal: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
+                    </div>
+                    <div className="mt-3 border-t border-border pt-3 text-[16px] font-semibold text-foreground">
+                      Total final: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+                    </div>
+                  </div>
+
+                  {showErrors && errors.itensCompra ? (
+                    <p className="text-sm text-destructive">{errors.itensCompra}</p>
+                  ) : null}
                 </div>
               </div>
             </div>
