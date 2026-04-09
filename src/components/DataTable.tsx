@@ -1373,7 +1373,7 @@ export function DataTable<T extends Record<string, any>>({
                         isActive ? tabColorMapActive[color] : tabColorMap[color],
                       )}
                     >
-                      {tab.count}
+                      {count}
                     </span>
                   )}
                 </button>
