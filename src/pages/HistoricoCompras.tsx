@@ -375,14 +375,15 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="w-[96vw] max-w-7xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Entrada de Produtos"
             subtitle="Cadastre uma nova compra de produto no estoque."
             onClose={closeModal}
             footer={<SaveButton onClick={handleSalvarCompra} />}
           >
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+              {" "}
               <div className="space-y-4">
                 <FormRow>
                   <TextField
@@ -443,7 +444,6 @@ export default function HistoricoCompras() {
                   Debitar do caixa
                 </label>
               </div>
-
               <div className="space-y-4">
                 <div className="overflow-hidden rounded-lg border border-border">
                   <table className="w-full border-collapse">
