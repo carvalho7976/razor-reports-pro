@@ -96,7 +96,13 @@ export function Dropdown({
         )}
       >
         <span className="truncate">{selected?.label || "Selecione..."}</span>
-        <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className="h-4 w-4 text-muted-foreground"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
@@ -144,15 +150,26 @@ export function FormModal({
   children,
   footer,
   onClose,
+  size = "md",
 }: {
   title: string;
   subtitle?: string;
   children: ReactNode;
   footer: ReactNode;
   onClose: () => void;
+  size?: "sm" | "md" | "lg" | "xl";
 }) {
   return (
-    <div className="w-full max-w-xl overflow-visible rounded-2xl bg-card shadow-2xl">
+    <div
+      className={cn(
+        "w-full overflow-visible rounded-2xl bg-card shadow-2xl",
+        size === "sm" && "max-w-md",
+        size === "md" && "max-w-xl",
+        size === "lg" && "max-w-3xl",
+        size === "xl" && "max-w-5xl",
+      )}
+    >
+      {" "}
       <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted/50 to-card px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -271,7 +288,12 @@ export function PasswordModal({
       }
     >
       <TextField label="Nova senha" value={senha} onChange={setSenha} error={showErrors ? errors.senha : ""} />
-      <TextField label="Confirmar senha" value={confirmar} onChange={setConfirmar} error={showErrors ? errors.confirmar : ""} />
+      <TextField
+        label="Confirmar senha"
+        value={confirmar}
+        onChange={setConfirmar}
+        error={showErrors ? errors.confirmar : ""}
+      />
     </FormModal>
   );
 }
