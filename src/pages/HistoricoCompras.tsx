@@ -1,16 +1,20 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
-import { User, CreditCard, Hash } from "lucide-react";
+import { User, CreditCard, Hash, Plus, Trash2, PackagePlus } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
-const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { FormModal, TextField, Dropdown, FormRow, SaveButton } from "@/components/FormModal";
+import { useToast } from "@/hooks/use-toast";
+
+const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Produto {
   nome: string;
   valor: number;
   quantidade: number;
-  total: number;
 }
+
 interface CompraResumida {
   id: number;
   data: string;
@@ -18,20 +22,44 @@ interface CompraResumida {
   valor: number;
   desconto: number;
   total: number;
+  debitarCaixa?: boolean;
   produtos: Produto[];
 }
 
-const resumidoData: CompraResumida[] = [
+interface ItemCompraForm {
+  id: number;
+  produto: string;
+  valor: string;
+  quantidade: string;
+}
+
+const produtosOptions = [
+  { value: "CREME DE BARBEAR", label: "CREME DE BARBEAR" },
+  { value: "GEL FIXADOR", label: "GEL FIXADOR" },
+  { value: "POMADA MODELADORA", label: "POMADA MODELADORA" },
+  { value: "SHAMPOO ANTICASPA", label: "SHAMPOO ANTICASPA" },
+  { value: "ÓLEO DE BARBA", label: "ÓLEO DE BARBA" },
+  { value: "CONDICIONADOR", label: "CONDICIONADOR" },
+];
+
+const usuariosOptions = [
+  { value: "Lara", label: "Lara" },
+  { value: "Carlos", label: "Carlos" },
+  { value: "Ana", label: "Ana" },
+  { value: "Caio", label: "Caio" },
+];
+
+const initialData: CompraResumida[] = [
   {
     id: 1,
     data: "04/04/2026",
     funcionario: "Lara",
-    valor: 54,
-    desconto: 0,
+    valor: 85,
+    desconto: 31,
     total: 54,
     produtos: [
-      { nome: "GEL FIXADOR", valor: 23, quantidade: 1, total: 23 },
-      { nome: "color dicolor 10.89 - dicolore", valor: 31, quantidade: 2, total: 31 },
+      { nome: "GEL FIXADOR", valor: 23, quantidade: 1 },
+      { nome: "color dicolor 10.89 - dicolore", valor: 31, quantidade: 2 },
     ],
   },
   {
@@ -42,8 +70,8 @@ const resumidoData: CompraResumida[] = [
     desconto: 10,
     total: 110,
     produtos: [
-      { nome: "Pomada Modeladora", valor: 40, quantidade: 2, total: 80 },
-      { nome: "Shampoo Anticaspa", valor: 20, quantidade: 2, total: 40 },
+      { nome: "Pomada Modeladora", valor: 40, quantidade: 2 },
+      { nome: "Shampoo Anticaspa", valor: 20, quantidade: 2 },
     ],
   },
   {
@@ -54,18 +82,90 @@ const resumidoData: CompraResumida[] = [
     desconto: 5,
     total: 90,
     produtos: [
-      { nome: "Óleo de Barba", valor: 45, quantidade: 1, total: 45 },
-      { nome: "Condicionador", valor: 25, quantidade: 2, total: 50 },
+      { nome: "Óleo de Barba", valor: 45, quantidade: 1 },
+      { nome: "Condicionador", valor: 25, quantidade: 2 },
     ],
   },
 ];
 
-export default function HistoricoCompras() {
-  const [aulaOpen, setAulaOpen] = useState(false);
-  const [tab, setTab] = useState("resumido");
+function toNumberBR(value: string) {
+  if (!value) return 0;
+  return Number(value.replace(/\./g, "").replace(",", ".")) || 0;
+}
 
-  const totalProdutos = resumidoData.reduce((s, r) => s + r.produtos.reduce((ps, p) => ps + p.quantidade, 0), 0);
-  const totalCompras = resumidoData.reduce((s, r) => s + r.total, 0);
+function toDateInputValue(brDate: string) {
+  const [dd, mm, yyyy] = brDate.split("/");
+  if (!dd || !mm || !yyyy) return "";
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fromDateInputValue(isoDate: string) {
+  const [yyyy, mm, dd] = isoDate.split("-");
+  if (!dd || !mm || !yyyy) return "";
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function matchesDateFilter(itemDateBR: string, dateFrom?: string, dateTo?: string) {
+  if (!dateFrom && !dateTo) return true;
+
+  const current = toDateInputValue(itemDateBR);
+  if (!current) return true;
+
+  if (dateFrom && current < dateFrom) return false;
+  if (dateTo && current > dateTo) return false;
+
+  return true;
+}
+
+export default function HistoricoCompras() {
+  const { toast } = useToast();
+
+  const [aulaOpen, setAulaOpen] = useState(false);
+  const [tab, setTab] = useState<"resumido" | "detalhado">("resumido");
+  const [compras, setCompras] = useState<CompraResumida[]>(initialData);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [detalhadoDataFiltro, setDetalhadoDataFiltro] = useState<string | null>(null);
+
+  const [dataCompra, setDataCompra] = useState("2026-04-08");
+  const [funcionario, setFuncionario] = useState("Lara");
+  const [produtoSelecionado, setProdutoSelecionado] = useState("");
+  const [valorItem, setValorItem] = useState("");
+  const [quantidadeItem, setQuantidadeItem] = useState("1");
+  const [desconto, setDesconto] = useState("0,00");
+  const [debitarCaixa, setDebitarCaixa] = useState(true);
+  const [itensCompra, setItensCompra] = useState<ItemCompraForm[]>([]);
+  const [showErrors, setShowErrors] = useState(false);
+
+  const resetForm = () => {
+    setDataCompra("2026-04-08");
+    setFuncionario("Lara");
+    setProdutoSelecionado("");
+    setValorItem("");
+    setQuantidadeItem("1");
+    setDesconto("0,00");
+    setDebitarCaixa(true);
+    setItensCompra([]);
+    setShowErrors(false);
+  };
+
+  const openNew = () => {
+    resetForm();
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    resetForm();
+  };
+
+  const totalProdutos = compras.reduce(
+    (sumCompras, compra) =>
+      sumCompras + compra.produtos.reduce((sumProdutos, produto) => sumProdutos + produto.quantidade, 0),
+    0,
+  );
+
+  const totalCompras = compras.reduce((sum, compra) => sum + compra.total, 0);
 
   const summaryCards: SummaryCard[] = [
     {
@@ -78,76 +178,99 @@ export default function HistoricoCompras() {
     },
     {
       label: "Total em Compras",
-      value: R$(totalCompras),
+      value: formatBRL(totalCompras),
       icon: <CreditCard className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
   ];
 
-  // Resumido columns (grouped by date + funcionario)
+  const abrirDetalhadoPorData = (data: string) => {
+    setDetalhadoDataFiltro(data);
+    setTab("detalhado");
+  };
+
   const columnsResumido: Column<any>[] = [
-    { key: "data", label: "Data", pinned: true },
+    {
+      key: "data",
+      label: "Data",
+      pinned: true,
+      render: (v: string) => (
+        <button
+          type="button"
+          onClick={() => abrirDetalhadoPorData(v)}
+          className="font-medium text-primary hover:underline"
+        >
+          {v}
+        </button>
+      ),
+    },
     {
       key: "funcionario",
       label: "Usuário Responsável",
       render: (v: string) => (
         <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">
+          <a href="/funcionarioPesquisa" className="font-medium hover:underline">
             {v}
           </a>
         </div>
       ),
     },
-    { key: "valor", label: "Valor", align: "right", render: (v: number) => R$(v) },
-    { key: "desconto", label: "Desconto", align: "right", render: (v: number) => R$(v) },
+    { key: "valor", label: "Valor", align: "right", render: (v: number) => formatBRL(v) },
+    { key: "desconto", label: "Desconto", align: "right", render: (v: number) => formatBRL(v) },
     {
       key: "total",
       label: "Total",
       align: "right",
-      render: (v: number) => (
-        <span style={{ color: "#00c5b4" }} className="font-medium">
-          {R$(v)}
-        </span>
-      ),
+      render: (v: number) => <span className="font-medium text-emerald-600">{formatBRL(v)}</span>,
     },
   ];
 
-  // Detalhado: flat list of products per purchase (no funcionario)
-  const detalhadoData = useMemo(() => {
+  const detalhadoDataBase = useMemo(() => {
     const rows: any[] = [];
-    resumidoData.forEach((compra) => {
-      compra.produtos.forEach((p, pi) => {
+
+    compras.forEach((compra) => {
+      compra.produtos.forEach((produto, index) => {
+        const totalItem = Number(produto.valor || 0) * Number(produto.quantidade || 0);
+
         rows.push({
-          id: compra.id * 1000 + pi,
+          id: compra.id * 1000 + index,
+          compraId: compra.id,
           data: compra.data,
-          produto: p.nome,
-          quantidade: p.quantidade,
-          valor: p.valor,
-          total: p.total,
+          produto: produto.nome,
+          quantidade: produto.quantidade,
+          valor: produto.valor,
+          total: totalItem,
         });
       });
     });
+
     return rows;
-  }, []);
+  }, [compras]);
+
+  const detalhadoData = useMemo(() => {
+    if (!detalhadoDataFiltro) return detalhadoDataBase;
+    return detalhadoDataBase.filter((item) => item.data === detalhadoDataFiltro);
+  }, [detalhadoDataBase, detalhadoDataFiltro]);
 
   const columnsDetalhado: Column<any>[] = [
     { key: "data", label: "Data", pinned: true },
     { key: "produto", label: "Produto" },
     { key: "quantidade", label: "Quantidade", align: "center" },
-    { key: "valor", label: "Valor Unitário", align: "right", render: (v: number) => R$(v) },
+    {
+      key: "valor",
+      label: "Valor Unitário",
+      align: "right",
+      render: (v: number) => formatBRL(v),
+    },
     {
       key: "total",
       label: "Total",
       align: "right",
-      render: (v: number) => (
-        <span style={{ color: "#00c5b4" }} className="font-medium">
-          {R$(v)}
-        </span>
-      ),
+      render: (v: number) => <span className="font-medium text-emerald-600">{formatBRL(v)}</span>,
     },
   ];
 
@@ -156,21 +279,276 @@ export default function HistoricoCompras() {
     { label: "Detalhado", value: "detalhado", color: "info" },
   ];
 
+  const itemPreviewTotal = useMemo(() => {
+    const valor = toNumberBR(valorItem);
+    const quantidade = Number(quantidadeItem) || 0;
+    return valor * quantidade;
+  }, [valorItem, quantidadeItem]);
+
+  const subtotalCompra = useMemo(() => {
+    return itensCompra.reduce((acc, item) => {
+      const valor = toNumberBR(item.valor);
+      const quantidade = Number(item.quantidade) || 0;
+      return acc + valor * quantidade;
+    }, 0);
+  }, [itensCompra]);
+
+  const descontoCompra = useMemo(() => toNumberBR(desconto), [desconto]);
+
+  const totalCompra = useMemo(() => {
+    const total = subtotalCompra - descontoCompra;
+    return total < 0 ? 0 : total;
+  }, [subtotalCompra, descontoCompra]);
+
+  const errors = {
+    dataCompra: !dataCompra ? "Informe a data." : "",
+    funcionario: !funcionario ? "Selecione o responsável." : "",
+    itensCompra: itensCompra.length === 0 ? "Adicione pelo menos um produto." : "",
+  };
+
+  const handleAdicionarItem = () => {
+    const valor = toNumberBR(valorItem);
+    const quantidade = Number(quantidadeItem) || 0;
+
+    if (!produtoSelecionado || valor <= 0 || quantidade <= 0) {
+      toast({
+        title: "Preencha o item corretamente",
+        description: "Selecione o produto, informe valor e quantidade válidos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setItensCompra((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        produto: produtoSelecionado,
+        valor: valorItem,
+        quantidade: quantidadeItem,
+      },
+    ]);
+
+    setProdutoSelecionado("");
+    setValorItem("");
+    setQuantidadeItem("1");
+  };
+
+  const handleRemoverItem = (id: number) => {
+    setItensCompra((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleSalvarCompra = () => {
+    setShowErrors(true);
+
+    if (errors.dataCompra || errors.funcionario || errors.itensCompra) return;
+
+    const novaCompra: CompraResumida = {
+      id: Math.max(0, ...compras.map((item) => item.id)) + 1,
+      data: fromDateInputValue(dataCompra),
+      funcionario,
+      valor: subtotalCompra,
+      desconto: descontoCompra,
+      total: totalCompra,
+      debitarCaixa,
+      produtos: itensCompra.map((item) => ({
+        nome: item.produto,
+        valor: toNumberBR(item.valor),
+        quantidade: Number(item.quantidade) || 0,
+      })),
+    };
+
+    setCompras((prev) => [novaCompra, ...prev]);
+    closeModal();
+
+    toast({
+      title: "Compra registrada",
+      description: "A entrada de produtos foi salva com sucesso.",
+    });
+  };
+
+  const titleActions = (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={openNew}
+        className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+      >
+        <Plus className="h-4 w-4" />
+        Novo
+      </button>
+
+      <AulaButton onOpen={() => setAulaOpen(true)} />
+    </div>
+  );
+
   return (
     <AppLayout>
       <DataTable
         title="Histórico de Compras"
-        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
-        data={tab === "resumido" ? resumidoData : detalhadoData}
+        titleIcon={titleActions}
+        data={tab === "resumido" ? compras : detalhadoData}
         columns={tab === "resumido" ? columnsResumido : columnsDetalhado}
         summaryCards={summaryCards}
         tabs={tabs}
         activeTab={tab}
-        onTabChange={setTab}
+        onTabChange={(value) => {
+          setTab(value as "resumido" | "detalhado");
+          if (value === "resumido") setDetalhadoDataFiltro(null);
+        }}
         pageSize={15}
         showDateFilter={true}
         tableId="historico_compras"
       />
+
+      <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <FormModal
+            title="Entrada de Produtos"
+            subtitle="Cadastre uma nova compra de produto no estoque."
+            onClose={closeModal}
+            footer={<SaveButton onClick={handleSalvarCompra} />}
+          >
+            <FormRow>
+              <TextField
+                label="Data da compra"
+                value={dataCompra}
+                onChange={setDataCompra}
+                type="date"
+                error={showErrors ? errors.dataCompra : ""}
+              />
+              <Dropdown
+                label="Usuário responsável"
+                value={funcionario}
+                setValue={setFuncionario}
+                options={usuariosOptions}
+              />
+            </FormRow>
+
+            <div className="rounded-2xl border border-border bg-card/50 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <PackagePlus className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-semibold text-foreground">Adicionar produto</h3>
+              </div>
+
+              <div className="space-y-3">
+                <FormRow>
+                  <Dropdown
+                    label="Produto"
+                    value={produtoSelecionado}
+                    setValue={setProdutoSelecionado}
+                    options={produtosOptions}
+                  />
+                  <TextField label="Custo do item" value={valorItem} onChange={setValorItem} placeholder="0,00" />
+                </FormRow>
+
+                <FormRow>
+                  <TextField
+                    label="Quantidade"
+                    value={quantidadeItem}
+                    onChange={setQuantidadeItem}
+                    type="number"
+                    placeholder="1"
+                  />
+                  <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
+                </FormRow>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleAdicionarItem}
+                    className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Adicionar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-border">
+              <table className="w-full border-collapse">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Valor Unitário</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Total</th>
+                    <th className="w-20 px-4 py-3 text-center text-sm font-semibold text-foreground">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {itensCompra.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                        Nenhum produto adicionado.
+                      </td>
+                    </tr>
+                  ) : (
+                    itensCompra.map((item) => {
+                      const valor = toNumberBR(item.valor);
+                      const quantidade = Number(item.quantidade) || 0;
+                      const total = valor * quantidade;
+
+                      return (
+                        <tr key={item.id} className="border-t border-border bg-card">
+                          <td className="px-4 py-3 text-sm text-foreground">{item.produto}</td>
+                          <td className="px-4 py-3 text-right text-sm text-foreground">{formatBRL(valor)}</td>
+                          <td className="px-4 py-3 text-center text-sm text-foreground">{quantidade}</td>
+                          <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">
+                            {formatBRL(total)}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              type="button"
+                              onClick={() => handleRemoverItem(item.id)}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-destructive/10 text-destructive transition hover:bg-destructive/20"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {showErrors && errors.itensCompra ? <p className="text-sm text-destructive">{errors.itensCompra}</p> : null}
+
+            <div className="flex items-center justify-between rounded-2xl border border-border bg-card/50 p-4">
+              <label className="flex items-center gap-3 text-sm font-medium text-foreground">
+                <input
+                  type="checkbox"
+                  checked={debitarCaixa}
+                  onChange={(e) => setDebitarCaixa(e.target.checked)}
+                  className="h-4 w-4 rounded border-border"
+                />
+                Debitar do caixa
+              </label>
+
+              <div className="space-y-1 text-right">
+                <div className="text-sm text-muted-foreground">
+                  Total: <span className="font-medium text-foreground">{formatBRL(subtotalCompra)}</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Desconto: <span className="font-medium text-foreground">{formatBRL(descontoCompra)}</span>
+                </div>
+                <div className="text-base font-semibold text-foreground">
+                  Total c/ desconto: <span className="text-emerald-600">{formatBRL(totalCompra)}</span>
+                </div>
+              </div>
+            </div>
+
+            <FormRow>
+              <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
+              <div />
+            </FormRow>
+          </FormModal>
+        </DialogContent>
+      </Dialog>
+
       <YouTubeModal
         open={aulaOpen}
         onClose={() => setAulaOpen(false)}
