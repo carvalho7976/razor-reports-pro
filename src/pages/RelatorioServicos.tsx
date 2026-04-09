@@ -6,24 +6,147 @@ import { User, CreditCard, Hash } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-interface ServicoResumido { id: number; nome: string; quantidade: number; valor: number; qtdVendaExtra: number; vendaExtra: number; desconto: number; data: string; }
-interface ServicoDetalhado { id: number; servico: string; cliente: string; celular: string; profissional: string; valor: number; vendaExtra: number; desconto: number; data: string; }
+interface ServicoResumido {
+  id: number;
+  nome: string;
+  quantidade: number;
+  valor: number;
+  qtdVendaExtra: number;
+  vendaExtra: number;
+  desconto: number;
+  data: string;
+}
+interface ServicoDetalhado {
+  id: number;
+  servico: string;
+  cliente: string;
+  celular: string;
+  profissional: string;
+  valor: number;
+  vendaExtra: number;
+  desconto: number;
+  data: string;
+}
 
 const resumidoData: ServicoResumido[] = [
-  { id: 1, nome: "Corte Masculino", quantidade: 45, valor: 2250, qtdVendaExtra: 5, vendaExtra: 150, desconto: 80, data: "05/04/2026" },
-  { id: 2, nome: "Escova", quantidade: 30, valor: 2400, qtdVendaExtra: 8, vendaExtra: 200, desconto: 120, data: "05/04/2026" },
-  { id: 3, nome: "Barba", quantidade: 38, valor: 1330, qtdVendaExtra: 0, vendaExtra: 0, desconto: 50, data: "05/04/2026" },
-  { id: 4, nome: "Coloração", quantidade: 15, valor: 3000, qtdVendaExtra: 10, vendaExtra: 500, desconto: 200, data: "05/04/2026" },
-  { id: 5, nome: "Hidratação", quantidade: 20, valor: 2400, qtdVendaExtra: 6, vendaExtra: 300, desconto: 100, data: "05/04/2026" },
-  { id: 6, nome: "Manicure", quantidade: 25, valor: 1250, qtdVendaExtra: 3, vendaExtra: 100, desconto: 60, data: "05/04/2026" },
+  {
+    id: 1,
+    nome: "Corte Masculino",
+    quantidade: 45,
+    valor: 2250,
+    qtdVendaExtra: 5,
+    vendaExtra: 150,
+    desconto: 80,
+    data: "05/04/2026",
+  },
+  {
+    id: 2,
+    nome: "Escova",
+    quantidade: 30,
+    valor: 2400,
+    qtdVendaExtra: 8,
+    vendaExtra: 200,
+    desconto: 120,
+    data: "05/04/2026",
+  },
+  {
+    id: 3,
+    nome: "Barba",
+    quantidade: 38,
+    valor: 1330,
+    qtdVendaExtra: 0,
+    vendaExtra: 0,
+    desconto: 50,
+    data: "05/04/2026",
+  },
+  {
+    id: 4,
+    nome: "Coloração",
+    quantidade: 15,
+    valor: 3000,
+    qtdVendaExtra: 10,
+    vendaExtra: 500,
+    desconto: 200,
+    data: "05/04/2026",
+  },
+  {
+    id: 5,
+    nome: "Hidratação",
+    quantidade: 20,
+    valor: 2400,
+    qtdVendaExtra: 6,
+    vendaExtra: 300,
+    desconto: 100,
+    data: "05/04/2026",
+  },
+  {
+    id: 6,
+    nome: "Manicure",
+    quantidade: 25,
+    valor: 1250,
+    qtdVendaExtra: 3,
+    vendaExtra: 100,
+    desconto: 60,
+    data: "05/04/2026",
+  },
 ];
 
 const detalhadoData: ServicoDetalhado[] = [
-  { id: 1, servico: "Corte Masculino", cliente: "João Silva", celular: "(41) 99123-4567", profissional: "Carlos", valor: 50, vendaExtra: 10, desconto: 0, data: "05/04/2026" },
-  { id: 2, servico: "Escova", cliente: "Maria Santos", celular: "(41) 98765-4321", profissional: "Ana", valor: 80, vendaExtra: 15, desconto: 10, data: "05/04/2026" },
-  { id: 3, servico: "Barba", cliente: "Pedro Oliveira", celular: "(41) 99876-5432", profissional: "Carlos", valor: 35, vendaExtra: 0, desconto: 5, data: "04/04/2026" },
-  { id: 4, servico: "Coloração", cliente: "Ana Costa", celular: "(41) 99654-3210", profissional: "Fernanda", valor: 200, vendaExtra: 50, desconto: 20, data: "04/04/2026" },
-  { id: 5, servico: "Hidratação", cliente: "Carla Dias", celular: "", profissional: "Ana", valor: 120, vendaExtra: 30, desconto: 10, data: "03/04/2026" },
+  {
+    id: 1,
+    servico: "Corte Masculino",
+    cliente: "João Silva",
+    celular: "(41) 99123-4567",
+    profissional: "Carlos",
+    valor: 50,
+    vendaExtra: 10,
+    desconto: 0,
+    data: "05/04/2026",
+  },
+  {
+    id: 2,
+    servico: "Escova",
+    cliente: "Maria Santos",
+    celular: "(41) 98765-4321",
+    profissional: "Ana",
+    valor: 80,
+    vendaExtra: 15,
+    desconto: 10,
+    data: "05/04/2026",
+  },
+  {
+    id: 3,
+    servico: "Barba",
+    cliente: "Pedro Oliveira",
+    celular: "(41) 99876-5432",
+    profissional: "Carlos",
+    valor: 35,
+    vendaExtra: 0,
+    desconto: 5,
+    data: "04/04/2026",
+  },
+  {
+    id: 4,
+    servico: "Coloração",
+    cliente: "Ana Costa",
+    celular: "(41) 99654-3210",
+    profissional: "Fernanda",
+    valor: 200,
+    vendaExtra: 50,
+    desconto: 20,
+    data: "04/04/2026",
+  },
+  {
+    id: 5,
+    servico: "Hidratação",
+    cliente: "Carla Dias",
+    celular: "",
+    profissional: "Ana",
+    valor: 120,
+    vendaExtra: 30,
+    desconto: 10,
+    data: "03/04/2026",
+  },
 ];
 
 export default function RelatorioServicos() {
@@ -38,47 +161,77 @@ export default function RelatorioServicos() {
   const totalValor = avulsoValor + assinanteValor;
 
   const summaryCards: SummaryCard[] = [
-    { label: "Total Avulso e Assinantes", value: `${totalQtd} · ${R$(totalValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-    { label: "Venda Avulso", value: `${avulsoQtd} · ${R$(avulsoValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-    { label: "Venda Assinantes", value: `${assinanteQtd} · ${R$(assinanteValor)}`, icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "green" },
-    { label: "Desconto", value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
+    {
+      label: "Total Avulso e Assinantes",
+      value: `${totalQtd} · ${R$(totalValor)}`,
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "green",
+    },
+    {
+      label: "Venda Avulso",
+      value: `${avulsoQtd} · ${R$(avulsoValor)}`,
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "green",
+    },
+    {
+      label: "Venda Assinantes",
+      value: `${assinanteQtd} · ${R$(assinanteValor)}`,
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "green",
+    },
+    {
+      label: "Desconto",
+      value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)),
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "red",
+    },
   ];
 
   const columnsResumido: Column<ServicoResumido>[] = [
     { key: "nome", label: "Serviço", pinned: true },
     { key: "quantidade", label: "Quantidade Avulso", align: "center" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "qtdVendaExtra", label: "Quantidade Assinantes", align: "center" },
-    { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: v => R$(v) },
-    { key: "desconto", label: "Desconto", align: "right", render: v => R$(v) },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    { key: "qtdVendaExtra", label: "Assinantes Atendidos", align: "center" },
+    { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
+    { key: "desconto", label: "Desconto", align: "right", render: (v) => R$(v) },
     { key: "data", label: "Data" },
   ];
 
   const columnsDetalhado: Column<ServicoDetalhado>[] = [
     { key: "servico", label: "Serviço", pinned: true },
     {
-      key: "cliente", label: "Cliente",
+      key: "cliente",
+      label: "Cliente",
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.celular} nome={row.cliente} />
-          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/clientePesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
     {
-      key: "profissional", label: "Profissional",
+      key: "profissional",
+      label: "Profissional",
       render: (v) => (
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: v => R$(v) },
-    { key: "desconto", label: "Desconto", align: "right", render: v => R$(v) },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
+    { key: "desconto", label: "Desconto", align: "right", render: (v) => R$(v) },
     { key: "data", label: "Data" },
   ];
 
@@ -92,8 +245,8 @@ export default function RelatorioServicos() {
       <DataTable
         title="Relatório de Serviços"
         titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
-        data={tab === "resumido" ? resumidoData as any[] : detalhadoData as any[]}
-        columns={tab === "resumido" ? columnsResumido as any : columnsDetalhado as any}
+        data={tab === "resumido" ? (resumidoData as any[]) : (detalhadoData as any[])}
+        columns={tab === "resumido" ? (columnsResumido as any) : (columnsDetalhado as any)}
         summaryCards={summaryCards}
         tabs={tabs}
         activeTab={tab}
