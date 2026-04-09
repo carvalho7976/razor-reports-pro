@@ -4,7 +4,7 @@ import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
 import { User, CreditCard, Hash, Trash2 } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { FormModal, TextField, Dropdown, FormRow, SaveButton } from "@/components/FormModal";
+import { FormModal, TextField, Dropdown, SaveButton } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -207,8 +207,6 @@ export default function HistoricoCompras() {
 
     compras.forEach((compra) => {
       compra.produtos.forEach((produto, index) => {
-        const totalItem = Number(produto.valor || 0) * Number(produto.quantidade || 0);
-
         rows.push({
           id: compra.id * 1000 + index,
           compraId: compra.id,
@@ -216,7 +214,7 @@ export default function HistoricoCompras() {
           produto: produto.nome,
           quantidade: produto.quantidade,
           valor: produto.valor,
-          total: totalItem,
+          total: Number(produto.valor || 0) * Number(produto.quantidade || 0),
         });
       });
     });
@@ -365,11 +363,11 @@ export default function HistoricoCompras() {
             subtitle="Cadastre uma nova compra de produto no estoque."
             onClose={closeModal}
             footer={<SaveButton onClick={handleSalvarCompra} />}
-            size="lg"
+            size="xl"
           >
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_420px]">
-              <div className="space-y-3">
-                <FormRow>
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Dropdown
                     label="Produto"
                     value={produtoSelecionado}
@@ -377,9 +375,9 @@ export default function HistoricoCompras() {
                     options={produtosOptions}
                   />
                   <TextField label="Custo do item" value={valorItem} onChange={setValorItem} placeholder="0,00" />
-                </FormRow>
+                </div>
 
-                <FormRow>
+                <div className="grid grid-cols-2 gap-4">
                   <TextField
                     label="Quantidade"
                     value={quantidadeItem}
@@ -387,13 +385,8 @@ export default function HistoricoCompras() {
                     type="number"
                     placeholder="1"
                   />
-                  <TextField
-                    label="Custo total"
-                    value={formatBRL(itemPreviewTotal)}
-                    onChange={() => {}}
-                    placeholder="R$ 0,00"
-                  />
-                </FormRow>
+                  <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
+                </div>
 
                 <div className="flex justify-end">
                   <button
@@ -406,8 +399,8 @@ export default function HistoricoCompras() {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="overflow-hidden rounded-lg border border-border">
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-lg border border-border bg-card">
                   <table className="w-full border-collapse">
                     <thead className="bg-muted/40">
                       <tr>
@@ -456,9 +449,8 @@ export default function HistoricoCompras() {
                   </table>
                 </div>
 
-                <div className="grid grid-cols-[180px_1fr] gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <TextField label="Desconto" value={desconto} onChange={setDesconto} placeholder="0,00" />
-
                   <Dropdown label="Débito" value={debitoTipo} setValue={setDebitoTipo} options={debitoOptions} />
                 </div>
 
