@@ -565,8 +565,9 @@ export default function HistoricoCompras() {
                         </tbody>
                       </table>
                     </div>
+                  </div>
 
-                        <div className="space-y-4 self-start">
+                  <div className="space-y-4 self-start">
   <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
 
   <Dropdown
