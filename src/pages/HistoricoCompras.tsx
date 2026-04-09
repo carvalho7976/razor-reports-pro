@@ -529,12 +529,7 @@ export default function HistoricoCompras() {
               <div className="px-6 py-5">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">
-                        {itensCompra.length} {itensCompra.length === 1 ? "item" : "itens"}
-                      </p>
-                    </div>
-
+                   
                     <div className="overflow-hidden rounded-lg border border-border bg-card">
                       <table className="w-full border-collapse">
                         <thead className="bg-muted/40">
@@ -565,9 +560,8 @@ export default function HistoricoCompras() {
                         </tbody>
                       </table>
                     </div>
-                  </div>
 
-                  <div className="space-y-4 self-start">
+                        <div className="space-y-4 self-start">
   <TextField label="Desconto total" value={desconto} onChange={setDesconto} placeholder="0,00" />
 
   <Dropdown
