@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Trash2, Eye, Power, Pencil } from "lucide-react";
@@ -53,11 +53,11 @@ export default function ListaPacotes() {
   const [showErrors, setShowErrors] = useState(false);
   const { toast } = useToast();
 
-  const data = useMemo(() => {
-    if (tab === "todos") return allData;
-    if (tab === "ativos") return allData.filter(d => d.status === "Ativo");
-    return allData.filter(d => d.status === "Desativado");
-  }, [tab, allData]);
+  const tabFilter = (row: Pacote, t: string) => {
+    if (t === "todos") return true;
+    if (t === "ativos") return row.status === "Ativo";
+    return row.status === "Desativado";
+  };
 
   const errors = { nome: !form?.nome ? "Informe o nome do pacote." : "" };
 
@@ -96,7 +96,7 @@ export default function ListaPacotes() {
   };
 
   const bulkRemove = (indices: number[]) => {
-    const ids = indices.map(i => data[i]?.id).filter(Boolean);
+    const ids = indices.map(i => allData[i]?.id).filter(Boolean);
     setAllData(prev => prev.filter(d => !ids.includes(d.id)));
     toast({ title: `${ids.length} pacote(s) removido(s)`, variant: "destructive" });
   };
