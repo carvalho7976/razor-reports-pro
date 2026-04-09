@@ -436,15 +436,17 @@ export default function HistoricoCompras() {
                     <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
 
                     <div className="flex items-end gap-3 pt-1">
-                      <div className="min-w-[170px]">
-                        <label className="mb-2 block text-sm font-medium text-foreground">XML</label>
+                      <label className="cursor-pointer">
                         <input
                           type="file"
                           accept=".xml,text/xml,application/xml"
                           onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
-                          className="block w-full text-sm text-foreground file:rounded-lg file:border file:border-border file:bg-card file:px-3 file:py-2 file:text-sm file:font-medium"
+                          className="hidden"
                         />
-                      </div>
+                        <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
+                          Importar XML
+                        </span>
+                      </label>
 
                       <button
                         type="button"
