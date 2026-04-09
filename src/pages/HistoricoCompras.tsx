@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
-import { User, CreditCard, Hash, Trash2, ChevronLeft } from "lucide-react";
+import { User, CreditCard, Hash, Trash2, ChevronLeft, Check } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { TextField, Dropdown } from "@/components/FormModal";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -100,15 +100,14 @@ function formatCurrencyInput(value: string) {
   const digits = value.replace(/\D/g, "");
   if (!digits) return "R$ 0,00";
 
+  const n = digits.length;
   let numberValue: number;
-  if (digits.length === 1) {
+  if (n === 1) {
     numberValue = Number(digits);
-  } else if (digits.length === 2) {
-    numberValue = Number(digits[0]) + Number(digits[1]) * 0.1;
+  } else if (n === 2) {
+    numberValue = Number(digits) / 10;
   } else {
-    const intPart = digits.slice(0, -2);
-    const decPart = digits.slice(-2);
-    numberValue = Number(intPart) + Number(decPart) / 100;
+    numberValue = Number(digits) / 100;
   }
 
   return numberValue.toLocaleString("pt-BR", {
@@ -123,7 +122,6 @@ function sanitizeQuantity(value: string) {
 }
 
 export default function HistoricoCompras() {
-  const { toast } = useToast();
 
   const [aulaOpen, setAulaOpen] = useState(false);
   const [tab, setTab] = useState<"resumido" | "detalhado">("resumido");
@@ -319,10 +317,8 @@ export default function HistoricoCompras() {
     const quantidade = Number(quantidadeItem) || 0;
 
     if (!produtoSelecionado || valor <= 0 || quantidade <= 0) {
-      toast({
-        title: "Preencha o item corretamente",
+      toast.error("Preencha o item corretamente", {
         description: "Selecione o produto, informe valor e quantidade válidos.",
-        variant: "destructive",
       });
       return;
     }
@@ -343,9 +339,16 @@ export default function HistoricoCompras() {
     setValorItem("R$ 0,00");
     setQuantidadeItem("1");
 
-    toast({
-      title: "Item adicionado",
-      description: produtoLabel,
+    toast.success(`${produtoLabel}`, {
+      description: "Item adicionado à compra",
+      icon: <Check className="h-4 w-4" />,
+      style: {
+        background: "hsl(142, 71%, 45%)",
+        color: "white",
+        border: "none",
+        borderRadius: "9999px",
+      },
+      duration: 2000,
     });
   };
 
@@ -385,8 +388,7 @@ export default function HistoricoCompras() {
     setCompras((prev) => [novaCompra, ...prev]);
     closeModal();
 
-    toast({
-      title: "Compra registrada",
+    toast.success("Compra registrada", {
       description: "A entrada de produtos foi salva com sucesso.",
     });
   };
