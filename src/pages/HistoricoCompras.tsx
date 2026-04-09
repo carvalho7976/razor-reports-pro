@@ -100,7 +100,13 @@ function formatCurrencyInput(value: string) {
   const digits = value.replace(/\D/g, "");
   if (!digits) return "R$ 0,00";
 
-  const numberValue = Number(digits) / 100;
+  function formatCurrencyInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+
+  if (!digits) return "R$ 0,00";
+
+  const numberValue = Number(digits) / 10;
+
   return numberValue.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -410,8 +416,8 @@ export default function HistoricoCompras() {
       />
 
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="left-1/2 top-1/2 w-[min(980px,calc(100vw-32px))] max-w-none -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <div className="w-full overflow-hidden rounded-2xl bg-card shadow-2xl">
+        <<DialogContent className="fixed right-0 top-0 h-screen w-[920px] max-w-[100vw] translate-x-0 translate-y-0 border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+  <div className="flex h-full w-full flex-col overflow-hidden rounded-none bg-card shadow-2xl">
             <div className="relative border-b border-border px-6 py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
