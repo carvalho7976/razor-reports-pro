@@ -162,21 +162,21 @@ export default function RelatorioServicos() {
 
   const summaryCards: SummaryCard[] = [
     {
-      label: "Total Avulso e Assinantes",
+      label: "Total Avulsos e Assinantes",
       value: `${totalQtd} · ${R$(totalValor)}`,
       icon: <CreditCard className="h-4 w-4" />,
       size: "wide",
       color: "green",
     },
     {
-      label: "Venda Avulso",
+      label: "Vendas para Avulsos",
       value: `${avulsoQtd} · ${R$(avulsoValor)}`,
       icon: <CreditCard className="h-4 w-4" />,
       size: "wide",
       color: "green",
     },
     {
-      label: "Venda Assinantes",
+      label: "Vendas para Assinantes",
       value: `${assinanteQtd} · ${R$(assinanteValor)}`,
       icon: <CreditCard className="h-4 w-4" />,
       size: "wide",
