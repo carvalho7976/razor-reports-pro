@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Star } from "lucide-react";
+import { User, Star, Store, ConciergeBell } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 interface Avaliacao {
@@ -115,21 +115,21 @@ export default function Avaliacoes() {
     {
       label: "NPS Empresa",
       value: String(notaEmpresa),
-      icon: <store className="h-4 w-4" />,
+      icon: <Store className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
     {
       label: "Nota Equipe",
       value: String(notaEquipe),
-      icon: <user-star className="h-4 w-4" />,
+      icon: <Star className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
     {
       label: "Nota Recepção",
       value: String(notaRecepcao),
-      icon: <concierge-bell className="h-4 w-4" />,
+      icon: <ConciergeBell className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
