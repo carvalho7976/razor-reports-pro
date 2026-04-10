@@ -228,14 +228,14 @@ export default function RelatorioProfissionais() {
     {
       label: "Taxa de Ocupação",
       value: `${taxaOcupacao.toFixed(1)}%`,
-      icon: <Calendar className="h-4 w-4" />,
+      icon: <calendar-arrow-up className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
     {
       label: "Total em aberto",
       value: R$(totalAberto),
-      icon: <Banknote className="h-4 w-4" />,
+      icon: <banknote-arrow-up className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
