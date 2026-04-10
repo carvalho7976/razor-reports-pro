@@ -278,8 +278,8 @@ export default function RelatorioProfissionais() {
       ),
     },
 
-    { key: "qtdServicos", label: "Qtd Serviços", align: "center" },
-    { key: "qtdProdutos", label: "Qtd Produtos", align: "center" },
+    { key: "qtdServicos", label: "Serviços", align: "center" },
+    { key: "qtdProdutos", label: "Produtos", align: "center" },
     { key: "clientesAtendidos", label: "Clientes Atendidos", align: "center" },
 
     { key: "totalServicos", label: "Vendas para Avulsos", align: "right", render: (v) => R$(v) },
