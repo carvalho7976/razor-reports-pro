@@ -143,7 +143,7 @@ export default function RelatorioClientes() {
         value: R$(ticketMedioGeral),
         icon: <Ticket className="h-4 w-4" />,
         size: "wide",
-        color: "green",
+        color: "blue",
       },
       {
         label: "Serviços",
