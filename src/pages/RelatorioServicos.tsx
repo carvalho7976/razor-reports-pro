@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, CreditCard, Hash, Scissors, Star, Tag } from "lucide-react";
+import { User, CreditCard, Hash } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -171,7 +171,7 @@ export default function RelatorioServicos() {
     {
       label: "Vendas para Avulsos",
       value: `${avulsoQtd} · ${R$(avulsoValor)}`,
-      icon: <Scissors className="h-4 w-4" />,
+      icon: <Users className="h-4 w-4" />,
       size: "wide",
       color: "green",
     },
