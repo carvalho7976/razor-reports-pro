@@ -1443,52 +1443,61 @@ export function DataTable<T extends Record<string, any>>({
       {selectable && (
         <div
           className={cn(
-            "flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-info/5",
-            "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] origin-top",
+            "grid transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
             selectedRows.size > 0
-              ? "opacity-100 translate-y-0 scale-100 border border-info/20 max-h-24"
-              : "opacity-0 -translate-y-1 scale-[0.98] border border-transparent max-h-0 py-0 overflow-hidden pointer-events-none",
+              ? "grid-rows-[1fr] opacity-100 mt-0"
+              : "grid-rows-[0fr] opacity-0 mt-0 pointer-events-none",
           )}
         >
-          <span className="text-xs sm:text-sm font-medium text-foreground">
-            {selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}
-          </span>
-
-          <div className="h-4 w-px bg-border" />
-
-          {selectionActions.map((action, i) => (
-            <div key={i} className="inline-flex items-center gap-0.5">
-              <button
-                onClick={() => {
-                  action.onClick(Array.from(selectedRows));
-                  clearSelection();
-                }}
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg",
-                  "transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                  action.variant === "destructive"
-                    ? "text-destructive hover:bg-destructive/10"
-                    : "text-success hover:bg-success/10",
-                )}
-              >
-                {action.icon}
-                <span className="hidden sm:inline">{action.label}</span>
-              </button>
-
-              {action.description && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="p-0.5 text-muted-foreground hover:text-foreground transition-colors">
-                      <Info className="h-3.5 w-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="max-w-[200px] text-xs">
-                    {action.description}
-                  </TooltipContent>
-                </Tooltip>
+          <div className="overflow-hidden">
+            <div
+              className={cn(
+                "flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-info/5 border border-info/20 origin-top",
+                "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                selectedRows.size > 0 ? "translate-y-0 scale-100" : "-translate-y-1 scale-[0.98]",
               )}
+            >
+              <span className="text-xs sm:text-sm font-medium text-foreground">
+                {selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}
+              </span>
+
+              <div className="h-4 w-px bg-border" />
+
+              {selectionActions.map((action, i) => (
+                <div key={i} className="inline-flex items-center gap-0.5">
+                  <button
+                    onClick={() => {
+                      action.onClick(Array.from(selectedRows));
+                      clearSelection();
+                    }}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg",
+                      "transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                      action.variant === "destructive"
+                        ? "text-destructive hover:bg-destructive/10"
+                        : "text-success hover:bg-success/10",
+                    )}
+                  >
+                    {action.icon}
+                    <span className="hidden sm:inline">{action.label}</span>
+                  </button>
+
+                  {action.description && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="p-0.5 text-muted-foreground hover:text-foreground transition-colors">
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-[200px] text-xs">
+                        {action.description}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       )}
 
