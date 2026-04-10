@@ -205,8 +205,33 @@ export default function RelatorioProfissionais() {
   const totalQtdServicos = detalhadoData.reduce((s, r) => s + r.qtdServicos, 0);
   const totalQtdProdutos = detalhadoData.reduce((s, r) => s + r.qtdProdutos, 0);
   const totalClientesAtendidos = detalhadoData.reduce((s, r) => s + r.clientesAtendidos, 0);
+  const formatTempo = (min: number) => {
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return `${h}h ${m}min`;
+  };
+  const totalTempoMin = resumidoData.reduce((s, r) => s + parseInt(r.tempoTrabalhado), 0);
+
+  // exemplo: 8h por dia * 60 = 480 min (ajusta se quiser)
+  const capacidadeTotalMin = resumidoData.length * 480;
+
+  const taxaOcupacao = capacidadeTotalMin > 0 ? (totalTempoMin / capacidadeTotalMin) * 100 : 0;
 
   const summaryCards: SummaryCard[] = [
+    {
+      label: "Tempo Total Trabalhado",
+      value: formatTempo(totalTempoMin),
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "blue",
+    },
+    {
+      label: "Taxa de Ocupação",
+      value: `${taxaOcupacao.toFixed(1)}%`,
+      icon: <CreditCard className="h-4 w-4" />,
+      size: "wide",
+      color: "green",
+    },
     {
       label: "Vendas para Assinantes",
       value: R$(totalVendaAssinantes),
