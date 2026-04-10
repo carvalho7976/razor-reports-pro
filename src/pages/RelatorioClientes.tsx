@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Users, CreditCard, TrendingUp, Ticket, Scissors, ShoppingBag } from "lucide-react";
+import { Users, CreditCard, TrendingUp, Ticket, Scissors, ShoppingBag, Wine } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -155,7 +155,7 @@ export default function RelatorioClientes() {
       {
         label: "Produtos",
         value: R$(totalProdutos),
-        icon: <bottle className="h-4 w-4" />,
+        icon: <Wine className="h-4 w-4" />,
         size: "wide",
         color: "green",
       },
