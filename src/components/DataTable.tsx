@@ -916,7 +916,7 @@ function TablePagination({
         </button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground">
           {start}–{end} de {totalItems}
         </span>
@@ -1120,7 +1120,7 @@ export function DataTable<T extends Record<string, any>>({
   }, [search, datePreset, columnFilters, sortEntries, initialColumns]);
 
   const removeFilter = useCallback(
-    (id: string, key: string, value: string) => {
+    (_id: string, key: string, value: string) => {
       if (key === "__search") {
         setSearch("");
       } else if (key === "__date") {
@@ -1157,8 +1157,6 @@ export function DataTable<T extends Record<string, any>>({
       return prev.filter((_, i) => i !== idx);
     });
   }, []);
-
-  const clearSort = useCallback(() => setSortEntries([]), []);
 
   const baseFilteredData = useMemo(() => {
     let result = [...data];
@@ -1255,9 +1253,29 @@ export function DataTable<T extends Record<string, any>>({
 
   const pagedData = filteredData.slice(page * internalPageSize, (page + 1) * internalPageSize);
 
+  const filteredIds = filteredData.map((_, i) => i);
   const pagedIds = pagedData.map((_, i) => page * internalPageSize + i);
+
   const allPageSelected = selectable && pagedIds.length > 0 && pagedIds.every((id) => selectedRows.has(id));
   const somePageSelected = selectable && pagedIds.some((id) => selectedRows.has(id));
+
+  const allFilteredSelected = selectable && filteredIds.length > 0 && filteredIds.every((id) => selectedRows.has(id));
+
+  const selectCurrentPage = () => {
+    setSelectedRows((prev) => {
+      const next = new Set(prev);
+      pagedIds.forEach((id) => next.add(id));
+      return next;
+    });
+  };
+
+  const selectAllResults = () => {
+    setSelectedRows(new Set(filteredIds));
+  };
+
+  const clearSelection = () => {
+    setSelectedRows(new Set());
+  };
 
   const toggleSelectAll = () => {
     setSelectedRows((prev) => {
@@ -1545,13 +1563,33 @@ export function DataTable<T extends Record<string, any>>({
           <span className="text-xs sm:text-sm font-medium text-foreground">
             {selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}
           </span>
+
           <div className="h-4 w-px bg-border" />
+
+          {!allPageSelected && pagedIds.length > 0 && (
+            <button
+              onClick={selectCurrentPage}
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg text-foreground hover:bg-muted transition-colors"
+            >
+              Selecionar página atual
+            </button>
+          )}
+
+          {!allFilteredSelected && filteredData.length > 0 && (
+            <button
+              onClick={selectAllResults}
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg text-info hover:bg-info/10 transition-colors"
+            >
+              Selecionar todos os resultados
+            </button>
+          )}
+
           {selectionActions.map((action, i) => (
             <div key={i} className="inline-flex items-center gap-0.5">
               <button
                 onClick={() => {
                   action.onClick(Array.from(selectedRows));
-                  setSelectedRows(new Set());
+                  clearSelection();
                 }}
                 className={cn(
                   "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
@@ -1577,10 +1615,8 @@ export function DataTable<T extends Record<string, any>>({
               )}
             </div>
           ))}
-          <button
-            onClick={() => setSelectedRows(new Set())}
-            className="ml-auto text-xs text-muted-foreground hover:text-foreground"
-          >
+
+          <button onClick={clearSelection} className="ml-auto text-xs text-muted-foreground hover:text-foreground">
             Limpar
           </button>
         </div>
@@ -1667,7 +1703,7 @@ export function DataTable<T extends Record<string, any>>({
                 </tr>
               ) : (
                 pagedData.map((row, i) => {
-                  const globalIdx = page * internalPageSize + i;
+                  const globalIdx = filteredData.findIndex((item) => item === row);
                   const isSelected = selectedRows.has(globalIdx);
 
                   return (
