@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Users, CreditCard, Hash, Package, Star, Tag } from "lucide-react";
+import { User, CreditCard, Hash } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -206,7 +206,7 @@ export default function RelatorioProdutos() {
     { key: "valor", label: "Vendas para Avulsos", align: "right", render: (v) => R$(v) },
     { key: "qtdVendaExtra", label: "Assinantes Atendidos", align: "center" },
     { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
-    { key: "desconto", label: "Desconto", align: "right", render: (v) => R$(v) },
+    { key: "desconto", label: "Total de Desconto", align: "right", render: (v) => R$(v) },
     { key: "data", label: "Data" },
   ];
 
