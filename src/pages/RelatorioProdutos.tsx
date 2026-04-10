@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Users, CreditCard, Hash, Package, Star, Tag } from "lucide-react";
+import { User, CreditCard, Hash } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -191,7 +191,7 @@ export default function RelatorioProdutos() {
       color: "green",
     },
     {
-      label: "Desconto",
+      label: "Total de Desconto",
       value: R$(resumidoData.reduce((s, r) => s + r.desconto, 0)),
       icon: <Tag className="h-4 w-4" />,
       size: "wide",
