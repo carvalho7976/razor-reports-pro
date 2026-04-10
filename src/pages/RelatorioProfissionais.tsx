@@ -208,30 +208,6 @@ export default function RelatorioProfissionais() {
 
   const summaryCards: SummaryCard[] = [
     {
-      label: "Qtd Serviços",
-      value: String(totalQtdServicos),
-      type: "quantity",
-      icon: <Hash className="h-4 w-4" />,
-      size: "compact",
-      color: "blue",
-    },
-    {
-      label: "Qtd Produtos",
-      value: String(totalQtdProdutos),
-      type: "quantity",
-      icon: <Package className="h-4 w-4" />,
-      size: "compact",
-      color: "blue",
-    },
-    {
-      label: "Clientes Atendidos",
-      value: String(totalClientesAtendidos),
-      type: "quantity",
-      icon: <Users className="h-4 w-4" />,
-      size: "compact",
-      color: "blue",
-    },
-    {
       label: "Vendas para Assinantes",
       value: R$(totalVendaAssinantes),
       icon: <CreditCard className="h-4 w-4" />,
