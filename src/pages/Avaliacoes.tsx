@@ -120,7 +120,7 @@ export default function Avaliacoes() {
       type: "quantity",
       icon: <MessageCircle className="h-4 w-4" />,
       size: "compact",
-      color: "yellow",
+      color: "blue",
     },
     {
       label: "NPS Empresa",
