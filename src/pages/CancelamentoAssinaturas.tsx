@@ -71,7 +71,7 @@ export default function CancelamentoAssinaturas() {
       label: "Total",
       value: String(initialData.length),
       type: "quantity",
-      icon: <Star-off className="h-4 w-4" />,
+      icon: <StarOff className="h-4 w-4" />,
       size: "compact",
       color: "blue",
     },
