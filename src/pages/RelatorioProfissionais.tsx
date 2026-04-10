@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, CreditCard, Hash, Package, Users } from "lucide-react";
+import { User, CreditCard, Hash, Package, Users, Clock, Calendar, Banknote } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -221,21 +221,21 @@ export default function RelatorioProfissionais() {
     {
       label: "Tempo Total Trabalhado",
       value: formatTempo(totalTempoMin),
-      icon: <clock-plus className="h-4 w-4" />,
+      icon: <Clock className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
     {
       label: "Taxa de Ocupação",
       value: `${taxaOcupacao.toFixed(1)}%`,
-      icon: <calendar-arrow-up className="h-4 w-4" />,
+      icon: <Calendar className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
     {
       label: "Total em aberto",
       value: R$(totalAberto),
-      icon: <banknote-arrow-up className="h-4 w-4" />,
+      icon: <Banknote className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
