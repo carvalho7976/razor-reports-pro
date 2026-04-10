@@ -1,4 +1,4 @@
-import { useState, useMemo, ReactNode, useCallback, useRef, useEffect, KeyboardEvent } from "react";
+import { useState, useMemo, ReactNode, useCallback, useRef, useEffect } from "react";
 import {
   Search,
   SlidersHorizontal,
@@ -10,8 +10,6 @@ import {
   EyeOff,
   Calendar,
   Download,
-  ChevronLeft,
-  ChevronRight,
   ArrowUpDown,
   MoreHorizontal,
   FileSpreadsheet,
@@ -21,6 +19,8 @@ import {
   GripVertical,
   Info,
   RotateCcw,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -52,14 +52,11 @@ export interface Column<T> {
   filterable?: boolean;
   pinned?: boolean;
   render?: (value: any, row: T, index: number) => ReactNode;
-  /** Custom sort value extractor — used instead of raw cell value when sorting */
   sortValue?: (row: T) => number | string;
   width?: string;
   align?: "left" | "center" | "right";
-  /** @deprecated Inline editing disabled */
   editable?: boolean;
   editType?: "text" | "number" | "currency";
-  /** Card width hint: "compact" for small cards, "wide" for larger ones */
   cardWidth?: "compact" | "wide";
 }
 
@@ -104,9 +101,7 @@ export interface SummaryCard {
   sentiment?: "positive" | "negative" | "neutral";
   filterValue?: string;
   onFilter?: (value: string) => void;
-  /** "compact" = ~140px, "wide" = ~200px+ (default auto) */
   size?: "compact" | "wide";
-  /** Icon color theme: blue (neutral/KPI), green (income/sales), red (expense/loss) */
   color?: "blue" | "green" | "red";
 }
 
@@ -128,10 +123,6 @@ interface DataTableProps<T extends Record<string, any>> {
   tabs?: TabDef[];
   activeTab?: string;
   onTabChange?: (tab: string) => void;
-  /** When provided, DataTable handles tab filtering internally.
-   *  Pass ALL data (unfiltered by tab) and this function to determine tab membership.
-   *  Tab counts will react to search/date filters automatically.
-   *  Return true if `row` belongs to the given `tabValue`. */
   tabFilterFn?: (row: T, tabValue: string) => boolean;
   showDateFilter?: boolean;
   summaryCards?: SummaryCard[] | ((filteredData: T[]) => SummaryCard[]);
@@ -139,11 +130,9 @@ interface DataTableProps<T extends Record<string, any>> {
   selectable?: boolean;
   selectionActions?: SelectionAction[];
   novoMenuItems?: NovoMenuItem[];
-  /** @deprecated Inline editing disabled */
   onCellEdit?: (rowIndex: number, key: string, value: any) => void;
   tableId?: string;
   dateField?: string;
-  /** Slot rendered between summary cards and tabs */
   slotBetweenCardsAndTabs?: ReactNode;
 }
 
@@ -182,7 +171,7 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
       >
         <Plus className="h-4 w-4" />
         Novo
-        <ChevronDown className="h-3.5 w-3.5 ml-0.5 opacity-70" />
+        <ChevronDownIcon className="h-3.5 w-3.5 ml-0.5 opacity-70" />
       </button>
       {open && (
         <div className="dropdown-panel right-0 top-full mt-2 min-w-[180px]">
@@ -234,6 +223,7 @@ function DateRangePicker({
     const today = new Date();
     let from: Date = today,
       to: Date = today;
+
     switch (key) {
       case "hoje":
         from = to = startOfDay(today);
@@ -272,6 +262,7 @@ function DateRangePicker({
         break;
       }
     }
+
     onRangeChange({ from, to });
     onSelect(key);
   };
@@ -391,10 +382,10 @@ function SearchWithFilter<T>({
         }
       });
     }
+
     return results.slice(0, 30);
   }, [search, data, filterableCols]);
 
-  // Group suggestions by column
   const grouped = useMemo(() => {
     const map = new Map<string, { col: Column<T>; values: string[] }>();
     for (const s of suggestions) {
@@ -478,7 +469,7 @@ function SearchWithFilter<T>({
   );
 }
 
-/* ── Column Manager (with drag & drop reorder + reset) ── */
+/* ── Column Manager ── */
 function ColumnManager<T>({
   initialColumns,
   hiddenColumns,
@@ -516,13 +507,13 @@ function ColumnManager<T>({
     return columnOrder.map((k) => map.get(k)!).filter(Boolean);
   }, [initialColumns, columnOrder]);
 
-  const handleDragStart = (idx: number) => {
-    setDragIdx(idx);
-  };
+  const handleDragStart = (idx: number) => setDragIdx(idx);
+
   const handleDragOver = (e: React.DragEvent, idx: number) => {
     e.preventDefault();
     setOverIdx(idx);
   };
+
   const handleDragEnd = () => {
     if (dragIdx !== null && overIdx !== null && dragIdx !== overIdx) {
       const newOrder = [...columnOrder];
@@ -562,6 +553,7 @@ function ColumnManager<T>({
               const pinned = pinnedColumns.has(col.key);
               const isDragging = dragIdx === idx;
               const isOver = overIdx === idx;
+
               return (
                 <div
                   key={col.key}
@@ -614,6 +606,7 @@ function ColumnManager<T>({
 function ExportMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -644,7 +637,7 @@ function ExportMenu() {
   );
 }
 
-/* ── Actions Menu (3-dot) ── */
+/* ── Actions Menu ── */
 export function ActionsMenu({
   items,
 }: {
@@ -693,7 +686,7 @@ export function ActionsMenu({
   );
 }
 
-/* ── Sort Dropdown (cumulative) ── */
+/* ── Sort Dropdown ── */
 interface SortEntry {
   key: string;
   dir: "asc" | "desc";
@@ -712,6 +705,7 @@ function SortDropdown<T>({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -792,12 +786,13 @@ function parseDateBR(dateStr: string): Date | null {
   if (!dateStr) return null;
   const clean = dateStr.trim();
   const formats = ["dd/MM/yyyy HH:mm", "dd/MM/yyyy"];
+
   for (const fmt of formats) {
     try {
       const d = parse(clean, fmt, new Date());
       if (!isNaN(d.getTime())) return d;
     } catch {
-      /* skip */
+      //
     }
   }
   return null;
@@ -820,7 +815,6 @@ const tabColorMapActive: Record<string, string> = {
   destructive: "bg-destructive text-destructive-foreground",
 };
 
-/* Tab underline colors */
 const tabBorderColor: Record<string, string> = {
   neutral: "border-foreground",
   success: "border-[hsl(var(--success))]",
@@ -828,6 +822,122 @@ const tabBorderColor: Record<string, string> = {
   warning: "border-[hsl(var(--warning))]",
   destructive: "border-[hsl(var(--destructive))]",
 };
+
+/* ── Pagination ── */
+interface TablePaginationProps {
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  pageSizeOptions?: number[];
+}
+
+function TablePagination({
+  page,
+  totalPages,
+  pageSize,
+  totalItems,
+  onPageChange,
+  onPageSizeChange,
+  pageSizeOptions = [10, 15, 20, 30],
+}: TablePaginationProps) {
+  const currentPage = page + 1;
+  const safeTotalPages = Math.max(1, totalPages);
+
+  const getVisiblePages = (): (number | string)[] => {
+    if (safeTotalPages <= 7) {
+      return Array.from({ length: safeTotalPages }, (_, i) => i + 1);
+    }
+
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, "...", safeTotalPages];
+    }
+
+    if (currentPage >= safeTotalPages - 3) {
+      return [1, "...", safeTotalPages - 4, safeTotalPages - 3, safeTotalPages - 2, safeTotalPages - 1, safeTotalPages];
+    }
+
+    return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", safeTotalPages];
+  };
+
+  const pages = getVisiblePages();
+  const start = totalItems === 0 ? 0 : page * pageSize + 1;
+  const end = Math.min((page + 1) * pageSize, totalItems);
+
+  return (
+    <div className="flex flex-col gap-3 border-t border-border bg-card px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => onPageChange(Math.max(0, page - 1))}
+          disabled={page === 0}
+          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Anterior
+        </button>
+
+        {pages.map((pageItem, index) =>
+          pageItem === "..." ? (
+            <span
+              key={`ellipsis-${index}`}
+              className="inline-flex h-9 min-w-9 items-center justify-center px-1 text-sm font-medium text-muted-foreground"
+            >
+              ...
+            </span>
+          ) : (
+            <button
+              key={pageItem}
+              type="button"
+              onClick={() => onPageChange(Number(pageItem) - 1)}
+              className={cn(
+                "inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-colors",
+                currentPage === pageItem
+                  ? "border border-primary bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              {pageItem}
+            </button>
+          ),
+        )}
+
+        <button
+          type="button"
+          onClick={() => onPageChange(Math.min(safeTotalPages - 1, page + 1))}
+          disabled={page >= safeTotalPages - 1}
+          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-primary transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+        >
+          Próxima
+          <ChevronRight className="ml-1 h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-sm text-muted-foreground">
+          {start}–{end} de {totalItems}
+        </span>
+
+        <div className="relative">
+          <select
+            value={pageSize}
+            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            className="h-10 min-w-[112px] appearance-none rounded-xl border border-border bg-background px-3 pr-9 text-sm font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+          >
+            {pageSizeOptions.map((size) => (
+              <option key={size} value={size}>
+                {size} / pág
+              </option>
+            ))}
+          </select>
+          <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
@@ -859,14 +969,16 @@ export function DataTable<T extends Record<string, any>>({
   const [sortEntries, setSortEntries] = useState<SortEntry[]>([]);
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(0);
+  const [internalPageSize, setInternalPageSize] = useState(pageSize);
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
-  // Persist pinned columns
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem(`col_pins_${storageKey}`);
       if (saved) return new Set(JSON.parse(saved) as string[]);
     } catch {
-      /* ignore */
+      //
     }
     const set = new Set<string>();
     initialColumns.forEach((c) => c.pinned && set.add(c.key));
@@ -875,10 +987,13 @@ export function DataTable<T extends Record<string, any>>({
 
   const [datePreset, setDatePreset] = useState<DatePreset>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [page, setPage] = useState(0);
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    setInternalPageSize(pageSize);
+  }, [pageSize]);
 
   const defaultOrder = useMemo(() => initialColumns.map((c) => c.key), [initialColumns]);
+
   const [columnOrder, setColumnOrder] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(`col_order_${storageKey}`);
@@ -892,7 +1007,7 @@ export function DataTable<T extends Record<string, any>>({
         return filtered;
       }
     } catch {
-      /* ignore */
+      //
     }
     return initialColumns.map((c) => c.key);
   });
@@ -903,7 +1018,7 @@ export function DataTable<T extends Record<string, any>>({
       try {
         localStorage.setItem(`col_order_${storageKey}`, JSON.stringify(newOrder));
       } catch {
-        /* ignore */
+        //
       }
     },
     [storageKey],
@@ -911,25 +1026,27 @@ export function DataTable<T extends Record<string, any>>({
 
   const resetColumnOrder = useCallback(() => {
     setColumnOrder(defaultOrder);
+
     try {
       localStorage.removeItem(`col_order_${storageKey}`);
     } catch {
-      /* ignore */
+      //
     }
-    // Also reset pins
+
     const defaultPins = new Set<string>();
     initialColumns.forEach((c) => c.pinned && defaultPins.add(c.key));
     setPinnedColumns(defaultPins);
+
     try {
       localStorage.removeItem(`col_pins_${storageKey}`);
     } catch {
-      /* ignore */
+      //
     }
   }, [defaultOrder, storageKey, initialColumns]);
 
-  // Auto-detect date field
   const autoDateField = useMemo(() => {
     if (dateField) return dateField;
+
     const dateKeys = [
       "data",
       "dataFechamento",
@@ -941,14 +1058,17 @@ export function DataTable<T extends Record<string, any>>({
       "aniversario",
       "abertura",
     ];
+
     for (const key of dateKeys) {
       if (initialColumns.some((c) => c.key === key)) return key;
     }
+
     return null;
   }, [dateField, initialColumns]);
 
   const columns = useMemo(() => {
     const orderMap = new Map(columnOrder.map((k, i) => [k, i]));
+
     return initialColumns
       .filter((c) => !hiddenColumns.has(c.key))
       .sort((a, b) => {
@@ -960,7 +1080,9 @@ export function DataTable<T extends Record<string, any>>({
 
   const activeFilters = useMemo<ActiveFilter[]>(() => {
     const filters: ActiveFilter[] = [];
+
     if (search) filters.push({ id: "__search", key: "__search", label: "Pesquisa", value: search });
+
     if (datePreset) {
       const labels: Record<string, string> = {
         hoje: "Hoje",
@@ -973,14 +1095,17 @@ export function DataTable<T extends Record<string, any>>({
         ano_passado: "Ano Anterior",
         personalizado: "Personalizado",
       };
+
       filters.push({ id: "__date", key: "__date", label: "Período", value: labels[datePreset] });
     }
+
     Object.entries(columnFilters).forEach(([key, values]) => {
       values.forEach((value, idx) => {
         const col = initialColumns.find((c) => c.key === key);
         filters.push({ id: `${key}_${idx}`, key, label: col?.label || key, value });
       });
     });
+
     sortEntries.forEach((s, idx) => {
       const col = initialColumns.find((c) => c.key === s.key);
       filters.push({
@@ -990,13 +1115,15 @@ export function DataTable<T extends Record<string, any>>({
         value: `${col?.label || s.key} ${s.dir === "asc" ? "A-Z" : "Z-A"}`,
       });
     });
+
     return filters;
   }, [search, datePreset, columnFilters, sortEntries, initialColumns]);
 
   const removeFilter = useCallback(
     (id: string, key: string, value: string) => {
-      if (key === "__search") setSearch("");
-      else if (key === "__date") {
+      if (key === "__search") {
+        setSearch("");
+      } else if (key === "__date") {
         setDatePreset(null);
         setDateRange(undefined);
       } else if (key === "__sort") {
@@ -1024,15 +1151,18 @@ export function DataTable<T extends Record<string, any>>({
     setSortEntries((prev) => {
       const idx = prev.findIndex((s) => s.key === key);
       if (idx === -1) return [...prev, { key, dir: "asc" }];
-      if (prev[idx].dir === "asc") return prev.map((s, i) => (i === idx ? { ...s, dir: "desc" as const } : s));
+      if (prev[idx].dir === "asc") {
+        return prev.map((s, i) => (i === idx ? { ...s, dir: "desc" as const } : s));
+      }
       return prev.filter((_, i) => i !== idx);
     });
   }, []);
+
   const clearSort = useCallback(() => setSortEntries([]), []);
 
-  // Base filtering: search + column filters + date range (NO tab filter)
   const baseFilteredData = useMemo(() => {
     let result = [...data];
+
     if (search) {
       const s = search.toLowerCase();
       result = result.filter((row) =>
@@ -1043,7 +1173,9 @@ export function DataTable<T extends Record<string, any>>({
         ),
       );
     }
+
     const allFilterEntries = Object.entries(columnFilters).filter(([, values]) => values.length > 0);
+
     if (allFilterEntries.length > 0) {
       result = result.filter((row) =>
         allFilterEntries.some(([key, values]) =>
@@ -1055,21 +1187,25 @@ export function DataTable<T extends Record<string, any>>({
         ),
       );
     }
-    // Date range filtering
+
     if (dateRange?.from && dateRange?.to && autoDateField) {
       result = result.filter((row) => {
         const dateStr = String(row[autoDateField] ?? "");
         const d = parseDateBR(dateStr);
         if (!d) return true;
-        return isWithinInterval(d, { start: startOfDay(dateRange.from!), end: startOfDay(dateRange.to!) });
+        return isWithinInterval(d, {
+          start: startOfDay(dateRange.from!),
+          end: startOfDay(dateRange.to!),
+        });
       });
     }
+
     return result;
   }, [data, search, columnFilters, columns, dateRange, autoDateField]);
 
-  // Dynamic tab counts (based on base filtered data)
   const dynamicTabCounts = useMemo(() => {
     if (!tabFilterFn || !tabs) return null;
+
     const counts: Record<string, number> = {};
     for (const tab of tabs) {
       counts[tab.value] = baseFilteredData.filter((row) => tabFilterFn(row, tab.value)).length;
@@ -1077,11 +1213,9 @@ export function DataTable<T extends Record<string, any>>({
     return counts;
   }, [tabFilterFn, tabs, baseFilteredData]);
 
-  // Full filtered data: base + tab filter + sorting
   const filteredData = useMemo(() => {
-    let result = tabFilterFn && activeTab
-      ? baseFilteredData.filter((row) => tabFilterFn(row, activeTab))
-      : [...baseFilteredData];
+    let result =
+      tabFilterFn && activeTab ? baseFilteredData.filter((row) => tabFilterFn(row, activeTab)) : [...baseFilteredData];
 
     if (sortEntries.length > 0) {
       result = [...result];
@@ -1090,22 +1224,38 @@ export function DataTable<T extends Record<string, any>>({
           const col = columns.find((c) => c.key === key);
           const aVal = col?.sortValue ? col.sortValue(a) : a[key];
           const bVal = col?.sortValue ? col.sortValue(b) : b[key];
+
           if (aVal == null && bVal == null) continue;
           if (aVal == null) return 1;
           if (bVal == null) return -1;
+
           const cmp = typeof aVal === "number" ? aVal - (bVal as number) : String(aVal).localeCompare(String(bVal));
+
           if (cmp !== 0) return dir === "asc" ? cmp : -cmp;
         }
+
         return 0;
       });
     }
+
     return result;
   }, [baseFilteredData, tabFilterFn, activeTab, sortEntries, columns]);
 
-  const totalPages = Math.ceil(filteredData.length / pageSize);
-  const pagedData = filteredData.slice(page * pageSize, (page + 1) * pageSize);
+  useEffect(() => {
+    setPage(0);
+  }, [search, columnFilters, dateRange, datePreset, activeTab, internalPageSize]);
 
-  const pagedIds = pagedData.map((_, i) => page * pageSize + i);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / internalPageSize));
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(0, totalPages - 1));
+    }
+  }, [page, totalPages]);
+
+  const pagedData = filteredData.slice(page * internalPageSize, (page + 1) * internalPageSize);
+
+  const pagedIds = pagedData.map((_, i) => page * internalPageSize + i);
   const allPageSelected = selectable && pagedIds.length > 0 && pagedIds.every((id) => selectedRows.has(id));
   const somePageSelected = selectable && pagedIds.some((id) => selectedRows.has(id));
 
@@ -1120,6 +1270,7 @@ export function DataTable<T extends Record<string, any>>({
       return next;
     });
   };
+
   const toggleSelectRow = (idx: number) => {
     setSelectedRows((prev) => {
       const next = new Set(prev);
@@ -1132,14 +1283,17 @@ export function DataTable<T extends Record<string, any>>({
     setPinnedColumns((prev) => {
       const next = new Set(prev);
       next.has(key) ? next.delete(key) : next.add(key);
+
       try {
         localStorage.setItem(`col_pins_${storageKey}`, JSON.stringify(Array.from(next)));
       } catch {
-        /* ignore */
+        //
       }
+
       return next;
     });
   };
+
   const toggleColumn = (key: string) => {
     setHiddenColumns((prev) => {
       const next = new Set(prev);
@@ -1148,11 +1302,8 @@ export function DataTable<T extends Record<string, any>>({
     });
   };
 
-  const activeFilterCount = Object.values(columnFilters).flat().length;
-
   return (
     <div className="space-y-3 sm:space-y-5">
-      {/* Header */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">{title}</h1>
@@ -1161,7 +1312,6 @@ export function DataTable<T extends Record<string, any>>({
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
 
-      {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:flex-wrap">
         <SearchWithFilter
           columns={initialColumns}
@@ -1208,7 +1358,6 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       </div>
 
-      {/* Active Filter Chips */}
       {activeFilters.length > 0 && (
         <div className="flex items-center gap-1.5 flex-wrap">
           {activeFilters.map((f) => (
@@ -1229,6 +1378,7 @@ export function DataTable<T extends Record<string, any>>({
               setDateRange(undefined);
               setColumnFilters({});
               setSortEntries([]);
+              setPage(0);
             }}
             className="text-xs text-red-500 hover:text-red-600 font-medium ml-1"
           >
@@ -1237,116 +1387,118 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
-      {/* Summary Cards - 2 standard widths */}
-      {summaryCards && (() => {
-        const resolvedCards = typeof summaryCards === 'function' ? summaryCards(filteredData) : summaryCards;
-        return (
-        <div className="flex flex-wrap gap-2 sm:gap-3">
-          {resolvedCards.map((card, i) => {
-            const isMonetary = card.type === "monetary";
-            const isQuantity = card.type === "quantity";
-            const sentimentColor =
-              card.sentiment === "positive"
-                ? "text-info"
-                : card.sentiment === "negative"
-                  ? "text-destructive"
-                  : "text-foreground";
-            const sentimentEmoji = card.sentiment === "positive" ? "🔵" : card.sentiment === "negative" ? "🔴" : "⚫";
+      {summaryCards &&
+        (() => {
+          const resolvedCards = typeof summaryCards === "function" ? summaryCards(filteredData) : summaryCards;
+          return (
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {resolvedCards.map((card, i) => {
+                const isMonetary = card.type === "monetary";
+                const isQuantity = card.type === "quantity";
 
-            const isClickable = card.onFilter && card.filterValue;
-            // Two standard widths: compact and wide - no max-w to avoid truncation
-            const isWide = isMonetary || card.size === "wide";
-            const widthClass = isWide ? "min-w-[180px]" : "min-w-[120px]";
+                const sentimentColor =
+                  card.sentiment === "positive"
+                    ? "text-info"
+                    : card.sentiment === "negative"
+                      ? "text-destructive"
+                      : "text-foreground";
 
-            const clickProps = isClickable
-              ? {
-                  onClick: () => card.onFilter!(card.filterValue!),
-                  role: "button" as const,
-                  className: cn(
-                    "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm transition-colors",
-                    "cursor-pointer hover:border-primary/30 hover:shadow-md",
-                    widthClass,
-                  ),
-                }
-              : {
-                  className: cn(
-                    "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm",
-                    widthClass,
-                  ),
-                };
+                const sentimentEmoji =
+                  card.sentiment === "positive" ? "🔵" : card.sentiment === "negative" ? "🔴" : "⚫";
 
-            if (isQuantity) {
-              return (
-                <div key={i} {...clickProps}>
-                  {card.icon && (
-                    <div
-                      className={cn(
-                        "h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0",
-                        card.color === "green"
-                          ? "bg-emerald-100 text-emerald-600"
-                          : card.color === "red"
-                            ? "bg-red-100 text-red-500"
-                            : card.color === "blue"
-                              ? "bg-blue-100 text-blue-600"
-                              : "bg-primary/10 text-primary",
+                const isClickable = card.onFilter && card.filterValue;
+                const isWide = isMonetary || card.size === "wide";
+                const widthClass = isWide ? "min-w-[180px]" : "min-w-[120px]";
+
+                const clickProps = isClickable
+                  ? {
+                      onClick: () => card.onFilter!(card.filterValue!),
+                      role: "button" as const,
+                      className: cn(
+                        "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm transition-colors",
+                        "cursor-pointer hover:border-primary/30 hover:shadow-md",
+                        widthClass,
+                      ),
+                    }
+                  : {
+                      className: cn(
+                        "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm",
+                        widthClass,
+                      ),
+                    };
+
+                if (isQuantity) {
+                  return (
+                    <div key={i} {...clickProps}>
+                      {card.icon && (
+                        <div
+                          className={cn(
+                            "h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0",
+                            card.color === "green"
+                              ? "bg-emerald-100 text-emerald-600"
+                              : card.color === "red"
+                                ? "bg-red-100 text-red-500"
+                                : card.color === "blue"
+                                  ? "bg-blue-100 text-blue-600"
+                                  : "bg-primary/10 text-primary",
+                          )}
+                        >
+                          {card.icon}
+                        </div>
                       )}
-                    >
-                      {card.icon}
+                      <div className="min-w-0">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
+                        <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
+                      </div>
                     </div>
-                  )}
-                  <div className="min-w-0">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
-                    <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
-                  </div>
-                </div>
-              );
-            }
+                  );
+                }
 
-            if (isMonetary) {
-              return (
-                <div key={i} {...clickProps}>
-                  <span className="text-base sm:text-lg">{sentimentEmoji}</span>
-                  <div className="min-w-0">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
-                    <p className={cn("text-sm sm:text-base font-bold tabular-nums", sentimentColor)}>{card.value}</p>
-                  </div>
-                </div>
-              );
-            }
+                if (isMonetary) {
+                  return (
+                    <div key={i} {...clickProps}>
+                      <span className="text-base sm:text-lg">{sentimentEmoji}</span>
+                      <div className="min-w-0">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
+                        <p className={cn("text-sm sm:text-base font-bold tabular-nums", sentimentColor)}>
+                          {card.value}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
 
-            return (
-              <div key={i} {...clickProps}>
-                {card.icon && (
-                  <div
-                    className={cn(
-                      "h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0",
-                      card.color === "green"
-                        ? "bg-emerald-100 text-emerald-600"
-                        : card.color === "red"
-                          ? "bg-red-100 text-red-500"
-                          : card.color === "blue"
-                            ? "bg-blue-100 text-blue-600"
-                            : "bg-primary/10 text-primary",
+                return (
+                  <div key={i} {...clickProps}>
+                    {card.icon && (
+                      <div
+                        className={cn(
+                          "h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center shrink-0",
+                          card.color === "green"
+                            ? "bg-emerald-100 text-emerald-600"
+                            : card.color === "red"
+                              ? "bg-red-100 text-red-500"
+                              : card.color === "blue"
+                                ? "bg-blue-100 text-blue-600"
+                                : "bg-primary/10 text-primary",
+                        )}
+                      >
+                        {card.icon}
+                      </div>
                     )}
-                  >
-                    {card.icon}
+                    <div className="min-w-0">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
+                      <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
+                    </div>
                   </div>
-                )}
-                <div className="min-w-0">
-                  <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{card.label}</p>
-                  <p className="text-xs sm:text-sm font-bold text-foreground whitespace-nowrap">{card.value}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        );
-      })()}
+                );
+              })}
+            </div>
+          );
+        })()}
 
-      {/* Slot between cards and tabs */}
       {slotBetweenCardsAndTabs}
 
-      {/* Tabs */}
       {tabs && (
         <div className="border-b border-border">
           <div className="flex gap-0 flex-wrap">
@@ -1354,10 +1506,15 @@ export function DataTable<T extends Record<string, any>>({
               const color = tabDef.color || "neutral";
               const isActive = activeTab === tabDef.value;
               const count = dynamicTabCounts ? dynamicTabCounts[tabDef.value] : tabDef.count;
+
               return (
                 <button
                   key={tabDef.value}
-                  onClick={() => { setSelectedRows(new Set()); onTabChange?.(tabDef.value); }}
+                  onClick={() => {
+                    setSelectedRows(new Set());
+                    setPage(0);
+                    onTabChange?.(tabDef.value);
+                  }}
                   className={cn(
                     "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
                     isActive
@@ -1383,7 +1540,6 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
-      {/* Selection Action Bar */}
       {selectable && selectedRows.size > 0 && (
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-info/5 border border-info/20 rounded-xl">
           <span className="text-xs sm:text-sm font-medium text-foreground">
@@ -1430,9 +1586,8 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
-      {/* Table */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <div className="overflow-x-auto max-h-[65vh] overflow-y-auto">
+        <div className="overflow-x-auto max-h-[65vh] overflow-y-auto min-w-0">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-table-header text-table-header-foreground sticky top-0 z-20">
@@ -1453,6 +1608,7 @@ export function DataTable<T extends Record<string, any>>({
                   const sortable = col.sortable !== false;
                   const sortIdx = sortEntries.findIndex((s) => s.key === col.key);
                   const sortDir = sortIdx !== -1 ? sortEntries[sortIdx].dir : null;
+
                   return (
                     <th
                       key={col.key}
@@ -1511,8 +1667,9 @@ export function DataTable<T extends Record<string, any>>({
                 </tr>
               ) : (
                 pagedData.map((row, i) => {
-                  const globalIdx = page * pageSize + i;
+                  const globalIdx = page * internalPageSize + i;
                   const isSelected = selectedRows.has(globalIdx);
+
                   return (
                     <tr
                       key={i}
@@ -1571,57 +1728,18 @@ export function DataTable<T extends Record<string, any>>({
           </table>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-3 sm:px-5 py-3 border-t border-border">
-            <span className="text-[10px] sm:text-xs text-muted-foreground">
-              {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filteredData.length)} de {filteredData.length}
-            </span>
-            <div className="flex items-center gap-0.5 sm:gap-1">
-              <button
-                onClick={() => setPage(Math.max(0, page - 1))}
-                disabled={page === 0}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              {Array.from(
-                { length: Math.min(totalPages, typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5) },
-                (_, i) => {
-                  const maxVisible = typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
-                  const pageNum =
-                    totalPages <= maxVisible
-                      ? i
-                      : Math.max(0, Math.min(page - Math.floor(maxVisible / 2), totalPages - maxVisible)) + i;
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={cn(
-                        "h-7 w-7 sm:h-8 sm:w-8 rounded-lg text-xs font-medium transition-all",
-                        page === pageNum
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-muted",
-                      )}
-                    >
-                      {pageNum + 1}
-                    </button>
-                  );
-                },
-              )}
-              <button
-                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                disabled={page === totalPages - 1}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 transition-colors"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+        {filteredData.length > 0 && (
+          <TablePagination
+            page={page}
+            totalPages={totalPages}
+            pageSize={internalPageSize}
+            totalItems={filteredData.length}
+            onPageChange={setPage}
+            onPageSizeChange={setInternalPageSize}
+          />
         )}
       </div>
 
-      {/* Record count */}
       <p className="text-xs text-muted-foreground">
         {filteredData.length} registro{filteredData.length !== 1 ? "s" : ""}
       </p>
