@@ -155,7 +155,7 @@ export default function RelatorioClientes() {
       {
         label: "Produtos",
         value: R$(totalProdutos),
-        icon: <soap-dispenser-droplet className="h-4 w-4" />,
+        icon: <ShoppingBag className="h-4 w-4" />,
         size: "wide",
         color: "green",
       },
