@@ -1260,20 +1260,6 @@ export function DataTable<T extends Record<string, any>>({
   const allPageSelected = selectable && pagedIds.length > 0 && pagedIds.every((id) => selectedRows.has(id));
   const somePageSelected = selectable && pagedIds.some((id) => selectedRows.has(id));
 
-  const allFilteredSelected = selectable && filteredIds.length > 0 && filteredIds.every((id) => selectedRows.has(id));
-
-  const selectCurrentPage = () => {
-    setSelectedRows((prev) => {
-      const next = new Set(prev);
-      pagedIds.forEach((id) => next.add(id));
-      return next;
-    });
-  };
-
-  const selectAllResults = () => {
-    setSelectedRows(new Set(filteredIds));
-  };
-
   const clearSelection = () => {
     setSelectedRows(new Set());
   };
@@ -1566,24 +1552,6 @@ export function DataTable<T extends Record<string, any>>({
           </span>
 
           <div className="h-4 w-px bg-border" />
-
-          {!allPageSelected && pagedIds.length > 0 && (
-            <button
-              onClick={selectCurrentPage}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg text-foreground hover:bg-muted transition-colors"
-            >
-              Selecionar página atual
-            </button>
-          )}
-
-          {!allFilteredSelected && filteredData.length > 0 && (
-            <button
-              onClick={selectAllResults}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg text-info hover:bg-info/10 transition-colors"
-            >
-              Selecionar todos os resultados
-            </button>
-          )}
 
           {selectionActions.map((action, i) => (
             <div key={i} className="inline-flex items-center gap-0.5">
