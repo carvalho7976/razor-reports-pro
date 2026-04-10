@@ -120,7 +120,6 @@ export default function RelatorioClientes() {
   }, [tab]);
 
   const buildCards = (filtered: Cliente[]): SummaryCard[] => {
-    const totalClientes = filtered.length;
     const totalServicos = filtered.reduce((s, r) => s + r.totalServicos, 0);
     const totalProdutos = filtered.reduce((s, r) => s + r.totalProdutos, 0);
     const totalAtendimentos = filtered.reduce((s, r) => s + r.frequencia, 0);
@@ -130,14 +129,6 @@ export default function RelatorioClientes() {
     const ticketMedioGeral = totalAtendimentos > 0 ? (totalServicos + totalProdutos) / totalAtendimentos : 0;
 
     return [
-      {
-        label: "Clientes Atendidos",
-        value: String(totalClientes),
-        type: "quantity",
-        icon: <Users className="h-4 w-4" />,
-        size: "compact",
-        color: "blue",
-      },
       {
         label: "Frequência Média",
         value: avgFreq.toFixed(1),
