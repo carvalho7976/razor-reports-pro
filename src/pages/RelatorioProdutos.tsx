@@ -179,7 +179,7 @@ export default function RelatorioProdutos() {
     {
       label: "Vendas para Avulsos",
       value: `${avulsoQtd} · ${R$(avulsoValor)}`,
-      icon: <Users className="h-4 w-4" />,
+      icon: <User className="h-4 w-4" />,
       size: "wide",
       color: "green",
     },
