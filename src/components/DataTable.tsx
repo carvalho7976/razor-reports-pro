@@ -770,7 +770,31 @@ function TablePagination({
   const end = Math.min((page + 1) * pageSize, totalItems);
 
   return (
-<div className="flex flex-col gap-3 border-t border-border bg-card px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-end">        <button
+    <div className="flex flex-col gap-3 border-t border-border bg-card px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-end">
+
+      {/* INFO + SELECT */}
+      <div className="flex items-center gap-3 md:mr-4">
+        <span className="text-sm text-muted-foreground">
+          {start}–{end} de {totalItems}
+        </span>
+
+        <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
+          <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align="end">
+            {pageSizeOptions.map((size) => (
+              <SelectItem key={size} value={String(size)}>
+                {size} / pág
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* PAGINAÇÃO */}
+      <div className="flex flex-wrap items-center gap-1.5 md:justify-end">
+        <button
           type="button"
           onClick={() => onPageChange(Math.max(0, page - 1))}
           disabled={page === 0}
@@ -797,12 +821,12 @@ function TablePagination({
                 "inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
                 currentPage === pageItem
                   ? "border border-primary bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               {pageItem}
             </button>
-          ),
+          )
         )}
 
         <button
@@ -815,6 +839,9 @@ function TablePagination({
           <ChevronRight className="ml-1 h-4 w-4" />
         </button>
       </div>
+    </div>
+  );
+}
 
       <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground">
