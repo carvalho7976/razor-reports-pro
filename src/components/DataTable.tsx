@@ -138,7 +138,6 @@ interface DataTableProps<T extends Record<string, any>> {
   slotBetweenCardsAndTabs?: ReactNode;
 }
 
-/* ── Novo Button (Notion-style) ── */
 export function NovoButton({ items }: { items: NovoMenuItem[] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -196,7 +195,6 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
   );
 }
 
-/* ── Compact Date Range Picker ── */
 function DateRangePicker({
   datePreset,
   onSelect,
@@ -335,7 +333,6 @@ function DateRangePicker({
   );
 }
 
-/* ── Search with Autocomplete Filter ── */
 function SearchWithFilter<T>({
   columns,
   data,
@@ -471,7 +468,6 @@ function SearchWithFilter<T>({
   );
 }
 
-/* ── Column Manager ── */
 function ColumnManager<T>({
   initialColumns,
   hiddenColumns,
@@ -604,7 +600,6 @@ function ColumnManager<T>({
   );
 }
 
-/* ── Export Menu ── */
 function ExportMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -639,7 +634,6 @@ function ExportMenu() {
   );
 }
 
-/* ── Actions Menu ── */
 export function ActionsMenu({
   items,
 }: {
@@ -688,102 +682,11 @@ export function ActionsMenu({
   );
 }
 
-/* ── Sort Dropdown ── */
 interface SortEntry {
   key: string;
   dir: "asc" | "desc";
 }
 
-function SortDropdown<T>({
-  columns,
-  sortEntries,
-  onToggleSort,
-  onClear,
-}: {
-  columns: Column<T>[];
-  sortEntries: SortEntry[];
-  onToggleSort: (key: string) => void;
-  onClear: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const sortableCols = columns.filter((c) => c.sortable !== false);
-  const sortMap = new Map(sortEntries.map((s) => [s.key, s.dir]));
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        className={cn("toolbar-btn", sortEntries.length > 0 && "toolbar-btn-active")}
-      >
-        <ArrowUpDown className="h-4 w-4" />
-        <span className="hidden sm:inline text-xs">
-          {sortEntries.length > 0 ? `Ordenação (${sortEntries.length})` : "Ordenar"}
-        </span>
-      </button>
-      {open && (
-        <div className="dropdown-panel left-0 top-full mt-2 min-w-[220px]">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pb-2">
-            Clique para adicionar/alternar
-          </p>
-          {sortableCols.map((col) => {
-            const dir = sortMap.get(col.key);
-            const idx = sortEntries.findIndex((s) => s.key === col.key);
-            return (
-              <button
-                key={col.key}
-                onClick={() => onToggleSort(col.key)}
-                className={cn(
-                  "w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
-                  dir && "text-primary font-medium",
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  {dir && (
-                    <span className="h-4 min-w-[16px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
-                      {idx + 1}
-                    </span>
-                  )}
-                  {col.label}
-                </span>
-                {dir && (
-                  <span className="text-xs text-primary">
-                    {dir === "asc" ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-          {sortEntries.length > 0 && (
-            <>
-              <div className="h-px bg-border my-1" />
-              <button
-                onClick={() => {
-                  onClear();
-                  setOpen(false);
-                }}
-                className="w-full px-3 py-2 text-sm text-destructive rounded-lg hover:bg-muted transition-colors text-left"
-              >
-                Limpar ordenação
-              </button>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Parse date helper ── */
 function parseDateBR(dateStr: string): Date | null {
   if (!dateStr) return null;
   const clean = dateStr.trim();
@@ -800,7 +703,6 @@ function parseDateBR(dateStr: string): Date | null {
   return null;
 }
 
-/* ── Tab color mapping ── */
 const tabColorMap: Record<string, string> = {
   neutral: "bg-muted text-muted-foreground",
   success: "bg-success/20 text-success",
@@ -825,7 +727,6 @@ const tabBorderColor: Record<string, string> = {
   destructive: "border-[hsl(var(--destructive))]",
 };
 
-/* ── Pagination ── */
 interface TablePaginationProps {
   page: number;
   totalPages: number;
@@ -875,7 +776,7 @@ function TablePagination({
           type="button"
           onClick={() => onPageChange(Math.max(0, page - 1))}
           disabled={page === 0}
-          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-muted-foreground transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
           Anterior
@@ -895,7 +796,7 @@ function TablePagination({
               type="button"
               onClick={() => onPageChange(Number(pageItem) - 1)}
               className={cn(
-                "inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-colors",
+                "inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
                 currentPage === pageItem
                   ? "border border-primary bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -910,7 +811,7 @@ function TablePagination({
           type="button"
           onClick={() => onPageChange(Math.min(safeTotalPages - 1, page + 1))}
           disabled={page >= safeTotalPages - 1}
-          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-primary transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-primary transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
         >
           Próxima
           <ChevronRight className="ml-1 h-4 w-4" />
@@ -926,7 +827,6 @@ function TablePagination({
           <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm">
             <SelectValue />
           </SelectTrigger>
-
           <SelectContent align="end">
             {pageSizeOptions.map((size) => (
               <SelectItem key={size} value={String(size)}>
@@ -940,7 +840,6 @@ function TablePagination({
   );
 }
 
-/* ── Main DataTable ── */
 export function DataTable<T extends Record<string, any>>({
   data,
   columns: initialColumns,
@@ -1255,25 +1154,20 @@ export function DataTable<T extends Record<string, any>>({
   const pagedData = filteredData.slice(page * internalPageSize, (page + 1) * internalPageSize);
 
   const filteredIds = filteredData.map((_, i) => i);
-  const pagedIds = pagedData.map((_, i) => page * internalPageSize + i);
-
-  const allPageSelected = selectable && pagedIds.length > 0 && pagedIds.every((id) => selectedRows.has(id));
-  const somePageSelected = selectable && pagedIds.some((id) => selectedRows.has(id));
-
-  const clearSelection = () => {
-    setSelectedRows(new Set());
-  };
+  const allFilteredSelected = selectable && filteredIds.length > 0 && filteredIds.every((id) => selectedRows.has(id));
+  const someFilteredSelected = selectable && filteredIds.some((id) => selectedRows.has(id));
 
   const toggleSelectAll = () => {
     setSelectedRows((prev) => {
-      const next = new Set(prev);
-      if (allPageSelected) {
-        pagedIds.forEach((id) => next.delete(id));
-      } else {
-        pagedIds.forEach((id) => next.add(id));
+      if (allFilteredSelected) {
+        return new Set();
       }
-      return next;
+      return new Set(filteredIds);
     });
+  };
+
+  const clearSelection = () => {
+    setSelectedRows(new Set());
   };
 
   const toggleSelectRow = (idx: number) => {
@@ -1384,6 +1278,7 @@ export function DataTable<T extends Record<string, any>>({
               setColumnFilters({});
               setSortEntries([]);
               setPage(0);
+              clearSelection();
             }}
             className="text-xs text-red-500 hover:text-red-600 font-medium ml-1"
           >
@@ -1420,7 +1315,7 @@ export function DataTable<T extends Record<string, any>>({
                       onClick: () => card.onFilter!(card.filterValue!),
                       role: "button" as const,
                       className: cn(
-                        "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm transition-colors",
+                        "flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-card rounded-xl border border-border shadow-sm transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
                         "cursor-pointer hover:border-primary/30 hover:shadow-md",
                         widthClass,
                       ),
@@ -1516,12 +1411,12 @@ export function DataTable<T extends Record<string, any>>({
                 <button
                   key={tabDef.value}
                   onClick={() => {
-                    setSelectedRows(new Set());
+                    clearSelection();
                     setPage(0);
                     onTabChange?.(tabDef.value);
                   }}
                   className={cn(
-                    "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-colors -mb-px border-b-2 whitespace-nowrap",
+                    "relative px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] -mb-px border-b-2 whitespace-nowrap",
                     isActive
                       ? cn(tabBorderColor[color], "text-foreground")
                       : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30",
@@ -1531,7 +1426,7 @@ export function DataTable<T extends Record<string, any>>({
                   {count !== undefined && (
                     <span
                       className={cn(
-                        "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full",
+                        "ml-1.5 sm:ml-2 text-[10px] font-bold tabular-nums px-1.5 py-0.5 rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
                         isActive ? tabColorMapActive[color] : tabColorMap[color],
                       )}
                     >
@@ -1546,7 +1441,7 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {selectable && selectedRows.size > 0 && (
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-info/5 border border-info/20 rounded-xl">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-info/5 border border-info/20 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
           <span className="text-xs sm:text-sm font-medium text-foreground">
             {selectedRows.size} selecionado{selectedRows.size > 1 ? "s" : ""}
           </span>
@@ -1561,7 +1456,7 @@ export function DataTable<T extends Record<string, any>>({
                   clearSelection();
                 }}
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors",
+                  "inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
                   action.variant === "destructive"
                     ? "text-destructive hover:bg-destructive/10"
                     : "text-success hover:bg-success/10",
@@ -1585,8 +1480,11 @@ export function DataTable<T extends Record<string, any>>({
             </div>
           ))}
 
-          <button onClick={clearSelection} className="ml-auto text-xs text-muted-foreground hover:text-foreground">
-            Limpar
+          <button
+            onClick={clearSelection}
+            className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Desselecionar todos
           </button>
         </div>
       )}
@@ -1597,15 +1495,11 @@ export function DataTable<T extends Record<string, any>>({
             <thead>
               <tr className="bg-table-header text-table-header-foreground sticky top-0 z-20">
                 {selectable && (
-                  <th className="w-10 px-3 py-3.5 border-b border-table-border">
-                    <input
-                      type="checkbox"
-                      checked={allPageSelected}
-                      ref={(el) => {
-                        if (el) el.indeterminate = somePageSelected && !allPageSelected;
-                      }}
-                      onChange={toggleSelectAll}
-                      className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
+                  <th className="w-12 px-3 py-3.5 border-b border-table-border">
+                    <Checkbox
+                      checked={allFilteredSelected ? true : someFilteredSelected ? "indeterminate" : false}
+                      onCheckedChange={toggleSelectAll}
+                      className="h-4 w-4 rounded-md border border-border bg-background hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                     />
                   </th>
                 )}
@@ -1679,17 +1573,16 @@ export function DataTable<T extends Record<string, any>>({
                     <tr
                       key={i}
                       className={cn(
-                        "border-b border-border/50 hover:bg-muted/30 transition-colors",
+                        "border-b border-border/50 hover:bg-muted/30 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
                         isSelected && "bg-primary/5",
                       )}
                     >
                       {selectable && (
-                        <td className="w-10 px-3 py-3.5">
+                        <td className="w-12 px-3 py-3.5">
                           <Checkbox
                             checked={isSelected}
                             onCheckedChange={() => toggleSelectRow(globalIdx)}
-                            className="h-4 w-4 rounded-md border border-border bg-background hover:bg-muted data-[state=checked]:bg-blue-600
-data-[state=checked]:border-blue-600 transition-all"
+                            className="h-4 w-4 rounded-md border border-border bg-background hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                           />
                         </td>
                       )}
@@ -1713,7 +1606,7 @@ data-[state=checked]:border-blue-600 transition-all"
 
               {totalRow && (
                 <tr className="bg-muted/40 font-semibold border-t border-border">
-                  {selectable && <td className="w-10 px-3 py-3.5" />}
+                  {selectable && <td className="w-12 px-3 py-3.5" />}
                   {columns.map((col) => (
                     <td
                       key={col.key}
