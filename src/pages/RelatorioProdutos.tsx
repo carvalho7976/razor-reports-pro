@@ -184,7 +184,7 @@ export default function RelatorioProdutos() {
       color: "green",
     },
     {
-      label: "Venda Assinantes",
+      label: "Vendas para Assinantes",
       value: `${assinanteQtd} · ${R$(assinanteValor)}`,
       icon: <CreditCard className="h-4 w-4" />,
       size: "wide",
