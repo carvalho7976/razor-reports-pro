@@ -924,7 +924,7 @@ function TablePagination({
           <select
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="h-10 min-w-[112px] appearance-none rounded-xl border border-border bg-background px-3 pr-9 text-sm font-medium text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="h-9 min-w-[110px] appearance-none rounded-xl border border-border bg-card px-3 pr-8 text-sm font-medium text-foreground shadow-sm outline-none transition-colors hover:bg-muted/40 focus:border-primary focus:ring-2 focus:ring-primary/20"
           >
             {pageSizeOptions.map((size) => (
               <option key={size} value={size}>
@@ -932,7 +932,7 @@ function TablePagination({
               </option>
             ))}
           </select>
-          <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
       </div>
     </div>
