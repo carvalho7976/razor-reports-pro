@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Star, Store, ConciergeBell, UsersRound } from "lucide-react";
+import { User, Store, ConciergeBell, Users, MessageCircle } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 interface Avaliacao {
@@ -111,7 +111,17 @@ export default function Avaliacoes() {
 
   const notaRecepcao = 8.5;
 
+  const totalAvaliacoes = initialData.length;
+
   const summaryCards: SummaryCard[] = [
+    {
+      label: "Avaliações",
+      value: String(totalAvaliacoes),
+      type: "quantity",
+      icon: <MessageCircle className="h-4 w-4" />,
+      size: "compact",
+      color: "yellow",
+    },
     {
       label: "NPS Empresa",
       value: String(notaEmpresa),
@@ -122,7 +132,7 @@ export default function Avaliacoes() {
     {
       label: "Nota Equipe",
       value: String(notaEquipe),
-      icon: <UsersRound className="h-4 w-4" />,
+      icon: <Users className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
