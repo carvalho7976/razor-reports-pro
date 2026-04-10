@@ -1499,7 +1499,7 @@ export function DataTable<T extends Record<string, any>>({
                     <Checkbox
                       checked={allFilteredSelected ? true : someFilteredSelected ? "indeterminate" : false}
                       onCheckedChange={toggleSelectAll}
-                      className="h-4 w-4 rounded-md border border-border bg-background hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                     />
                   </th>
                 )}
@@ -1582,7 +1582,7 @@ export function DataTable<T extends Record<string, any>>({
                           <Checkbox
                             checked={isSelected}
                             onCheckedChange={() => toggleSelectRow(globalIdx)}
-                            className="h-4 w-4 rounded-md border border-border bg-background hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                            className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                           />
                         </td>
                       )}
