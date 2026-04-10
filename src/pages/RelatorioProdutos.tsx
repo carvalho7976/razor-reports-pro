@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Users, CreditCard, Hash, Package, Star, Tag } from "lucide-react";
+import { User, CreditCard, Hash } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -172,7 +172,7 @@ export default function RelatorioProdutos() {
     {
       label: "Total Avulsos e Assinantes",
       value: `${totalQtd} · ${R$(totalValor)}`,
-      icon: <Package className="h-4 w-4" />,
+      icon: <bottle-wine className="h-4 w-4" />,
       size: "wide",
       color: "green",
     },
