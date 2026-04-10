@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Trash2, Hash } from "lucide-react";
+import { User, Trash2, Hash, CalendarClock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
@@ -140,7 +140,7 @@ export default function RelatorioAgendamentos() {
         label: "Total",
         value: String(filtered.length),
         type: "quantity" as const,
-        icon: <calendar-clock className="h-4 w-4" />,
+        icon: <CalendarClock className="h-4 w-4" />,
         size: "compact" as const,
         color: "blue" as const,
       },
