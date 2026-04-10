@@ -111,7 +111,7 @@ const buildCards = (_filtered: Pacote[]): SummaryCard[] => {
       type: "quantity",
       icon: <Layers className="h-4 w-4" />,
       size: "compact",
-      color: "info",
+      color: "blue",
     },
     {
       label: "Valor Vendido",
