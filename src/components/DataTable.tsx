@@ -921,20 +921,19 @@ function TablePagination({
           {start}–{end} de {totalItems}
         </span>
 
-        <div className="relative">
-          <select
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="h-9 min-w-[110px] appearance-none rounded-xl border border-border bg-card px-3 pr-8 text-sm font-medium text-foreground shadow-sm outline-none transition-colors hover:bg-muted/40 focus:border-primary focus:ring-2 focus:ring-primary/20"
-          >
+        <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
+          <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm">
+            <SelectValue />
+          </SelectTrigger>
+
+          <SelectContent align="end">
             {pageSizeOptions.map((size) => (
-              <option key={size} value={size}>
+              <SelectItem key={size} value={String(size)}>
                 {size} / pág
-              </option>
+              </SelectItem>
             ))}
-          </select>
-          <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        </div>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
