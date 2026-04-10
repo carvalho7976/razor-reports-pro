@@ -1479,13 +1479,6 @@ export function DataTable<T extends Record<string, any>>({
               )}
             </div>
           ))}
-
-          <button
-            onClick={clearSelection}
-            className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Desselecionar todos
-          </button>
         </div>
       )}
 
