@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, PackageOpen, BadgeDollarSign, Tag } from "lucide-react";
+import { User, Package, Layers, DollarSign, Tag } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -87,30 +87,48 @@ const tabFilter = (row: Pacote, tab: string) => {
   return row.restam === 0;
 };
 
-const buildCards = (filtered: Pacote[]): SummaryCard[] => [
-  {
-    label: "Total Vendido",
-    value: String(filtered.length),
-    type: "quantity",
-    icon: <PackageOpen className="h-4 w-4" />,
-    size: "compact",
-    color: "blue",
-  },
-  {
-    label: "Valor Vendido",
-    value: R$(filtered.reduce((s, r) => s + r.valor, 0)),
-    icon: <BadgeDollarSign className="h-4 w-4" />,
-    size: "wide",
-    color: "green",
-  },
-  {
-    label: "Total de Desconto",
-    value: R$(filtered.reduce((s, r) => s + r.desconto, 0)),
-    icon: <Tag className="h-4 w-4" />,
-    size: "wide",
-    color: "red",
-  },
-];
+const buildCards = (_filtered: Pacote[]): SummaryCard[] => {
+  const totalVendido = initialData.length;
+
+  const totalDisponivel = initialData.filter((p) => p.restam > 0).reduce((acc, p) => acc + p.restam, 0);
+
+  const valorVendido = initialData.reduce((s, r) => s + r.valor, 0);
+
+  const totalDesconto = initialData.reduce((s, r) => s + r.desconto, 0);
+
+  return [
+    {
+      label: "Total Vendido",
+      value: String(totalVendido),
+      type: "quantity",
+      icon: <Package className="h-4 w-4" />,
+      size: "compact",
+      color: "blue",
+    },
+    {
+      label: "Total Disponível",
+      value: String(totalDisponivel),
+      type: "quantity",
+      icon: <Layers className="h-4 w-4" />,
+      size: "compact",
+      color: "info",
+    },
+    {
+      label: "Valor Vendido",
+      value: R$(valorVendido),
+      icon: <DollarSign className="h-4 w-4" />,
+      size: "wide",
+      color: "green",
+    },
+    {
+      label: "Total de Desconto",
+      value: R$(totalDesconto),
+      icon: <Tag className="h-4 w-4" />,
+      size: "wide",
+      color: "red",
+    },
+  ];
+};
 
 export default function RelatorioPacotes() {
   const [aulaOpen, setAulaOpen] = useState(false);
