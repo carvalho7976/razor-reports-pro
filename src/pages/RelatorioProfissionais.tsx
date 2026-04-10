@@ -264,6 +264,16 @@ export default function RelatorioProfissionais() {
 
     { key: "totalServicos", label: "Vendas para Avulsos", align: "right", render: (v) => R$(v) },
     { key: "tempoTrabalhado", label: "Tempo Trabalhado", align: "center" },
+    {
+      key: "ocupacao" as any,
+      label: "Ocupação",
+      align: "center",
+      render: (_v: any, row: RelProf) => {
+        const min = parseInt(row.tempoTrabalhado) || 0;
+        const pct = min > 0 ? ((min / 480) * 100).toFixed(1) : "0.0";
+        return `${pct}%`;
+      },
+    },
     { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
     { key: "totalProdutos", label: "Vendas de Produto", align: "right", render: (v) => R$(v) },
     { key: "totalAberto", label: "Total em aberto", align: "right", render: (v) => R$(v) },
