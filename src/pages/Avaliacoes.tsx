@@ -122,7 +122,7 @@ export default function Avaliacoes() {
     {
       label: "Nota Equipe",
       value: String(notaEquipe),
-      icon: <users-round className="h-4 w-4" />,
+      icon: <UsersRound className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
