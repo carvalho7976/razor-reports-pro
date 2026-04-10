@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, Hash } from "lucide-react";
+import { Hash, BanknoteIcon } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -71,14 +71,14 @@ export default function CancelamentoAssinaturas() {
       label: "Total",
       value: String(initialData.length),
       type: "quantity",
-      icon: <Star className="h-4 w-4" />,
+      icon: <Hash className="h-4 w-4" />,
       size: "compact",
       color: "blue",
     },
     {
       label: "Valor Total",
       value: R$(initialData.reduce((s, r) => s + r.valor, 0)),
-      icon: <banknote-arrow-down className="h-4 w-4" />,
+      icon: <BanknoteIcon className="h-4 w-4" />,
       color: "red",
     },
   ];
