@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Package, Layers, DollarSign, Tag } from "lucide-react";
+import { User, Package, Layers, DollarSign, Tag, Scissors } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
