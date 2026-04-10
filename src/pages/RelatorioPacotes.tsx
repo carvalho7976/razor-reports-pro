@@ -98,7 +98,7 @@ const buildCards = (_filtered: Pacote[]): SummaryCard[] => {
 
   return [
     {
-      label: "Total Vendido",
+      label: "Pacotes Vendidos",
       value: String(totalVendido),
       type: "quantity",
       icon: <Package className="h-4 w-4" />,
@@ -106,12 +106,12 @@ const buildCards = (_filtered: Pacote[]): SummaryCard[] => {
       color: "blue",
     },
     {
-      label: "Total Disponível",
+      label: "Serviços Disponíveis",
       value: String(totalDisponivel),
       type: "quantity",
       icon: <Layers className="h-4 w-4" />,
       size: "compact",
-      color: "blue",
+      color: "info",
     },
     {
       label: "Valor Vendido",
