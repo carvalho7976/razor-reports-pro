@@ -233,27 +233,6 @@ export default function RelatorioProfissionais() {
       color: "green",
     },
     {
-      label: "Vendas para Assinantes",
-      value: R$(totalVendaAssinantes),
-      icon: <CreditCard className="h-4 w-4" />,
-      size: "wide",
-      color: "green",
-    },
-    {
-      label: "Vendas para Avulsos",
-      value: R$(totalServicos),
-      icon: <CreditCard className="h-4 w-4" />,
-      size: "wide",
-      color: "green",
-    },
-    {
-      label: "Vendas de Produto",
-      value: R$(totalProdutos),
-      icon: <CreditCard className="h-4 w-4" />,
-      size: "wide",
-      color: "green",
-    },
-    {
       label: "Total em aberto",
       value: R$(totalAberto),
       icon: <CreditCard className="h-4 w-4" />,
