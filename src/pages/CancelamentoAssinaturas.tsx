@@ -6,43 +6,115 @@ import { CreditCard, Hash } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-interface Cancelamento { id: number; nome: string; celular: string; plano: string; motivo: string; dataCancelamento: string; valor: number; }
+interface Cancelamento {
+  id: number;
+  nome: string;
+  celular: string;
+  plano: string;
+  motivo: string;
+  dataCancelamento: string;
+  valor: number;
+}
 
 const initialData: Cancelamento[] = [
-  { id: 1, nome: "Ricardo Ferreira", celular: "(41) 99123-4567", plano: "Plano Mensal", motivo: "Mudança de cidade", dataCancelamento: "01/04/2026", valor: 89.9 },
-  { id: 2, nome: "Marcos Paulo", celular: "(41) 98765-4321", plano: "Plano Trimestral", motivo: "Insatisfação", dataCancelamento: "28/03/2026", valor: 239.9 },
-  { id: 3, nome: "Felipe Souza", celular: "(41) 99876-5432", plano: "Plano Mensal", motivo: "Financeiro", dataCancelamento: "25/03/2026", valor: 89.9 },
-  { id: 4, nome: "Gustavo Lima", celular: "(41) 99654-3210", plano: "Plano Semestral", motivo: "Não utiliza", dataCancelamento: "20/03/2026", valor: 449.9 },
-  { id: 5, nome: "Bruno Alves", celular: "(41) 98432-1098", plano: "Plano Mensal", motivo: "Mudança de cidade", dataCancelamento: "15/03/2026", valor: 89.9 },
+  {
+    id: 1,
+    nome: "Ricardo Ferreira",
+    celular: "(41) 99123-4567",
+    plano: "Plano Mensal",
+    motivo: "Mudança de cidade",
+    dataCancelamento: "01/04/2026",
+    valor: 89.9,
+  },
+  {
+    id: 2,
+    nome: "Marcos Paulo",
+    celular: "(41) 98765-4321",
+    plano: "Plano Trimestral",
+    motivo: "Insatisfação",
+    dataCancelamento: "28/03/2026",
+    valor: 239.9,
+  },
+  {
+    id: 3,
+    nome: "Felipe Souza",
+    celular: "(41) 99876-5432",
+    plano: "Plano Mensal",
+    motivo: "Financeiro",
+    dataCancelamento: "25/03/2026",
+    valor: 89.9,
+  },
+  {
+    id: 4,
+    nome: "Gustavo Lima",
+    celular: "(41) 99654-3210",
+    plano: "Plano Semestral",
+    motivo: "Não utiliza",
+    dataCancelamento: "20/03/2026",
+    valor: 449.9,
+  },
+  {
+    id: 5,
+    nome: "Bruno Alves",
+    celular: "(41) 98432-1098",
+    plano: "Plano Mensal",
+    motivo: "Mudança de cidade",
+    dataCancelamento: "15/03/2026",
+    valor: 89.9,
+  },
 ];
 
 export default function CancelamentoAssinaturas() {
   const [aulaOpen, setAulaOpen] = useState(false);
   const summaryCards: SummaryCard[] = [
-    { label: "Total", value: String(initialData.length), type: "quantity", icon: <Hash className="h-4 w-4" />, size: "compact", color: "blue" },
-    { label: "Valor Total", value: R$(initialData.reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "red" },
+    {
+      label: "Total",
+      value: String(initialData.length),
+      type: "quantity",
+      icon: <Star className="h-4 w-4" />,
+      size: "compact",
+      color: "blue",
+    },
+    {
+      label: "Valor Total",
+      value: R$(initialData.reduce((s, r) => s + r.valor, 0)),
+      icon: <banknote-arrow-down className="h-4 w-4" />,
+      color: "red",
+    },
   ];
 
   const columns: Column<Cancelamento>[] = [
     {
-      key: "nome", label: "Nome", pinned: true,
+      key: "nome",
+      label: "Nome",
+      pinned: true,
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.celular} nome={row.nome} />
-          <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
+          <a href="/clientePesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
         </div>
       ),
     },
     { key: "plano", label: "Plano" },
     { key: "motivo", label: "Motivo" },
     { key: "dataCancelamento", label: "Data Cancelamento" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
   ];
 
   return (
     <AppLayout>
-      <DataTable title="Cancelamento de Assinaturas"
-        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />} data={initialData} columns={columns} summaryCards={summaryCards} pageSize={15} showDateFilter={true} tableId="cancelamento_assinaturas" />
+      <DataTable
+        title="Cancelamento de Assinaturas"
+        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
+        data={initialData}
+        columns={columns}
+        summaryCards={summaryCards}
+        pageSize={15}
+        showDateFilter={true}
+        tableId="cancelamento_assinaturas"
+      />
       <YouTubeModal
         open={aulaOpen}
         onClose={() => setAulaOpen(false)}
