@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Star, Store, ConciergeBell } from "lucide-react";
+import { User, Star, Store, ConciergeBell, UsersRound } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 interface Avaliacao {
@@ -122,7 +122,7 @@ export default function Avaliacoes() {
     {
       label: "Nota Equipe",
       value: String(notaEquipe),
-      icon: <users-round className="h-4 w-4" />,
+      icon: <UsersRound className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
