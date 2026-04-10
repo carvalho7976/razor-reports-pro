@@ -221,23 +221,23 @@ export default function RelatorioProfissionais() {
     {
       label: "Tempo Total Trabalhado",
       value: formatTempo(totalTempoMin),
-      icon: <clock-plus className="h-4 w-4" />,
+      icon: <clock className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
     {
       label: "Taxa de Ocupação",
       value: `${taxaOcupacao.toFixed(1)}%`,
-      icon: <calendar-arrow-up className="h-4 w-4" />,
+      icon: <calendar className="h-4 w-4" />,
       size: "wide",
-      color: "green",
+      color: "blue",
     },
     {
       label: "Total em aberto",
       value: R$(totalAberto),
-      icon: <banknote-arrow-up className="h-4 w-4" />,
+      icon: <banknote className="h-4 w-4" />,
       size: "wide",
-      color: "green",
+      color: "blue",
     },
   ];
 
