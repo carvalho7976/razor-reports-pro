@@ -16,6 +16,7 @@ interface RelProf {
   vendaExtra: number;
   totalProdutos: number;
   totalAberto: number;
+  ocupacao: number;
 }
 
 interface ProfDetalhado {
