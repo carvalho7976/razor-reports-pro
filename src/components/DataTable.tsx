@@ -1716,11 +1716,10 @@ export function DataTable<T extends Record<string, any>>({
                     >
                       {selectable && (
                         <td className="w-10 px-3 py-3.5">
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={isSelected}
-                            onChange={() => toggleSelectRow(globalIdx)}
-                            className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
+                            onCheckedChange={() => toggleSelectRow(globalIdx)}
+                            className="h-4 w-4 rounded-md border border-border bg-background hover:bg-muted data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all"
                           />
                         </td>
                       )}
