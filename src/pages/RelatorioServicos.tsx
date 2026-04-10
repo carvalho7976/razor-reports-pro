@@ -194,7 +194,7 @@ export default function RelatorioServicos() {
   const columnsResumido: Column<ServicoResumido>[] = [
     { key: "nome", label: "Serviço", pinned: true },
     { key: "quantidade", label: "Avulsos Atendidos", align: "center" },
-    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    { key: "valor", label: "Venda para Avulsos", align: "right", render: (v) => R$(v) },
     { key: "qtdVendaExtra", label: "Assinantes Atendidos", align: "center" },
     { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: (v) => R$(v) },
@@ -229,7 +229,7 @@ export default function RelatorioServicos() {
         </div>
       ),
     },
-    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    { key: "valor", label: "Venda para Avulsos", align: "right", render: (v) => R$(v) },
     { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: (v) => R$(v) },
     { key: "data", label: "Data" },
