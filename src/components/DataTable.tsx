@@ -843,27 +843,7 @@ function TablePagination({
   );
 }
 
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-muted-foreground">
-          {start}–{end} de {totalItems}
-        </span>
 
-        <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
-          <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="end">
-            {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={String(size)}>
-                {size} / pág
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  );
-}
 
 export function DataTable<T extends Record<string, any>>({
   data,
