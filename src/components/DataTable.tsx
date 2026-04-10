@@ -770,9 +770,7 @@ function TablePagination({
   const end = Math.min((page + 1) * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-border bg-card px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-between">
-      <div className="flex flex-wrap items-center gap-1.5">
-        <button
+<div className="flex flex-col gap-3 border-t border-border bg-card px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-end">        <button
           type="button"
           onClick={() => onPageChange(Math.max(0, page - 1))}
           disabled={page === 0}
