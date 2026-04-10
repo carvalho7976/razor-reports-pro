@@ -277,6 +277,11 @@ export default function RelatorioProfissionais() {
         </div>
       ),
     },
+
+    { key: "qtdServicos", label: "Qtd Serviços", align: "center" },
+    { key: "qtdProdutos", label: "Qtd Produtos", align: "center" },
+    { key: "clientesAtendidos", label: "Clientes Atendidos", align: "center" },
+
     { key: "totalServicos", label: "Vendas para Avulsos", align: "right", render: (v) => R$(v) },
     { key: "tempoTrabalhado", label: "Tempo Trabalhado", align: "center" },
     { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
