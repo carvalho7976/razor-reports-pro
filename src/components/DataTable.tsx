@@ -1,5 +1,6 @@
 import { useState, useMemo, ReactNode, useCallback, useRef, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Search,
   SlidersHorizontal,
