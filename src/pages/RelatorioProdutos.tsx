@@ -172,7 +172,7 @@ export default function RelatorioProdutos() {
     {
       label: "Total Avulsos e Assinantes",
       value: `${totalQtd} · ${R$(totalValor)}`,
-      icon: <Wine className="h-4 w-4" />,
+      icon: <SprayCan className="h-4 w-4" />,
       size: "wide",
       color: "green",
     },
