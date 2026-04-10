@@ -239,7 +239,7 @@ export default function RelatorioProdutos() {
       ),
     },
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
-    { key: "vendaExtra", label: "Venda Assinantes", align: "right", render: (v) => R$(v) },
+    { key: "vendaExtra", label: "Vendas para Assinantes", align: "right", render: (v) => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: (v) => R$(v) },
     { key: "data", label: "Data" },
   ];
