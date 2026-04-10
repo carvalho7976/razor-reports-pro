@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, Star, Store, ConciergeBell } from "lucide-react";
+import { User, Star, Store, ConciergeBell, UsersRound } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 interface Avaliacao {
