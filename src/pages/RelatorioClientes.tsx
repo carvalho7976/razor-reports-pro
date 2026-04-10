@@ -124,6 +124,7 @@ export default function RelatorioClientes() {
     const totalProdutos = filtered.reduce((s, r) => s + r.totalProdutos, 0);
     const totalAtendimentos = filtered.reduce((s, r) => s + r.frequencia, 0);
 
+    const totalClientes = filtered.length;
     const avgFreq = totalClientes > 0 ? filtered.reduce((s, r) => s + r.frequencia, 0) / totalClientes : 0;
 
     const ticketMedioGeral = totalAtendimentos > 0 ? (totalServicos + totalProdutos) / totalAtendimentos : 0;
