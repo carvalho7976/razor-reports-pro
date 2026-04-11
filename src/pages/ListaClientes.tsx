@@ -6,7 +6,7 @@ import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { FormModal, TextField, Dropdown, FormRow, DeleteModal, SaveButton } from "@/components/FormModal";
+import { FormModal, TextField, DeleteModal, SaveButton } from "@/components/FormModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -21,7 +21,6 @@ interface Cliente {
   telefone: string;
   celular: string;
   email: string;
-  comoConheceu: string;
   aniversario: string;
   genero: GeneroCliente;
   tags: string;
@@ -45,7 +44,6 @@ const data: Cliente[] = [
     telefone: "(61) 99450-9929",
     celular: "(61) 99450-9929",
     email: "",
-    comoConheceu: "",
     aniversario: "01/05/2017",
     genero: "Masculino",
     tags: "bloquear123",
@@ -67,7 +65,6 @@ const data: Cliente[] = [
     telefone: "(67) 99162-990",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -89,7 +86,6 @@ const data: Cliente[] = [
     telefone: "6181627802",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "10/05/2025",
     genero: "Feminino",
     tags: "",
@@ -111,7 +107,6 @@ const data: Cliente[] = [
     telefone: "12981134764",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -133,7 +128,6 @@ const data: Cliente[] = [
     telefone: "(88) 90300-0166",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Masculino",
     tags: "",
@@ -155,7 +149,6 @@ const data: Cliente[] = [
     telefone: "(55) 55555-5555",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Masculino",
     tags: "",
@@ -177,7 +170,6 @@ const data: Cliente[] = [
     telefone: "(21) 99999-9999",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "20/01/1988",
     genero: "Masculino",
     tags: "",
@@ -199,7 +191,6 @@ const data: Cliente[] = [
     telefone: "(21) 99999-9999",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "20/03/1988",
     genero: "Masculino",
     tags: "",
@@ -221,7 +212,6 @@ const data: Cliente[] = [
     telefone: "",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -243,7 +233,6 @@ const data: Cliente[] = [
     telefone: "(99) 99999-99999",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "22/03/1988",
     genero: "Feminino",
     tags: "",
@@ -265,7 +254,6 @@ const data: Cliente[] = [
     telefone: "11993966288",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -287,7 +275,6 @@ const data: Cliente[] = [
     telefone: "12982466363",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -309,7 +296,6 @@ const data: Cliente[] = [
     telefone: "13997288558",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -331,7 +317,6 @@ const data: Cliente[] = [
     telefone: "(19) 99239-3840",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -353,7 +338,6 @@ const data: Cliente[] = [
     telefone: "11994527149",
     celular: "",
     email: "",
-    comoConheceu: "",
     aniversario: "",
     genero: "Feminino",
     tags: "",
@@ -386,7 +370,6 @@ const emptyForm = (): Cliente => ({
   telefone: "",
   celular: "",
   email: "",
-  comoConheceu: "",
   aniversario: "",
   genero: "",
   tags: "",
@@ -418,6 +401,36 @@ function TabButton({ active, children, onClick }: { active: boolean; children: R
         }`}
       />
     </button>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-sm font-medium">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+      >
+        <option value="">Selecione</option>
+        {options.map((option) => (
+          <option key={`${label}-${option.value}`} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 
@@ -757,9 +770,11 @@ export default function ListaClientes() {
                     Endereço
                   </TabButton>
                 </div>
+              </div>
 
+              <div className="px-8 pb-8 pt-6">
                 {clienteTab === "basicos" && (
-                  <>
+                  <div className="space-y-4">
                     <TextField
                       label="Nome"
                       value={form.nome}
@@ -767,34 +782,19 @@ export default function ListaClientes() {
                       error={showErrors ? errors.nome : ""}
                     />
 
-                    <TextField
-                      label="CPF"
-                      value={form.cpf}
-                      onChange={(v) => setForm({ ...form, cpf: v })}
-                    />
+                    <TextField label="CPF" value={form.cpf} onChange={(v) => setForm({ ...form, cpf: v })} />
 
-                    <FormRow cols={3}>
+                    <div className="grid grid-cols-2 gap-4">
                       <TextField
                         label="Celular"
                         value={form.celular}
                         onChange={(v) => setForm({ ...form, celular: v })}
                         placeholder="(00) 00000-0000"
                       />
+                      <TextField label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
+                    </div>
 
-                      <TextField
-                        label="Email"
-                        value={form.email}
-                        onChange={(v) => setForm({ ...form, email: v })}
-                      />
-
-                      <TextField
-                        label="Como conheceu"
-                        value={form.comoConheceu}
-                        onChange={(v) => setForm({ ...form, comoConheceu: v })}
-                      />
-                    </FormRow>
-
-                    <FormRow cols={3}>
+                    <div className="grid grid-cols-2 gap-4">
                       <TextField
                         label="Aniversário"
                         value={form.aniversario}
@@ -802,52 +802,45 @@ export default function ListaClientes() {
                         placeholder="DD/MM/AAAA"
                       />
 
-                      <Dropdown
+                      <SelectField
                         label="Gênero"
                         value={form.genero}
-                        setValue={(v) => setForm({ ...form, genero: v as GeneroCliente })}
+                        onChange={(v) => setForm({ ...form, genero: v as GeneroCliente })}
                         options={[
                           { value: "Masculino", label: "Masculino" },
                           { value: "Feminino", label: "Feminino" },
                           { value: "Outro", label: "Outro" },
                         ]}
                       />
+                    </div>
 
-                      <TextField
-                        label="Tag"
-                        value={form.tags}
-                        onChange={(v) => setForm({ ...form, tags: v })}
-                      />
-                    </FormRow>
-                  </>
+                    <TextField label="Tag" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} />
+                  </div>
                 )}
 
                 {clienteTab === "endereco" && (
-                  <>
-                    <FormRow cols={3}>
-                      <TextField
-                        label="Endereço"
-                        value={form.endereco}
-                        onChange={(v) => setForm({ ...form, endereco: v })}
-                      />
+                  <div className="space-y-4">
+                    <TextField
+                      label="Endereço"
+                      value={form.endereco}
+                      onChange={(v) => setForm({ ...form, endereco: v })}
+                    />
 
-                      <TextField label="N" value={form.numero} onChange={(v) => setForm({ ...form, numero: v })} />
+                    <TextField label="N" value={form.numero} onChange={(v) => setForm({ ...form, numero: v })} />
 
-                      <TextField
-                        label="Complemento"
-                        value={form.complemento}
-                        onChange={(v) => setForm({ ...form, complemento: v })}
-                      />
-                    </FormRow>
+                    <TextField
+                      label="Complemento"
+                      value={form.complemento}
+                      onChange={(v) => setForm({ ...form, complemento: v })}
+                    />
 
-                    <FormRow cols={3}>
-                      <TextField label="Bairro" value={form.bairro} onChange={(v) => setForm({ ...form, bairro: v })} />
+                    <TextField label="Bairro" value={form.bairro} onChange={(v) => setForm({ ...form, bairro: v })} />
 
+                    <div className="grid grid-cols-2 gap-4">
                       <TextField label="Estado" value={form.estado} onChange={(v) => setForm({ ...form, estado: v })} />
-
                       <TextField label="Cidade" value={form.cidade} onChange={(v) => setForm({ ...form, cidade: v })} />
-                    </FormRow>
-                  </>
+                    </div>
+                  </div>
                 )}
               </div>
 
