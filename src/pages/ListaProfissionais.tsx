@@ -108,14 +108,14 @@ export default function ListaProfissionais() {
   const columns: Column<Profissional>[] = [
     {
       key: "nome", label: "Nome", pinned: true,
-      render: v => (
+      render: (v, row) => (
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
           <a
             href="#"
-            onClick={(e) => { e.preventDefault(); openEdit(row as unknown as Profissional); }}
+            onClick={(e) => { e.preventDefault(); openEdit(row); }}
             className="hover:underline font-medium"
           >{v}</a>
         </div>
