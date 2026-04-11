@@ -770,10 +770,76 @@ function TablePagination({
   const end = Math.min((page + 1) * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-border bg-card px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-end">
+  <div className="flex flex-col gap-3 border-t border-border/50 bg-background/60 backdrop-blur-sm px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-end rounded-b-xl">
 
-      {/* INFO + SELECT */}
-      <div className="flex items-center gap-3 md:mr-4">
+    {/* INFO */}
+    <div className="flex items-center gap-3 md:mr-4">
+      <span className="text-sm text-muted-foreground">
+        {start}–{end} de {totalItems}
+      </span>
+
+      <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
+        <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm hover:border-primary/40 transition-all">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end">
+          {pageSizeOptions.map((size) => (
+            <SelectItem key={size} value={String(size)}>
+              {size} / pág
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    {/* PAGINAÇÃO */}
+    <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
+
+      {/* anterior */}
+      <button
+        onClick={() => onPageChange(Math.max(0, page - 1))}
+        disabled={page === 0}
+        className="h-8 px-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-background transition-all disabled:opacity-40"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+
+      {/* páginas */}
+      {pages.map((pageItem, index) =>
+        pageItem === "..." ? (
+          <span key={index} className="px-2 text-xs text-muted-foreground">
+            ...
+          </span>
+        ) : (
+          <button
+            key={pageItem}
+            onClick={() => onPageChange(Number(pageItem) - 1)}
+            className={cn(
+              "h-8 min-w-[32px] px-2 rounded-lg text-sm font-medium transition-all duration-200",
+              currentPage === pageItem
+                ? "bg-background shadow-sm border border-border text-foreground scale-[1.05]"
+                : "text-muted-foreground hover:bg-background hover:text-foreground"
+            )}
+          >
+            {pageItem}
+          </button>
+        )
+      )}
+
+      {/* próxima */}
+      <button
+        onClick={() => onPageChange(Math.min(safeTotalPages - 1, page + 1))}
+        disabled={page >= safeTotalPages - 1}
+        className="h-8 px-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-background transition-all disabled:opacity-40"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+    </div>
+  </div>
+  );
+}
+
+      <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground">
           {start}–{end} de {totalItems}
         </span>
@@ -791,59 +857,9 @@ function TablePagination({
           </SelectContent>
         </Select>
       </div>
-
-      {/* PAGINAÇÃO */}
-      <div className="flex flex-wrap items-center gap-1.5 md:justify-end">
-        <button
-          type="button"
-          onClick={() => onPageChange(Math.max(0, page - 1))}
-          disabled={page === 0}
-          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-muted-foreground transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          Anterior
-        </button>
-
-        {pages.map((pageItem, index) =>
-          pageItem === "..." ? (
-            <span
-              key={`ellipsis-${index}`}
-              className="inline-flex h-9 min-w-9 items-center justify-center px-1 text-sm font-medium text-muted-foreground"
-            >
-              ...
-            </span>
-          ) : (
-            <button
-              key={pageItem}
-              type="button"
-              onClick={() => onPageChange(Number(pageItem) - 1)}
-              className={cn(
-                "inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                currentPage === pageItem
-                  ? "border border-primary bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              {pageItem}
-            </button>
-          )
-        )}
-
-        <button
-          type="button"
-          onClick={() => onPageChange(Math.min(safeTotalPages - 1, page + 1))}
-          disabled={page >= safeTotalPages - 1}
-          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-primary transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
-        >
-          Próxima
-          <ChevronRight className="ml-1 h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 }
-
-
 
 export function DataTable<T extends Record<string, any>>({
   data,
