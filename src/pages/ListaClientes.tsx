@@ -6,8 +6,7 @@ import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { FormModal, TextField, DeleteModal, SaveButton } from "@/components/FormModal";
-
+import { FormModal, TextField, Dropdown, FormRow, DeleteModal, SaveButton } from "@/components/FormModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 type StatusCliente = "ativo" | "semi-ativo" | "inativo";
@@ -802,21 +801,16 @@ export default function ListaClientes() {
                         placeholder="DD/MM/AAAA"
                       />
 
-                      <SelectField
-                        label="Gênero"
-                        value={form.genero}
-                        onChange={(v) => setForm({ ...form, genero: v as GeneroCliente })}
-                        options={[
-                          { value: "Masculino", label: "Masculino" },
-                          { value: "Feminino", label: "Feminino" },
-                          { value: "Outro", label: "Outro" },
-                        ]}
-                      />
-                    </div>
-
-                    <TextField label="Tag" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} />
-                  </div>
-                )}
+<Dropdown
+  label="Gênero"
+  value={form.genero}
+  setValue={(v) => setForm({ ...form, genero: v as GeneroCliente })}
+  options={[
+    { value: "Masculino", label: "Masculino" },
+    { value: "Feminino", label: "Feminino" },
+    { value: "Outro", label: "Outro" },
+  ]}
+/>
 
                 {clienteTab === "endereco" && (
                   <div className="space-y-4">
