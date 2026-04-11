@@ -759,7 +759,7 @@ export default function ListaClientes() {
                 </div>
               </div>
 
-              <{clienteTab === "basicos" && (
+              {clienteTab === "basicos" && (
   <>
     <TextField
       label="Nome"
