@@ -32,6 +32,7 @@ import ListaCategorias from "./pages/ListaCategorias";
 import ListaProdutos from "./pages/ListaProdutos";
 import ListaPacotes from "./pages/ListaPacotes";
 import ListaFormasPagamento from "./pages/ListaFormasPagamento";
+import ProfissionalPerfil from "./pages/ProfissionalPerfil";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
           <Route path="/produtoPesquisa" element={<ListaProdutos />} />
           <Route path="/comboPesquisa" element={<ListaPacotes />} />
           <Route path="/formaPagamentoPesquisa" element={<ListaFormasPagamento />} />
+          <Route path="/profissionalPerfil" element={<ProfissionalPerfil />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

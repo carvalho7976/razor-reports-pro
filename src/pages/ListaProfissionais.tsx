@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction } from "@/components/DataTable";
 import { Lock, Pencil, Trash2, User } from "lucide-react";
@@ -47,6 +48,7 @@ type ModalState =
 const emptyForm = (): Profissional => ({ id: 0, nome: "", email: "", celular: "", aniversario: "", funcao: "Profissional" });
 
 export default function ListaProfissionais() {
+  const navigate = useNavigate();
   const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const [modal, setModal] = useState<ModalState>(null);
@@ -59,8 +61,8 @@ export default function ListaProfissionais() {
     email: !form?.email ? "Informe o email." : "",
   };
 
-  const openNew = () => { setForm(emptyForm()); setShowErrors(false); setModal({ type: "new" }); };
-  const openEdit = (item: Profissional) => { setForm({ ...item }); setShowErrors(false); setModal({ type: "edit", item }); };
+  const openNew = () => navigate("/profissionalPerfil");
+  const openEdit = (item: Profissional) => navigate(`/profissionalPerfil?nome=${encodeURIComponent(item.nome)}&email=${encodeURIComponent(item.email)}&celular=${encodeURIComponent(item.celular)}&funcao=${encodeURIComponent(item.funcao)}`);
   const openDelete = (item: Profissional) => setModal({ type: "delete", item });
   const openPassword = (item: Profissional) => setModal({ type: "password", item });
   const closeModal = () => { setModal(null); setForm(null); setShowErrors(false); };
@@ -106,12 +108,16 @@ export default function ListaProfissionais() {
   const columns: Column<Profissional>[] = [
     {
       key: "nome", label: "Nome", pinned: true,
-      render: v => (
+      render: (v, row) => (
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
-          <a href="/funcionarioPesquisa" className="hover:underline font-medium">{v}</a>
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); openEdit(row); }}
+            className="hover:underline font-medium"
+          >{v}</a>
         </div>
       ),
     },
