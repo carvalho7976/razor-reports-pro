@@ -831,7 +831,7 @@ export default function ListaClientes() {
                       <Dropdown
                         label="Como Conheceu"
                         value={form.conheceu}
-                        setValue={(v) => setForm({ ...form, conheceu: v as comoconheceu })}
+                        setValue={(v) => setForm({ ...form, conheceu: v })}
                         options={[
                           { value: "Google", label: "Google" },
                           { value: "Instagram", label: "Instagram" },
