@@ -811,16 +811,20 @@ export default function ListaClientes() {
     { value: "Outro", label: "Outro" },
   ]}
 />
- <Dropdown
-  label="Como Conheceu"
-  value={form.conheceu}
-  setValue={(v) => setForm({ ...form, conheceu: v as comoconheceu })}
-  options={[
-    { value: "Google", label: "Google" },
-    { value: "Instagram", label: "Instagram" },
-    { value: "Anúncio", label: "Anúncio" },
-  ]}
-/>
+                      <Dropdown
+                        label="Como Conheceu"
+                        value={form.conheceu}
+                        setValue={(v) => setForm({ ...form, conheceu: v as comoconheceu })}
+                        options={[
+                          { value: "Google", label: "Google" },
+                          { value: "Instagram", label: "Instagram" },
+                          { value: "Anúncio", label: "Anúncio" },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {clienteTab === "endereco" && (
                   <div className="space-y-4">
                     <TextField
