@@ -22,6 +22,7 @@ interface Cliente {
   email: string;
   aniversario: string;
   genero: GeneroCliente;
+  conheceu: string;
   tags: string;
   endereco: string;
   numero: string;
