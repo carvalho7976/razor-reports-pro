@@ -25,14 +25,12 @@ interface ProfDetalhado {
   id: number;
   profissional: string;
   servico: string;
+  produto: string;
   cliente: string;
   celular: string;
   valor: number;
   vendaExtra: number;
   data: string;
-  qtdServicos: number;
-  clientesAtendidos: number;
-  qtdProdutos: number;
 }
 
 const detalhadoData: ProfDetalhado[] = [
@@ -40,66 +38,56 @@ const detalhadoData: ProfDetalhado[] = [
     id: 1,
     profissional: "Cesar",
     servico: "Corte Masculino",
+    produto: "",
     cliente: "João Silva",
     celular: "(41) 99123-4567",
     valor: 50,
     vendaExtra: 10,
     data: "05/04/2026",
-    qtdServicos: 16,
-    clientesAtendidos: 7,
-    qtdProdutos: 0,
   },
   {
     id: 2,
     profissional: "Claudia",
     servico: "Escova",
+    produto: "Pomada Modeladora",
     cliente: "Maria Santos",
     celular: "(41) 98765-4321",
     valor: 80,
     vendaExtra: 20,
     data: "05/04/2026",
-    qtdServicos: 20,
-    clientesAtendidos: 9,
-    qtdProdutos: 41,
   },
   {
     id: 3,
     profissional: "Cesar",
     servico: "Barba",
+    produto: "",
     cliente: "Pedro Oliveira",
     celular: "(41) 99876-5432",
     valor: 35,
     vendaExtra: 0,
     data: "04/04/2026",
-    qtdServicos: 16,
-    clientesAtendidos: 7,
-    qtdProdutos: 0,
   },
   {
     id: 4,
     profissional: "Claudia",
     servico: "Coloração",
+    produto: "Shampoo Matizador",
     cliente: "Ana Costa",
     celular: "(41) 99654-3210",
     valor: 200,
     vendaExtra: 50,
     data: "04/04/2026",
-    qtdServicos: 20,
-    clientesAtendidos: 9,
-    qtdProdutos: 41,
   },
   {
     id: 5,
     profissional: "Marcia Silva",
     servico: "Hidratação",
+    produto: "",
     cliente: "Carla Dias",
     celular: "",
     valor: 120,
     vendaExtra: 30,
     data: "03/04/2026",
-    qtdServicos: 9,
-    clientesAtendidos: 3,
-    qtdProdutos: 0,
   },
 ];
 
@@ -110,9 +98,9 @@ const resumoDetalhadoPorProfissional = detalhadoData.reduce<
 
   if (!acc[nome]) {
     acc[nome] = {
-      qtdServicos: item.qtdServicos,
-      clientesAtendidos: item.clientesAtendidos,
-      qtdProdutos: item.qtdProdutos,
+      qtdServicos: detalhadoData.filter((d) => d.profissional === nome && !!d.servico).length,
+      clientesAtendidos: new Set(detalhadoData.filter((d) => d.profissional === nome).map((d) => d.cliente)).size,
+      qtdProdutos: detalhadoData.filter((d) => d.profissional === nome && !!d.produto).length,
     };
   }
 
@@ -336,6 +324,11 @@ export default function RelatorioProfissionais() {
     },
     { key: "servico", label: "Serviço" },
     {
+      key: "produto",
+      label: "Produto",
+      render: (v) => v || "—",
+    },
+    {
       key: "cliente",
       label: "Cliente",
       render: (v, row) => (
@@ -347,9 +340,6 @@ export default function RelatorioProfissionais() {
         </div>
       ),
     },
-    { key: "qtdServicos", label: "Serviços", align: "center" },
-    { key: "qtdProdutos", label: "Produtos", align: "center" },
-    { key: "clientesAtendidos", label: "Clientes Atendidos", align: "center" },
     { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
     { key: "vendaExtra", label: "Venda Extra", align: "right", render: (v) => R$(v) },
     { key: "data", label: "Data" },
