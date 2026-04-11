@@ -801,16 +801,19 @@ export default function ListaClientes() {
                         placeholder="DD/MM/AAAA"
                       />
 
-<Dropdown
-  label="Gênero"
-  value={form.genero}
-  setValue={(v) => setForm({ ...form, genero: v as GeneroCliente })}
-  options={[
-    { value: "Masculino", label: "Masculino" },
-    { value: "Feminino", label: "Feminino" },
-    { value: "Outro", label: "Outro" },
-  ]}
-/>
+                      <Dropdown
+                        label="Gênero"
+                        value={form.genero}
+                        setValue={(v) => setForm({ ...form, genero: v as GeneroCliente })}
+                        options={[
+                          { value: "Masculino", label: "Masculino" },
+                          { value: "Feminino", label: "Feminino" },
+                          { value: "Outro", label: "Outro" },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {clienteTab === "endereco" && (
                   <div className="space-y-4">
