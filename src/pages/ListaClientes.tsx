@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction, TabDef, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Trash2, Merge, Tag, MessageCircle, Pencil, Coins, CreditCard } from "lucide-react";
+import { Trash2, Merge, Tag, MessageCircle, Pencil, Coins, CreditCard, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
@@ -204,6 +204,7 @@ type ModalState =
   | { type: "delete"; item: Cliente }
   | { type: "moedas"; item: Cliente }
   | { type: "credito"; item: Cliente }
+  | { type: "tags"; item: Cliente }
   | null;
 
 const emptyForm = (): Cliente => ({
@@ -227,6 +228,8 @@ export default function ListaClientes() {
   const [showErrors, setShowErrors] = useState(false);
   const [moedasQtd, setMoedasQtd] = useState("");
   const [creditoValor, setCreditoValor] = useState("");
+  const [tagInput, setTagInput] = useState("");
+  const [tagsList, setTagsList] = useState<string[]>([]);
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
@@ -241,30 +244,53 @@ export default function ListaClientes() {
     setShowErrors(false);
     setModal({ type: "new" });
   };
+
   const openEdit = (item: Cliente) => {
     setForm({ ...item });
     setShowErrors(false);
     setModal({ type: "edit", item });
   };
+
   const openDelete = (item: Cliente) => setModal({ type: "delete", item });
+
   const openMoedas = (item: Cliente) => {
     setMoedasQtd("");
     setModal({ type: "moedas", item });
   };
+
   const openCredito = (item: Cliente) => {
     setCreditoValor("");
     setModal({ type: "credito", item });
   };
+
+  const openTags = (item: Cliente) => {
+    setTagInput("");
+    setTagsList(
+      item.tags
+        ? item.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [],
+    );
+    setModal({ type: "tags", item });
+  };
+
   const closeModal = () => {
     setModal(null);
     setForm(null);
     setShowErrors(false);
+    setMoedasQtd("");
+    setCreditoValor("");
+    setTagInput("");
+    setTagsList([]);
   };
 
   const handleSave = () => {
     if (!form) return;
     setShowErrors(true);
     if (errors.nome) return;
+
     if (modal?.type === "new") {
       const nextCod = String(Math.max(...allData.map((d) => Number(d.cod) || 0)) + 1);
       setAllData((prev) => [{ ...form, cod: nextCod }, ...prev]);
@@ -273,6 +299,7 @@ export default function ListaClientes() {
       setAllData((prev) => prev.map((d) => (d.cod === form.cod ? form : d)));
       toast({ title: "Cliente atualizado" });
     }
+
     closeModal();
   };
 
@@ -299,6 +326,39 @@ export default function ListaClientes() {
     closeModal();
   };
 
+  const handleAddTag = () => {
+    const normalized = tagInput.trim();
+    if (!normalized) return;
+
+    const exists = tagsList.some((tag) => tag.toLowerCase() === normalized.toLowerCase());
+    if (exists) return;
+
+    setTagsList((prev) => [...prev, normalized]);
+    setTagInput("");
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTagsList((prev) => prev.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleSaveTags = () => {
+    if (modal?.type !== "tags") return;
+
+    setAllData((prev) =>
+      prev.map((d) =>
+        d.cod === modal.item.cod
+          ? {
+              ...d,
+              tags: tagsList.join(", "),
+            }
+          : d,
+      ),
+    );
+
+    toast({ title: "Tags atualizadas" });
+    closeModal();
+  };
+
   const totalClientes = allData.length;
   const ativos = allData.filter((c) => c.status === "ativo").length;
   const semiAtivos = allData.filter((c) => c.status === "semi-ativo").length;
@@ -311,13 +371,16 @@ export default function ListaClientes() {
     setAllData((prev) => prev.filter((d) => !cods.includes(d.cod)));
     toast({ title: `${cods.length} cliente(s) removido(s)`, variant: "destructive" });
   };
+
   const bulkMerge = (indices: number[]) =>
     toast({ title: `Mesclar ${indices.length} clientes`, description: "Funcionalidade em desenvolvimento" });
+
   const bulkMessage = (indices: number[]) =>
     toast({
       title: `Enviar mensagem para ${indices.length} cliente(s)`,
       description: "Funcionalidade em desenvolvimento",
     });
+
   const bulkTag = (indices: number[]) =>
     toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
 
@@ -414,6 +477,7 @@ export default function ListaClientes() {
         <ActionsMenu
           items={[
             { label: "Editar", icon: <Pencil className="h-4 w-4" />, onClick: () => openEdit(row) },
+            { label: "Tags", icon: <Tag className="h-4 w-4" />, onClick: () => openTags(row) },
             { label: "Moedas", icon: <Coins className="h-4 w-4" />, onClick: () => openMoedas(row) },
             { label: "Crédito", icon: <CreditCard className="h-4 w-4" />, onClick: () => openCredito(row) },
             {
@@ -454,7 +518,6 @@ export default function ListaClientes() {
         tableId="lista_clientes"
       />
 
-      {/* New / Edit */}
       <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           {form && (
@@ -498,7 +561,6 @@ export default function ListaClientes() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete */}
       <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <DeleteModal
@@ -510,7 +572,6 @@ export default function ListaClientes() {
         </DialogContent>
       </Dialog>
 
-      {/* Moedas */}
       <Dialog open={modal?.type === "moedas"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
@@ -524,7 +585,6 @@ export default function ListaClientes() {
         </DialogContent>
       </Dialog>
 
-      {/* Crédito */}
       <Dialog open={modal?.type === "credito"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
@@ -539,6 +599,58 @@ export default function ListaClientes() {
               onChange={setCreditoValor}
               placeholder="0,00"
             />
+          </FormModal>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={modal?.type === "tags"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <FormModal
+            title="Gerenciar tags"
+            subtitle={modal?.type === "tags" ? `Cliente: ${modal.item.nome}` : ""}
+            onClose={closeModal}
+            footer={<SaveButton onClick={handleSaveTags} />}
+          >
+            <div className="space-y-3">
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <TextField label="Nova tag" value={tagInput} onChange={setTagInput} placeholder="Digite uma tag" />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddTag}
+                  className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                >
+                  Adicionar
+                </button>
+              </div>
+
+              <div className="min-h-[44px] rounded-xl border border-border bg-background px-3 py-2">
+                {tagsList.length === 0 ? (
+                  <span className="text-sm text-muted-foreground">Nenhuma tag adicionada.</span>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {tagsList.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground transition hover:bg-background hover:text-destructive"
+                          aria-label={`Remover tag ${tag}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </FormModal>
         </DialogContent>
       </Dialog>
