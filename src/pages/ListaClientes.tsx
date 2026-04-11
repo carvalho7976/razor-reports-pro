@@ -757,7 +757,6 @@ export default function ListaClientes() {
                     Endereço
                   </TabButton>
                 </div>
-              </div>
 
                 {clienteTab === "basicos" && (
                   <>
