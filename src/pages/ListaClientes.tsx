@@ -6,194 +6,350 @@ import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { FormModal, TextField, Dropdown, FormRow, DeleteModal, SaveButton } from "@/components/FormModal";
+import { FormModal, TextField, DeleteModal, SaveButton } from "@/components/FormModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 type StatusCliente = "ativo" | "semi-ativo" | "inativo";
+type GeneroCliente = "Masculino" | "Feminino" | "Outro" | "";
+type ClienteTab = "basicos" | "endereco";
 
 interface Cliente {
   cod: string;
   nome: string;
+  cpf: string;
   telefone: string;
+  celular: string;
+  email: string;
   aniversario: string;
+  genero: GeneroCliente;
+  tags: string;
+  endereco: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  estado: string;
+  cidade: string;
   ultimaVisita: string;
   moedas: number;
   creditos: number;
-  tags: string;
   status: StatusCliente;
 }
-
-const statusOptions = [
-  { value: "ativo", label: "Ativo" },
-  { value: "semi-ativo", label: "Semi-ativo" },
-  { value: "inativo", label: "Inativo" },
-];
 
 const data: Cliente[] = [
   {
     cod: "745142",
     nome: "Abner Ferreira Chaves",
+    cpf: "",
     telefone: "(61) 99450-9929",
+    celular: "(61) 99450-9929",
+    email: "",
     aniversario: "01/05/2017",
+    genero: "Masculino",
+    tags: "bloquear123",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "04/11/2025",
     moedas: 196,
     creditos: 0,
-    tags: "bloquear123",
     status: "inativo",
   },
   {
     cod: "1037806",
     nome: "Ada Naama",
+    cpf: "",
     telefone: "(67) 99162-990",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "17/02/2026",
     moedas: 25,
     creditos: 0,
-    tags: "",
     status: "ativo",
   },
   {
     cod: "1037807",
     nome: "Adara Cerqueira",
+    cpf: "",
     telefone: "6181627802",
+    celular: "",
+    email: "",
     aniversario: "10/05/2025",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "17/02/2026",
     moedas: 0,
     creditos: 0,
-    tags: "",
     status: "ativo",
   },
   {
     cod: "1037808",
     nome: "Adelia Maria Sales",
+    cpf: "",
     telefone: "12981134764",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "26/11/2025",
     moedas: 4,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1167159",
     nome: "Adelio Marçal",
+    cpf: "",
     telefone: "(88) 90300-0166",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Masculino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "05/11/2025",
     moedas: 4,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "675732",
     nome: "Ademar Herminio",
+    cpf: "",
     telefone: "(55) 55555-5555",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Masculino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "01/10/2025",
     moedas: 397,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1069712",
     nome: "Adenilson",
+    cpf: "",
     telefone: "(21) 99999-9999",
+    celular: "",
+    email: "",
     aniversario: "20/01/1988",
+    genero: "Masculino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "12/08/2025",
     moedas: 0,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1204833",
     nome: "Adenilson",
+    cpf: "",
     telefone: "(21) 99999-9999",
+    celular: "",
+    email: "",
     aniversario: "20/03/1988",
+    genero: "Masculino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "11/12/2025",
     moedas: 4,
     creditos: 0,
-    tags: "",
     status: "semi-ativo",
   },
   {
     cod: "1037809",
     nome: "Adhara Maria",
+    cpf: "",
     telefone: "",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "10/02/2026",
     moedas: 24,
     creditos: 0,
-    tags: "",
     status: "ativo",
   },
   {
     cod: "848084",
     nome: "Adriana",
+    cpf: "",
     telefone: "(99) 99999-99999",
+    celular: "",
+    email: "",
     aniversario: "22/03/1988",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "24/06/2025",
     moedas: 97,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1037810",
     nome: "Adriana",
+    cpf: "",
     telefone: "11993966288",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "",
     moedas: 0,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1037811",
     nome: "Adriana",
+    cpf: "",
     telefone: "12982466363",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "",
     moedas: 0,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1037812",
     nome: "Adriana Bitencourt",
+    cpf: "",
     telefone: "13997288558",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "",
     moedas: 0,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1037813",
     nome: "Adriana Cabello",
+    cpf: "",
     telefone: "(19) 99239-3840",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "",
     moedas: 0,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
   {
     cod: "1037814",
     nome: "Adriana Cherin",
+    cpf: "",
     telefone: "11994527149",
+    celular: "",
+    email: "",
     aniversario: "",
+    genero: "Feminino",
+    tags: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    estado: "",
+    cidade: "",
     ultimaVisita: "",
     moedas: 0,
     creditos: 0,
-    tags: "",
     status: "inativo",
   },
 ];
@@ -210,18 +366,78 @@ type ModalState =
 const emptyForm = (): Cliente => ({
   cod: "",
   nome: "",
+  cpf: "",
   telefone: "",
+  celular: "",
+  email: "",
   aniversario: "",
+  genero: "",
+  tags: "",
+  endereco: "",
+  numero: "",
+  complemento: "",
+  bairro: "",
+  estado: "",
+  cidade: "",
   ultimaVisita: "",
   moedas: 0,
   creditos: 0,
-  tags: "",
   status: "ativo",
 });
+
+function TabButton({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative px-1 pb-2 text-sm font-medium transition ${
+        active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {children}
+      <span
+        className={`absolute inset-x-0 -bottom-px h-0.5 rounded-full transition ${
+          active ? "bg-primary" : "bg-transparent"
+        }`}
+      />
+    </button>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-sm font-medium">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+      >
+        <option value="">Selecione</option>
+        {options.map((option) => (
+          <option key={`${label}-${option.value}`} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 export default function ListaClientes() {
   const [aulaOpen, setAulaOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("todos");
+  const [clienteTab, setClienteTab] = useState<ClienteTab>("basicos");
   const [allData, setAllData] = useState(data);
   const [modal, setModal] = useState<ModalState>(null);
   const [form, setForm] = useState<Cliente | null>(null);
@@ -237,17 +453,21 @@ export default function ListaClientes() {
     return allData.filter((c) => c.status === activeTab);
   }, [activeTab, allData]);
 
-  const errors = { nome: !form?.nome ? "Informe o nome do cliente." : "" };
+  const errors = {
+    nome: !form?.nome ? "Informe o nome do cliente." : "",
+  };
 
   const openNew = () => {
     setForm(emptyForm());
     setShowErrors(false);
+    setClienteTab("basicos");
     setModal({ type: "new" });
   };
 
   const openEdit = (item: Cliente) => {
     setForm({ ...item });
     setShowErrors(false);
+    setClienteTab("basicos");
     setModal({ type: "edit", item });
   };
 
@@ -284,6 +504,7 @@ export default function ListaClientes() {
     setCreditoValor("");
     setTagInput("");
     setTagsList([]);
+    setClienteTab("basicos");
   };
 
   const handleSave = () => {
@@ -438,7 +659,7 @@ export default function ListaClientes() {
       pinned: true,
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
-          <WhatsAppButton telefone={row.telefone} nome={row.nome} />
+          <WhatsAppButton telefone={row.telefone || row.celular} nome={row.nome} />
           <a href="/clientePesquisa" className="hover:underline font-medium">
             {v}
           </a>
@@ -521,42 +742,112 @@ export default function ListaClientes() {
       <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           {form && (
-            <FormModal
-              title={modal?.type === "new" ? "Novo cliente" : "Editar cliente"}
-              subtitle="Preencha os dados do cliente."
-              onClose={closeModal}
-              footer={<SaveButton onClick={handleSave} />}
-            >
-              <TextField
-                label="Nome"
-                value={form.nome}
-                onChange={(v) => setForm({ ...form, nome: v })}
-                error={showErrors ? errors.nome : ""}
-              />
-              <FormRow>
-                <TextField
-                  label="Telefone"
-                  value={form.telefone}
-                  onChange={(v) => setForm({ ...form, telefone: v })}
-                  placeholder="(00) 00000-0000"
-                />
-                <TextField
-                  label="Aniversário"
-                  value={form.aniversario}
-                  onChange={(v) => setForm({ ...form, aniversario: v })}
-                  placeholder="DD/MM/AAAA"
-                />
-              </FormRow>
-              <FormRow>
-                <TextField label="Tags" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} />
-                <Dropdown
-                  label="Status"
-                  value={form.status}
-                  setValue={(v) => setForm({ ...form, status: v as StatusCliente })}
-                  options={statusOptions}
-                />
-              </FormRow>
-            </FormModal>
+            <div className="overflow-hidden rounded-[24px] bg-background shadow-2xl">
+              <div className="flex items-start justify-between border-b border-border px-8 pb-5 pt-7">
+                <div>
+                  <h2 className="text-[24px] font-semibold leading-none tracking-tight">
+                    {modal?.type === "new" ? "Novo cliente" : "Editar cliente"}
+                  </h2>
+                  <p className="mt-3 text-[14px] text-muted-foreground">Preencha os dados do cliente.</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  aria-label="Fechar"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="px-8 pt-5">
+                <div className="flex gap-8 border-b border-border">
+                  <TabButton active={clienteTab === "basicos"} onClick={() => setClienteTab("basicos")}>
+                    Dados Básicos
+                  </TabButton>
+                  <TabButton active={clienteTab === "endereco"} onClick={() => setClienteTab("endereco")}>
+                    Endereço
+                  </TabButton>
+                </div>
+              </div>
+
+              <div className="px-8 pb-8 pt-6">
+                {clienteTab === "basicos" && (
+                  <div className="space-y-4">
+                    <TextField
+                      label="Nome"
+                      value={form.nome}
+                      onChange={(v) => setForm({ ...form, nome: v })}
+                      error={showErrors ? errors.nome : ""}
+                    />
+
+                    <TextField label="CPF" value={form.cpf} onChange={(v) => setForm({ ...form, cpf: v })} />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <TextField
+                        label="Celular"
+                        value={form.celular}
+                        onChange={(v) => setForm({ ...form, celular: v })}
+                        placeholder="(00) 00000-0000"
+                      />
+                      <TextField label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <TextField
+                        label="Aniversário"
+                        value={form.aniversario}
+                        onChange={(v) => setForm({ ...form, aniversario: v })}
+                        placeholder="DD/MM/AAAA"
+                      />
+
+                      <SelectField
+                        label="Gênero"
+                        value={form.genero}
+                        onChange={(v) => setForm({ ...form, genero: v as GeneroCliente })}
+                        options={[
+                          { value: "Masculino", label: "Masculino" },
+                          { value: "Feminino", label: "Feminino" },
+                          { value: "Outro", label: "Outro" },
+                        ]}
+                      />
+                    </div>
+
+                    <TextField label="Tag" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} />
+                  </div>
+                )}
+
+                {clienteTab === "endereco" && (
+                  <div className="space-y-4">
+                    <TextField
+                      label="Endereço"
+                      value={form.endereco}
+                      onChange={(v) => setForm({ ...form, endereco: v })}
+                    />
+
+                    <TextField label="N" value={form.numero} onChange={(v) => setForm({ ...form, numero: v })} />
+
+                    <TextField
+                      label="Complemento"
+                      value={form.complemento}
+                      onChange={(v) => setForm({ ...form, complemento: v })}
+                    />
+
+                    <TextField label="Bairro" value={form.bairro} onChange={(v) => setForm({ ...form, bairro: v })} />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <TextField label="Estado" value={form.estado} onChange={(v) => setForm({ ...form, estado: v })} />
+                      <TextField label="Cidade" value={form.cidade} onChange={(v) => setForm({ ...form, cidade: v })} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-border px-8 py-4">
+                <SaveButton onClick={handleSave} />
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
