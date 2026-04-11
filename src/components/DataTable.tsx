@@ -1605,8 +1605,9 @@ export function DataTable<T extends Record<string, any>>({
                             pinnedColumns.has(col.key) &&
                               cn(
                                 "sticky left-0 z-10 transition-colors duration-150",
-                                isSelected ? "bg-muted" : "bg-card",
-                                !isSelected && "group-hover:bg-muted/30",
+                                isSelected
+                                  ? "bg-muted group-hover:bg-muted"
+                                  : "bg-card group-hover:bg-muted/30",
                               ),
                             col.align === "right" && "text-right",
                             col.align === "center" && "text-center",
