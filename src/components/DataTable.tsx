@@ -1622,8 +1622,10 @@ isSelected && "bg-[#f7f7f7]"                    >
                           key={col.key}
                           className={cn(
                             "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
-                            pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-card",
-                            col.align === "right" && "text-right",
+pinnedColumns.has(col.key) && cn(
+  "sticky left-0 z-10",
+  isSelected ? "bg-[#f7f7f7]" : "bg-card"
+)                            col.align === "right" && "text-right",
                             col.align === "center" && "text-center",
                           )}
                         >
