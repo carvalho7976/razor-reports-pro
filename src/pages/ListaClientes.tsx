@@ -757,71 +757,70 @@ export default function ListaClientes() {
                     Endereço
                   </TabButton>
                 </div>
-              </div>
 
-              <{clienteTab === "basicos" && (
-  <>
-    <TextField
-      label="Nome"
-      value={form.nome}
-      onChange={(v) => setForm({ ...form, nome: v })}
-      error={showErrors ? errors.nome : ""}
-    />
+                {clienteTab === "basicos" && (
+                  <>
+                    <TextField
+                      label="Nome"
+                      value={form.nome}
+                      onChange={(v) => setForm({ ...form, nome: v })}
+                      error={showErrors ? errors.nome : ""}
+                    />
 
-    <TextField
-      label="CPF"
-      value={form.cpf}
-      onChange={(v) => setForm({ ...form, cpf: v })}
-    />
+                    <TextField
+                      label="CPF"
+                      value={form.cpf}
+                      onChange={(v) => setForm({ ...form, cpf: v })}
+                    />
 
-    <FormRow cols={3}>
-      <TextField
-        label="Celular"
-        value={form.celular}
-        onChange={(v) => setForm({ ...form, celular: v })}
-        placeholder="(00) 00000-0000"
-      />
+                    <FormRow cols={3}>
+                      <TextField
+                        label="Celular"
+                        value={form.celular}
+                        onChange={(v) => setForm({ ...form, celular: v })}
+                        placeholder="(00) 00000-0000"
+                      />
 
-      <TextField
-        label="Email"
-        value={form.email}
-        onChange={(v) => setForm({ ...form, email: v })}
-      />
+                      <TextField
+                        label="Email"
+                        value={form.email}
+                        onChange={(v) => setForm({ ...form, email: v })}
+                      />
 
-      <TextField
-        label="Como conheceu"
-        value={form.comoConheceu}
-        onChange={(v) => setForm({ ...form, comoConheceu: v })}
-      />
-    </FormRow>
+                      <TextField
+                        label="Como conheceu"
+                        value={form.comoConheceu}
+                        onChange={(v) => setForm({ ...form, comoConheceu: v })}
+                      />
+                    </FormRow>
 
-    <FormRow cols={3}>
-      <TextField
-        label="Aniversário"
-        value={form.aniversario}
-        onChange={(v) => setForm({ ...form, aniversario: v })}
-        placeholder="DD/MM/AAAA"
-      />
+                    <FormRow cols={3}>
+                      <TextField
+                        label="Aniversário"
+                        value={form.aniversario}
+                        onChange={(v) => setForm({ ...form, aniversario: v })}
+                        placeholder="DD/MM/AAAA"
+                      />
 
-      <Dropdown
-        label="Gênero"
-        value={form.genero}
-        setValue={(v) => setForm({ ...form, genero: v as GeneroCliente })}
-        options={[
-          { value: "Masculino", label: "Masculino" },
-          { value: "Feminino", label: "Feminino" },
-          { value: "Outro", label: "Outro" },
-        ]}
-      />
+                      <Dropdown
+                        label="Gênero"
+                        value={form.genero}
+                        setValue={(v) => setForm({ ...form, genero: v as GeneroCliente })}
+                        options={[
+                          { value: "Masculino", label: "Masculino" },
+                          { value: "Feminino", label: "Feminino" },
+                          { value: "Outro", label: "Outro" },
+                        ]}
+                      />
 
-      <TextField
-        label="Tag"
-        value={form.tags}
-        onChange={(v) => setForm({ ...form, tags: v })}
-      />
-    </FormRow>
-  </>
-)}
+                      <TextField
+                        label="Tag"
+                        value={form.tags}
+                        onChange={(v) => setForm({ ...form, tags: v })}
+                      />
+                    </FormRow>
+                  </>
+                )}
 
                 {clienteTab === "endereco" && (
                   <>
