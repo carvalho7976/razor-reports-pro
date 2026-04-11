@@ -839,28 +839,6 @@ function TablePagination({
   );
 }
 
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-muted-foreground">
-          {start}–{end} de {totalItems}
-        </span>
-
-        <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
-          <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="end">
-            {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={String(size)}>
-                {size} / pág
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  );
-}
-
 export function DataTable<T extends Record<string, any>>({
   data,
   columns: initialColumns,
@@ -1607,7 +1585,9 @@ export function DataTable<T extends Record<string, any>>({
                       key={i}
                       className={cn(
                         "group border-b border-border/50 hover:bg-muted/30 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-isSelected && "bg-[#f7f7f7]"                    >
+                        isSelected && "bg-muted",
+                      )}
+                    >
                       {selectable && (
                         <td className="w-12 px-3 py-3.5">
                           <Checkbox
@@ -1622,11 +1602,12 @@ isSelected && "bg-[#f7f7f7]"                    >
                           key={col.key}
                           className={cn(
                             "px-5 py-3.5 whitespace-nowrap text-sm text-foreground",
-pinnedColumns.has(col.key) && cn(
-  "sticky left-0 z-10",
-  isSelected ? "bg-[#f7f7f7]" : "bg-card"
-  !isSelected && "group-hover:bg-muted/30"
-)                            col.align === "right" && "text-right",
+                            pinnedColumns.has(col.key) && cn(
+                              "sticky left-0 z-10",
+                              isSelected ? "bg-muted" : "bg-card",
+                              !isSelected && "group-hover:bg-muted/30",
+                            ),
+                            col.align === "right" && "text-right",
                             col.align === "center" && "text-center",
                           )}
                         >
