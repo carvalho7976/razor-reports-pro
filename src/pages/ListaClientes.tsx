@@ -402,15 +402,7 @@ const emptyForm = (): Cliente => ({
   status: "ativo",
 });
 
-function TabButton({
-  active,
-  children,
-  onClick,
-}: {
-  active: boolean;
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
+function TabButton({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -762,4 +754,205 @@ export default function ListaClientes() {
                     Dados Básicos
                   </TabButton>
                   <TabButton active={clienteTab === "endereco"} onClick={() => setClienteTab("endereco")}>
-                    End
+                    Endereço
+                  </TabButton>
+                </div>
+              </div>
+
+              <div className="px-8 pb-8 pt-6">
+                {clienteTab === "basicos" && (
+                  <>
+                    <FormRow cols={3}>
+                      <TextField
+                        label="Nome"
+                        value={form.nome}
+                        onChange={(v) => setForm({ ...form, nome: v })}
+                        error={showErrors ? errors.nome : ""}
+                      />
+
+                      <TextField label="CPF" value={form.cpf} onChange={(v) => setForm({ ...form, cpf: v })} />
+
+                      <TextField
+                        label="Celular"
+                        value={form.celular}
+                        onChange={(v) => setForm({ ...form, celular: v })}
+                        placeholder="(00) 00000-0000"
+                      />
+                    </FormRow>
+
+                    <FormRow cols={3}>
+                      <TextField label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
+
+                      <TextField
+                        label="Como conheceu"
+                        value={form.comoConheceu}
+                        onChange={(v) => setForm({ ...form, comoConheceu: v })}
+                      />
+
+                      <TextField
+                        label="Aniversário"
+                        value={form.aniversario}
+                        onChange={(v) => setForm({ ...form, aniversario: v })}
+                        placeholder="DD/MM/AAAA"
+                      />
+                    </FormRow>
+
+                    <FormRow cols={3}>
+                      <Dropdown
+                        label="Gênero"
+                        value={form.genero}
+                        setValue={(v) => setForm({ ...form, genero: v as GeneroCliente })}
+                        options={[
+                          { value: "Masculino", label: "Masculino" },
+                          { value: "Feminino", label: "Feminino" },
+                          { value: "Outro", label: "Outro" },
+                        ]}
+                      />
+
+                      <TextField label="Tag" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} />
+
+                      <div />
+                    </FormRow>
+                  </>
+                )}
+
+                {clienteTab === "endereco" && (
+                  <>
+                    <FormRow cols={3}>
+                      <TextField
+                        label="Endereço"
+                        value={form.endereco}
+                        onChange={(v) => setForm({ ...form, endereco: v })}
+                      />
+
+                      <TextField label="N" value={form.numero} onChange={(v) => setForm({ ...form, numero: v })} />
+
+                      <TextField
+                        label="Complemento"
+                        value={form.complemento}
+                        onChange={(v) => setForm({ ...form, complemento: v })}
+                      />
+                    </FormRow>
+
+                    <FormRow cols={3}>
+                      <TextField label="Bairro" value={form.bairro} onChange={(v) => setForm({ ...form, bairro: v })} />
+
+                      <TextField label="Estado" value={form.estado} onChange={(v) => setForm({ ...form, estado: v })} />
+
+                      <TextField label="Cidade" value={form.cidade} onChange={(v) => setForm({ ...form, cidade: v })} />
+                    </FormRow>
+                  </>
+                )}
+              </div>
+
+              <div className="border-t border-border px-8 py-4">
+                <SaveButton onClick={handleSave} />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={modal?.type === "delete"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <DeleteModal
+            title="Excluir cliente"
+            message={modal?.type === "delete" ? `Deseja excluir "${modal.item.nome}"?` : ""}
+            onConfirm={handleDelete}
+            onClose={closeModal}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={modal?.type === "moedas"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <FormModal
+            title="Adicionar moedas"
+            subtitle={modal?.type === "moedas" ? `Para ${modal.item.nome}` : ""}
+            onClose={closeModal}
+            footer={<SaveButton onClick={handleMoedas} />}
+          >
+            <TextField label="Quantidade de moedas" value={moedasQtd} onChange={setMoedasQtd} placeholder="0" />
+          </FormModal>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={modal?.type === "credito"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <FormModal
+            title="Adicionar crédito"
+            subtitle={modal?.type === "credito" ? `Para ${modal.item.nome}` : ""}
+            onClose={closeModal}
+            footer={<SaveButton onClick={handleCredito} />}
+          >
+            <TextField
+              label="Valor do crédito (R$)"
+              value={creditoValor}
+              onChange={setCreditoValor}
+              placeholder="0,00"
+            />
+          </FormModal>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={modal?.type === "tags"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <FormModal
+            title="Gerenciar tags"
+            subtitle={modal?.type === "tags" ? `Cliente: ${modal.item.nome}` : ""}
+            onClose={closeModal}
+            footer={<SaveButton onClick={handleSaveTags} />}
+          >
+            <div className="space-y-3">
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <TextField label="Nova tag" value={tagInput} onChange={setTagInput} placeholder="Digite uma tag" />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddTag}
+                  className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                >
+                  Adicionar
+                </button>
+              </div>
+
+              <div className="min-h-[44px] rounded-xl border border-border bg-background px-3 py-2">
+                {tagsList.length === 0 ? (
+                  <span className="text-sm text-muted-foreground">Nenhuma tag adicionada.</span>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {tagsList.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground transition hover:bg-background hover:text-destructive"
+                          aria-label={`Remover tag ${tag}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </FormModal>
+        </DialogContent>
+      </Dialog>
+
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Lista de Clientes"
+      />
+    </AppLayout>
+  );
+}
