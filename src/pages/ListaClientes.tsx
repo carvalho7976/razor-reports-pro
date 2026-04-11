@@ -22,6 +22,7 @@ interface Cliente {
   email: string;
   aniversario: string;
   genero: GeneroCliente;
+  conheceu: string;
   tags: string;
   endereco: string;
   numero: string;
@@ -45,6 +46,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "01/05/2017",
     genero: "Masculino",
+    conheceu: "",
     tags: "bloquear123",
     endereco: "",
     numero: "",
@@ -66,6 +68,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -87,6 +90,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "10/05/2025",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -108,6 +112,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -129,6 +134,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Masculino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -150,6 +156,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Masculino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -171,6 +178,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "20/01/1988",
     genero: "Masculino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -192,6 +200,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "20/03/1988",
     genero: "Masculino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -213,6 +222,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -234,6 +244,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "22/03/1988",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -255,6 +266,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -276,6 +288,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -297,6 +310,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -318,6 +332,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -339,6 +354,7 @@ const data: Cliente[] = [
     email: "",
     aniversario: "",
     genero: "Feminino",
+    conheceu: "",
     tags: "",
     endereco: "",
     numero: "",
@@ -371,7 +387,8 @@ const emptyForm = (): Cliente => ({
   email: "",
   aniversario: "",
   genero: "",
-  tags: "",
+  conheceu: "",
+    tags: "",
   endereco: "",
   numero: "",
   complemento: "",
@@ -811,16 +828,20 @@ export default function ListaClientes() {
     { value: "Outro", label: "Outro" },
   ]}
 />
- <Dropdown
-  label="Como Conheceu"
-  value={form.conheceu}
-  setValue={(v) => setForm({ ...form, conheceu: v as comoconheceu })}
-  options={[
-    { value: "Google", label: "Google" },
-    { value: "Instagram", label: "Instagram" },
-    { value: "Anúncio", label: "Anúncio" },
-  ]}
-/>
+                      <Dropdown
+                        label="Como Conheceu"
+                        value={form.conheceu}
+                        setValue={(v) => setForm({ ...form, conheceu: v })}
+                        options={[
+                          { value: "Google", label: "Google" },
+                          { value: "Instagram", label: "Instagram" },
+                          { value: "Anúncio", label: "Anúncio" },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {clienteTab === "endereco" && (
                   <div className="space-y-4">
                     <TextField
