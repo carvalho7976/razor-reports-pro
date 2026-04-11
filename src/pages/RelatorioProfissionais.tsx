@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { User, CreditCard, Hash, Package, Users, Clock, Calendar, Banknote } from "lucide-react";
+import { User, Clock, Calendar, Banknote } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -16,6 +16,9 @@ interface RelProf {
   vendaExtra: number;
   totalProdutos: number;
   totalAberto: number;
+  qtdServicos: number;
+  clientesAtendidos: number;
+  qtdProdutos: number;
 }
 
 interface ProfDetalhado {
@@ -31,99 +34,6 @@ interface ProfDetalhado {
   clientesAtendidos: number;
   qtdProdutos: number;
 }
-
-const resumidoData: RelProf[] = [
-  {
-    profissional: "Cesar",
-    funcao: "Gerente",
-    totalServicos: 895,
-    ticketMedio: 55.94,
-    tempoTrabalhado: "575 min",
-    totalProdutos: 0,
-    vendaExtra: 80,
-    totalAberto: 641.25,
-  },
-  {
-    profissional: "Claudia",
-    funcao: "Profissional",
-    totalServicos: 922,
-    ticketMedio: 46.1,
-    tempoTrabalhado: "990 min",
-    totalProdutos: 920.6,
-    vendaExtra: 200,
-    totalAberto: 448.55,
-  },
-  {
-    profissional: "Fila de espera",
-    funcao: "Recepção",
-    totalServicos: 0,
-    ticketMedio: 0,
-    tempoTrabalhado: "0 min",
-    totalProdutos: 0,
-    vendaExtra: 0,
-    totalAberto: 0,
-  },
-  {
-    profissional: "Henrique",
-    funcao: "Recepção",
-    totalServicos: 0,
-    ticketMedio: 0,
-    tempoTrabalhado: "0 min",
-    totalProdutos: 0,
-    vendaExtra: 0,
-    totalAberto: 0,
-  },
-  {
-    profissional: "Lara",
-    funcao: "Frizzar",
-    totalServicos: 0,
-    ticketMedio: 0,
-    tempoTrabalhado: "0 min",
-    totalProdutos: 0,
-    vendaExtra: 0,
-    totalAberto: 0,
-  },
-  {
-    profissional: "Marcia Silva",
-    funcao: "Assistente",
-    totalServicos: 510,
-    ticketMedio: 56.67,
-    tempoTrabalhado: "300 min",
-    totalProdutos: 0,
-    vendaExtra: 30,
-    totalAberto: 200,
-  },
-  {
-    profissional: "Matheus",
-    funcao: "Profissional",
-    totalServicos: 290,
-    ticketMedio: 48.33,
-    tempoTrabalhado: "210 min",
-    totalProdutos: 0,
-    vendaExtra: 0,
-    totalAberto: 330,
-  },
-  {
-    profissional: "Ramon",
-    funcao: "Caixa",
-    totalServicos: 0,
-    ticketMedio: 0,
-    tempoTrabalhado: "0 min",
-    totalProdutos: 0,
-    vendaExtra: 0,
-    totalAberto: 0,
-  },
-  {
-    profissional: "Vini",
-    funcao: "Auxiliar",
-    totalServicos: 0,
-    ticketMedio: 0,
-    tempoTrabalhado: "0 min",
-    totalProdutos: 0,
-    vendaExtra: 0,
-    totalAberto: 360.72,
-  },
-];
 
 const detalhadoData: ProfDetalhado[] = [
   {
@@ -193,6 +103,142 @@ const detalhadoData: ProfDetalhado[] = [
   },
 ];
 
+const resumoDetalhadoPorProfissional = detalhadoData.reduce<
+  Record<string, { qtdServicos: number; clientesAtendidos: number; qtdProdutos: number }>
+>((acc, item) => {
+  const nome = item.profissional;
+
+  if (!acc[nome]) {
+    acc[nome] = {
+      qtdServicos: item.qtdServicos,
+      clientesAtendidos: item.clientesAtendidos,
+      qtdProdutos: item.qtdProdutos,
+    };
+  }
+
+  return acc;
+}, {});
+
+const resumidoData: RelProf[] = [
+  {
+    profissional: "Cesar",
+    funcao: "Gerente",
+    totalServicos: 895,
+    ticketMedio: 55.94,
+    tempoTrabalhado: "575 min",
+    totalProdutos: 0,
+    vendaExtra: 80,
+    totalAberto: 641.25,
+    qtdServicos: resumoDetalhadoPorProfissional["Cesar"]?.qtdServicos ?? 0,
+    clientesAtendidos: resumoDetalhadoPorProfissional["Cesar"]?.clientesAtendidos ?? 0,
+    qtdProdutos: resumoDetalhadoPorProfissional["Cesar"]?.qtdProdutos ?? 0,
+  },
+  {
+    profissional: "Claudia",
+    funcao: "Profissional",
+    totalServicos: 922,
+    ticketMedio: 46.1,
+    tempoTrabalhado: "990 min",
+    totalProdutos: 920.6,
+    vendaExtra: 200,
+    totalAberto: 448.55,
+    qtdServicos: resumoDetalhadoPorProfissional["Claudia"]?.qtdServicos ?? 0,
+    clientesAtendidos: resumoDetalhadoPorProfissional["Claudia"]?.clientesAtendidos ?? 0,
+    qtdProdutos: resumoDetalhadoPorProfissional["Claudia"]?.qtdProdutos ?? 0,
+  },
+  {
+    profissional: "Fila de espera",
+    funcao: "Recepção",
+    totalServicos: 0,
+    ticketMedio: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+    qtdServicos: 0,
+    clientesAtendidos: 0,
+    qtdProdutos: 0,
+  },
+  {
+    profissional: "Henrique",
+    funcao: "Recepção",
+    totalServicos: 0,
+    ticketMedio: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+    qtdServicos: 0,
+    clientesAtendidos: 0,
+    qtdProdutos: 0,
+  },
+  {
+    profissional: "Lara",
+    funcao: "Frizzar",
+    totalServicos: 0,
+    ticketMedio: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+    qtdServicos: 0,
+    clientesAtendidos: 0,
+    qtdProdutos: 0,
+  },
+  {
+    profissional: "Marcia Silva",
+    funcao: "Assistente",
+    totalServicos: 510,
+    ticketMedio: 56.67,
+    tempoTrabalhado: "300 min",
+    totalProdutos: 0,
+    vendaExtra: 30,
+    totalAberto: 200,
+    qtdServicos: resumoDetalhadoPorProfissional["Marcia Silva"]?.qtdServicos ?? 0,
+    clientesAtendidos: resumoDetalhadoPorProfissional["Marcia Silva"]?.clientesAtendidos ?? 0,
+    qtdProdutos: resumoDetalhadoPorProfissional["Marcia Silva"]?.qtdProdutos ?? 0,
+  },
+  {
+    profissional: "Matheus",
+    funcao: "Profissional",
+    totalServicos: 290,
+    ticketMedio: 48.33,
+    tempoTrabalhado: "210 min",
+    totalProdutos: 0,
+    vendaExtra: 0,
+    totalAberto: 330,
+    qtdServicos: resumoDetalhadoPorProfissional["Matheus"]?.qtdServicos ?? 0,
+    clientesAtendidos: resumoDetalhadoPorProfissional["Matheus"]?.clientesAtendidos ?? 0,
+    qtdProdutos: resumoDetalhadoPorProfissional["Matheus"]?.qtdProdutos ?? 0,
+  },
+  {
+    profissional: "Ramon",
+    funcao: "Caixa",
+    totalServicos: 0,
+    ticketMedio: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    vendaExtra: 0,
+    totalAberto: 0,
+    qtdServicos: 0,
+    clientesAtendidos: 0,
+    qtdProdutos: 0,
+  },
+  {
+    profissional: "Vini",
+    funcao: "Auxiliar",
+    totalServicos: 0,
+    ticketMedio: 0,
+    tempoTrabalhado: "0 min",
+    totalProdutos: 0,
+    vendaExtra: 0,
+    totalAberto: 360.72,
+    qtdServicos: 0,
+    clientesAtendidos: 0,
+    qtdProdutos: 0,
+  },
+];
+
 export default function RelatorioProfissionais() {
   const [tab, setTab] = useState("resumido");
   const [aulaOpen, setAulaOpen] = useState(false);
@@ -202,19 +248,14 @@ export default function RelatorioProfissionais() {
   const totalProdutos = resumidoData.reduce((s, r) => s + r.totalProdutos, 0);
   const totalAberto = resumidoData.reduce((s, r) => s + r.totalAberto, 0);
 
-  const totalQtdServicos = detalhadoData.reduce((s, r) => s + r.qtdServicos, 0);
-  const totalQtdProdutos = detalhadoData.reduce((s, r) => s + r.qtdProdutos, 0);
-  const totalClientesAtendidos = detalhadoData.reduce((s, r) => s + r.clientesAtendidos, 0);
   const formatTempo = (min: number) => {
     const h = Math.floor(min / 60);
     const m = min % 60;
     return `${h}h ${m}min`;
   };
+
   const totalTempoMin = resumidoData.reduce((s, r) => s + parseInt(r.tempoTrabalhado), 0);
-
-  // exemplo: 8h por dia * 60 = 480 min (ajusta se quiser)
   const capacidadeTotalMin = resumidoData.length * 480;
-
   const taxaOcupacao = capacidadeTotalMin > 0 ? (totalTempoMin / capacidadeTotalMin) * 100 : 0;
 
   const summaryCards: SummaryCard[] = [
@@ -257,11 +298,9 @@ export default function RelatorioProfissionais() {
         </div>
       ),
     },
-
     { key: "qtdServicos", label: "Serviços", align: "center" },
     { key: "qtdProdutos", label: "Produtos", align: "center" },
     { key: "clientesAtendidos", label: "Clientes Atendidos", align: "center" },
-
     { key: "totalServicos", label: "Vendas para Avulsos", align: "right", render: (v) => R$(v) },
     { key: "tempoTrabalhado", label: "Tempo Trabalhado", align: "center" },
     {
