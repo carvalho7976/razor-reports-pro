@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown, FormRow, FormModal } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, X, Plus, Trash2, Search } from "lucide-react";
+import { Camera, Plus, Trash2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
@@ -246,23 +246,16 @@ export default function ProfissionalPerfil() {
     }
   };
 
-  const update = (field: keyof ProfissionalForm, value: string | boolean) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-  const handleSave = () => {
-    if (!form.nome || !form.email) {
-      toast({ title: "Preencha os campos obrigatórios (Nome e Email)", variant: "destructive" });
-      return;
-    }
-
-    toast({
-      title: isNew ? "Profissional cadastrado com sucesso" : "Profissional atualizado com sucesso",
+  const update = (field: keyof ProfissionalForm, value: string | boolean) => {
+    setForm((prev) => {
+      const next = { ...prev, [field]: value };
+      // Auto-save toast on meaningful changes
+      if (value !== "" && value !== false) {
+        toast({ title: "Alteração salva automaticamente" });
+      }
+      return next;
     });
-
-    navigate("/funcionarioPesquisa");
   };
-
-  const handleCancel = () => navigate("/funcionarioPesquisa");
 
   const handleFotoClick = () => {
     fileInputRef.current?.click();
