@@ -4,13 +4,13 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function AppHeaderBar() {
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-header px-3 text-header-foreground sm:px-4">
+    <header className="flex h-12 shrink-0 items-center justify-between bg-white px-3 text-foreground sm:px-4">
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="hover:bg-header-foreground/10 hover:text-header-foreground" />
+        <SidebarTrigger className="hover:bg-black/5 hover:text-foreground" />
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <button className="btn-action hidden border border-header-foreground/20 bg-transparent py-1.5 text-xs text-header-foreground hover:bg-header-foreground/10 sm:inline-flex">
+        <button className="btn-action hidden border border-border bg-transparent py-1.5 text-xs text-foreground hover:bg-black/5 sm:inline-flex">
           <Heart className="h-3.5 w-3.5" />
           <span className="hidden lg:inline">Indicar amigo</span>
         </button>
@@ -28,7 +28,7 @@ export function AppHeaderBar() {
         <div className="ml-1 flex items-center gap-2 sm:ml-2">
           <ThemeToggle />
 
-          <button className="relative rounded p-1.5 hover:bg-header-foreground/10">
+          <button className="relative rounded p-1.5 hover:bg-black/5">
             <Bell className="h-4 w-4" />
             <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
               3
