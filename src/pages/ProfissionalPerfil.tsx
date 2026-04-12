@@ -170,6 +170,7 @@ export default function ProfissionalPerfil() {
     nivelAcesso: profFuncao,
   }));
 
+  const [activeTab, setActiveTab] = useState("basicos");
   const [expedienteOpen, setExpedienteOpen] = useState(false);
   const [expediente, setExpediente] = useState<ExpedienteState>(defaultExpediente);
 
