@@ -1,10 +1,33 @@
-import { useLocation, Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
-  Settings, CalendarDays, MessageCircle, Bot, User, Users,
-  Scissors, Package, Wallet, BarChart3, Star, ChevronLeft, ChevronRight, X,
+  Settings,
+  CalendarDays,
+  MessageCircle,
+  Bot,
+  User,
+  Users,
+  Scissors,
+  Package,
+  Wallet,
+  BarChart3,
+  Star,
+  LogOut,
+  Sparkles,
+  ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuBadge,
+  SidebarSeparator,
+  useSidebar,
+} from "@/components/ui/sidebar";
 
 const navItems = [
   { icon: Settings, label: "Configurações", path: "/configuracoes" },
@@ -20,68 +43,112 @@ const navItems = [
   { icon: Star, label: "Favoritos", path: "/favoritos" },
 ];
 
-interface AppSidebarProps {
-  onClose?: () => void;
-}
-
-export function AppSidebar({ onClose }: AppSidebarProps) {
+export function AppSidebar() {
   const location = useLocation();
-  const [expanded, setExpanded] = useState(false);
+  const { state } = useSidebar();
 
-  // On mobile the sidebar is always shown expanded (full labels)
-  const showLabels = expanded;
+  const collapsed = state === "collapsed";
 
   return (
-    <aside
-      className={cn(
-        "bg-sidebar flex flex-col border-r border-sidebar-border h-full transition-all duration-200 shrink-0",
-        "w-56 md:w-14",
-        expanded && "md:w-48"
-      )}
-    >
-      {/* Mobile close button */}
-      <div className="flex items-center justify-between p-3 md:hidden">
-        <span className="text-sidebar-foreground text-sm font-semibold">Menu</span>
-        <button onClick={onClose} className="p-1 text-sidebar-foreground hover:text-sidebar-accent-foreground">
-          <X className="h-5 w-5" />
-        </button>
-      </div>
+    <Sidebar collapsible="icon" variant="sidebar">
+      <SidebarHeader className="px-3 py-3">
+        <Link
+          to="/"
+          className={cn(
+            "flex items-center gap-3 rounded-lg border border-sidebar-border bg-sidebar-accent/40 px-3 py-3 transition-colors hover:bg-sidebar-accent",
+            collapsed && "justify-center px-2",
+          )}
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Scissors className="h-4 w-4" />
+          </div>
 
-      <div className="flex-1 flex flex-col gap-1 py-3 px-1.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const active = location.pathname === item.path ||
-            location.pathname.startsWith(item.path + "/");
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              title={item.label}
-              onClick={onClose}
-              className={cn(
-                "relative flex items-center gap-3 rounded-md p-2.5 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                active && "bg-sidebar-accent text-sidebar-primary"
-              )}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {/* Always show on mobile, conditional on desktop */}
-              <span className={cn("text-sm truncate", !showLabels && "md:hidden")}>
-                {item.label}
-              </span>
-              {item.badge && (
-                <span className="absolute -top-0.5 -right-0.5 bg-sidebar-primary text-sidebar-primary-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                  {item.badge}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="p-2.5 text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors border-t border-sidebar-border hidden md:flex justify-center"
-      >
-        {expanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-      </button>
-    </aside>
+          {!collapsed && (
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-sidebar-foreground">
+                BARBER<span className="text-primary">PRO</span>
+              </p>
+              <p className="truncate text-[11px] text-sidebar-foreground/65">Painel de gestão</p>
+            </div>
+          )}
+        </Link>
+
+        {!collapsed && (
+          <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/30 px-3 py-2">
+            <div className="flex items-center gap-2 text-xs text-sidebar-foreground/75">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <span className="font-medium">Acesso rápido aos módulos</span>
+            </div>
+          </div>
+        )}
+      </SidebarHeader>
+
+      <SidebarSeparator />
+
+      <SidebarContent className="px-2 py-2">
+        <SidebarMenu>
+          {navItems.map((item) => {
+            const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+
+            return (
+              <SidebarMenuItem key={item.path}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={active}
+                  tooltip={item.label}
+                  className={cn("h-10 rounded-lg", active && "font-semibold")}
+                >
+                  <Link to={item.path}>
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+
+                {item.badge ? (
+                  <SidebarMenuBadge className="bg-primary text-primary-foreground">{item.badge}</SidebarMenuBadge>
+                ) : null}
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarContent>
+
+      <SidebarSeparator />
+
+      <SidebarFooter className="px-2 py-3">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Sair" className="h-10 rounded-lg text-sidebar-foreground/85">
+              <button type="button">
+                <LogOut className="h-4 w-4 shrink-0" />
+                <span>Sair</span>
+              </button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {!collapsed && (
+            <div className="mt-2 rounded-lg border border-sidebar-border bg-sidebar-accent/30 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-sidebar-foreground">Lara Pereira</p>
+                  <p className="truncate text-[11px] text-sidebar-foreground/65">Administradora</p>
+                </div>
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
+                  LP
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="mt-3 inline-flex w-full items-center justify-between rounded-md border border-sidebar-border px-2.5 py-2 text-xs font-medium text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent"
+              >
+                Minha conta
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
