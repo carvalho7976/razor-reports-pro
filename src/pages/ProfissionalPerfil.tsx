@@ -358,7 +358,10 @@ export default function ProfissionalPerfil() {
                     <button className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]">
                       Configurar serviços
                     </button>
-                    <button className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]">
+                    <button
+                      onClick={() => setExpedienteOpen(true)}
+                      className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
+                    >
                       Configurar expediente
                     </button>
                   </div>
