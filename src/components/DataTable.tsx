@@ -353,7 +353,7 @@ function SearchWithFilter<T>({
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
-  const filterableCols = columns.filter((c) => c.filterable !== false);
+  const filterableCols = columns.filter((c) => c.filterable !== false && c.key !== "acoes");
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -501,8 +501,8 @@ function ColumnManager<T>({
   }, []);
 
   const orderedColumns = useMemo(() => {
-    const map = new Map(initialColumns.map((c) => [c.key, c]));
-    return columnOrder.map((k) => map.get(k)!).filter(Boolean);
+    const map = new Map(initialColumns.filter((c) => c.key !== "acoes").map((c) => [c.key, c]));
+    return columnOrder.filter((k) => k !== "acoes").map((k) => map.get(k)!).filter(Boolean);
   }, [initialColumns, columnOrder]);
 
   const handleDragStart = (idx: number) => setDragIdx(idx);
@@ -690,7 +690,7 @@ interface SortEntry {
 function parseDateBR(dateStr: string): Date | null {
   if (!dateStr) return null;
   const clean = dateStr.trim();
-  const formats = ["dd/MM/yyyy HH:mm", "dd/MM/yyyy"];
+  const formats = ["dd/MM/yyyy HH:mm", "dd/MM/yyyy HH:mm:ss", "dd/MM/yyyy"];
 
   for (const fmt of formats) {
     try {
@@ -701,6 +701,11 @@ function parseDateBR(dateStr: string): Date | null {
     }
   }
   return null;
+}
+
+function parseDateBRToTimestamp(dateStr: string): number {
+  const d = parseDateBR(dateStr);
+  return d ? d.getTime() : 0;
 }
 
 const tabColorMap: Record<string, string> = {
@@ -971,6 +976,9 @@ export function DataTable<T extends Record<string, any>>({
     return initialColumns
       .filter((c) => !hiddenColumns.has(c.key))
       .sort((a, b) => {
+        // "acoes" column always last
+        if (a.key === "acoes") return 1;
+        if (b.key === "acoes") return -1;
         const pinDiff = (pinnedColumns.has(a.key) ? 0 : 1) - (pinnedColumns.has(b.key) ? 0 : 1);
         if (pinDiff !== 0) return pinDiff;
         return (orderMap.get(a.key) ?? 999) - (orderMap.get(b.key) ?? 999);
@@ -1119,8 +1127,18 @@ export function DataTable<T extends Record<string, any>>({
       result.sort((a, b) => {
         for (const { key, dir } of sortEntries) {
           const col = columns.find((c) => c.key === key);
-          const aVal = col?.sortValue ? col.sortValue(a) : a[key];
-          const bVal = col?.sortValue ? col.sortValue(b) : b[key];
+          let aVal = col?.sortValue ? col.sortValue(a) : a[key];
+          let bVal = col?.sortValue ? col.sortValue(b) : b[key];
+
+          // Auto-detect date fields and parse for proper sorting
+          if (!col?.sortValue && typeof aVal === "string" && typeof bVal === "string") {
+            const aDate = parseDateBRToTimestamp(aVal);
+            const bDate = parseDateBRToTimestamp(bVal);
+            if (aDate && bDate) {
+              aVal = aDate;
+              bVal = bDate;
+            }
+          }
 
           if (aVal == null && bVal == null) continue;
           if (aVal == null) return 1;
@@ -1140,6 +1158,7 @@ export function DataTable<T extends Record<string, any>>({
 
   useEffect(() => {
     setPage(0);
+    setHiddenColumns(new Set());
   }, [search, columnFilters, dateRange, datePreset, activeTab, internalPageSize]);
 
   const totalPages = Math.max(1, Math.ceil(filteredData.length / internalPageSize));

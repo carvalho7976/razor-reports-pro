@@ -596,12 +596,32 @@ export default function ListaClientes() {
     closeModal();
   };
 
+  const summaryCards = (filtered: Cliente[]): SummaryCard[] => {
+    const totalMoedas = filtered.reduce((s, c) => s + c.moedas, 0);
+    const totalCreditos = filtered.reduce((s, c) => s + c.creditos, 0);
+    return [
+      {
+        label: "Moedas Distribuídas",
+        value: String(totalMoedas),
+        type: "quantity",
+        icon: <Coins className="h-4 w-4" />,
+        size: "compact",
+        color: "blue",
+      },
+      {
+        label: "Créditos em Aberto",
+        value: R$(totalCreditos),
+        icon: <CreditCard className="h-4 w-4" />,
+        size: "wide",
+        color: "blue",
+      },
+    ];
+  };
+
   const totalClientes = allData.length;
   const ativos = allData.filter((c) => c.status === "ativo").length;
   const semiAtivos = allData.filter((c) => c.status === "semi-ativo").length;
   const inativos = allData.filter((c) => c.status === "inativo").length;
-  const totalMoedas = allData.reduce((s, c) => s + c.moedas, 0);
-  const totalCreditos = allData.reduce((s, c) => s + c.creditos, 0);
 
   const bulkRemove = (indices: number[]) => {
     const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
@@ -649,24 +669,6 @@ export default function ListaClientes() {
     },
   ];
 
-  const summaryCards: SummaryCard[] = [
-    {
-      label: "Moedas Distribuídas",
-      value: String(totalMoedas),
-      type: "quantity",
-      icon: <Coins className="h-4 w-4" />,
-      size: "compact",
-      color: "blue",
-    },
-    {
-      label: "Créditos em Aberto",
-      value: R$(totalCreditos),
-      icon: <CreditCard className="h-4 w-4" />,
-      size: "wide",
-      color: "blue",
-    },
-  ];
-
   const columns: Column<Cliente>[] = [
     { key: "cod", label: "ID", width: "90px" },
     {
@@ -676,7 +678,7 @@ export default function ListaClientes() {
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
           <WhatsAppButton telefone={row.telefone || row.celular} nome={row.nome} />
-          <a href="/clientePesquisa" className="hover:underline font-medium">
+          <a href="/clientePesquisa" className="hover:underline font-medium text-foreground">
             {v}
           </a>
         </div>

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown, FormRow, FormModal } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, X, Plus, Trash2, Search } from "lucide-react";
+import { Camera, Plus, Trash2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
@@ -201,6 +201,7 @@ export default function ProfissionalPerfil() {
   const [servicosAdicionados, setServicosAdicionados] = useState<ServicoAdicionado[]>([]);
   const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
   const [servicosDropdownOpen, setServicosDropdownOpen] = useState(false);
+  const [servicosPendentes, setServicosPendentes] = useState<number[]>([]);
   const servicosDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const updateDia = (key: string, field: keyof DiaExpediente, value: string | boolean) =>
@@ -210,9 +211,20 @@ export default function ProfissionalPerfil() {
     .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
     .filter((s) => s.nome.toLowerCase().includes(servicoBusca.toLowerCase()));
 
-  const handleAdicionarServico = (servico: ServicoDisponivel) => {
-    if (servicosAdicionados.some((s) => s.id === servico.id)) return;
-    setServicosAdicionados((prev) => [...prev, { ...servico, comissao: "" }]);
+  const toggleServicoPendente = (id: number) => {
+    setServicosPendentes((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleAdicionarSelecionados = () => {
+    const novos = servicosDisponiveis
+      .filter((s) => servicosPendentes.includes(s.id) && !servicosAdicionados.some((a) => a.id === s.id))
+      .map((s) => ({ ...s, comissao: "" }));
+    setServicosAdicionados((prev) => [...prev, ...novos]);
+    setServicosPendentes([]);
+    setServicosDropdownOpen(false);
+    setServicoBusca("");
   };
 
   const handleAdicionarTodos = () => {
@@ -220,6 +232,7 @@ export default function ProfissionalPerfil() {
       .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
       .map((s) => ({ ...s, comissao: "" }));
     setServicosAdicionados((prev) => [...prev, ...novos]);
+    setServicosPendentes([]);
     setServicosDropdownOpen(false);
     setServicoBusca("");
   };
@@ -246,23 +259,16 @@ export default function ProfissionalPerfil() {
     }
   };
 
-  const update = (field: keyof ProfissionalForm, value: string | boolean) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-  const handleSave = () => {
-    if (!form.nome || !form.email) {
-      toast({ title: "Preencha os campos obrigatórios (Nome e Email)", variant: "destructive" });
-      return;
-    }
-
-    toast({
-      title: isNew ? "Profissional cadastrado com sucesso" : "Profissional atualizado com sucesso",
+  const update = (field: keyof ProfissionalForm, value: string | boolean) => {
+    setForm((prev) => {
+      const next = { ...prev, [field]: value };
+      // Auto-save toast on meaningful changes
+      if (value !== "" && value !== false) {
+        toast({ title: "Alteração salva automaticamente" });
+      }
+      return next;
     });
-
-    navigate("/funcionarioPesquisa");
   };
-
-  const handleCancel = () => navigate("/funcionarioPesquisa");
 
   const handleFotoClick = () => {
     fileInputRef.current?.click();
@@ -312,22 +318,6 @@ export default function ProfissionalPerfil() {
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={handleSave}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-[hsl(var(--success))] px-5 text-sm font-semibold text-[hsl(var(--success-foreground))] transition hover:opacity-90 active:scale-[0.98]"
-              >
-                <Save className="h-4 w-4" />
-                Salvar
-              </button>
-              <button
-                onClick={handleCancel}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-destructive px-5 text-sm font-semibold text-destructive-foreground transition hover:opacity-90 active:scale-[0.98]"
-              >
-                <X className="h-4 w-4" />
-                Cancelar
-              </button>
-            </div>
           </div>
         </div>
 
@@ -362,11 +352,8 @@ export default function ProfissionalPerfil() {
                   <TextField label="Nome *" value={form.nome} onChange={(v) => update("nome", v)} />
                 </div>
 
-                <div className="max-w-xl">
+                <div className="max-w-xl grid grid-cols-2 gap-4">
                   <TextField label="Email *" value={form.email} onChange={(v) => update("email", v)} />
-                </div>
-
-                <div className="max-w-xl">
                   <TextField
                     label="Celular"
                     value={form.celular}
@@ -409,11 +396,10 @@ export default function ProfissionalPerfil() {
                       },
                     ].map((item) => (
                       <label key={item.field} className="flex cursor-pointer select-none items-center gap-3">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={form[item.field] as boolean}
-                          onChange={(e) => update(item.field, e.target.checked)}
-                          className="h-4 w-4 rounded border-border text-foreground accent-foreground"
+                          onCheckedChange={(v) => update(item.field, !!v)}
+                          className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
                         />
                         <span className="text-sm text-foreground">{item.label}</span>
                       </label>
@@ -486,11 +472,10 @@ export default function ProfissionalPerfil() {
 
               <div className="mt-4 grid gap-4 max-w-xl">
                 <label className="flex cursor-pointer select-none items-center gap-3">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={form.parceiro}
-                    onChange={(e) => update("parceiro", e.target.checked)}
-                    className="h-4 w-4 rounded border-border text-foreground accent-foreground"
+                    onCheckedChange={(v) => update("parceiro", !!v)}
+                    className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
                   />
                   <span className="text-sm font-medium text-foreground">Profissional parceiro</span>
                 </label>
@@ -510,7 +495,7 @@ export default function ProfissionalPerfil() {
 
       {/* Modal Expediente */}
       <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
-        <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden">
+        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <h2 className="text-base font-semibold text-foreground">Expediente de trabalho</h2>
           </div>
@@ -520,7 +505,7 @@ export default function ProfissionalPerfil() {
               const d = expediente[dia.key];
               return (
                 <div key={dia.key} className="px-5 py-3">
-                  <div className="flex items-center gap-3 mb-1">
+                  <div className="flex items-center gap-3 mb-2">
                     <span className="w-10 text-sm font-semibold text-foreground">{dia.label}</span>
                     <Switch
                       checked={d.ativo}
@@ -529,37 +514,37 @@ export default function ProfissionalPerfil() {
                   </div>
 
                   {d.ativo && (
-                    <div className="ml-[52px] grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                    <div className="ml-[52px] flex flex-wrap gap-x-8 gap-y-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground w-16">Trabalho:</span>
+                        <span className="text-muted-foreground text-xs font-medium shrink-0">Trabalho:</span>
                         <input
                           type="time"
                           value={d.trabalhoInicio}
                           onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
-                        <span className="text-muted-foreground">às</span>
+                        <span className="text-muted-foreground text-xs">às</span>
                         <input
                           type="time"
                           value={d.trabalhoFim}
                           onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground w-16">Almoço:</span>
+                        <span className="text-muted-foreground text-xs font-medium shrink-0">Almoço:</span>
                         <input
                           type="time"
                           value={d.almocoInicio}
                           onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
-                        <span className="text-muted-foreground">às</span>
+                        <span className="text-muted-foreground text-xs">às</span>
                         <input
                           type="time"
                           value={d.almocoFim}
                           onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
                       </div>
                     </div>
@@ -574,7 +559,7 @@ export default function ProfissionalPerfil() {
               onClick={() => setExpedienteOpen(false)}
               className="inline-flex h-9 items-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
             >
-              Fechar
+              Salvar
             </button>
           </div>
         </DialogContent>
@@ -636,14 +621,13 @@ export default function ProfissionalPerfil() {
                         <button
                           key={s.id}
                           type="button"
-                          onClick={() => {
-                            handleAdicionarServico(s);
-                            setServicosDropdownOpen(false);
-                            setServicoBusca("");
-                          }}
+                          onClick={() => toggleServicoPendente(s.id)}
                           className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
                         >
-                          <Checkbox checked={false} className="pointer-events-none" />
+                          <Checkbox
+                            checked={servicosPendentes.includes(s.id)}
+                            className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                          />
                           <span>{s.nome}</span>
                         </button>
                       ))}
@@ -656,16 +640,11 @@ export default function ProfissionalPerfil() {
               </div>
 
               <button
-                onClick={() => {
-                  if (servicosDispFiltrados.length === 1) {
-                    handleAdicionarServico(servicosDispFiltrados[0]);
-                  }
-                  setServicosDropdownOpen(true);
-                }}
+                onClick={handleAdicionarSelecionados}
                 className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-foreground bg-background px-4 text-sm font-semibold text-foreground transition hover:bg-muted active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" />
-                Adicionar
+                Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
               </button>
             </div>
 
