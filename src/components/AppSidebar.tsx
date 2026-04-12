@@ -124,7 +124,13 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className={cn("border-none bg-transparent p-2", collapsed ? "w-[92px]" : "w-[272px]")}
+      className="border-none bg-transparent p-2"
+      style={
+        {
+          "--sidebar-width": "272px",
+          "--sidebar-width-icon": "72px",
+        } as React.CSSProperties
+      }
     >
       <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
         <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
