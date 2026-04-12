@@ -121,7 +121,7 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      variant="floating"
+      variant="sidebar"
       className={cn("border-none bg-transparent p-2", collapsed ? "w-[86px]" : "w-[272px]")}
     >
       <div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
