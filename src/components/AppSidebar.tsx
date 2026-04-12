@@ -1,47 +1,126 @@
 import { Link, useLocation } from "react-router-dom";
 import {
-  Settings,
   CalendarDays,
   MessageCircle,
-  Bot,
-  User,
+  Wallet,
   Users,
+  User,
   Scissors,
   Package,
-  Wallet,
   BarChart3,
   Star,
-  LogOut,
-  Sparkles,
+  Bot,
+  Settings,
+  GraduationCap,
+  BookOpen,
+  Crown,
+  ShoppingBag,
   ChevronRight,
+  LogOut,
+  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Sidebar,
   SidebarContent,
-  SidebarHeader,
   SidebarFooter,
+  SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuBadge,
-  SidebarSeparator,
+  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const navItems = [
-  { icon: Settings, label: "Configurações", path: "/configuracoes" },
-  { icon: CalendarDays, label: "Agenda", path: "/agenda" },
-  { icon: MessageCircle, label: "Chat", path: "/chat", badge: 1 },
-  { icon: Bot, label: "Automação", path: "/automacao" },
-  { icon: User, label: "Clientes", path: "/clientePesquisa" },
-  { icon: Users, label: "Equipe", path: "/funcionarioPesquisa" },
-  { icon: Scissors, label: "Serviços", path: "/servicos" },
-  { icon: Package, label: "Produtos", path: "/produtos" },
-  { icon: Wallet, label: "Financeiro", path: "/contasPesquisa" },
-  { icon: BarChart3, label: "Relatórios", path: "/relatorioDesempenhoFuncionario" },
-  { icon: Star, label: "Favoritos", path: "/favoritos" },
+type NavItem = {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  path: string;
+  badge?: number;
+};
+
+type NavGroup = {
+  title?: string;
+  items: NavItem[];
+};
+
+const navGroups: NavGroup[] = [
+  {
+    items: [
+      { icon: CalendarDays, label: "Agenda", path: "/agenda" },
+      { icon: MessageCircle, label: "Marketing", path: "/chat", badge: 1 },
+      { icon: Wallet, label: "Financeiro", path: "/contasPesquisa" },
+    ],
+  },
+  {
+    title: "Seu negócio",
+    items: [
+      { icon: User, label: "Clientes", path: "/clientePesquisa" },
+      { icon: Users, label: "Profissionais", path: "/funcionarioPesquisa" },
+      { icon: Scissors, label: "Serviços", path: "/servicos" },
+      { icon: Package, label: "Produtos", path: "/produtos" },
+    ],
+  },
+  {
+    title: "Desenvolvimento",
+    items: [
+      { icon: GraduationCap, label: "Treinamentos", path: "/treinamentos" },
+      { icon: BookOpen, label: "Academy", path: "/academy" },
+    ],
+  },
+  {
+    title: "Facilitadores",
+    items: [
+      { icon: ShoppingBag, label: "Frizzar Pack", path: "/frizzar-pack" },
+      { icon: Crown, label: "Planos Frizzar", path: "/planos-frizzar" },
+      { icon: Bot, label: "Automação", path: "/automacao" },
+      { icon: BarChart3, label: "Relatórios", path: "/relatorioDesempenhoFuncionario" },
+      { icon: Settings, label: "Configurações", path: "/configuracoes" },
+      { icon: Star, label: "Favoritos", path: "/favoritos" },
+    ],
+  },
 ];
+
+function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed: boolean; active: boolean }) {
+  const Icon = item.icon;
+
+  return (
+    <SidebarMenuItem className="relative">
+      {active && (
+        <span
+          className={cn(
+            "absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-white transition-all duration-200",
+            collapsed ? "-left-1 h-8 w-1.5" : "-left-2 h-8 w-1.5",
+          )}
+        />
+      )}
+
+      <SidebarMenuButton
+        asChild
+        isActive={active}
+        tooltip={item.label}
+        className={cn(
+          "relative h-11 rounded-xl px-3 text-sm font-medium transition-all duration-200",
+          active
+            ? "bg-white text-zinc-900 hover:bg-white hover:text-zinc-900"
+            : "text-sidebar-foreground/85 hover:bg-white/8 hover:text-white",
+          collapsed && "justify-center px-0",
+        )}
+      >
+        <Link to={item.path}>
+          <Icon className={cn("h-4 w-4 shrink-0", active ? "text-zinc-900" : "text-current")} />
+          {!collapsed && <span>{item.label}</span>}
+        </Link>
+      </SidebarMenuButton>
+
+      {!collapsed && item.badge ? (
+        <span className="absolute right-3 top-1/2 flex h-5 min-w-5 -translate-y-1/2 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+          {item.badge}
+        </span>
+      ) : null}
+    </SidebarMenuItem>
+  );
+}
 
 export function AppSidebar() {
   const location = useLocation();
@@ -50,105 +129,97 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar collapsible="icon" variant="sidebar">
-      <SidebarHeader className="px-3 py-3">
-        <Link
-          to="/"
-          className={cn(
-            "flex items-center gap-3 rounded-lg border border-sidebar-border bg-sidebar-accent/40 px-3 py-3 transition-colors hover:bg-sidebar-accent",
-            collapsed && "justify-center px-2",
-          )}
-        >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Scissors className="h-4 w-4" />
-          </div>
-
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-sidebar-foreground">
-                BARBER<span className="text-primary">PRO</span>
-              </p>
-              <p className="truncate text-[11px] text-sidebar-foreground/65">Painel de gestão</p>
+    <Sidebar
+      collapsible="icon"
+      variant="floating"
+      className={cn("border-none bg-transparent p-2", collapsed ? "w-[88px]" : "w-[280px]")}
+    >
+      <div className="flex h-full w-full flex-col overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#191a27_0%,#171827_35%,#11131f_100%)] text-white shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+        <SidebarHeader className={cn("px-4 pt-4 pb-3", collapsed && "px-3")}>
+          <Link
+            to="/"
+            className={cn(
+              "flex items-center gap-3 rounded-xl transition-colors",
+              collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
+            )}
+          >
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white">
+              <Scissors className="h-5 w-5" />
             </div>
-          )}
-        </Link>
 
-        {!collapsed && (
-          <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/30 px-3 py-2">
-            <div className="flex items-center gap-2 text-xs text-sidebar-foreground/75">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span className="font-medium">Acesso rápido aos módulos</span>
-            </div>
-          </div>
-        )}
-      </SidebarHeader>
-
-      <SidebarSeparator />
-
-      <SidebarContent className="px-2 py-2">
-        <SidebarMenu>
-          {navItems.map((item) => {
-            const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
-
-            return (
-              <SidebarMenuItem key={item.path}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={active}
-                  tooltip={item.label}
-                  className={cn("h-10 rounded-lg", active && "font-semibold")}
-                >
-                  <Link to={item.path}>
-                    <item.icon className="h-4 w-4 shrink-0" />
-                    <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-
-                {item.badge ? (
-                  <SidebarMenuBadge className="bg-primary text-primary-foreground">{item.badge}</SidebarMenuBadge>
-                ) : null}
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
-      </SidebarContent>
-
-      <SidebarSeparator />
-
-      <SidebarFooter className="px-2 py-3">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Sair" className="h-10 rounded-lg text-sidebar-foreground/85">
-              <button type="button">
-                <LogOut className="h-4 w-4 shrink-0" />
-                <span>Sair</span>
-              </button>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {!collapsed && (
-            <div className="mt-2 rounded-lg border border-sidebar-border bg-sidebar-accent/30 p-3">
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="truncate text-xs font-semibold text-sidebar-foreground">Lara Pereira</p>
-                  <p className="truncate text-[11px] text-sidebar-foreground/65">Administradora</p>
-                </div>
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
-                  LP
-                </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="truncate text-[18px] font-bold leading-none text-white">
+                  FRIZZAR<span className="text-primary">.</span>
+                </p>
+                <p className="mt-1 truncate text-[11px] text-white/55">Painel de gestão</p>
               </div>
+            )}
+          </Link>
+        </SidebarHeader>
 
-              <button
-                type="button"
-                className="mt-3 inline-flex w-full items-center justify-between rounded-md border border-sidebar-border px-2.5 py-2 text-xs font-medium text-sidebar-foreground/85 transition-colors hover:bg-sidebar-accent"
-              >
-                Minha conta
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+        <SidebarContent className={cn("px-3 pb-3", collapsed && "px-2")}>
+          {navGroups.map((group, groupIndex) => (
+            <div key={groupIndex} className="mb-4 last:mb-0">
+              {!collapsed && group.title && (
+                <div className="px-3 pb-2 pt-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.02em] text-white/28">{group.title}</p>
+                </div>
+              )}
+
+              <SidebarMenu className="gap-1.5">
+                {group.items.map((item) => {
+                  const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+
+                  return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
+                })}
+              </SidebarMenu>
             </div>
-          )}
-        </SidebarMenu>
-      </SidebarFooter>
+          ))}
+        </SidebarContent>
+
+        <SidebarFooter className={cn("mt-auto px-3 pb-3 pt-2", collapsed && "px-2")}>
+          <div className="space-y-2">
+            <div
+              className={cn(
+                "flex items-center rounded-xl bg-white/6",
+                collapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2.5",
+              )}
+            >
+              {collapsed ? (
+                <ThemeToggle />
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-sm text-white/70">
+                    <Moon className="h-4 w-4" />
+                    <span>Dark Mode</span>
+                  </div>
+                  <ThemeToggle />
+                </>
+              )}
+            </div>
+
+            <SidebarMenu className="gap-1.5">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip="Logout"
+                  className={cn(
+                    "h-11 rounded-xl text-white/70 hover:bg-white/8 hover:text-white",
+                    collapsed && "justify-center px-0",
+                  )}
+                  onClick={() => {
+                    console.log("logout");
+                  }}
+                >
+                  <LogOut className="h-4 w-4 shrink-0" />
+                  {!collapsed && <span>Logout</span>}
+                  {!collapsed && <ChevronRight className="ml-auto h-4 w-4 opacity-45" />}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </div>
+        </SidebarFooter>
+      </div>
     </Sidebar>
   );
 }
