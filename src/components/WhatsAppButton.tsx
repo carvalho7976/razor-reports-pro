@@ -6,20 +6,32 @@ import { Button } from "@/components/ui/button";
 
 const messageTemplates = [
   {
-    key: "aniversario", label: "Aniversário", icon: <Gift className="h-4 w-4" />,
-    getText: (nome: string) => `🎂 Feliz aniversário, ${nome}! A equipe Frizzar deseja um dia incrível pra você. Venha comemorar com a gente — temos uma surpresa especial esperando por você! 🎉`,
+    key: "aniversario",
+    label: "Aniversário",
+    icon: <Gift className="h-4 w-4" />,
+    getText: (nome: string) =>
+      `🎂 Feliz aniversário, ${nome}! A equipe Frizzar deseja um dia incrível pra você. Venha comemorar com a gente — temos uma surpresa especial esperando por você! 🎉`,
   },
   {
-    key: "retorno", label: "Retorno", icon: <RotateCcw className="h-4 w-4" />,
-    getText: (nome: string) => `Olá ${nome}! Faz um tempinho que não te vemos por aqui. 😊 Que tal agendar um horário? Estamos com novidades que você vai adorar! Agende já pelo nosso app ou responda essa mensagem.`,
+    key: "retorno",
+    label: "Retorno",
+    icon: <RotateCcw className="h-4 w-4" />,
+    getText: (nome: string) =>
+      `Olá ${nome}! Faz um tempinho que não te vemos por aqui. 😊 Que tal agendar um horário? Estamos com novidades que você vai adorar! Agende já pelo nosso app ou responda essa mensagem.`,
   },
   {
-    key: "lembrete", label: "Lembrete", icon: <Bell className="h-4 w-4" />,
-    getText: (nome: string) => `Oi ${nome}, tudo bem? Passando pra lembrar do seu agendamento conosco. Qualquer dúvida ou necessidade de reagendar, é só nos avisar. Até breve! ✂️`,
+    key: "lembrete",
+    label: "Lembrete",
+    icon: <Bell className="h-4 w-4" />,
+    getText: (nome: string) =>
+      `Oi ${nome}, tudo bem? Passando pra lembrar do seu agendamento conosco. Qualquer dúvida ou necessidade de reagendar, é só nos avisar. Até breve! ✂️`,
   },
   {
-    key: "indicacao", label: "Pedido de indicação", icon: <Users className="h-4 w-4" />,
-    getText: (nome: string) => `Oi ${nome}! Que bom ter você como cliente. 💈 Se tiver um amigo que curtisse conhecer nosso trabalho, indique pra gente! Vocês dois ganham condições especiais. É só compartilhar essa mensagem! 🤝`,
+    key: "indicacao",
+    label: "Pedido de indicação",
+    icon: <Users className="h-4 w-4" />,
+    getText: (nome: string) =>
+      `Oi ${nome}! Que bom ter você como cliente. 💈 Se tiver um amigo que curtisse conhecer nosso trabalho, indique pra gente! Vocês dois ganham condições especiais. É só compartilhar essa mensagem! 🤝`,
   },
 ];
 
@@ -42,7 +54,16 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
   };
 
   return (
-    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setCustomOpen(false); setCustomText(""); } }}>
+    <Popover
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) {
+          setCustomOpen(false);
+          setCustomText("");
+        }
+      }}
+    >
       <PopoverTrigger asChild>
         <button className="p-1 rounded hover:bg-success/20 transition-colors" title="Enviar mensagem WhatsApp">
           <MessageCircle className="h-4 w-4 text-success" />
@@ -56,7 +77,7 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
               <button
                 key={tpl.key}
                 onClick={() => sendWhatsApp(tpl.getText(firstName))}
-                className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm hover:bg-accent transition-colors text-left w-full"
+                className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-left w-full"
               >
                 {tpl.icon}
                 {tpl.label}
@@ -65,7 +86,7 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
             ))}
             <button
               onClick={() => setCustomOpen(true)}
-              className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm hover:bg-accent transition-colors text-left w-full"
+              className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-left w-full"
             >
               <Edit3 className="h-4 w-4" />
               Outro (personalizada)
@@ -81,7 +102,9 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
               autoFocus
             />
             <div className="flex gap-2 justify-end">
-              <Button variant="ghost" size="sm" onClick={() => setCustomOpen(false)}>Voltar</Button>
+              <Button variant="ghost" size="sm" onClick={() => setCustomOpen(false)}>
+                Voltar
+              </Button>
               <Button size="sm" disabled={!customText.trim()} onClick={() => sendWhatsApp(customText)}>
                 <MessageCircle className="h-3.5 w-3.5 mr-1" /> Enviar
               </Button>
