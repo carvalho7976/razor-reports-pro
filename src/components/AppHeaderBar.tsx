@@ -1,5 +1,4 @@
-import { Scissors, Bell, Heart, CreditCard, Grid3X3 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Bell, Heart, CreditCard, Grid3X3 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -8,13 +7,6 @@ export function AppHeaderBar() {
     <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-header px-3 text-header-foreground sm:px-4">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="hover:bg-header-foreground/10 hover:text-header-foreground" />
-
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg tracking-tight">
-          <Scissors className="h-5 w-5" />
-          <span>
-            BARBER<span className="text-primary">PRO</span>
-          </span>
-        </Link>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
