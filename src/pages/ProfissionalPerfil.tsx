@@ -565,6 +565,123 @@ export default function ProfissionalPerfil() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modal Serviços */}
+      <Dialog open={servicosOpen} onOpenChange={setServicosOpen}>
+        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <h2 className="text-base font-semibold text-foreground">Adicione os serviços que o profissional realiza</h2>
+          </div>
+
+          <div className="px-5 py-4 space-y-4">
+            {/* Selector + Add */}
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <Select value={servicoSelecionado} onValueChange={setServicoSelecionado}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Selecione os serviços" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {servicosDisponiveis
+                      .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
+                      .map((s) => (
+                        <SelectItem key={s.id} value={String(s.id)}>
+                          {s.nome}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <button
+                onClick={handleAdicionarServico}
+                disabled={!servicoSelecionado}
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-[hsl(var(--success))] px-4 text-sm font-semibold text-[hsl(var(--success-foreground))] transition hover:opacity-90 disabled:opacity-50"
+              >
+                <Plus className="h-4 w-4" />
+                Adicionar
+              </button>
+            </div>
+
+            {/* Table */}
+            <div>
+              <p className="text-sm font-medium text-center text-muted-foreground mb-2">Serviços Adicionados</p>
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-[hsl(0_0%_20%)] text-white">
+                      <th className="w-10 py-2 px-3 text-left">
+                        <Checkbox
+                          checked={servicosAdicionados.length > 0 && servicosSelecionados.length === servicosAdicionados.length}
+                          onCheckedChange={toggleTodosServicos}
+                          className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
+                        />
+                      </th>
+                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Nome</th>
+                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Preço</th>
+                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Tempo</th>
+                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Comissão</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {servicosAdicionados.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-6 text-center text-muted-foreground text-sm">
+                          Nenhum registro encontrado
+                        </td>
+                      </tr>
+                    ) : (
+                      servicosAdicionados.map((s) => (
+                        <tr key={s.id} className="border-t border-border hover:bg-muted/50 transition-colors">
+                          <td className="py-2 px-3">
+                            <Checkbox
+                              checked={servicosSelecionados.includes(s.id)}
+                              onCheckedChange={() => toggleServicoSelecionado(s.id)}
+                            />
+                          </td>
+                          <td className="py-2 px-3 text-foreground">{s.nome}</td>
+                          <td className="py-2 px-3 text-foreground">{s.preco}</td>
+                          <td className="py-2 px-3 text-foreground">{s.tempo}</td>
+                          <td className="py-2 px-3">
+                            <input
+                              type="text"
+                              value={s.comissao}
+                              onChange={(e) =>
+                                setServicosAdicionados((prev) =>
+                                  prev.map((x) => (x.id === s.id ? { ...x, comissao: e.target.value } : x))
+                                )
+                              }
+                              placeholder="Ex: 50%"
+                              className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex justify-between items-center px-5 py-3 border-t border-border">
+            <button
+              onClick={handleRemoverServicos}
+              disabled={servicosSelecionados.length === 0}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-destructive px-4 text-sm font-semibold text-destructive-foreground transition hover:opacity-90 disabled:opacity-50"
+            >
+              <Minus className="h-4 w-4" />
+              Remover
+            </button>
+            <button
+              onClick={() => setServicosOpen(false)}
+              className="inline-flex h-9 items-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
+            >
+              Fechar
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
