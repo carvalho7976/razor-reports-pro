@@ -100,7 +100,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         isActive={active}
         tooltip={item.label}
         className={cn(
-          "relative h-11 rounded-xl px-3 text-sm font-medium transition-all duration-200",
+          "relative h-10 px-3 text-sm font-medium transition-all duration-200",
+          "rounded-md",
           active
             ? "bg-white text-zinc-900 hover:bg-white hover:text-zinc-900"
             : "text-sidebar-foreground/85 hover:bg-white/8 hover:text-white",
@@ -132,18 +133,18 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       variant="floating"
-      className={cn("border-none bg-transparent p-2", collapsed ? "w-[88px]" : "w-[280px]")}
+      className={cn("border-none bg-transparent p-2", collapsed ? "w-[86px]" : "w-[272px]")}
     >
-      <div className="flex h-full w-full flex-col overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#191a27_0%,#171827_35%,#11131f_100%)] text-white shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+      <div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#191a27_0%,#171827_35%,#11131f_100%)] text-white shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
         <SidebarHeader className={cn("px-4 pt-4 pb-3", collapsed && "px-3")}>
           <Link
             to="/"
             className={cn(
-              "flex items-center gap-3 rounded-xl transition-colors",
+              "flex items-center gap-3 transition-colors",
               collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
             )}
           >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/10 text-white">
               <Scissors className="h-5 w-5" />
             </div>
 
@@ -163,7 +164,7 @@ export function AppSidebar() {
             <div key={groupIndex} className="mb-4 last:mb-0">
               {!collapsed && group.title && (
                 <div className="px-3 pb-2 pt-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.02em] text-white/28">{group.title}</p>
+                  <p className="text-[11px] font-semibold text-white/28">{group.title}</p>
                 </div>
               )}
 
@@ -182,7 +183,8 @@ export function AppSidebar() {
           <div className="space-y-2">
             <div
               className={cn(
-                "flex items-center rounded-xl bg-white/6",
+                "flex items-center bg-white/6",
+                "rounded-md",
                 collapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2.5",
               )}
             >
@@ -204,7 +206,7 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   tooltip="Logout"
                   className={cn(
-                    "h-11 rounded-xl text-white/70 hover:bg-white/8 hover:text-white",
+                    "h-10 text-white/70 hover:bg-white/8 hover:text-white rounded-md",
                     collapsed && "justify-center px-0",
                   )}
                   onClick={() => {
