@@ -1,14 +1,13 @@
 import { useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { TextField, Dropdown, FormRow } from "@/components/FormModal";
+import { TextField, Dropdown, FormRow, FormModal } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, X, Plus, Minus, Trash2 } from "lucide-react";
+import { Camera, Save, X, Plus, Trash2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ServicoDisponivel {
   id: number;
@@ -198,25 +197,40 @@ export default function ProfissionalPerfil() {
   const [expedienteOpen, setExpedienteOpen] = useState(false);
   const [expediente, setExpediente] = useState<ExpedienteState>(defaultExpediente);
   const [servicosOpen, setServicosOpen] = useState(false);
-  const [servicoSelecionado, setServicoSelecionado] = useState("");
+  const [servicoBusca, setServicoBusca] = useState("");
   const [servicosAdicionados, setServicosAdicionados] = useState<ServicoAdicionado[]>([]);
   const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
+  const [servicosDropdownOpen, setServicosDropdownOpen] = useState(false);
+  const servicosDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const updateDia = (key: string, field: keyof DiaExpediente, value: string | boolean) =>
     setExpediente((prev) => ({ ...prev, [key]: { ...prev[key], [field]: value } }));
 
-  const handleAdicionarServico = () => {
-    const id = Number(servicoSelecionado);
-    const servico = servicosDisponiveis.find((s) => s.id === id);
-    if (!servico || servicosAdicionados.some((s) => s.id === id)) return;
+  const servicosDispFiltrados = servicosDisponiveis
+    .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
+    .filter((s) => s.nome.toLowerCase().includes(servicoBusca.toLowerCase()));
+
+  const handleAdicionarServico = (servico: ServicoDisponivel) => {
+    if (servicosAdicionados.some((s) => s.id === servico.id)) return;
     setServicosAdicionados((prev) => [...prev, { ...servico, comissao: "" }]);
-    setServicoSelecionado("");
+  };
+
+  const handleAdicionarTodos = () => {
+    const novos = servicosDisponiveis
+      .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
+      .map((s) => ({ ...s, comissao: "" }));
+    setServicosAdicionados((prev) => [...prev, ...novos]);
+    setServicosDropdownOpen(false);
+    setServicoBusca("");
   };
 
   const handleRemoverServicos = () => {
     setServicosAdicionados((prev) => prev.filter((s) => !servicosSelecionados.includes(s.id)));
     setServicosSelecionados([]);
   };
+
+  const updateServico = (id: number, field: keyof ServicoAdicionado, value: string) =>
+    setServicosAdicionados((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
 
   const toggleServicoSelecionado = (id: number) => {
     setServicosSelecionados((prev) =>
@@ -567,35 +581,88 @@ export default function ProfissionalPerfil() {
       </Dialog>
 
       {/* Modal Serviços */}
-      <Dialog open={servicosOpen} onOpenChange={setServicosOpen}>
-        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <h2 className="text-base font-semibold text-foreground">Adicione os serviços que o profissional realiza</h2>
-          </div>
-
-          <div className="px-5 py-4 space-y-4">
-            {/* Selector + Add */}
-            <div className="flex items-end gap-3">
-              <div className="flex-1">
-                <Select value={servicoSelecionado} onValueChange={setServicoSelecionado}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Selecione os serviços" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {servicosDisponiveis
-                      .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
-                      .map((s) => (
-                        <SelectItem key={s.id} value={String(s.id)}>
-                          {s.nome}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+      <Dialog open={servicosOpen} onOpenChange={(open) => { setServicosOpen(open); if (!open) { setServicoBusca(""); setServicosDropdownOpen(false); } }}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden max-w-3xl">
+          <FormModal
+            title="Configurar serviços"
+            subtitle="Adicione os serviços que o profissional realiza."
+            onClose={() => { setServicosOpen(false); setServicoBusca(""); setServicosDropdownOpen(false); }}
+            size="lg"
+            footer={
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setServicosOpen(false)}
+                  className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 active:scale-[0.98]"
+                >
+                  Fechar
+                </button>
               </div>
+            }
+          >
+            {/* Selector with search */}
+            <div className="flex items-end gap-3 mb-3">
+              <div className="relative flex-1" ref={servicosDropdownRef}>
+                <label className="text-[13px] font-semibold text-foreground">Selecione os serviços</label>
+                <button
+                  type="button"
+                  onClick={() => setServicosDropdownOpen((p) => !p)}
+                  className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-card px-3 text-sm text-foreground transition-all hover:border-muted-foreground"
+                >
+                  <span className="text-muted-foreground">Buscar serviço...</span>
+                  <Search className="h-4 w-4 text-muted-foreground" />
+                </button>
+
+                {servicosDropdownOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+                    <div className="border-b border-border p-2">
+                      <input
+                        placeholder="Buscar..."
+                        value={servicoBusca}
+                        onChange={(e) => setServicoBusca(e.target.value)}
+                        className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-auto">
+                      <button
+                        type="button"
+                        onClick={handleAdicionarTodos}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted border-b border-border"
+                      >
+                        Selecionar todos
+                      </button>
+                      {servicosDispFiltrados.map((s) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => {
+                            handleAdicionarServico(s);
+                            setServicosDropdownOpen(false);
+                            setServicoBusca("");
+                          }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
+                        >
+                          <Checkbox checked={false} className="pointer-events-none" />
+                          <span>{s.nome}</span>
+                        </button>
+                      ))}
+                      {servicosDispFiltrados.length === 0 && (
+                        <p className="px-4 py-3 text-sm text-muted-foreground text-center">Nenhum serviço encontrado</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
-                onClick={handleAdicionarServico}
-                disabled={!servicoSelecionado}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-[hsl(var(--success))] px-4 text-sm font-semibold text-[hsl(var(--success-foreground))] transition hover:opacity-90 disabled:opacity-50"
+                onClick={() => {
+                  if (servicosDispFiltrados.length === 1) {
+                    handleAdicionarServico(servicosDispFiltrados[0]);
+                  }
+                  setServicosDropdownOpen(true);
+                }}
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-foreground bg-background px-4 text-sm font-semibold text-foreground transition hover:bg-muted active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" />
                 Adicionar
@@ -603,11 +670,11 @@ export default function ProfissionalPerfil() {
             </div>
 
             {/* Table */}
-            <div>
-              <p className="text-sm font-medium text-center text-muted-foreground mb-2">Serviços Adicionados</p>
-              <div className="border border-border rounded-lg overflow-hidden">
+            <p className="text-[13px] font-semibold text-center text-muted-foreground mb-2">Serviços Adicionados</p>
+            <div className="border border-border rounded-lg overflow-hidden">
+              <div className="max-h-[40vh] overflow-auto">
                 <table className="w-full text-sm">
-                  <thead>
+                  <thead className="sticky top-0 z-10">
                     <tr className="bg-[hsl(0_0%_20%)] text-white">
                       <th className="w-10 py-2 px-3 text-left">
                         <Checkbox
@@ -625,7 +692,7 @@ export default function ProfissionalPerfil() {
                   <tbody>
                     {servicosAdicionados.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="py-6 text-center text-muted-foreground text-sm">
+                        <td colSpan={5} className="py-8 text-center text-muted-foreground text-sm">
                           Nenhum registro encontrado
                         </td>
                       </tr>
@@ -639,17 +706,27 @@ export default function ProfissionalPerfil() {
                             />
                           </td>
                           <td className="py-2 px-3 text-foreground">{s.nome}</td>
-                          <td className="py-2 px-3 text-foreground">{s.preco}</td>
-                          <td className="py-2 px-3 text-foreground">{s.tempo}</td>
+                          <td className="py-2 px-3">
+                            <input
+                              type="text"
+                              value={s.preco}
+                              onChange={(e) => updateServico(s.id, "preco", e.target.value)}
+                              className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </td>
+                          <td className="py-2 px-3">
+                            <input
+                              type="text"
+                              value={s.tempo}
+                              onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
+                              className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </td>
                           <td className="py-2 px-3">
                             <input
                               type="text"
                               value={s.comissao}
-                              onChange={(e) =>
-                                setServicosAdicionados((prev) =>
-                                  prev.map((x) => (x.id === s.id ? { ...x, comissao: e.target.value } : x))
-                                )
-                              }
+                              onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
                               placeholder="Ex: 50%"
                               className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
                             />
@@ -661,25 +738,25 @@ export default function ProfissionalPerfil() {
                 </table>
               </div>
             </div>
-          </div>
 
-          {/* Footer */}
-          <div className="flex justify-between items-center px-5 py-3 border-t border-border">
-            <button
-              onClick={handleRemoverServicos}
-              disabled={servicosSelecionados.length === 0}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-destructive px-4 text-sm font-semibold text-destructive-foreground transition hover:opacity-90 disabled:opacity-50"
-            >
-              <Minus className="h-4 w-4" />
-              Remover
-            </button>
-            <button
-              onClick={() => setServicosOpen(false)}
-              className="inline-flex h-9 items-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
-            >
-              Fechar
-            </button>
-          </div>
+            {/* Pastilha flutuante de remoção */}
+            {servicosSelecionados.length > 0 && (
+              <div className="flex items-center justify-center mt-3">
+                <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2 shadow-lg">
+                  <span className="text-sm text-muted-foreground">
+                    {servicosSelecionados.length} selecionado(s)
+                  </span>
+                  <button
+                    onClick={handleRemoverServicos}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/20"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Remover
+                  </button>
+                </div>
+              </div>
+            )}
+          </FormModal>
         </DialogContent>
       </Dialog>
     </AppLayout>
