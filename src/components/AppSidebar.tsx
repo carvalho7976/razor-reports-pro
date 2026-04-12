@@ -81,7 +81,9 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
   return (
     <SidebarMenuItem className="relative">
-      {active && <span className="absolute left-0 top-1/2 z-20 h-9 w-[4px] -translate-y-1/2 rounded-full bg-white" />}
+      {active && (
+        <span className="absolute -left-[2px] top-1/2 z-20 h-9 w-[5px] -translate-y-1/2 rounded-full bg-white" />
+      )}
 
       <SidebarMenuButton
         asChild
@@ -89,7 +91,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200",
-          collapsed ? "ml-1 justify-center rounded-xl px-0" : "ml-1 rounded-xl px-3",
+          collapsed ? "ml-2 justify-center rounded-xl px-0" : "ml-2 rounded-xl px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
             : "text-white/72 hover:bg-white/8 hover:text-white",
@@ -146,7 +148,13 @@ export function AppSidebar() {
           </Link>
         </SidebarHeader>
 
-        <SidebarContent className={cn("px-3 pb-4", collapsed && "px-2", "overflow-hidden")}>
+        <SidebarContent
+          className={cn(
+            "px-3 pb-4",
+            collapsed && "px-2",
+            "overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+          )}
+        >
           {navGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="mb-4 last:mb-0">
               {!collapsed && group.title && (
