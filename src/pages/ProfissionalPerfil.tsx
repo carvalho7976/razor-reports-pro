@@ -5,6 +5,41 @@ import { TextField, Dropdown, FormRow } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Save, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+
+const diasSemana = [
+  { key: "seg", label: "Seg" },
+  { key: "ter", label: "Ter" },
+  { key: "qua", label: "Qua" },
+  { key: "qui", label: "Qui" },
+  { key: "sex", label: "Sex" },
+  { key: "sab", label: "Sáb" },
+  { key: "dom", label: "Dom" },
+] as const;
+
+interface DiaExpediente {
+  ativo: boolean;
+  trabalhoInicio: string;
+  trabalhoFim: string;
+  almocoInicio: string;
+  almocoFim: string;
+}
+
+const defaultDia = (ativo = true): DiaExpediente => ({
+  ativo,
+  trabalhoInicio: "08:00",
+  trabalhoFim: "18:00",
+  almocoInicio: "12:00",
+  almocoFim: "13:00",
+});
+
+type ExpedienteState = Record<string, DiaExpediente>;
+
+const defaultExpediente = (): ExpedienteState =>
+  Object.fromEntries(
+    diasSemana.map((d) => [d.key, defaultDia(d.key !== "dom")])
+  );
 
 const nivelAcessoOptions = [
   { value: "Gerente", label: "Gerente" },
