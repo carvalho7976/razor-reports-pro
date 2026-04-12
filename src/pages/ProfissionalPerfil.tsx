@@ -410,7 +410,10 @@ export default function ProfissionalPerfil() {
                 <div>
                   <h2 className="mb-4 text-base font-semibold text-foreground">Ações</h2>
                   <div className="flex flex-wrap gap-3">
-                    <button className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]">
+                    <button
+                      onClick={() => setServicosOpen(true)}
+                      className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
+                    >
                       Configurar serviços
                     </button>
                     <button
