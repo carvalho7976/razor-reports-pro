@@ -482,7 +482,7 @@ export default function ProfissionalPerfil() {
 
       {/* Modal Expediente */}
       <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
-        <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden">
+        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <h2 className="text-base font-semibold text-foreground">Expediente de trabalho</h2>
           </div>
@@ -492,7 +492,7 @@ export default function ProfissionalPerfil() {
               const d = expediente[dia.key];
               return (
                 <div key={dia.key} className="px-5 py-3">
-                  <div className="flex items-center gap-3 mb-1">
+                  <div className="flex items-center gap-3 mb-2">
                     <span className="w-10 text-sm font-semibold text-foreground">{dia.label}</span>
                     <Switch
                       checked={d.ativo}
@@ -501,37 +501,37 @@ export default function ProfissionalPerfil() {
                   </div>
 
                   {d.ativo && (
-                    <div className="ml-[52px] grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                    <div className="ml-[52px] flex flex-wrap gap-x-8 gap-y-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground w-16">Trabalho:</span>
+                        <span className="text-muted-foreground text-xs font-medium shrink-0">Trabalho:</span>
                         <input
                           type="time"
                           value={d.trabalhoInicio}
                           onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
-                        <span className="text-muted-foreground">às</span>
+                        <span className="text-muted-foreground text-xs">às</span>
                         <input
                           type="time"
                           value={d.trabalhoFim}
                           onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground w-16">Almoço:</span>
+                        <span className="text-muted-foreground text-xs font-medium shrink-0">Almoço:</span>
                         <input
                           type="time"
                           value={d.almocoInicio}
                           onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
-                        <span className="text-muted-foreground">às</span>
+                        <span className="text-muted-foreground text-xs">às</span>
                         <input
                           type="time"
                           value={d.almocoFim}
                           onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
-                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
                       </div>
                     </div>
@@ -546,7 +546,7 @@ export default function ProfissionalPerfil() {
               onClick={() => setExpedienteOpen(false)}
               className="inline-flex h-9 items-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
             >
-              Fechar
+              Salvar
             </button>
           </div>
         </DialogContent>
