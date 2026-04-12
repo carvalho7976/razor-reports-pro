@@ -89,8 +89,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
       {active && (
         <span
           className={cn(
-            "absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-white transition-all duration-200",
-            collapsed ? "-left-1 h-8 w-1.5" : "-left-2 h-8 w-1.5",
+            "absolute top-1/2 z-20 -translate-y-1/2 rounded-full bg-white",
+            collapsed ? "-left-2 h-8 w-[4px]" : "-left-2 h-8 w-[4px]",
           )}
         />
       )}
@@ -100,22 +100,21 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         isActive={active}
         tooltip={item.label}
         className={cn(
-          "relative h-10 px-3 text-sm font-medium transition-all duration-200",
-          "rounded-md",
+          "relative h-10 text-sm font-medium transition-all duration-200",
+          collapsed ? "justify-center px-0 rounded-xl" : "px-3 rounded-xl",
           active
-            ? "bg-white text-zinc-900 hover:bg-white hover:text-zinc-900"
-            : "text-sidebar-foreground/85 hover:bg-white/8 hover:text-white",
-          collapsed && "justify-center px-0",
+            ? "mx-1 bg-white text-black hover:bg-white hover:text-black"
+            : "mx-0 text-white/72 hover:bg-white/8 hover:text-white",
         )}
       >
         <Link to={item.path}>
-          <Icon className={cn("h-4 w-4 shrink-0", active ? "text-zinc-900" : "text-current")} />
+          <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
       </SidebarMenuButton>
 
       {!collapsed && item.badge ? (
-        <span className="absolute right-3 top-1/2 flex h-5 min-w-5 -translate-y-1/2 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+        <span className="absolute right-3 top-1/2 flex h-5 min-w-5 -translate-y-1/2 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
           {item.badge}
         </span>
       ) : null}
@@ -135,7 +134,7 @@ export function AppSidebar() {
       variant="floating"
       className={cn("border-none bg-transparent p-2", collapsed ? "w-[86px]" : "w-[272px]")}
     >
-      <div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#191a27_0%,#171827_35%,#11131f_100%)] text-white shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+      <div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
         <SidebarHeader className={cn("px-4 pt-4 pb-3", collapsed && "px-3")}>
           <Link
             to="/"
@@ -153,7 +152,7 @@ export function AppSidebar() {
                 <p className="truncate text-[18px] font-bold leading-none text-white">
                   FRIZZAR<span className="text-primary">.</span>
                 </p>
-                <p className="mt-1 truncate text-[11px] text-white/55">Painel de gestão</p>
+                <p className="mt-1 truncate text-[11px] text-white/45">Painel de gestão</p>
               </div>
             )}
           </Link>
@@ -164,7 +163,7 @@ export function AppSidebar() {
             <div key={groupIndex} className="mb-4 last:mb-0">
               {!collapsed && group.title && (
                 <div className="px-3 pb-2 pt-2">
-                  <p className="text-[11px] font-semibold text-white/28">{group.title}</p>
+                  <p className="text-[11px] font-semibold text-white/22">{group.title}</p>
                 </div>
               )}
 
@@ -183,8 +182,7 @@ export function AppSidebar() {
           <div className="space-y-2">
             <div
               className={cn(
-                "flex items-center bg-white/6",
-                "rounded-md",
+                "flex items-center bg-white/6 rounded-md",
                 collapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2.5",
               )}
             >
@@ -192,7 +190,7 @@ export function AppSidebar() {
                 <ThemeToggle />
               ) : (
                 <>
-                  <div className="flex items-center gap-2 text-sm text-white/70">
+                  <div className="flex items-center gap-2 text-sm text-white/65">
                     <Moon className="h-4 w-4" />
                     <span>Dark Mode</span>
                   </div>
@@ -206,7 +204,7 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   tooltip="Logout"
                   className={cn(
-                    "h-10 text-white/70 hover:bg-white/8 hover:text-white rounded-md",
+                    "h-10 rounded-md text-white/65 hover:bg-white/8 hover:text-white",
                     collapsed && "justify-center px-0",
                   )}
                   onClick={() => {
