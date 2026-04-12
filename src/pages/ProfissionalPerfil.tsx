@@ -435,6 +435,78 @@ export default function ProfissionalPerfil() {
           )}
         </div>
       </div>
+
+      {/* Modal Expediente */}
+      <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
+        <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <h2 className="text-base font-semibold text-foreground">Expediente de trabalho</h2>
+          </div>
+
+          <div className="divide-y divide-border max-h-[60vh] overflow-y-auto">
+            {diasSemana.map((dia) => {
+              const d = expediente[dia.key];
+              return (
+                <div key={dia.key} className="px-5 py-3">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="w-10 text-sm font-semibold text-foreground">{dia.label}</span>
+                    <Switch
+                      checked={d.ativo}
+                      onCheckedChange={(v) => updateDia(dia.key, "ativo", v)}
+                    />
+                  </div>
+
+                  {d.ativo && (
+                    <div className="ml-[52px] grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground w-16">Trabalho:</span>
+                        <input
+                          type="time"
+                          value={d.trabalhoInicio}
+                          onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
+                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                        />
+                        <span className="text-muted-foreground">às</span>
+                        <input
+                          type="time"
+                          value={d.trabalhoFim}
+                          onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
+                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground w-16">Almoço:</span>
+                        <input
+                          type="time"
+                          value={d.almocoInicio}
+                          onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
+                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                        />
+                        <span className="text-muted-foreground">às</span>
+                        <input
+                          type="time"
+                          value={d.almocoFim}
+                          onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
+                          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex justify-end gap-2 px-5 py-3 border-t border-border">
+            <button
+              onClick={() => setExpedienteOpen(false)}
+              className="inline-flex h-9 items-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
+            >
+              Fechar
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
