@@ -339,11 +339,8 @@ export default function ProfissionalPerfil() {
                   <TextField label="Nome *" value={form.nome} onChange={(v) => update("nome", v)} />
                 </div>
 
-                <div className="max-w-xl">
+                <div className="max-w-xl grid grid-cols-2 gap-4">
                   <TextField label="Email *" value={form.email} onChange={(v) => update("email", v)} />
-                </div>
-
-                <div className="max-w-xl">
                   <TextField
                     label="Celular"
                     value={form.celular}
@@ -386,11 +383,10 @@ export default function ProfissionalPerfil() {
                       },
                     ].map((item) => (
                       <label key={item.field} className="flex cursor-pointer select-none items-center gap-3">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={form[item.field] as boolean}
-                          onChange={(e) => update(item.field, e.target.checked)}
-                          className="h-4 w-4 rounded border-border text-foreground accent-foreground"
+                          onCheckedChange={(v) => update(item.field, !!v)}
+                          className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
                         />
                         <span className="text-sm text-foreground">{item.label}</span>
                       </label>
