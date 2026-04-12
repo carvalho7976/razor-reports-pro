@@ -621,14 +621,13 @@ export default function ProfissionalPerfil() {
                         <button
                           key={s.id}
                           type="button"
-                          onClick={() => {
-                            handleAdicionarServico(s);
-                            setServicosDropdownOpen(false);
-                            setServicoBusca("");
-                          }}
+                          onClick={() => toggleServicoPendente(s.id)}
                           className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
                         >
-                          <Checkbox checked={false} className="pointer-events-none" />
+                          <Checkbox
+                            checked={servicosPendentes.includes(s.id)}
+                            className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                          />
                           <span>{s.nome}</span>
                         </button>
                       ))}
@@ -641,16 +640,11 @@ export default function ProfissionalPerfil() {
               </div>
 
               <button
-                onClick={() => {
-                  if (servicosDispFiltrados.length === 1) {
-                    handleAdicionarServico(servicosDispFiltrados[0]);
-                  }
-                  setServicosDropdownOpen(true);
-                }}
+                onClick={handleAdicionarSelecionados}
                 className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-foreground bg-background px-4 text-sm font-semibold text-foreground transition hover:bg-muted active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" />
-                Adicionar
+                Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
               </button>
             </div>
 
