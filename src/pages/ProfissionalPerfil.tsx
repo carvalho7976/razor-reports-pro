@@ -201,6 +201,7 @@ export default function ProfissionalPerfil() {
   const [servicosAdicionados, setServicosAdicionados] = useState<ServicoAdicionado[]>([]);
   const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
   const [servicosDropdownOpen, setServicosDropdownOpen] = useState(false);
+  const [servicosPendentes, setServicosPendentes] = useState<number[]>([]);
   const servicosDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const updateDia = (key: string, field: keyof DiaExpediente, value: string | boolean) =>
@@ -210,9 +211,20 @@ export default function ProfissionalPerfil() {
     .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
     .filter((s) => s.nome.toLowerCase().includes(servicoBusca.toLowerCase()));
 
-  const handleAdicionarServico = (servico: ServicoDisponivel) => {
-    if (servicosAdicionados.some((s) => s.id === servico.id)) return;
-    setServicosAdicionados((prev) => [...prev, { ...servico, comissao: "" }]);
+  const toggleServicoPendente = (id: number) => {
+    setServicosPendentes((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleAdicionarSelecionados = () => {
+    const novos = servicosDisponiveis
+      .filter((s) => servicosPendentes.includes(s.id) && !servicosAdicionados.some((a) => a.id === s.id))
+      .map((s) => ({ ...s, comissao: "" }));
+    setServicosAdicionados((prev) => [...prev, ...novos]);
+    setServicosPendentes([]);
+    setServicosDropdownOpen(false);
+    setServicoBusca("");
   };
 
   const handleAdicionarTodos = () => {
@@ -220,6 +232,7 @@ export default function ProfissionalPerfil() {
       .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
       .map((s) => ({ ...s, comissao: "" }));
     setServicosAdicionados((prev) => [...prev, ...novos]);
+    setServicosPendentes([]);
     setServicosDropdownOpen(false);
     setServicoBusca("");
   };
