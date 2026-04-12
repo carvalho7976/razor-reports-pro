@@ -15,16 +15,11 @@ import {
   BookOpen,
   Crown,
   ShoppingBag,
-  ChevronRight,
-  LogOut,
-  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -86,7 +81,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
   return (
     <SidebarMenuItem className="relative">
-      {active && <span className="absolute left-0 top-1/2 z-20 h-8 w-[3px] -translate-y-1/2 rounded-full bg-white" />}
+      {active && <span className="absolute left-0 top-1/2 z-20 h-9 w-[4px] -translate-y-1/2 rounded-full bg-white" />}
 
       <SidebarMenuButton
         asChild
@@ -94,7 +89,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200",
-          collapsed ? "ml-2 justify-center rounded-xl px-0" : "ml-2 rounded-xl px-3",
+          collapsed ? "ml-1 justify-center rounded-xl px-0" : "ml-1 rounded-xl px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
             : "text-white/72 hover:bg-white/8 hover:text-white",
@@ -151,7 +146,7 @@ export function AppSidebar() {
           </Link>
         </SidebarHeader>
 
-        <SidebarContent className={cn("px-3 pb-3", collapsed && "px-2")}>
+        <SidebarContent className={cn("px-3 pb-4", collapsed && "px-2", "overflow-hidden")}>
           {navGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="mb-4 last:mb-0">
               {!collapsed && group.title && (
@@ -170,48 +165,6 @@ export function AppSidebar() {
             </div>
           ))}
         </SidebarContent>
-
-        <SidebarFooter className={cn("mt-auto px-3 pb-3 pt-2", collapsed && "px-2")}>
-          <div className="space-y-2">
-            <div
-              className={cn(
-                "flex items-center rounded-md bg-white/6",
-                collapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2.5",
-              )}
-            >
-              {collapsed ? (
-                <ThemeToggle />
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 text-sm text-white/65">
-                    <Moon className="h-4 w-4" />
-                    <span>Dark Mode</span>
-                  </div>
-                  <ThemeToggle />
-                </>
-              )}
-            </div>
-
-            <SidebarMenu className="gap-1.5">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  tooltip="Logout"
-                  className={cn(
-                    "h-10 rounded-md text-white/65 hover:bg-white/8 hover:text-white",
-                    collapsed && "justify-center px-0",
-                  )}
-                  onClick={() => {
-                    console.log("logout");
-                  }}
-                >
-                  <LogOut className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span>Logout</span>}
-                  {!collapsed && <ChevronRight className="ml-auto h-4 w-4 opacity-45" />}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </div>
-        </SidebarFooter>
       </div>
     </Sidebar>
   );
