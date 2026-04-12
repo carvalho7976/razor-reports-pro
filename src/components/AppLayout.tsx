@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeaderBar } from "./AppHeaderBar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -12,7 +12,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <SidebarProvider defaultOpen={true}>
       <AppSidebar />
 
-      <SidebarInset>
+      <SidebarInset className="bg-background">
         <AppHeaderBar />
         <main className="flex-1 overflow-auto p-3 sm:p-6">{children}</main>
       </SidebarInset>
