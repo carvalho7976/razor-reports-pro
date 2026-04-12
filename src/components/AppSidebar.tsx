@@ -15,6 +15,8 @@ import {
   BookOpen,
   Crown,
   ShoppingBag,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -82,7 +84,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
   return (
     <SidebarMenuItem className="relative">
       {active && (
-        <span className="absolute -left-[2px] top-1/2 z-20 h-9 w-[5px] -translate-y-1/2 rounded-full bg-white" />
+        <span className="absolute -left-[1px] top-1/2 z-20 h-9 w-[5px] -translate-y-1/2 rounded-full bg-white" />
       )}
 
       <SidebarMenuButton
@@ -91,7 +93,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200",
-          collapsed ? "ml-2 justify-center rounded-xl px-0" : "ml-2 rounded-xl px-3",
+          collapsed ? "ml-2 justify-center rounded-lg px-0" : "ml-2 rounded-lg px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
             : "text-white/72 hover:bg-white/8 hover:text-white",
@@ -114,7 +116,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
 export function AppSidebar() {
   const location = useLocation();
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
 
   const collapsed = state === "collapsed";
 
@@ -122,10 +124,10 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className={cn("border-none bg-transparent p-2", collapsed ? "w-[86px]" : "w-[272px]")}
+      className={cn("border-none bg-transparent p-2", collapsed ? "w-[72px]" : "w-[272px]")}
     >
-      <div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
-        <SidebarHeader className={cn("px-4 pb-3 pt-4", collapsed && "px-3")}>
+      <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+        <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
           <Link
             to="/"
             className={cn(
@@ -150,7 +152,7 @@ export function AppSidebar() {
 
         <SidebarContent
           className={cn(
-            "px-3 pb-4",
+            "px-3 pb-3",
             collapsed && "px-2",
             "overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           )}
@@ -173,6 +175,26 @@ export function AppSidebar() {
             </div>
           ))}
         </SidebarContent>
+
+        <div className="mt-auto px-3 pb-3 pt-2">
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className={cn(
+              "flex h-10 w-full items-center text-white/65 hover:bg-white/8 hover:text-white transition-colors",
+              collapsed ? "justify-center rounded-lg px-0" : "justify-between rounded-lg px-3",
+            )}
+          >
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <>
+                <span className="text-sm font-medium">Recolher menu</span>
+                <ChevronLeft className="h-4 w-4" />
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </Sidebar>
   );
