@@ -1158,6 +1158,7 @@ export function DataTable<T extends Record<string, any>>({
 
   useEffect(() => {
     setPage(0);
+    setHiddenColumns(new Set());
   }, [search, columnFilters, dateRange, datePreset, activeTab, internalPageSize]);
 
   const totalPages = Math.max(1, Math.ceil(filteredData.length / internalPageSize));
