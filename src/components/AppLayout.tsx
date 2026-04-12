@@ -12,7 +12,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <SidebarProvider defaultOpen={true}>
       <AppSidebar />
 
-      <SidebarInset className="bg-background">
+      <SidebarInset className="min-w-0 bg-background">
         <AppHeaderBar />
         <main className="flex-1 overflow-auto p-3 sm:p-6">{children}</main>
       </SidebarInset>
