@@ -618,6 +618,57 @@ export default function ListaClientes() {
     ];
   };
 
+  const totalClientes = allData.length;
+  const ativos = allData.filter((c) => c.status === "ativo").length;
+  const semiAtivos = allData.filter((c) => c.status === "semi-ativo").length;
+  const inativos = allData.filter((c) => c.status === "inativo").length;
+
+  const bulkRemove = (indices: number[]) => {
+    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    setAllData((prev) => prev.filter((d) => !cods.includes(d.cod)));
+    toast({ title: `${cods.length} cliente(s) removido(s)`, variant: "destructive" });
+  };
+
+  const bulkMerge = (indices: number[]) =>
+    toast({ title: `Mesclar ${indices.length} clientes`, description: "Funcionalidade em desenvolvimento" });
+
+  const bulkMessage = (indices: number[]) =>
+    toast({
+      title: `Enviar mensagem para ${indices.length} cliente(s)`,
+      description: "Funcionalidade em desenvolvimento",
+    });
+
+  const bulkTag = (indices: number[]) =>
+    toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
+
+  const selectionActions: SelectionAction[] = [
+    {
+      label: "Mesclar",
+      icon: <Merge className="h-4 w-4" />,
+      onClick: bulkMerge,
+      description: "Unifica cadastros duplicados em um único registro",
+    },
+    {
+      label: "Remover",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkRemove,
+      variant: "destructive",
+      description: "Remove permanentemente os clientes selecionados da lista",
+    },
+    {
+      label: "Mensagem",
+      icon: <MessageCircle className="h-4 w-4" />,
+      onClick: bulkMessage,
+      description: "Envia mensagem via WhatsApp para os clientes selecionados",
+    },
+    {
+      label: "Tag",
+      icon: <Tag className="h-4 w-4" />,
+      onClick: bulkTag,
+      description: "Adiciona uma tag aos clientes selecionados",
+    },
+  ];
+
   const columns: Column<Cliente>[] = [
     { key: "cod", label: "ID", width: "90px" },
     {
