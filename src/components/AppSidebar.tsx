@@ -124,7 +124,7 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className={cn("border-none bg-transparent p-2", collapsed ? "w-[72px]" : "w-[272px]")}
+      className={cn("border-none bg-transparent p-2", collapsed ? "w-[92px]" : "w-[272px]")}
     >
       <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
         <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
@@ -181,18 +181,11 @@ export function AppSidebar() {
             type="button"
             onClick={toggleSidebar}
             className={cn(
-              "flex h-10 w-full items-center text-white/65 hover:bg-white/8 hover:text-white transition-colors",
-              collapsed ? "justify-center rounded-lg px-0" : "justify-between rounded-lg px-3",
+              "flex h-10 w-full items-center text-white/65 hover:bg-white/8 hover:text-white transition-colors rounded-lg",
+              collapsed ? "justify-center px-0" : "justify-center px-0",
             )}
           >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <>
-                <span className="text-sm font-medium">Recolher menu</span>
-                <ChevronLeft className="h-4 w-4" />
-              </>
-            )}
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
         </div>
       </div>
