@@ -501,8 +501,8 @@ function ColumnManager<T>({
   }, []);
 
   const orderedColumns = useMemo(() => {
-    const map = new Map(initialColumns.map((c) => [c.key, c]));
-    return columnOrder.map((k) => map.get(k)!).filter(Boolean);
+    const map = new Map(initialColumns.filter((c) => c.key !== "acoes").map((c) => [c.key, c]));
+    return columnOrder.filter((k) => k !== "acoes").map((k) => map.get(k)!).filter(Boolean);
   }, [initialColumns, columnOrder]);
 
   const handleDragStart = (idx: number) => setDragIdx(idx);
