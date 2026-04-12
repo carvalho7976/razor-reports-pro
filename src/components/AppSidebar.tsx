@@ -86,14 +86,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
   return (
     <SidebarMenuItem className="relative">
-      {active && (
-        <span
-          className={cn(
-            "absolute top-1/2 z-20 -translate-y-1/2 rounded-full bg-white",
-            collapsed ? "-left-2 h-8 w-[4px]" : "-left-2 h-8 w-[4px]",
-          )}
-        />
-      )}
+      {active && <span className="absolute left-0 top-1/2 z-20 h-8 w-[3px] -translate-y-1/2 rounded-full bg-white" />}
 
       <SidebarMenuButton
         asChild
@@ -101,10 +94,10 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200",
-          collapsed ? "justify-center px-0 rounded-xl" : "px-3 rounded-xl",
+          collapsed ? "ml-2 justify-center rounded-xl px-0" : "ml-2 rounded-xl px-3",
           active
-            ? "mx-1 bg-white text-black hover:bg-white hover:text-black"
-            : "mx-0 text-white/72 hover:bg-white/8 hover:text-white",
+            ? "!bg-white !text-black hover:!bg-white hover:!text-black"
+            : "text-white/72 hover:bg-white/8 hover:text-white",
         )}
       >
         <Link to={item.path}>
@@ -135,7 +128,7 @@ export function AppSidebar() {
       className={cn("border-none bg-transparent p-2", collapsed ? "w-[86px]" : "w-[272px]")}
     >
       <div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
-        <SidebarHeader className={cn("px-4 pt-4 pb-3", collapsed && "px-3")}>
+        <SidebarHeader className={cn("px-4 pb-3 pt-4", collapsed && "px-3")}>
           <Link
             to="/"
             className={cn(
@@ -182,7 +175,7 @@ export function AppSidebar() {
           <div className="space-y-2">
             <div
               className={cn(
-                "flex items-center bg-white/6 rounded-md",
+                "flex items-center rounded-md bg-white/6",
                 collapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2.5",
               )}
             >
