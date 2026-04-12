@@ -170,7 +170,11 @@ export default function ProfissionalPerfil() {
     nivelAcesso: profFuncao,
   }));
 
-  const [activeTab, setActiveTab] = useState("basicos");
+  const [expedienteOpen, setExpedienteOpen] = useState(false);
+  const [expediente, setExpediente] = useState<ExpedienteState>(defaultExpediente);
+
+  const updateDia = (key: string, field: keyof DiaExpediente, value: string | boolean) =>
+    setExpediente((prev) => ({ ...prev, [key]: { ...prev[key], [field]: value } }));
 
   const update = (field: keyof ProfissionalForm, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
