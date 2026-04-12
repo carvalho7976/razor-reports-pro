@@ -459,11 +459,10 @@ export default function ProfissionalPerfil() {
 
               <div className="mt-4 grid gap-4 max-w-xl">
                 <label className="flex cursor-pointer select-none items-center gap-3">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={form.parceiro}
-                    onChange={(e) => update("parceiro", e.target.checked)}
-                    className="h-4 w-4 rounded border-border text-foreground accent-foreground"
+                    onCheckedChange={(v) => update("parceiro", !!v)}
+                    className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
                   />
                   <span className="text-sm font-medium text-foreground">Profissional parceiro</span>
                 </label>
