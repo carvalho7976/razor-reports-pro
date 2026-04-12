@@ -502,10 +502,7 @@ function ColumnManager<T>({
 
   const orderedColumns = useMemo(() => {
     const map = new Map(initialColumns.filter((c) => c.key !== "acoes").map((c) => [c.key, c]));
-    return columnOrder
-      .filter((k) => k !== "acoes")
-      .map((k) => map.get(k)!)
-      .filter(Boolean);
+    return columnOrder.filter((k) => k !== "acoes").map((k) => map.get(k)!).filter(Boolean);
   }, [initialColumns, columnOrder]);
 
   const handleDragStart = (idx: number) => setDragIdx(idx);
@@ -671,10 +668,8 @@ export function ActionsMenu({
                 setOpen(false);
               }}
               className={cn(
-                "w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-colors",
-                item.variant === "destructive"
-                  ? "text-destructive hover:bg-destructive hover:text-white"
-                  : "text-foreground hover:bg-foreground hover:text-background",
+                "w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors",
+                item.variant === "destructive" && "text-destructive hover:bg-destructive/10",
               )}
             >
               {item.icon}
@@ -780,70 +775,72 @@ function TablePagination({
   const end = Math.min((page + 1) * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-border/50 bg-background/60 backdrop-blur-sm px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-end rounded-b-xl">
-      {/* INFO */}
-      <div className="flex items-center gap-3 md:mr-4">
-        <span className="text-sm text-muted-foreground">
-          {start}–{end} de {totalItems}
-        </span>
+  <div className="flex flex-col gap-3 border-t border-border/50 bg-background/60 backdrop-blur-sm px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-end rounded-b-xl">
 
-        <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
-          <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm hover:border-primary/40 transition-all">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="end">
-            {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={String(size)}>
-                {size} / pág
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    {/* INFO */}
+    <div className="flex items-center gap-3 md:mr-4">
+      <span className="text-sm text-muted-foreground">
+        {start}–{end} de {totalItems}
+      </span>
 
-      {/* PAGINAÇÃO */}
-      <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
-        {/* anterior */}
-        <button
-          onClick={() => onPageChange(Math.max(0, page - 1))}
-          disabled={page === 0}
-          className="h-8 px-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-background transition-all disabled:opacity-40"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-
-        {/* páginas */}
-        {pages.map((pageItem, index) =>
-          pageItem === "..." ? (
-            <span key={index} className="px-2 text-xs text-muted-foreground">
-              ...
-            </span>
-          ) : (
-            <button
-              key={pageItem}
-              onClick={() => onPageChange(Number(pageItem) - 1)}
-              className={cn(
-                "h-8 min-w-[32px] px-2 rounded-lg text-sm font-medium transition-all duration-200",
-                currentPage === pageItem
-                  ? "bg-background shadow-sm border border-border text-foreground scale-[1.05]"
-                  : "text-muted-foreground hover:bg-background hover:text-foreground",
-              )}
-            >
-              {pageItem}
-            </button>
-          ),
-        )}
-
-        {/* próxima */}
-        <button
-          onClick={() => onPageChange(Math.min(safeTotalPages - 1, page + 1))}
-          disabled={page >= safeTotalPages - 1}
-          className="h-8 px-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-background transition-all disabled:opacity-40"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
+      <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
+        <SelectTrigger className="h-9 w-[110px] rounded-xl border border-border bg-background text-sm font-medium shadow-sm hover:border-primary/40 transition-all">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end">
+          {pageSizeOptions.map((size) => (
+            <SelectItem key={size} value={String(size)}>
+              {size} / pág
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
+
+    {/* PAGINAÇÃO */}
+    <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
+
+      {/* anterior */}
+      <button
+        onClick={() => onPageChange(Math.max(0, page - 1))}
+        disabled={page === 0}
+        className="h-8 px-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-background transition-all disabled:opacity-40"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+
+      {/* páginas */}
+      {pages.map((pageItem, index) =>
+        pageItem === "..." ? (
+          <span key={index} className="px-2 text-xs text-muted-foreground">
+            ...
+          </span>
+        ) : (
+          <button
+            key={pageItem}
+            onClick={() => onPageChange(Number(pageItem) - 1)}
+            className={cn(
+              "h-8 min-w-[32px] px-2 rounded-lg text-sm font-medium transition-all duration-200",
+              currentPage === pageItem
+                ? "bg-background shadow-sm border border-border text-foreground scale-[1.05]"
+                : "text-muted-foreground hover:bg-background hover:text-foreground"
+            )}
+          >
+            {pageItem}
+          </button>
+        )
+      )}
+
+      {/* próxima */}
+      <button
+        onClick={() => onPageChange(Math.min(safeTotalPages - 1, page + 1))}
+        disabled={page >= safeTotalPages - 1}
+        className="h-8 px-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-background transition-all disabled:opacity-40"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+    </div>
+  </div>
   );
 }
 
@@ -1627,7 +1624,9 @@ export function DataTable<T extends Record<string, any>>({
                             pinnedColumns.has(col.key) &&
                               cn(
                                 "sticky left-0 z-10 transition-colors duration-150",
-                                isSelected ? "bg-muted group-hover:bg-muted" : "bg-card group-hover:bg-muted/30",
+                                isSelected
+                                  ? "bg-muted group-hover:bg-muted"
+                                  : "bg-card group-hover:bg-muted/30",
                               ),
                             col.align === "right" && "text-right",
                             col.align === "center" && "text-center",
