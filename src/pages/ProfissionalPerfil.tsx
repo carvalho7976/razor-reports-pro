@@ -197,25 +197,40 @@ export default function ProfissionalPerfil() {
   const [expedienteOpen, setExpedienteOpen] = useState(false);
   const [expediente, setExpediente] = useState<ExpedienteState>(defaultExpediente);
   const [servicosOpen, setServicosOpen] = useState(false);
-  const [servicoSelecionado, setServicoSelecionado] = useState("");
+  const [servicoBusca, setServicoBusca] = useState("");
   const [servicosAdicionados, setServicosAdicionados] = useState<ServicoAdicionado[]>([]);
   const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
+  const [servicosDropdownOpen, setServicosDropdownOpen] = useState(false);
+  const servicosDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const updateDia = (key: string, field: keyof DiaExpediente, value: string | boolean) =>
     setExpediente((prev) => ({ ...prev, [key]: { ...prev[key], [field]: value } }));
 
-  const handleAdicionarServico = () => {
-    const id = Number(servicoSelecionado);
-    const servico = servicosDisponiveis.find((s) => s.id === id);
-    if (!servico || servicosAdicionados.some((s) => s.id === id)) return;
+  const servicosDispFiltrados = servicosDisponiveis
+    .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
+    .filter((s) => s.nome.toLowerCase().includes(servicoBusca.toLowerCase()));
+
+  const handleAdicionarServico = (servico: ServicoDisponivel) => {
+    if (servicosAdicionados.some((s) => s.id === servico.id)) return;
     setServicosAdicionados((prev) => [...prev, { ...servico, comissao: "" }]);
-    setServicoSelecionado("");
+  };
+
+  const handleAdicionarTodos = () => {
+    const novos = servicosDisponiveis
+      .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
+      .map((s) => ({ ...s, comissao: "" }));
+    setServicosAdicionados((prev) => [...prev, ...novos]);
+    setServicosDropdownOpen(false);
+    setServicoBusca("");
   };
 
   const handleRemoverServicos = () => {
     setServicosAdicionados((prev) => prev.filter((s) => !servicosSelecionados.includes(s.id)));
     setServicosSelecionados([]);
   };
+
+  const updateServico = (id: number, field: keyof ServicoAdicionado, value: string) =>
+    setServicosAdicionados((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
 
   const toggleServicoSelecionado = (id: number) => {
     setServicosSelecionados((prev) =>
