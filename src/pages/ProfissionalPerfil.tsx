@@ -3,10 +3,34 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown, FormRow } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, X } from "lucide-react";
+import { Camera, Save, X, Plus, Minus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface ServicoDisponivel {
+  id: number;
+  nome: string;
+  preco: string;
+  tempo: string;
+}
+
+interface ServicoAdicionado extends ServicoDisponivel {
+  comissao: string;
+}
+
+const servicosDisponiveis: ServicoDisponivel[] = [
+  { id: 1, nome: "Corte Masculino", preco: "R$ 45,00", tempo: "30 min" },
+  { id: 2, nome: "Corte Feminino", preco: "R$ 65,00", tempo: "45 min" },
+  { id: 3, nome: "Barba", preco: "R$ 30,00", tempo: "20 min" },
+  { id: 4, nome: "Hidratação", preco: "R$ 80,00", tempo: "60 min" },
+  { id: 5, nome: "Coloração", preco: "R$ 120,00", tempo: "90 min" },
+  { id: 6, nome: "Escova Progressiva", preco: "R$ 200,00", tempo: "120 min" },
+  { id: 7, nome: "Manicure", preco: "R$ 35,00", tempo: "40 min" },
+  { id: 8, nome: "Pedicure", preco: "R$ 40,00", tempo: "50 min" },
+];
 
 const diasSemana = [
   { key: "seg", label: "Seg" },
@@ -173,9 +197,40 @@ export default function ProfissionalPerfil() {
   const [activeTab, setActiveTab] = useState("basicos");
   const [expedienteOpen, setExpedienteOpen] = useState(false);
   const [expediente, setExpediente] = useState<ExpedienteState>(defaultExpediente);
+  const [servicosOpen, setServicosOpen] = useState(false);
+  const [servicoSelecionado, setServicoSelecionado] = useState("");
+  const [servicosAdicionados, setServicosAdicionados] = useState<ServicoAdicionado[]>([]);
+  const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
 
   const updateDia = (key: string, field: keyof DiaExpediente, value: string | boolean) =>
     setExpediente((prev) => ({ ...prev, [key]: { ...prev[key], [field]: value } }));
+
+  const handleAdicionarServico = () => {
+    const id = Number(servicoSelecionado);
+    const servico = servicosDisponiveis.find((s) => s.id === id);
+    if (!servico || servicosAdicionados.some((s) => s.id === id)) return;
+    setServicosAdicionados((prev) => [...prev, { ...servico, comissao: "" }]);
+    setServicoSelecionado("");
+  };
+
+  const handleRemoverServicos = () => {
+    setServicosAdicionados((prev) => prev.filter((s) => !servicosSelecionados.includes(s.id)));
+    setServicosSelecionados([]);
+  };
+
+  const toggleServicoSelecionado = (id: number) => {
+    setServicosSelecionados((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const toggleTodosServicos = () => {
+    if (servicosSelecionados.length === servicosAdicionados.length) {
+      setServicosSelecionados([]);
+    } else {
+      setServicosSelecionados(servicosAdicionados.map((s) => s.id));
+    }
+  };
 
   const update = (field: keyof ProfissionalForm, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
