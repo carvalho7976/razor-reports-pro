@@ -1,14 +1,13 @@
 import { useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { TextField, Dropdown, FormRow } from "@/components/FormModal";
+import { TextField, Dropdown, FormRow, FormModal } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, X, Plus, Minus, Trash2 } from "lucide-react";
+import { Camera, Save, X, Plus, Trash2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ServicoDisponivel {
   id: number;
