@@ -7,7 +7,7 @@ export function AppHeaderBar() {
   return (
     <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-header px-3 text-header-foreground sm:px-4">
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="md:hidden hover:bg-header-foreground/10 hover:text-header-foreground" />
+        <SidebarTrigger className="hover:bg-header-foreground/10 hover:text-header-foreground" />
 
         <Link to="/" className="flex items-center gap-2 font-bold text-lg tracking-tight">
           <Scissors className="h-5 w-5" />
