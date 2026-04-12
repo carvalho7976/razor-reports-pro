@@ -305,22 +305,6 @@ export default function ProfissionalPerfil() {
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={handleSave}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-[hsl(var(--success))] px-5 text-sm font-semibold text-[hsl(var(--success-foreground))] transition hover:opacity-90 active:scale-[0.98]"
-              >
-                <Save className="h-4 w-4" />
-                Salvar
-              </button>
-              <button
-                onClick={handleCancel}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-destructive px-5 text-sm font-semibold text-destructive-foreground transition hover:opacity-90 active:scale-[0.98]"
-              >
-                <X className="h-4 w-4" />
-                Cancelar
-              </button>
-            </div>
           </div>
         </div>
 
