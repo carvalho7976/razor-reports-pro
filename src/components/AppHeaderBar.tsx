@@ -1,13 +1,10 @@
 import { Bell, Heart, CreditCard, Grid3X3 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function AppHeaderBar() {
   return (
     <header className="flex h-12 shrink-0 items-center justify-between bg-white px-3 text-foreground sm:px-4">
-      <div className="flex items-center gap-2">
-        <SidebarTrigger className="hover:bg-black/5 hover:text-foreground" />
-      </div>
+      <div />
 
       <div className="flex items-center gap-2 sm:gap-3">
         <button className="btn-action hidden border border-border bg-transparent py-1.5 text-xs text-foreground hover:bg-black/5 sm:inline-flex">
