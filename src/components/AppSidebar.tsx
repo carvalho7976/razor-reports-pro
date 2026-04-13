@@ -83,20 +83,19 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
   const Icon = item.icon;
 
   return (
-    // overflow-visible aqui para o palito não ser cortado
-    <SidebarMenuItem className="relative overflow-visible">
-      {/* Palito no SidebarMenuItem, fora do Link */}
+    <SidebarMenuItem className="relative">
       {active && (
         <span
-          className="pointer-events-none absolute z-50"
           style={{
-            left: 0,
+            position: "absolute",
+            left: "-16px",
             top: "50%",
             transform: "translateY(-50%)",
             width: "4px",
             height: "28px",
-            background: "#ffffff",
+            backgroundColor: "#ffffff",
             borderRadius: "0 4px 4px 0",
+            zIndex: 50,
           }}
         />
       )}
@@ -106,8 +105,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         isActive={active}
         tooltip={item.label}
         className={cn(
-          "relative h-10 text-sm font-medium transition-all duration-200",
-          "rounded-lg",
+          "relative h-10 text-sm font-medium transition-all duration-200 rounded-lg",
           collapsed ? "justify-center px-0" : "px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
@@ -146,7 +144,7 @@ export function AppSidebar() {
         } as React.CSSProperties
       }
     >
-      <div className="flex h-full w-full flex-col overflow-hidden rounded-r-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+      <div className="flex h-full w-full flex-col rounded-r-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
         <SidebarHeader className={cn("px-4 pb-3 pt-3", collapsed && "px-3")}>
           <Link
             to="/"
