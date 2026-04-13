@@ -133,8 +133,8 @@ export function AppSidebar() {
         } as React.CSSProperties
       }
     >
-    <div className="h-full w-full bg-black p-2">
-  <div className="flex h-full w-full flex-col overflow-hidden rounded-r-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">   <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+      <div className="h-full w-full bg-black p-2">
+        <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
           <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
             <Link
               to="/"
