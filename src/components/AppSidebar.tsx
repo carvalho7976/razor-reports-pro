@@ -88,13 +88,14 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         <span
           style={{
             position: "absolute",
-            left: "-16px",
+            // no collapsed fica dentro do item (left: 0), no expandido sai para a borda (left: -16px)
+            left: collapsed ? "0" : "-16px",
             top: "50%",
             transform: "translateY(-50%)",
             width: collapsed ? "4px" : "6px",
             height: collapsed ? "24px" : "28px",
             backgroundColor: "#ffffff",
-            borderRadius: "0 4px 4px 0",
+            borderRadius: collapsed ? "4px" : "0 4px 4px 0",
             zIndex: 50,
           }}
         />
@@ -106,7 +107,6 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200 rounded-lg",
-          // ícones centralizados no collapsed
           collapsed ? "flex justify-center items-center px-0 w-full" : "px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
@@ -141,13 +141,11 @@ export function AppSidebar() {
       style={
         {
           "--sidebar-width": "272px",
-          "--sidebar-width-icon": "65px", // ← menu recolhido mais estreito
+          "--sidebar-width-icon": "65px",
         } as React.CSSProperties
       }
     >
-      {/* padding em volta para dar espaço da página + bordas arredondadas em todos os lados */}
       <div className="p-2 h-full w-full bg-transparent">
-        {" "}
         <div
           className="flex h-full w-full flex-col rounded-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]"
           style={{ overflow: "visible" }}
@@ -179,8 +177,9 @@ export function AppSidebar() {
             className={cn(
               "pb-3",
               collapsed ? "px-2" : "px-4",
+              // scroll invisível mas funcional
               "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-              "overflow-x-visible overflow-y-auto",
+              "overflow-x-visible overflow-y-scroll",
             )}
           >
             {navGroups.map((group, groupIndex) => (
