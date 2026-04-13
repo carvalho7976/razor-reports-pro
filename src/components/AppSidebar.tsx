@@ -84,14 +84,6 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
   return (
     <SidebarMenuItem className="relative">
-      {/* Palito colado na borda esquerda absoluta do sidebar */}
-      {active && (
-        <span
-          className="pointer-events-none absolute top-1/2 z-20 h-8 w-[6px] -translate-y-1/2 rounded-full bg-white"
-          style={{ left: 0 }}
-        />
-      )}
-
       <SidebarMenuButton
         asChild
         isActive={active}
@@ -106,6 +98,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         )}
       >
         <Link to={item.path}>
+          {/* Palito absolutamente posicionado dentro do botão, borda esquerda do item */}
+          {active && <span className="absolute left-0 top-1/2 h-6 w-[5px] -translate-y-1/2 rounded-full bg-black" />}
           <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
