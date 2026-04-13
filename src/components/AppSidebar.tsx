@@ -16,8 +16,8 @@ import {
   BookOpen,
   Crown,
   ShoppingBag,
-  ChevronLeft,
-  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -85,7 +85,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
   return (
     <SidebarMenuItem className="relative">
       {active && (
-        <span className="absolute -left-[1px] top-1/2 z-20 h-9 w-[5px] -translate-y-1/2 rounded-full bg-white" />
+        // Palito mais largo (7px) e mais próximo à margem esquerda (left-0)
+        <span className="absolute left-0 top-1/2 z-20 h-9 w-[7px] -translate-y-1/2 rounded-full bg-white" />
       )}
 
       <SidebarMenuButton
@@ -94,7 +95,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200",
-          collapsed ? "ml-2 justify-center rounded-lg px-0" : "ml-2 rounded-lg px-3",
+          collapsed ? "ml-1 justify-center rounded-lg px-0" : "ml-1 rounded-lg px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
             : "text-white/72 hover:bg-white/8 hover:text-white",
@@ -128,13 +129,16 @@ export function AppSidebar() {
       className="border-none bg-transparent p-0"
       style={
         {
-          "--sidebar-width": "272px",
-          "--sidebar-width-icon": "72px",
+          // Larguras um pouco menores
+          "--sidebar-width": "240px",
+          "--sidebar-width-icon": "60px",
         } as React.CSSProperties
       }
     >
-      <div className="h-full w-full bg-black p-2">
-        <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+      {/* bg transparente igual ao bg da página, só o inner é preto */}
+      <div className="h-full w-full bg-transparent py-2 pl-2 pr-0">
+        {/* Bordas arredondadas apenas no lado direito */}
+        <div className="flex h-full w-full flex-col overflow-hidden rounded-r-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
           <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
             <Link
               to="/"
@@ -176,7 +180,6 @@ export function AppSidebar() {
                 <SidebarMenu className="gap-1.5">
                   {group.items.map((item) => {
                     const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
-
                     return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
                   })}
                 </SidebarMenu>
@@ -188,11 +191,10 @@ export function AppSidebar() {
             <button
               type="button"
               onClick={toggleSidebar}
-              className={cn(
-                "flex h-10 w-full items-center justify-center rounded-lg text-white/65 transition-colors hover:bg-white/8 hover:text-white",
-              )}
+              className="flex h-10 w-full items-center justify-center rounded-lg text-white/65 transition-colors hover:bg-white/8 hover:text-white"
             >
-              {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              {/* Ícone antigo estilo painel */}
+              {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
             </button>
           </div>
         </div>
