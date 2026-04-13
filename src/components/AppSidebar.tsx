@@ -83,7 +83,24 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
   const Icon = item.icon;
 
   return (
-    <SidebarMenuItem className="relative">
+    // overflow-visible aqui para o palito não ser cortado
+    <SidebarMenuItem className="relative overflow-visible">
+      {/* Palito no SidebarMenuItem, fora do Link */}
+      {active && (
+        <span
+          className="pointer-events-none absolute z-50"
+          style={{
+            left: 0,
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: "4px",
+            height: "28px",
+            background: "#ffffff",
+            borderRadius: "0 4px 4px 0",
+          }}
+        />
+      )}
+
       <SidebarMenuButton
         asChild
         isActive={active}
@@ -98,21 +115,6 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         )}
       >
         <Link to={item.path}>
-          {/* Palito na borda esquerda do container do sidebar, não do item */}
-          {active && (
-            <span
-              style={{
-                position: "absolute",
-                left: "-16px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: "4px",
-                height: "28px",
-                background: "#fff",
-                borderRadius: "0 4px 4px 0",
-              }}
-            />
-          )}
           <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
@@ -144,7 +146,6 @@ export function AppSidebar() {
         } as React.CSSProperties
       }
     >
-      {/* Sem wrap — ocupa 100% e bordas arredondadas só à direita */}
       <div className="flex h-full w-full flex-col overflow-hidden rounded-r-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
         <SidebarHeader className={cn("px-4 pb-3 pt-3", collapsed && "px-3")}>
           <Link
@@ -172,8 +173,10 @@ export function AppSidebar() {
         <SidebarContent
           className={cn(
             "pb-3",
+            // overflow-visible para o palito aparecer fora do padding
+            "overflow-x-visible overflow-y-auto",
             collapsed ? "px-3" : "px-4",
-            "overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+            "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           )}
         >
           {navGroups.map((group, groupIndex) => (
@@ -184,7 +187,8 @@ export function AppSidebar() {
                 </div>
               )}
 
-              <SidebarMenu className="gap-1.5">
+              {/* overflow-visible no SidebarMenu também */}
+              <SidebarMenu className="gap-1.5 overflow-visible">
                 {group.items.map((item) => {
                   const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
                   return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
