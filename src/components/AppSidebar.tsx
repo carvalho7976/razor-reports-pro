@@ -146,7 +146,8 @@ export function AppSidebar() {
       }
     >
       {/* padding em volta para dar espaço da página + bordas arredondadas em todos os lados */}
-      <div className="p-2 h-full w-full">
+      <div className="p-2 h-full w-full bg-transparent">
+        {" "}
         <div
           className="flex h-full w-full flex-col rounded-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]"
           style={{ overflow: "visible" }}
