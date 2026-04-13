@@ -91,8 +91,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
             left: "-16px",
             top: "50%",
             transform: "translateY(-50%)",
-            width: "7px",
-            height: "40px",
+            width: collapsed ? "4px" : "6px",
+            height: collapsed ? "24px" : "28px",
             backgroundColor: "#ffffff",
             borderRadius: "0 4px 4px 0",
             zIndex: 50,
@@ -106,13 +106,14 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200 rounded-lg",
-          collapsed ? "justify-center px-0" : "px-3",
+          // ícones centralizados no collapsed
+          collapsed ? "flex justify-center items-center px-0 w-full" : "px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
             : "text-white/72 hover:bg-white/8 hover:text-white",
         )}
       >
-        <Link to={item.path}>
+        <Link to={item.path} className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}>
           <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
@@ -140,80 +141,84 @@ export function AppSidebar() {
       style={
         {
           "--sidebar-width": "272px",
-          "--sidebar-width-icon": "72px",
+          "--sidebar-width-icon": "56px", // ← menu recolhido mais estreito
         } as React.CSSProperties
       }
     >
-      <div className="flex h-full w-full flex-col rounded-r-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
-        <SidebarHeader className={cn("px-4 pb-3 pt-3", collapsed && "px-3")}>
-          <Link
-            to="/"
-            className={cn(
-              "flex items-center gap-3 transition-colors",
-              collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
-            )}
-          >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/10 text-white">
-              <Scissors className="h-5 w-5" />
-            </div>
-
-            {!collapsed && (
-              <div className="min-w-0">
-                <p className="truncate text-[18px] font-bold leading-none text-white">
-                  FRIZZAR<span className="text-primary">.</span>
-                </p>
-                <p className="mt-1 truncate text-[11px] text-white/45">Painel de gestão</p>
-              </div>
-            )}
-          </Link>
-        </SidebarHeader>
-
-        <SidebarContent
-          className={cn(
-            "pb-3",
-            // overflow-visible para o palito aparecer fora do padding
-            "overflow-x-visible overflow-y-auto",
-            collapsed ? "px-3" : "px-4",
-            "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-          )}
+      {/* padding em volta para dar espaço da página + bordas arredondadas em todos os lados */}
+      <div className="p-2 h-full w-full">
+        <div
+          className="flex h-full w-full flex-col rounded-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]"
+          style={{ overflow: "visible" }}
         >
-          {navGroups.map((group, groupIndex) => (
-            <div key={groupIndex} className="mb-4 last:mb-0">
-              {!collapsed && group.title && (
-                <div className="px-3 pb-2 pt-2">
-                  <p className="text-[11px] font-semibold text-white/22">{group.title}</p>
+          <SidebarHeader className={cn("px-4 pb-3 pt-3", collapsed && "px-2")}>
+            <Link
+              to="/"
+              className={cn(
+                "flex items-center gap-3 transition-colors",
+                collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
+              )}
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/10 text-white">
+                <Scissors className="h-5 w-5" />
+              </div>
+
+              {!collapsed && (
+                <div className="min-w-0">
+                  <p className="truncate text-[18px] font-bold leading-none text-white">
+                    FRIZZAR<span className="text-primary">.</span>
+                  </p>
+                  <p className="mt-1 truncate text-[11px] text-white/45">Painel de gestão</p>
                 </div>
               )}
+            </Link>
+          </SidebarHeader>
 
-              {/* overflow-visible no SidebarMenu também */}
-              <SidebarMenu className="gap-1.5 overflow-visible">
-                {group.items.map((item) => {
-                  const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
-                  return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
-                })}
-              </SidebarMenu>
-            </div>
-          ))}
-        </SidebarContent>
-
-        <div className={cn("mt-auto pb-3 pt-2", collapsed ? "px-3" : "px-4")}>
-          <button
-            type="button"
-            onClick={toggleSidebar}
+          <SidebarContent
             className={cn(
-              "flex h-10 w-full items-center gap-3 rounded-lg px-3 text-white/65 transition-colors hover:bg-white/8 hover:text-white",
-              collapsed && "justify-center px-0",
+              "pb-3",
+              collapsed ? "px-2" : "px-4",
+              "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+              "overflow-x-visible overflow-y-auto",
             )}
           >
-            {collapsed ? (
-              <PanelLeftOpen className="h-4 w-4 shrink-0" />
-            ) : (
-              <>
-                <PanelLeftClose className="h-4 w-4 shrink-0" />
-                <span className="text-sm font-medium">Recolher menu</span>
-              </>
-            )}
-          </button>
+            {navGroups.map((group, groupIndex) => (
+              <div key={groupIndex} className="mb-4 last:mb-0">
+                {!collapsed && group.title && (
+                  <div className="px-3 pb-2 pt-2">
+                    <p className="text-[11px] font-semibold text-white/22">{group.title}</p>
+                  </div>
+                )}
+
+                <SidebarMenu className="gap-1.5 overflow-visible">
+                  {group.items.map((item) => {
+                    const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+                    return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
+                  })}
+                </SidebarMenu>
+              </div>
+            ))}
+          </SidebarContent>
+
+          <div className={cn("mt-auto pb-3 pt-2", collapsed ? "px-2" : "px-4")}>
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className={cn(
+                "flex h-10 w-full items-center gap-3 rounded-lg px-3 text-white/65 transition-colors hover:bg-white/8 hover:text-white",
+                collapsed && "justify-center px-0",
+              )}
+            >
+              {collapsed ? (
+                <PanelLeftOpen className="h-4 w-4 shrink-0" />
+              ) : (
+                <>
+                  <PanelLeftClose className="h-4 w-4 shrink-0" />
+                  <span className="text-sm font-medium">Recolher menu</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </Sidebar>
