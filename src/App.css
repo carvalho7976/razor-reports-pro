@@ -40,6 +40,3 @@
 .read-the-docs {
   color: #888;
 }
-[data-sidebar="sidebar"] {
-  transition: width 0.3s ease-in-out !important;
-}
