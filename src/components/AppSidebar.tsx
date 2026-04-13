@@ -81,6 +81,7 @@ const navGroups: NavGroup[] = [
 
 function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed: boolean; active: boolean }) {
   const Icon = item.icon;
+  const { toggleSidebar } = useSidebar();
 
   return (
     <SidebarMenuItem className="relative">
@@ -88,12 +89,11 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         <span
           style={{
             position: "absolute",
-            // no collapsed fica dentro do item (left: 0), no expandido sai para a borda (left: -16px)
-            left: collapsed ? "-15px" : "-16px",
+            left: collapsed ? "0" : "-16px",
             top: "50%",
             transform: "translateY(-50%)",
-            width: collapsed ? "10px" : "7px",
-            height: collapsed ? "25px" : "35px",
+            width: collapsed ? "4px" : "6px",
+            height: collapsed ? "24px" : "28px",
             backgroundColor: "#ffffff",
             borderRadius: collapsed ? "4px" : "0 4px 4px 0",
             zIndex: 50,
@@ -113,7 +113,18 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
             : "text-white/72 hover:bg-white/8 hover:text-white",
         )}
       >
-        <Link to={item.path} className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}>
+        <Link
+          to={item.path}
+          className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}
+          onClick={
+            collapsed
+              ? (e) => {
+                  e.preventDefault();
+                  toggleSidebar();
+                }
+              : undefined
+          }
+        >
           <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
