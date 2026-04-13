@@ -142,6 +142,7 @@ export function AppSidebar() {
         {
           "--sidebar-width": "272px",
           "--sidebar-width-icon": "65px",
+          "--sidebar-transition": "width 0.3s ease-in-out",
         } as React.CSSProperties
       }
     >
