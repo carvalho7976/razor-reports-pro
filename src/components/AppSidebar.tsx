@@ -141,7 +141,7 @@ export function AppSidebar() {
       style={
         {
           "--sidebar-width": "272px",
-          "--sidebar-width-icon": "70px", // ← menu recolhido mais estreito
+          "--sidebar-width-icon": "65px", // ← menu recolhido mais estreito
         } as React.CSSProperties
       }
     >
