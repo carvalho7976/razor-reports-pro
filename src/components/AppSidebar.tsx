@@ -89,7 +89,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
           style={{
             position: "absolute",
             // no collapsed fica dentro do item (left: 0), no expandido sai para a borda (left: -16px)
-            left: collapsed ? "0" : "-16px",
+            left: collapsed ? "-10px" : "-16px",
             top: "50%",
             transform: "translateY(-50%)",
             width: collapsed ? "20px" : "7px",
