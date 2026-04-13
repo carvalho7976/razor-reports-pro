@@ -154,4 +154,7 @@ shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
   .date-preset-btn-active {
     @apply bg-primary text-primary-foreground shadow-sm shadow-primary/20;
   }
+  [data-sidebar="sidebar"] {
+    transition: width 0.3s ease-in-out !important;
+  }
 }
