@@ -93,7 +93,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
             top: "50%",
             transform: "translateY(-50%)",
             width: collapsed ? "10px" : "7px",
-            height: collapsed ? "25px" : "40px",
+            height: collapsed ? "25px" : "35px",
             backgroundColor: "#ffffff",
             borderRadius: collapsed ? "4px" : "0 4px 4px 0",
             zIndex: 50,
