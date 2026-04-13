@@ -137,7 +137,7 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className="border-none bg-transparent p-0"
+      className="border-none bg-transparent p-0 [&>[data-sidebar=sidebar]]:bg-transparent"
       style={
         {
           "--sidebar-width": "272px",
