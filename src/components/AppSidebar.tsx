@@ -84,11 +84,11 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
   return (
     <SidebarMenuItem className="relative">
-      {/* Palito fixado na borda esquerda do sidebar, fora do padding do item */}
+      {/* Palito colado na borda esquerda absoluta do sidebar */}
       {active && (
         <span
-          className="pointer-events-none absolute top-1/2 z-20 h-8 w-[5px] -translate-y-1/2 rounded-full bg-white"
-          style={{ left: "-12px" }}
+          className="pointer-events-none absolute top-1/2 z-20 h-8 w-[6px] -translate-y-1/2 rounded-full bg-white"
+          style={{ left: 0 }}
         />
       )}
 
@@ -98,8 +98,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         tooltip={item.label}
         className={cn(
           "relative h-10 text-sm font-medium transition-all duration-200",
-          "rounded-lg px-3",
-          collapsed && "justify-center px-0",
+          "rounded-lg",
+          collapsed ? "justify-center px-0" : "px-3",
           active
             ? "!bg-white !text-black hover:!bg-white hover:!text-black"
             : "text-white/72 hover:bg-white/8 hover:text-white",
@@ -132,14 +132,14 @@ export function AppSidebar() {
       className="border-none bg-transparent p-0"
       style={
         {
-          "--sidebar-width": "240px",
-          "--sidebar-width-icon": "60px",
+          "--sidebar-width": "272px",
+          "--sidebar-width-icon": "72px",
         } as React.CSSProperties
       }
     >
-      {/* Container com todas as bordas arredondadas, sem wrap */}
-      <div className="m-2 flex h-[calc(100%-16px)] flex-col overflow-hidden rounded-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
-        <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
+      {/* Sem wrap — ocupa 100% e bordas arredondadas só à direita */}
+      <div className="flex h-full w-full flex-col overflow-hidden rounded-r-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+        <SidebarHeader className={cn("px-4 pb-3 pt-3", collapsed && "px-3")}>
           <Link
             to="/"
             className={cn(
@@ -165,7 +165,7 @@ export function AppSidebar() {
         <SidebarContent
           className={cn(
             "pb-3",
-            collapsed ? "px-2" : "px-4", // px-4 para o palito ter espaço à esquerda
+            collapsed ? "px-3" : "px-4",
             "overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           )}
         >
@@ -187,8 +187,7 @@ export function AppSidebar() {
           ))}
         </SidebarContent>
 
-        {/* Botão de recolher com ícone + label como item de menu normal */}
-        <div className={cn("mt-auto pb-3 pt-2", collapsed ? "px-2" : "px-4")}>
+        <div className={cn("mt-auto pb-3 pt-2", collapsed ? "px-3" : "px-4")}>
           <button
             type="button"
             onClick={toggleSidebar}
