@@ -125,7 +125,7 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className="border-none bg-transparent p-2"
+      className="border-none bg-transparent p-0"
       style={
         {
           "--sidebar-width": "272px",
@@ -133,67 +133,68 @@ export function AppSidebar() {
         } as React.CSSProperties
       }
     >
-      <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
-        <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
-          <Link
-            to="/"
-            className={cn(
-              "flex items-center gap-3 transition-colors",
-              collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
-            )}
-          >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/10 text-white">
-              <Scissors className="h-5 w-5" />
-            </div>
-
-            {!collapsed && (
-              <div className="min-w-0">
-                <p className="truncate text-[18px] font-bold leading-none text-white">
-                  FRIZZAR<span className="text-primary">.</span>
-                </p>
-                <p className="mt-1 truncate text-[11px] text-white/45">Painel de gestão</p>
+      <div className="h-full w-full p-2">
+        <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+          <SidebarHeader className={cn("px-3 pb-3 pt-3", collapsed && "px-2")}>
+            <Link
+              to="/"
+              className={cn(
+                "flex items-center gap-3 transition-colors",
+                collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
+              )}
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/10 text-white">
+                <Scissors className="h-5 w-5" />
               </div>
-            )}
-          </Link>
-        </SidebarHeader>
 
-        <SidebarContent
-          className={cn(
-            "px-3 pb-3",
-            collapsed && "px-2",
-            "overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-          )}
-        >
-          {navGroups.map((group, groupIndex) => (
-            <div key={groupIndex} className="mb-4 last:mb-0">
-              {!collapsed && group.title && (
-                <div className="px-3 pb-2 pt-2">
-                  <p className="text-[11px] font-semibold text-white/22">{group.title}</p>
+              {!collapsed && (
+                <div className="min-w-0">
+                  <p className="truncate text-[18px] font-bold leading-none text-white">
+                    FRIZZAR<span className="text-primary">.</span>
+                  </p>
+                  <p className="mt-1 truncate text-[11px] text-white/45">Painel de gestão</p>
                 </div>
               )}
+            </Link>
+          </SidebarHeader>
 
-              <SidebarMenu className="gap-1.5">
-                {group.items.map((item) => {
-                  const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
-
-                  return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
-                })}
-              </SidebarMenu>
-            </div>
-          ))}
-        </SidebarContent>
-
-        <div className="mt-auto px-3 pb-3 pt-2">
-          <button
-            type="button"
-            onClick={toggleSidebar}
+          <SidebarContent
             className={cn(
-              "flex h-10 w-full items-center text-white/65 hover:bg-white/8 hover:text-white transition-colors rounded-lg",
-              collapsed ? "justify-center px-0" : "justify-center px-0",
+              "px-3 pb-3",
+              collapsed && "px-2",
+              "overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
             )}
           >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
+            {navGroups.map((group, groupIndex) => (
+              <div key={groupIndex} className="mb-4 last:mb-0">
+                {!collapsed && group.title && (
+                  <div className="px-3 pb-2 pt-2">
+                    <p className="text-[11px] font-semibold text-white/22">{group.title}</p>
+                  </div>
+                )}
+
+                <SidebarMenu className="gap-1.5">
+                  {group.items.map((item) => {
+                    const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+
+                    return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
+                  })}
+                </SidebarMenu>
+              </div>
+            ))}
+          </SidebarContent>
+
+          <div className="mt-auto px-3 pb-3 pt-2">
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className={cn(
+                "flex h-10 w-full items-center justify-center rounded-lg text-white/65 transition-colors hover:bg-white/8 hover:text-white",
+              )}
+            >
+              {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
       </div>
     </Sidebar>
