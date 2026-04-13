@@ -98,8 +98,21 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         )}
       >
         <Link to={item.path}>
-          {/* Palito absolutamente posicionado dentro do botão, borda esquerda do item */}
-          {active && <span className="absolute left-0 top-1/2 h-6 w-[5px] -translate-y-1/2 rounded-full bg-black" />}
+          {/* Palito na borda esquerda do container do sidebar, não do item */}
+          {active && (
+            <span
+              style={{
+                position: "absolute",
+                left: "-16px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "4px",
+                height: "28px",
+                background: "#fff",
+                borderRadius: "0 4px 4px 0",
+              }}
+            />
+          )}
           <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
