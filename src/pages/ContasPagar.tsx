@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
-import { CheckCircle, XCircle, Pencil, Trash2, CreditCard } from "lucide-react";
+import { CheckCircle, XCircle, Pencil, Trash2, CreditCard, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
