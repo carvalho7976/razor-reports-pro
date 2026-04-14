@@ -78,7 +78,7 @@ export default function CancelamentoAssinaturas() {
     {
       label: "Valor Total",
       value: R$(initialData.reduce((s, r) => s + r.valor, 0)),
-      icon: <BanknoteIcon className="h-4 w-4" />,
+      icon: <DollarSign className="h-4 w-4" />,
       color: "red",
     },
   ];
