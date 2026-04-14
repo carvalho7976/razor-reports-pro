@@ -18,12 +18,60 @@ interface Conta {
 }
 
 const initialData: Conta[] = [
-  { id: 1, conta: "Aluguel", descricao: "Aluguel do salão", vencimento: "10/03/2026", valor: 3500, status: "Pendente", dataPagamento: "" },
-  { id: 2, conta: "Energia", descricao: "Conta de luz", vencimento: "15/03/2026", valor: 890, status: "Pendente", dataPagamento: "" },
-  { id: 3, conta: "Água", descricao: "Conta de água", vencimento: "12/03/2026", valor: 280, status: "Pago", dataPagamento: "12/03/2026" },
-  { id: 4, conta: "Internet", descricao: "Internet fibra", vencimento: "20/03/2026", valor: 199.9, status: "Pendente", dataPagamento: "" },
-  { id: 5, conta: "Fornecedor", descricao: "Produtos de barba", vencimento: "05/03/2026", valor: 1250, status: "Pago", dataPagamento: "04/03/2026" },
-  { id: 6, conta: "Manutenção", descricao: "Reparo cadeira", vencimento: "25/03/2026", valor: 450, status: "Pendente", dataPagamento: "" },
+  {
+    id: 1,
+    conta: "Aluguel",
+    descricao: "Aluguel do salão",
+    vencimento: "10/03/2026",
+    valor: 3500,
+    status: "Pendente",
+    dataPagamento: "",
+  },
+  {
+    id: 2,
+    conta: "Energia",
+    descricao: "Conta de luz",
+    vencimento: "15/03/2026",
+    valor: 890,
+    status: "Pendente",
+    dataPagamento: "",
+  },
+  {
+    id: 3,
+    conta: "Água",
+    descricao: "Conta de água",
+    vencimento: "12/03/2026",
+    valor: 280,
+    status: "Pago",
+    dataPagamento: "12/03/2026",
+  },
+  {
+    id: 4,
+    conta: "Internet",
+    descricao: "Internet fibra",
+    vencimento: "20/03/2026",
+    valor: 199.9,
+    status: "Pendente",
+    dataPagamento: "",
+  },
+  {
+    id: 5,
+    conta: "Fornecedor",
+    descricao: "Produtos de barba",
+    vencimento: "05/03/2026",
+    valor: 1250,
+    status: "Pago",
+    dataPagamento: "04/03/2026",
+  },
+  {
+    id: 6,
+    conta: "Manutenção",
+    descricao: "Reparo cadeira",
+    vencimento: "25/03/2026",
+    valor: 450,
+    status: "Pendente",
+    dataPagamento: "",
+  },
 ];
 
 const tabFilter = (row: Conta, tab: string) => {
@@ -33,8 +81,18 @@ const tabFilter = (row: Conta, tab: string) => {
 };
 
 const buildCards = (filtered: Conta[]): SummaryCard[] => [
-  { label: "Em aberto", value: R$(filtered.filter(d => d.status === "Pendente").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "red" },
-  { label: "Pago", value: R$(filtered.filter(d => d.status === "Pago").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "green" },
+  {
+    label: "Em aberto",
+    value: R$(filtered.filter((d) => d.status === "Pendente").reduce((s, r) => s + r.valor, 0)),
+    icon: <DollarSign className="h-4 w-4" />,
+    color: "red",
+  },
+  {
+    label: "Pago",
+    value: R$(filtered.filter((d) => d.status === "Pago").reduce((s, r) => s + r.valor, 0)),
+    icon: <DollarSign className="h-4 w-4" />,
+    color: "green",
+  },
 ];
 
 export default function ContasPagar() {
@@ -44,47 +102,95 @@ export default function ContasPagar() {
   const { toast } = useToast();
 
   const toggleStatus = (id: number) => {
-    setAllData(prev => prev.map(d => d.id === id ? { ...d, status: d.status === "Pendente" ? "Pago" : "Pendente", dataPagamento: d.status === "Pendente" ? new Date().toLocaleDateString("pt-BR") : "" } : d));
+    setAllData((prev) =>
+      prev.map((d) =>
+        d.id === id
+          ? {
+              ...d,
+              status: d.status === "Pendente" ? "Pago" : "Pendente",
+              dataPagamento: d.status === "Pendente" ? new Date().toLocaleDateString("pt-BR") : "",
+            }
+          : d,
+      ),
+    );
     toast({ title: "Status atualizado" });
   };
 
   const remove = (id: number) => {
-    setAllData(prev => prev.filter(d => d.id !== id));
+    setAllData((prev) => prev.filter((d) => d.id !== id));
     toast({ title: "Conta removida", variant: "destructive" });
   };
 
   const bulkMarkPaid = (indices: number[]) => {
-    const ids = indices.map(i => allData[i]?.id).filter(Boolean);
-    setAllData(prev => prev.map(d => ids.includes(d.id) ? { ...d, status: "Pago", dataPagamento: new Date().toLocaleDateString("pt-BR") } : d));
+    const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
+    setAllData((prev) =>
+      prev.map((d) =>
+        ids.includes(d.id) ? { ...d, status: "Pago", dataPagamento: new Date().toLocaleDateString("pt-BR") } : d,
+      ),
+    );
     toast({ title: `${ids.length} conta(s) marcada(s) como paga(s)` });
   };
 
   const bulkDelete = (indices: number[]) => {
-    const ids = indices.map(i => allData[i]?.id).filter(Boolean);
-    setAllData(prev => prev.filter(d => !ids.includes(d.id)));
+    const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
+    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
     toast({ title: `${ids.length} conta(s) removida(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Pagar", icon: <CheckCircle className="h-4 w-4" />, onClick: bulkMarkPaid, description: "Marca as contas selecionadas como pagas" },
-    { label: "Deletar", icon: <Trash2 className="h-4 w-4" />, onClick: bulkDelete, variant: "destructive", description: "Remove permanentemente as contas selecionadas" },
+    {
+      label: "Pagar",
+      icon: <CheckCircle className="h-4 w-4" />,
+      onClick: bulkMarkPaid,
+      description: "Marca as contas selecionadas como pagas",
+    },
+    {
+      label: "Deletar",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkDelete,
+      variant: "destructive",
+      description: "Remove permanentemente as contas selecionadas",
+    },
   ];
 
   const columns: Column<Conta>[] = [
     { key: "conta", label: "Conta", pinned: true },
     { key: "descricao", label: "Descrição" },
     { key: "vencimento", label: "Vencimento" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "status", label: "Status", render: v => <span className="font-medium" style={{ color: v === "Pago" ? "#00c5b4" : "#ff2f2f" }}>{v}</span> },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    {
+      key: "status",
+      label: "Status",
+      render: (v) => (
+        <span className="font-medium" style={{ color: v === "Pago" ? "#00c5b4" : "#ff2f2f" }}>
+          {v}
+        </span>
+      ),
+    },
     { key: "dataPagamento", label: "Data do Pagamento" },
     {
-      key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
+      key: "acoes" as any,
+      label: "Ações",
+      sortable: false,
+      filterable: false,
+      align: "center",
       render: (_v: any, row: Conta) => (
-        <ActionsMenu items={[
-          { label: row.status === "Pendente" ? "Marcar como pago" : "Marcar como pendente", icon: row.status === "Pendente" ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />, onClick: () => toggleStatus(row.id) },
-          { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
-          { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive", onClick: () => remove(row.id) },
-        ]} />
+        <ActionsMenu
+          items={[
+            {
+              label: row.status === "Pendente" ? "Marcar como pago" : "Marcar como pendente",
+              icon: row.status === "Pendente" ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />,
+              onClick: () => toggleStatus(row.id),
+            },
+            { label: "Editar", icon: <Pencil className="h-4 w-4" /> },
+            {
+              label: "Excluir",
+              icon: <Trash2 className="h-4 w-4" />,
+              variant: "destructive",
+              onClick: () => remove(row.id),
+            },
+          ]}
+        />
       ),
     },
   ];
@@ -114,7 +220,12 @@ export default function ContasPagar() {
         showDateFilter={true}
         tableId="contas_pagar"
       />
-      <YouTubeModal open={aulaOpen} onClose={() => setAulaOpen(false)} videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Aula - Contas a Pagar" />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Contas a Pagar"
+      />
     </AppLayout>
   );
 }
