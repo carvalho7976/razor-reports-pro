@@ -198,12 +198,12 @@ export default function FluxoCaixa() {
     {
       label: "Entradas",
       value: R$(totalEntrada),
-      icon: <CreditCard className="h-4 w-4" />,
+      icon: <DollarSign className="h-4 w-4" />,
       size: "wide",
       color: "green",
     },
-    { label: "Saídas", value: R$(totalSaida), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "red" },
-    { label: "Saldo", value: R$(saldo), icon: <CreditCard className="h-4 w-4" />, size: "wide", color: "blue" },
+    { label: "Saídas", value: R$(totalSaida), icon: <DollarSign className="h-4 w-4" />, size: "wide", color: "red" },
+    { label: "Saldo", value: R$(saldo), icon: <DollarSign className="h-4 w-4" />, size: "wide", color: "blue" },
   ];
 
   const resumidoData: FluxoResumido[] = useMemo(() => {
