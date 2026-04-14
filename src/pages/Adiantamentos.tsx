@@ -81,8 +81,8 @@ export default function Adiantamentos() {
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Em Aberto", value: R$(totalEmAberto), icon: <CreditCard className="h-4 w-4" />, color: "red" },
-    { label: "Devolvido", value: R$(totalDevolvido), icon: <CreditCard className="h-4 w-4" />, color: "green" },
+    { label: "Em Aberto", value: R$(totalEmAberto), icon: <handshake className="h-4 w-4" />, color: "red" },
+    { label: "Devolvido", value: R$(totalDevolvido), icon: <handshake className="h-4 w-4" />, color: "green" },
   ];
 
   const columns: Column<Adiantamento>[] = [
