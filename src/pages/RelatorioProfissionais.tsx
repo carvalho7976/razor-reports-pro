@@ -264,7 +264,7 @@ export default function RelatorioProfissionais() {
     {
       label: "Total em aberto",
       value: R$(totalAberto),
-      icon: <dollar-sign className="h-4 w-4" />,
+      icon: <Banknote className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
