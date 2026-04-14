@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, FileText, Receipt, Hash } from "lucide-react";
+import { CreditCard, FileText, Receipt, Hash, DollarSign, Tag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
