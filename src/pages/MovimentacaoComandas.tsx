@@ -175,7 +175,7 @@ export default function MovimentacaoComandas() {
       label: "Total de Comandas",
       value: String(totalComandas),
       type: "quantity",
-      icon: <Hash className="h-4 w-4" />,
+      icon: <notepad-text className="h-4 w-4" />,
       size: "compact",
       color: "blue",
     },
