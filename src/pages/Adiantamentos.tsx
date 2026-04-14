@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
-import { User, CheckCircle, Trash2, CreditCard } from "lucide-react";
+import { User, CheckCircle, Trash2, Handshake } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
@@ -81,8 +81,8 @@ export default function Adiantamentos() {
   ];
 
   const summaryCards: SummaryCard[] = [
-    { label: "Em Aberto", value: R$(totalEmAberto), icon: <handshake className="h-4 w-4" />, color: "red" },
-    { label: "Devolvido", value: R$(totalDevolvido), icon: <handshake className="h-4 w-4" />, color: "green" },
+    { label: "Em Aberto", value: R$(totalEmAberto), icon: <Handshake className="h-4 w-4" />, color: "red" },
+    { label: "Devolvido", value: R$(totalDevolvido), icon: <Handshake className="h-4 w-4" />, color: "green" },
   ];
 
   const columns: Column<Adiantamento>[] = [

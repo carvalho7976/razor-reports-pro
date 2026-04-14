@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
-import { User, CreditCard } from "lucide-react";
+import { User, CreditCard, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

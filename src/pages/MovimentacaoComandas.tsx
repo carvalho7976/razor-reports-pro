@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, FileText, Receipt, Hash, DollarSign, Tag } from "lucide-react";
+import { CreditCard, FileText, Receipt, Hash, DollarSign, Tag, NotepadText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
@@ -175,7 +175,7 @@ export default function MovimentacaoComandas() {
       label: "Total de Comandas",
       value: String(totalComandas),
       type: "quantity",
-      icon: <notepad-text className="h-4 w-4" />,
+      icon: <NotepadText className="h-4 w-4" />,
       size: "compact",
       color: "blue",
     },
