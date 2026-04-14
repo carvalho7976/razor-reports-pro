@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
-import { User, CheckCircle, Printer, CreditCard } from "lucide-react";
+import { User, CheckCircle, Printer, CreditCard, HandCoins, Handshake } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 
@@ -119,25 +119,25 @@ export default function ComissoesPagar() {
     {
       label: "Comissões em Aberto",
       value: R$(totalComissoesEmAberto),
-      icon: <hand-coins className="h-4 w-4" />,
+      icon: <HandCoins className="h-4 w-4" />,
       color: "red",
     },
     {
       label: "Comissões Pagas",
       value: R$(totalComissoesPagas),
-      icon: <hand-coins className="h-4 w-4" />,
+      icon: <HandCoins className="h-4 w-4" />,
       color: "blue",
     },
     {
       label: "Adiantamento em Aberto",
       value: R$(totalAdiantamentosEmAberto),
-      icon: <handshake className="h-4 w-4" />,
+      icon: <Handshake className="h-4 w-4" />,
       color: "red",
     },
     {
       label: "Adiantamento Pago",
       value: R$(totalAdiantamentosPagos),
-      icon: <handshake className="h-4 w-4" />,
+      icon: <Handshake className="h-4 w-4" />,
       color: "blue",
     },
   ];
