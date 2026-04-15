@@ -1,7 +1,7 @@
 import { useMemo, useState, type KeyboardEvent } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, TabDef, SummaryCard } from "@/components/DataTable";
-import { User, CreditCard, Hash, Trash2, ChevronLeft } from "lucide-react";
+import { User, CreditCard, Hash, Trash2, ChevronLeft, SprayCan, DollarSign } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { TextField, Dropdown } from "@/components/FormModal";
