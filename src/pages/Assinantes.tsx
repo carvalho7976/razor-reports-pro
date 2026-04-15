@@ -19,12 +19,66 @@ interface Assinante {
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const initialData: Assinante[] = [
-  { id: 1, nome: "CAIO CESAR DE SOUZA FERNANDES", telefone: "(41) 99123-4567", plano: "Plano Mensal", inicio: "01/01/2026", vencimento: "01/04/2026", valor: 89.9, status: "Ativo" },
-  { id: 2, nome: "Everton", telefone: "(41) 99876-5432", plano: "Plano Trimestral", inicio: "15/12/2025", vencimento: "15/03/2026", valor: 239.9, status: "Atrasado" },
-  { id: 3, nome: "Luis Alberto Santos", telefone: "(41) 98432-1098", plano: "Plano Mensal", inicio: "10/02/2026", vencimento: "10/03/2026", valor: 89.9, status: "Atrasado" },
-  { id: 4, nome: "Gean", telefone: "(41) 99654-3210", plano: "Plano Semestral", inicio: "01/11/2025", vencimento: "01/05/2026", valor: 449.9, status: "Ativo" },
-  { id: 5, nome: "Marcel Pires", telefone: "(41) 99111-2233", plano: "Plano Mensal", inicio: "20/02/2026", vencimento: "20/03/2026", valor: 89.9, status: "Atrasado" },
-  { id: 6, nome: "Diego Almeida", telefone: "(41) 98765-4321", plano: "Plano Mensal", inicio: "05/03/2026", vencimento: "05/04/2026", valor: 89.9, status: "Ativo" },
+  {
+    id: 1,
+    nome: "CAIO CESAR DE SOUZA FERNANDES",
+    telefone: "(41) 99123-4567",
+    plano: "Plano Mensal",
+    inicio: "01/01/2026",
+    vencimento: "01/04/2026",
+    valor: 89.9,
+    status: "Ativo",
+  },
+  {
+    id: 2,
+    nome: "Everton",
+    telefone: "(41) 99876-5432",
+    plano: "Plano Trimestral",
+    inicio: "15/12/2025",
+    vencimento: "15/03/2026",
+    valor: 239.9,
+    status: "Atrasado",
+  },
+  {
+    id: 3,
+    nome: "Luis Alberto Santos",
+    telefone: "(41) 98432-1098",
+    plano: "Plano Mensal",
+    inicio: "10/02/2026",
+    vencimento: "10/03/2026",
+    valor: 89.9,
+    status: "Atrasado",
+  },
+  {
+    id: 4,
+    nome: "Gean",
+    telefone: "(41) 99654-3210",
+    plano: "Plano Semestral",
+    inicio: "01/11/2025",
+    vencimento: "01/05/2026",
+    valor: 449.9,
+    status: "Ativo",
+  },
+  {
+    id: 5,
+    nome: "Marcel Pires",
+    telefone: "(41) 99111-2233",
+    plano: "Plano Mensal",
+    inicio: "20/02/2026",
+    vencimento: "20/03/2026",
+    valor: 89.9,
+    status: "Atrasado",
+  },
+  {
+    id: 6,
+    nome: "Diego Almeida",
+    telefone: "(41) 98765-4321",
+    plano: "Plano Mensal",
+    inicio: "05/03/2026",
+    vencimento: "05/04/2026",
+    valor: 89.9,
+    status: "Ativo",
+  },
 ];
 
 const tabFilter = (row: Assinante, tab: string) => {
@@ -34,8 +88,18 @@ const tabFilter = (row: Assinante, tab: string) => {
 };
 
 const buildCards = (filtered: Assinante[]): SummaryCard[] => [
-  { label: "Total em Dia", value: R$(filtered.filter(d => d.status === "Ativo").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "green" },
-  { label: "Total Atrasado", value: R$(filtered.filter(d => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0)), icon: <CreditCard className="h-4 w-4" />, color: "red" },
+  {
+    label: "Total em Dia",
+    value: R$(filtered.filter((d) => d.status === "Ativo").reduce((s, r) => s + r.valor, 0)),
+    icon: <DollarSign className="h-4 w-4" />,
+    color: "green",
+  },
+  {
+    label: "Total Atrasado",
+    value: R$(filtered.filter((d) => d.status === "Atrasado").reduce((s, r) => s + r.valor, 0)),
+    icon: <DollarSign className="h-4 w-4" />,
+    color: "red",
+  },
 ];
 
 export default function Assinantes() {
@@ -45,27 +109,48 @@ export default function Assinantes() {
   const [tab, setTab] = useState("total");
 
   const bulkCancel = (indices: number[]) => {
-    const ids = indices.map(i => allData[i]?.id).filter(Boolean);
-    setAllData(prev => prev.filter(d => !ids.includes(d.id)));
+    const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
+    setAllData((prev) => prev.filter((d) => !ids.includes(d.id)));
     toast({ title: `${ids.length} assinatura(s) cancelada(s)`, variant: "destructive" });
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Cancelar Assinatura", icon: <XCircle className="h-4 w-4" />, onClick: bulkCancel, variant: "destructive", description: "Cancela as assinaturas selecionadas" },
+    {
+      label: "Cancelar Assinatura",
+      icon: <XCircle className="h-4 w-4" />,
+      onClick: bulkCancel,
+      variant: "destructive",
+      description: "Cancela as assinaturas selecionadas",
+    },
   ];
 
   const columns: Column<Assinante>[] = [
-    { key: "nome", label: "Nome", pinned: true, render: (v, row) => (
-      <div className="flex items-center gap-1.5">
-        <WhatsAppButton telefone={row.telefone} nome={row.nome} />
-        <a href="/clientePesquisa" className="hover:underline font-medium">{v}</a>
-      </div>
-    )},
+    {
+      key: "nome",
+      label: "Nome",
+      pinned: true,
+      render: (v, row) => (
+        <div className="flex items-center gap-1.5">
+          <WhatsAppButton telefone={row.telefone} nome={row.nome} />
+          <a href="/clientePesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
+        </div>
+      ),
+    },
     { key: "plano", label: "Plano" },
     { key: "inicio", label: "Início" },
     { key: "vencimento", label: "Vencimento" },
-    { key: "valor", label: "Valor", align: "right", render: v => R$(v) },
-    { key: "status", label: "Status", render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span> },
+    { key: "valor", label: "Valor", align: "right", render: (v) => R$(v) },
+    {
+      key: "status",
+      label: "Status",
+      render: (v) => (
+        <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>
+          {v}
+        </span>
+      ),
+    },
   ];
 
   const tabs: TabDef[] = [
@@ -92,7 +177,12 @@ export default function Assinantes() {
         pageSize={15}
         tableId="assinantes"
       />
-      <YouTubeModal open={aulaOpen} onClose={() => setAulaOpen(false)} videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Aula - Assinantes" />
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Assinantes"
+      />
     </AppLayout>
   );
 }
