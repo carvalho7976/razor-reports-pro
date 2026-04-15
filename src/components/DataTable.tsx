@@ -1481,7 +1481,7 @@ export function DataTable<T extends Record<string, any>>({
 
               <div className="h-4 w-px bg-border" />
 
-              {selectionActions.map((action, i) => (
+              {[...selectionActions].sort((a, b) => (a.variant === "destructive" ? 1 : 0) - (b.variant === "destructive" ? 1 : 0)).map((action, i) => (
                 <div key={i} className="inline-flex items-center gap-0.5">
                   <button
                     onClick={() => {
