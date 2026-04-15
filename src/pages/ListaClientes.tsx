@@ -580,20 +580,27 @@ export default function ListaClientes() {
   };
 
   const handleSaveTags = () => {
-    if (modal?.type !== "tags") return;
-
-    setAllData((prev) =>
-      prev.map((d) =>
-        d.cod === modal.item.cod
-          ? {
-              ...d,
-              tags: tagsList.join(", "),
-            }
-          : d,
-      ),
-    );
-
-    toast({ title: "Tags atualizadas" });
+    if (modal?.type === "tags") {
+      setAllData((prev) =>
+        prev.map((d) =>
+          d.cod === modal.item.cod ? { ...d, tags: tagsList.join(", ") } : d,
+        ),
+      );
+      toast({ title: "Tags atualizadas" });
+    } else if (modal?.type === "bulk-tags") {
+      const newTags = tagsList.join(", ");
+      setAllData((prev) =>
+        prev.map((d) => {
+          if (!modal.cods.includes(d.cod)) return d;
+          const existing = d.tags
+            ? d.tags.split(",").map((t) => t.trim()).filter(Boolean)
+            : [];
+          const merged = [...new Set([...existing, ...tagsList])];
+          return { ...d, tags: merged.join(", ") };
+        }),
+      );
+      toast({ title: `Tags adicionadas a ${modal.cods.length} cliente(s)` });
+    }
     closeModal();
   };
 
