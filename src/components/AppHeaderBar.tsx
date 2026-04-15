@@ -10,11 +10,12 @@ export function AppHeaderBar() {
       <button
         type="button"
         onClick={toggleSidebar}
-        className="rounded-lg p-1.5 hover:bg-black/5 transition-colors"
+        className="rounded-lg p-1.5 hover:bg-black/5 transition-colors md:hidden"
         aria-label="Menu"
       >
         <Menu className="h-5 w-5" />
       </button>
+      <div className="hidden md:block" />
 
       <div className="flex items-center gap-2 sm:gap-3">
         <button className="btn-action hidden border border-border bg-transparent py-1.5 text-xs text-foreground hover:bg-black/5 sm:inline-flex">
