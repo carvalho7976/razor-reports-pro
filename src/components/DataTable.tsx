@@ -641,25 +641,40 @@ export function ActionsMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node) && btnRef.current && !btnRef.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const handleToggle = () => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.right });
+    }
+    setOpen(!open);
+  };
+
   return (
-    <div className="relative inline-flex" ref={ref}>
+    <div className="relative inline-flex">
       <button
-        onClick={() => setOpen(!open)}
+        ref={btnRef}
+        onClick={handleToggle}
         className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
       >
         <MoreHorizontal className="h-4 w-4" />
       </button>
       {open && (
-        <div className="dropdown-panel right-0 top-full mt-1 min-w-[160px] z-50">
+        <div
+          ref={ref}
+          className="fixed z-[100] bg-card border border-border rounded-xl shadow-xl p-3 min-w-[160px] animate-in fade-in-0 zoom-in-95 duration-150"
+          style={{ top: pos.top, left: pos.left, transform: "translateX(-100%)" }}
+        >
           {items.map((item, i) => (
             <button
               key={i}
