@@ -588,18 +588,13 @@ export default function ListaClientes() {
       );
       toast({ title: "Tags atualizadas" });
     } else if (modal?.type === "bulk-tags") {
-      const newTags = tagsList.join(", ");
       setAllData((prev) =>
         prev.map((d) => {
           if (!modal.cods.includes(d.cod)) return d;
-          const existing = d.tags
-            ? d.tags.split(",").map((t) => t.trim()).filter(Boolean)
-            : [];
-          const merged = [...new Set([...existing, ...tagsList])];
-          return { ...d, tags: merged.join(", ") };
+          return { ...d, tags: tagsList.join(", ") };
         }),
       );
-      toast({ title: `Tags adicionadas a ${modal.cods.length} cliente(s)` });
+      toast({ title: `Tags atualizadas para ${modal.cods.length} cliente(s)` });
     }
     closeModal();
   };
