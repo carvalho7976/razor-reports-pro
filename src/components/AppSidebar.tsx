@@ -197,7 +197,7 @@ export function AppSidebar() {
                 <SidebarMenu className="gap-1.5 overflow-visible">
                   {group.items.map((item) => {
                     const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
-                    return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
+                    return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} onNavigate={isMobile ? () => setOpenMobile(false) : undefined} />;
                   })}
                 </SidebarMenu>
               </div>
