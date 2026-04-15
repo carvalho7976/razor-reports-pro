@@ -932,11 +932,11 @@ export default function ListaClientes() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={modal?.type === "tags"} onOpenChange={(open) => !open && closeModal()}>
+      <Dialog open={modal?.type === "tags" || modal?.type === "bulk-tags"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Gerenciar tags"
-            subtitle={modal?.type === "tags" ? `Cliente: ${modal.item.nome}` : ""}
+            subtitle={modal?.type === "tags" ? `Cliente: ${modal.item.nome}` : modal?.type === "bulk-tags" ? `${modal.cods.length} cliente(s) selecionado(s)` : ""}
             onClose={closeModal}
             footer={<SaveButton onClick={handleSaveTags} />}
           >
