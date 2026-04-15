@@ -639,8 +639,12 @@ export default function ListaClientes() {
       description: "Funcionalidade em desenvolvimento",
     });
 
-  const bulkTag = (indices: number[]) =>
-    toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
+  const bulkTag = (indices: number[]) => {
+    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    setTagInput("");
+    setTagsList([]);
+    setModal({ type: "bulk-tags", cods });
+  };
 
   const selectionActions: SelectionAction[] = [
     {
