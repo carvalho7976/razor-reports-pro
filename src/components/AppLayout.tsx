@@ -9,7 +9,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar />
 
       <SidebarInset className="min-w-0 bg-background">

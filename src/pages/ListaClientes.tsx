@@ -674,13 +674,6 @@ export default function ListaClientes() {
       description: "Unifica cadastros duplicados em um único registro",
     },
     {
-      label: "Remover",
-      icon: <Trash2 className="h-4 w-4" />,
-      onClick: bulkRemove,
-      variant: "destructive",
-      description: "Remove permanentemente os clientes selecionados da lista",
-    },
-    {
       label: "Mensagem",
       icon: <MessageCircle className="h-4 w-4" />,
       onClick: bulkMessage,
@@ -697,6 +690,13 @@ export default function ListaClientes() {
       icon: <Coins className="h-4 w-4" />,
       onClick: bulkMoedas,
       description: "Adiciona moedas aos clientes selecionados",
+    },
+    {
+      label: "Remover",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: bulkRemove,
+      variant: "destructive",
+      description: "Remove permanentemente os clientes selecionados da lista",
     },
   ];
 
