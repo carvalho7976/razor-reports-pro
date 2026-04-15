@@ -550,10 +550,17 @@ export default function ListaClientes() {
   };
 
   const handleMoedas = () => {
-    if (modal?.type !== "moedas") return;
-    const qtd = Number(moedasQtd) || 0;
-    setAllData((prev) => prev.map((d) => (d.cod === modal.item.cod ? { ...d, moedas: d.moedas + qtd } : d)));
-    toast({ title: `${qtd} moeda(s) adicionada(s) para ${modal.item.nome}` });
+    if (modal?.type === "moedas") {
+      const qtd = Number(moedasQtd) || 0;
+      setAllData((prev) => prev.map((d) => (d.cod === modal.item.cod ? { ...d, moedas: d.moedas + qtd } : d)));
+      toast({ title: `${qtd} moeda(s) adicionada(s) para ${modal.item.nome}` });
+    } else if (modal?.type === "bulk-moedas") {
+      const qtd = Number(moedasQtd) || 0;
+      setAllData((prev) =>
+        prev.map((d) => (modal.cods.includes(d.cod) ? { ...d, moedas: d.moedas + qtd } : d))
+      );
+      toast({ title: `${qtd} moeda(s) adicionada(s) para ${modal.cods.length} cliente(s)` });
+    }
     closeModal();
   };
 
@@ -653,6 +660,12 @@ export default function ListaClientes() {
     setModal({ type: "bulk-tags", cods });
   };
 
+  const bulkMoedas = (indices: number[]) => {
+    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    setMoedasQtd("");
+    setModal({ type: "bulk-moedas", cods });
+  };
+
   const selectionActions: SelectionAction[] = [
     {
       label: "Mesclar",
@@ -678,6 +691,12 @@ export default function ListaClientes() {
       icon: <Tag className="h-4 w-4" />,
       onClick: bulkTag,
       description: "Adiciona uma tag aos clientes selecionados",
+    },
+    {
+      label: "Moedas",
+      icon: <Coins className="h-4 w-4" />,
+      onClick: bulkMoedas,
+      description: "Adiciona moedas aos clientes selecionados",
     },
   ];
 
@@ -901,11 +920,17 @@ export default function ListaClientes() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={modal?.type === "moedas"} onOpenChange={(open) => !open && closeModal()}>
+      <Dialog open={modal?.type === "moedas" || modal?.type === "bulk-moedas"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Adicionar moedas"
-            subtitle={modal?.type === "moedas" ? `Para ${modal.item.nome}` : ""}
+            subtitle={
+              modal?.type === "moedas"
+                ? `Para ${modal.item.nome}`
+                : modal?.type === "bulk-moedas"
+                ? `Para ${modal.cods.length} cliente(s) selecionado(s)`
+                : ""
+            }
             onClose={closeModal}
             footer={<SaveButton onClick={handleMoedas} />}
           >
