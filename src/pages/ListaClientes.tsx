@@ -376,6 +376,7 @@ type ModalState =
   | { type: "moedas"; item: Cliente }
   | { type: "credito"; item: Cliente }
   | { type: "tags"; item: Cliente }
+  | { type: "bulk-tags"; cods: string[] }
   | null;
 
 const emptyForm = (): Cliente => ({
