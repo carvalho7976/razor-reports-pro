@@ -1,10 +1,20 @@
-import { Bell, Heart, CreditCard, Grid3X3 } from "lucide-react";
+import { Bell, Heart, CreditCard, Grid3X3, Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export function AppHeaderBar() {
+  const { toggleSidebar } = useSidebar();
+
   return (
     <header className="flex h-12 shrink-0 items-center justify-between bg-white px-3 text-foreground sm:px-4">
-      <div />
+      <button
+        type="button"
+        onClick={toggleSidebar}
+        className="rounded-lg p-1.5 hover:bg-black/5 transition-colors"
+        aria-label="Menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
 
       <div className="flex items-center gap-2 sm:gap-3">
         <button className="btn-action hidden border border-border bg-transparent py-1.5 text-xs text-foreground hover:bg-black/5 sm:inline-flex">
