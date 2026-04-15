@@ -648,8 +648,12 @@ export default function ListaClientes() {
 
   const bulkTag = (indices: number[]) => {
     const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    const selectedClients = allData.filter((d) => cods.includes(d.cod));
+    const allExistingTags = selectedClients.flatMap((c) =>
+      c.tags ? c.tags.split(",").map((t) => t.trim()).filter(Boolean) : []
+    );
     setTagInput("");
-    setTagsList([]);
+    setTagsList([...new Set(allExistingTags)]);
     setModal({ type: "bulk-tags", cods });
   };
 
