@@ -588,18 +588,13 @@ export default function ListaClientes() {
       );
       toast({ title: "Tags atualizadas" });
     } else if (modal?.type === "bulk-tags") {
-      const newTags = tagsList.join(", ");
       setAllData((prev) =>
         prev.map((d) => {
           if (!modal.cods.includes(d.cod)) return d;
-          const existing = d.tags
-            ? d.tags.split(",").map((t) => t.trim()).filter(Boolean)
-            : [];
-          const merged = [...new Set([...existing, ...tagsList])];
-          return { ...d, tags: merged.join(", ") };
+          return { ...d, tags: tagsList.join(", ") };
         }),
       );
-      toast({ title: `Tags adicionadas a ${modal.cods.length} cliente(s)` });
+      toast({ title: `Tags atualizadas para ${modal.cods.length} cliente(s)` });
     }
     closeModal();
   };
@@ -946,8 +941,34 @@ export default function ListaClientes() {
           >
             <div className="space-y-3">
               <div className="flex items-end gap-2">
-                <div className="flex-1">
+                <div className="relative flex-1">
                   <TextField label="Nova tag" value={tagInput} onChange={setTagInput} placeholder="Digite uma tag" />
+                  {tagInput.trim() && (() => {
+                    const allTags = [...new Set(allData.flatMap((c) =>
+                      c.tags ? c.tags.split(",").map((t) => t.trim()).filter(Boolean) : []
+                    ))];
+                    const suggestions = allTags.filter(
+                      (t) => t.toLowerCase().includes(tagInput.trim().toLowerCase()) && !tagsList.includes(t)
+                    );
+                    if (suggestions.length === 0) return null;
+                    return (
+                      <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-32 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+                        {suggestions.map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => {
+                              setTagsList((prev) => [...prev, s]);
+                              setTagInput("");
+                            }}
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-muted transition"
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 <button
