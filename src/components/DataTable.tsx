@@ -659,7 +659,7 @@ export function ActionsMenu({
         <MoreHorizontal className="h-4 w-4" />
       </button>
       {open && (
-        <div className="dropdown-panel right-0 top-full mt-1 min-w-[160px]">
+        <div className="dropdown-panel right-0 top-full mt-1 min-w-[160px] z-50">
           {items.map((item, i) => (
             <button
               key={i}
