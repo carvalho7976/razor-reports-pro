@@ -376,6 +376,7 @@ type ModalState =
   | { type: "moedas"; item: Cliente }
   | { type: "credito"; item: Cliente }
   | { type: "tags"; item: Cliente }
+  | { type: "bulk-tags"; cods: string[] }
   | null;
 
 const emptyForm = (): Cliente => ({
@@ -579,20 +580,27 @@ export default function ListaClientes() {
   };
 
   const handleSaveTags = () => {
-    if (modal?.type !== "tags") return;
-
-    setAllData((prev) =>
-      prev.map((d) =>
-        d.cod === modal.item.cod
-          ? {
-              ...d,
-              tags: tagsList.join(", "),
-            }
-          : d,
-      ),
-    );
-
-    toast({ title: "Tags atualizadas" });
+    if (modal?.type === "tags") {
+      setAllData((prev) =>
+        prev.map((d) =>
+          d.cod === modal.item.cod ? { ...d, tags: tagsList.join(", ") } : d,
+        ),
+      );
+      toast({ title: "Tags atualizadas" });
+    } else if (modal?.type === "bulk-tags") {
+      const newTags = tagsList.join(", ");
+      setAllData((prev) =>
+        prev.map((d) => {
+          if (!modal.cods.includes(d.cod)) return d;
+          const existing = d.tags
+            ? d.tags.split(",").map((t) => t.trim()).filter(Boolean)
+            : [];
+          const merged = [...new Set([...existing, ...tagsList])];
+          return { ...d, tags: merged.join(", ") };
+        }),
+      );
+      toast({ title: `Tags adicionadas a ${modal.cods.length} cliente(s)` });
+    }
     closeModal();
   };
 
@@ -638,8 +646,12 @@ export default function ListaClientes() {
       description: "Funcionalidade em desenvolvimento",
     });
 
-  const bulkTag = (indices: number[]) =>
-    toast({ title: `Adicionar tag a ${indices.length} cliente(s)`, description: "Funcionalidade em desenvolvimento" });
+  const bulkTag = (indices: number[]) => {
+    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    setTagInput("");
+    setTagsList([]);
+    setModal({ type: "bulk-tags", cods });
+  };
 
   const selectionActions: SelectionAction[] = [
     {
@@ -920,11 +932,11 @@ export default function ListaClientes() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={modal?.type === "tags"} onOpenChange={(open) => !open && closeModal()}>
+      <Dialog open={modal?.type === "tags" || modal?.type === "bulk-tags"} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Gerenciar tags"
-            subtitle={modal?.type === "tags" ? `Cliente: ${modal.item.nome}` : ""}
+            subtitle={modal?.type === "tags" ? `Cliente: ${modal.item.nome}` : modal?.type === "bulk-tags" ? `${modal.cods.length} cliente(s) selecionado(s)` : ""}
             onClose={closeModal}
             footer={<SaveButton onClick={handleSaveTags} />}
           >
