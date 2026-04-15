@@ -141,8 +141,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
 export function AppSidebar() {
   const location = useLocation();
-  const { state, toggleSidebar } = useSidebar();
-  const collapsed = state === "collapsed";
+  const { state, isMobile, toggleSidebar, setOpenMobile } = useSidebar();
+  const collapsed = !isMobile && state === "collapsed";
 
   return (
     <Sidebar
