@@ -79,9 +79,8 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed: boolean; active: boolean }) {
+function SidebarNavItem({ item, collapsed, active, onNavigate }: { item: NavItem; collapsed: boolean; active: boolean; onNavigate?: () => void }) {
   const Icon = item.icon;
-  const { toggleSidebar } = useSidebar();
 
   return (
     <SidebarMenuItem className="relative">
@@ -116,14 +115,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         <Link
           to={item.path}
           className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}
-          onClick={
-            collapsed
-              ? (e) => {
-                  e.preventDefault();
-                  toggleSidebar();
-                }
-              : undefined
-          }
+          onClick={onNavigate}
         >
           <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
@@ -141,8 +133,8 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
 
 export function AppSidebar() {
   const location = useLocation();
-  const { state, toggleSidebar } = useSidebar();
-  const collapsed = state === "collapsed";
+  const { state, isMobile, toggleSidebar, setOpenMobile } = useSidebar();
+  const collapsed = !isMobile && state === "collapsed";
 
   return (
     <Sidebar
@@ -205,7 +197,7 @@ export function AppSidebar() {
                 <SidebarMenu className="gap-1.5 overflow-visible">
                   {group.items.map((item) => {
                     const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
-                    return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} />;
+                    return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} onNavigate={isMobile ? () => setOpenMobile(false) : undefined} />;
                   })}
                 </SidebarMenu>
               </div>
