@@ -79,9 +79,8 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed: boolean; active: boolean }) {
+function SidebarNavItem({ item, collapsed, active, onNavigate }: { item: NavItem; collapsed: boolean; active: boolean; onNavigate?: () => void }) {
   const Icon = item.icon;
-  const { toggleSidebar } = useSidebar();
 
   return (
     <SidebarMenuItem className="relative">
@@ -116,14 +115,7 @@ function SidebarNavItem({ item, collapsed, active }: { item: NavItem; collapsed:
         <Link
           to={item.path}
           className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}
-          onClick={
-            collapsed
-              ? (e) => {
-                  e.preventDefault();
-                  toggleSidebar();
-                }
-              : undefined
-          }
+          onClick={onNavigate}
         >
           <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
           {!collapsed && <span>{item.label}</span>}
