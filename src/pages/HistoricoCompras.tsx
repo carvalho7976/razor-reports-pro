@@ -198,14 +198,14 @@ export default function HistoricoCompras() {
       label: "Produtos Comprados",
       value: String(totalProdutos),
       type: "quantity",
-      icon: <Hash className="h-4 w-4" />,
+      icon: <SprayCan className="h-4 w-4" />,
       size: "compact",
       color: "blue",
     },
     {
       label: "Total em Compras",
       value: formatBRL(totalCompras),
-      icon: <CreditCard className="h-4 w-4" />,
+      icon: <DollarSign className="h-4 w-4" />,
       size: "wide",
       color: "blue",
     },
@@ -420,7 +420,7 @@ export default function HistoricoCompras() {
 
   return (
     <AppLayout>
-            <DataTable
+      <DataTable
         title="Histórico de Compras"
         titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
         data={tab === "resumido" ? compras : detalhadoData}
