@@ -33,6 +33,7 @@ import ListaProdutos from "./pages/ListaProdutos";
 import ListaPacotes from "./pages/ListaPacotes";
 import ListaFormasPagamento from "./pages/ListaFormasPagamento";
 import ProfissionalPerfil from "./pages/ProfissionalPerfil";
+import NovaCompra from "./pages/NovaCompra";
 
 const queryClient = new QueryClient();
 
