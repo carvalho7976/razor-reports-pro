@@ -89,12 +89,11 @@ interface ContaForm {
   descricao: string;
   valor: string;
   vencimento: string;
-  recorrente: boolean;
   recorrencia: number;
-  salvarEPagar: boolean;
+  jaFoiPaga: boolean;
 }
 
-const emptyForm: ContaForm = { conta: "", credor: "", descricao: "", valor: "R$ 0,00", vencimento: "", recorrente: false, recorrencia: 1, salvarEPagar: false };
+const emptyForm: ContaForm = { conta: "", credor: "", descricao: "", valor: "R$ 0,00", vencimento: "", recorrencia: 0, jaFoiPaga: false };
 
 function contaToForm(c: Conta): ContaForm {
   return {
@@ -103,9 +102,8 @@ function contaToForm(c: Conta): ContaForm {
     descricao: c.descricao,
     valor: c.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
     vencimento: c.vencimento,
-    recorrente: c.recorrente,
     recorrencia: c.recorrencia,
-    salvarEPagar: false,
+    jaFoiPaga: false,
   };
 }
 
@@ -137,12 +135,12 @@ export default function ContasPagar() {
         id: newId, conta: form.conta, credor: form.credor, descricao: form.descricao,
         valor: parseCurrency(form.valor), vencimento: form.vencimento,
         status: "Pendente", dataPagamento: "", formaPagamento: "",
-        recorrente: form.recorrente, recorrencia: form.recorrencia,
+        recorrente: form.recorrencia > 0, recorrencia: form.recorrencia,
       };
       setAllData((prev) => [...prev, newConta]);
       toast({ title: "Conta criada com sucesso" });
 
-      if (form.salvarEPagar) {
+      if (form.jaFoiPaga) {
         closeModal();
         setTimeout(() => {
           setPayDate(new Date().toISOString().slice(0, 10));
@@ -155,7 +153,7 @@ export default function ContasPagar() {
       setAllData((prev) => prev.map((d) => d.id === modal.item.id ? {
         ...d, conta: form.conta, credor: form.credor, descricao: form.descricao,
         valor: parseCurrency(form.valor), vencimento: form.vencimento,
-        recorrente: form.recorrente, recorrencia: form.recorrencia,
+        recorrente: form.recorrencia > 0, recorrencia: form.recorrencia,
       } : d));
       toast({ title: "Conta atualizada" });
     }
@@ -280,11 +278,11 @@ export default function ContasPagar() {
               <div className="flex flex-col gap-3">
                 {modal?.type === "new" && (
                   <div className="flex items-center justify-between">
-                    <label htmlFor="salvarEPagar" className="text-sm font-medium text-foreground">Salvar e ir para pagamento</label>
+                    <label htmlFor="jaFoiPaga" className="text-sm font-medium text-foreground">Essa conta já foi paga?</label>
                     <Switch
-                      id="salvarEPagar"
-                      checked={form.salvarEPagar}
-                      onCheckedChange={(checked) => setForm({ ...form, salvarEPagar: checked })}
+                      id="jaFoiPaga"
+                      checked={form.jaFoiPaga}
+                      onCheckedChange={(checked) => setForm({ ...form, jaFoiPaga: checked })}
                     />
                   </div>
                 )}
@@ -313,41 +311,31 @@ export default function ContasPagar() {
               />
             </FormRow>
             <div className="flex items-center justify-between pt-1">
-              <label htmlFor="recorrente" className="text-sm text-foreground">Essa conta se repete?</label>
-              <Switch
-                id="recorrente"
-                checked={form.recorrente}
-                onCheckedChange={(checked) => setForm({ ...form, recorrente: checked })}
-              />
-            </div>
-            {form.recorrente && (
-              <div className="grid gap-0.5">
-                <label className="text-[13px] font-semibold text-foreground">Quantas vezes?</label>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, recorrencia: Math.max(1, form.recorrencia - 1) })}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    min={1}
-                    value={form.recorrencia}
-                    onChange={(e) => setForm({ ...form, recorrencia: Math.max(1, Number(e.target.value) || 1) })}
-                    className="h-10 w-full rounded-lg border border-border bg-card px-3 text-center text-sm text-foreground outline-none focus:border-foreground focus:ring-4 focus:ring-muted"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, recorrencia: form.recorrencia + 1 })}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
+              <label className="text-sm text-foreground">Conta recorrente?</label>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, recorrencia: Math.max(0, form.recorrencia - 1) })}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors text-sm"
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  min={0}
+                  value={form.recorrencia}
+                  onChange={(e) => setForm({ ...form, recorrencia: Math.max(0, Number(e.target.value) || 0) })}
+                  className="h-8 w-14 rounded-lg border border-border bg-card px-2 text-center text-sm text-foreground outline-none focus:border-foreground focus:ring-4 focus:ring-muted"
+                />
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, recorrencia: form.recorrencia + 1 })}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors text-sm"
+                >
+                  +
+                </button>
               </div>
-            )}
+            </div>
           </FormModal>
         </DialogContent>
       </Dialog>
