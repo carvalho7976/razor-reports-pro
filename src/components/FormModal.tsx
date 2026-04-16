@@ -216,7 +216,7 @@ export function DeleteModal({
   onClose: () => void;
 }) {
   return (
-    <div className="w-full max-w-xl overflow-visible rounded-2xl bg-card shadow-2xl">
+    <div className="w-full max-w-xl rounded-2xl bg-card shadow-2xl flex flex-col max-h-[85vh]">
       <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted/50 to-card px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
