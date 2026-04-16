@@ -171,14 +171,14 @@ export function FormModal({
   return (
     <div
       className={cn(
-        "w-full overflow-visible rounded-2xl bg-card shadow-2xl",
+        "w-full rounded-2xl bg-card shadow-2xl flex flex-col max-h-[85vh]",
         size === "sm" && "max-w-md",
         size === "md" && "max-w-xl",
         size === "lg" && "max-w-4xl",
         size === "xl" && "max-w-5xl",
       )}
     >
-      <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted/50 to-card px-6 py-4">
+      <div className="relative shrink-0 rounded-t-2xl border-b border-border bg-gradient-to-b from-muted/50 to-card px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
@@ -194,8 +194,8 @@ export function FormModal({
           </button>
         </div>
       </div>
-      <div className="grid gap-3 px-6 pt-5 pb-6">{children}</div>
-      <div className="border-t border-border px-6 py-3">{footer}</div>
+      <div className="grid gap-3 px-6 pt-5 pb-6 overflow-y-auto min-h-0">{children}</div>
+      <div className="shrink-0 border-t border-border px-6 py-3">{footer}</div>
     </div>
   );
 }
@@ -216,7 +216,7 @@ export function DeleteModal({
   onClose: () => void;
 }) {
   return (
-    <div className="w-full max-w-xl overflow-visible rounded-2xl bg-card shadow-2xl">
+    <div className="w-full max-w-xl rounded-2xl bg-card shadow-2xl flex flex-col max-h-[85vh]">
       <div className="relative rounded-t-2xl border-b border-border bg-gradient-to-b from-muted/50 to-card px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
