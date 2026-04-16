@@ -33,6 +33,7 @@ import ListaProdutos from "./pages/ListaProdutos";
 import ListaPacotes from "./pages/ListaPacotes";
 import ListaFormasPagamento from "./pages/ListaFormasPagamento";
 import ProfissionalPerfil from "./pages/ProfissionalPerfil";
+import NovaCompra from "./pages/NovaCompra";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
           <Route path="/comboPesquisa" element={<ListaPacotes />} />
           <Route path="/formaPagamentoPesquisa" element={<ListaFormasPagamento />} />
           <Route path="/profissionalPerfil" element={<ProfissionalPerfil />} />
+          <Route path="/novaCompra" element={<NovaCompra />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
