@@ -89,12 +89,11 @@ interface ContaForm {
   descricao: string;
   valor: string;
   vencimento: string;
-  recorrente: boolean;
   recorrencia: number;
-  salvarEPagar: boolean;
+  jaFoiPaga: boolean;
 }
 
-const emptyForm: ContaForm = { conta: "", credor: "", descricao: "", valor: "R$ 0,00", vencimento: "", recorrente: false, recorrencia: 1, salvarEPagar: false };
+const emptyForm: ContaForm = { conta: "", credor: "", descricao: "", valor: "R$ 0,00", vencimento: "", recorrencia: 0, jaFoiPaga: false };
 
 function contaToForm(c: Conta): ContaForm {
   return {

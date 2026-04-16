@@ -361,36 +361,34 @@ export function DatePickerField({
             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
-          <div className="p-2">
-            <CalendarComponent
-              mode="single"
-              selected={dateValue}
-              onSelect={(date) => {
-                if (date) {
-                  onChange(format(date, "yyyy-MM-dd"));
-                }
-                setOpen(false);
-              }}
-              locale={ptBR}
-              className="pointer-events-auto"
-            />
-            <div className="border-t border-border px-3 py-2 flex justify-between">
-              <button
-                type="button"
-                onClick={() => { onChange(""); setOpen(false); }}
-                className="text-xs text-destructive hover:underline font-medium"
-              >
-                Limpar
-              </button>
-              <button
-                type="button"
-                onClick={() => { onChange(format(new Date(), "yyyy-MM-dd")); setOpen(false); }}
-                className="text-xs text-foreground hover:underline font-medium"
-              >
-                Hoje
-              </button>
-            </div>
+        <PopoverContent className="w-auto p-0" align="start" sideOffset={4} style={{ zIndex: 9999 }}>
+          <CalendarComponent
+            mode="single"
+            selected={dateValue}
+            onSelect={(date) => {
+              if (date) {
+                onChange(format(date, "yyyy-MM-dd"));
+              }
+              setOpen(false);
+            }}
+            locale={ptBR}
+            className="pointer-events-auto p-2"
+          />
+          <div className="border-t border-border px-3 py-1.5 flex justify-between">
+            <button
+              type="button"
+              onClick={() => { onChange(""); setOpen(false); }}
+              className="text-xs text-destructive hover:underline font-medium"
+            >
+              Limpar
+            </button>
+            <button
+              type="button"
+              onClick={() => { onChange(format(new Date(), "yyyy-MM-dd")); setOpen(false); }}
+              className="text-xs text-foreground hover:underline font-medium"
+            >
+              Hoje
+            </button>
           </div>
         </PopoverContent>
       </Popover>
