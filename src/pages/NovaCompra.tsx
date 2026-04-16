@@ -240,26 +240,28 @@ export default function NovaCompra() {
 
                 <TextField label="Custo total" value={formatBRL(itemPreviewTotal)} onChange={() => {}} disabled />
 
-                <div className="flex items-end gap-3 pt-1">
-                  <label className="cursor-pointer">
-                    <input
-                      type="file"
-                      accept=".xml,text/xml,application/xml"
-                      onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
-                      className="hidden"
-                    />
-                    <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
-                      Importar XML
-                    </span>
-                  </label>
+                <div className="flex items-end justify-between pt-1">
+                  <div className="flex items-end gap-3">
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept=".xml,text/xml,application/xml"
+                        onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
+                        className="hidden"
+                      />
+                      <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
+                        Importar XML
+                      </span>
+                    </label>
 
-                  <button
-                    type="button"
-                    onClick={handleAdicionarItem}
-                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
-                  >
-                    Adicionar item
-                  </button>
+                    <button
+                      type="button"
+                      onClick={handleAdicionarItem}
+                      className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                    >
+                      Adicionar item
+                    </button>
+                  </div>
 
                   <button
                     type="button"
