@@ -290,16 +290,13 @@ export default function ContasPagar() {
               </div>
             }
           >
-            <FormRow>
-              <Dropdown
-                label="Tipo de conta"
-                value={form.conta}
-                setValue={(v) => setForm({ ...form, conta: v })}
-                options={contaOptions}
-                error={showErrors && !form.conta ? "Selecione o tipo" : ""}
-              />
-              <TextField label="Credor" value={form.credor} onChange={(v) => setForm({ ...form, credor: v })} placeholder="Nome do credor" />
-            </FormRow>
+            <Dropdown
+              label="Tipo de conta"
+              value={form.conta}
+              setValue={(v) => setForm({ ...form, conta: v })}
+              options={contaOptions}
+              error={showErrors && !form.conta ? "Selecione o tipo" : ""}
+            />
             <TextField label="Descrição" value={form.descricao} onChange={(v) => setForm({ ...form, descricao: v })} placeholder="Descrição da conta" error={showErrors && !form.descricao ? "Informe a descrição" : ""} />
             <FormRow>
               <TextField label="Valor" value={form.valor} onChange={(v) => setForm({ ...form, valor: formatCurrencyInput(v) })} placeholder="R$ 0,00" error={showErrors && parseCurrency(form.valor) <= 0 ? "Informe o valor" : ""} />
@@ -310,9 +307,9 @@ export default function ContasPagar() {
                 error={showErrors && !form.vencimento ? "Informe o vencimento" : ""}
               />
             </FormRow>
-            <div className="flex items-center justify-between pt-1">
-              <label className="text-sm text-foreground">Conta recorrente?</label>
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[13px] font-semibold text-foreground">Conta recorrente?</label>
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, recorrencia: Math.max(0, form.recorrencia - 1) })}
@@ -321,11 +318,11 @@ export default function ContasPagar() {
                   −
                 </button>
                 <input
-                  type="number"
-                  min={0}
+                  type="text"
+                  inputMode="numeric"
                   value={form.recorrencia}
-                  onChange={(e) => setForm({ ...form, recorrencia: Math.max(0, Number(e.target.value) || 0) })}
-                  className="h-8 w-14 rounded-lg border border-border bg-card px-2 text-center text-sm text-foreground outline-none focus:border-foreground focus:ring-4 focus:ring-muted"
+                  onChange={(e) => setForm({ ...form, recorrencia: Math.max(0, Number(e.target.value.replace(/\D/g, "")) || 0) })}
+                  className="h-8 w-12 rounded-lg border border-border bg-card px-1 text-center text-sm text-foreground outline-none focus:border-foreground focus:ring-4 focus:ring-muted [appearance:textfield]"
                 />
                 <button
                   type="button"

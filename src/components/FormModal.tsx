@@ -194,7 +194,7 @@ export function FormModal({
           </button>
         </div>
       </div>
-      <div className="grid gap-1 px-6 pt-5 pb-6">{children}</div>
+      <div className="grid gap-3 px-6 pt-5 pb-6">{children}</div>
       <div className="border-t border-border px-6 py-3">{footer}</div>
     </div>
   );
