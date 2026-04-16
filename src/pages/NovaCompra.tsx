@@ -207,6 +207,7 @@ export default function NovaCompra() {
         {/* CONTENT */}
         <div className="mx-6 mt-5 pb-10">
           {activeTab === "itens" && (
+            <>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               {/* Left: form */}
               <div className="space-y-4 self-start">
