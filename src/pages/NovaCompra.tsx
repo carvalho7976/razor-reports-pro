@@ -260,6 +260,14 @@ export default function NovaCompra() {
                   >
                     Adicionar item
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={handleAvancarFechamento}
+                    className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                  >
+                    Avançar para fechamento
+                  </button>
                 </div>
               </div>
 
@@ -403,19 +411,10 @@ export default function NovaCompra() {
           )}
         </div>
 
-        {/* FOOTER */}
-        <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-between gap-3">
-            {activeTab === "itens" ? (
-              <button
-                type="button"
-                onClick={() => navigate("/comprasPesquisa")}
-                className="inline-flex h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Voltar
-              </button>
-            ) : (
+        {/* FOOTER - only on fechamento tab */}
+        {activeTab === "fechamento" && (
+          <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
+            <div className="flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => setActiveTab("itens")}
@@ -424,17 +423,6 @@ export default function NovaCompra() {
                 <ChevronLeft className="h-4 w-4" />
                 Voltar
               </button>
-            )}
-
-            {activeTab === "itens" ? (
-              <button
-                type="button"
-                onClick={handleAvancarFechamento}
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-              >
-                Avançar para fechamento
-              </button>
-            ) : (
               <button
                 type="button"
                 onClick={handleSalvarCompra}
@@ -442,9 +430,9 @@ export default function NovaCompra() {
               >
                 Concluir compra
               </button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </AppLayout>
   );
