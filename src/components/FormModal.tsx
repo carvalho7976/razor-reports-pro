@@ -319,3 +319,82 @@ export function SaveButton({ onClick }: { onClick: () => void }) {
     </div>
   );
 }
+
+export function DatePickerField({
+  label,
+  value,
+  onChange,
+  error,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const dateValue = useMemo(() => {
+    if (!value) return undefined;
+    try {
+      return new Date(value + "T12:00:00");
+    } catch {
+      return undefined;
+    }
+  }, [value]);
+
+  return (
+    <div className="grid gap-0.5">
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={cn(
+              "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm transition-all",
+              error
+                ? "border-destructive/50 focus:ring-destructive/10"
+                : "border-border focus:ring-muted",
+              value ? "text-foreground" : "text-muted-foreground",
+            )}
+          >
+            <span>{dateValue ? format(dateValue, "dd/MM/yyyy") : "Selecione a data"}</span>
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
+          <div className="p-2">
+            <CalendarComponent
+              mode="single"
+              selected={dateValue}
+              onSelect={(date) => {
+                if (date) {
+                  onChange(format(date, "yyyy-MM-dd"));
+                }
+                setOpen(false);
+              }}
+              locale={ptBR}
+              className="pointer-events-auto"
+            />
+            <div className="border-t border-border px-3 py-2 flex justify-between">
+              <button
+                type="button"
+                onClick={() => { onChange(""); setOpen(false); }}
+                className="text-xs text-destructive hover:underline font-medium"
+              >
+                Limpar
+              </button>
+              <button
+                type="button"
+                onClick={() => { onChange(format(new Date(), "yyyy-MM-dd")); setOpen(false); }}
+                className="text-xs text-foreground hover:underline font-medium"
+              >
+                Hoje
+              </button>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+      <FieldError message={error} />
+    </div>
+  );
+}
