@@ -207,6 +207,7 @@ export default function NovaCompra() {
         {/* CONTENT */}
         <div className="mx-6 mt-5 pb-10">
           {activeTab === "itens" && (
+            <>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               {/* Left: form */}
               <div className="space-y-4 self-start">
@@ -259,14 +260,6 @@ export default function NovaCompra() {
                     className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
                   >
                     Adicionar item
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleAvancarFechamento}
-                    className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-                  >
-                    Avançar para fechamento
                   </button>
                 </div>
               </div>
@@ -341,6 +334,17 @@ export default function NovaCompra() {
                 <p className="text-sm text-destructive">{errors.itensCompra}</p>
               ) : null}
             </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                onClick={handleAvancarFechamento}
+                className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+              >
+                Avançar para fechamento
+              </button>
+            </div>
+            </>
           )}
 
           {activeTab === "fechamento" && (
