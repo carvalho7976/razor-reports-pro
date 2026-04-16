@@ -328,21 +328,20 @@ export default function NovaCompra() {
                     </div>
                   </div>
                 )}
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleAvancarFechamento}
+                    className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+                  >
+                    Avançar para fechamento
+                  </button>
+                </div>
               </div>
 
               {showErrors && errors.itensCompra ? (
                 <p className="text-sm text-destructive">{errors.itensCompra}</p>
               ) : null}
-            </div>
-
-            <div className="flex justify-end mt-4">
-              <button
-                type="button"
-                onClick={handleAvancarFechamento}
-                className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-              >
-                Avançar para fechamento
-              </button>
             </div>
             </>
           )}
