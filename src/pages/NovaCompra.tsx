@@ -333,6 +333,16 @@ export default function NovaCompra() {
                 <p className="text-sm text-destructive">{errors.itensCompra}</p>
               ) : null}
             </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                onClick={handleAvancarFechamento}
+                className="h-10 rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+              >
+                Avançar para fechamento
+              </button>
+            </div>
           )}
 
           {activeTab === "fechamento" && (
