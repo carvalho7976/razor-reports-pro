@@ -73,6 +73,7 @@ const App = () => (
           <Route path="/comboPesquisa" element={<ListaPacotes />} />
           <Route path="/formaPagamentoPesquisa" element={<ListaFormasPagamento />} />
           <Route path="/profissionalPerfil" element={<ProfissionalPerfil />} />
+          <Route path="/novaCompra" element={<NovaCompra />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
