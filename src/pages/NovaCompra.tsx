@@ -344,6 +344,7 @@ export default function NovaCompra() {
                 Avançar para fechamento
               </button>
             </div>
+            </>
           )}
 
           {activeTab === "fechamento" && (
