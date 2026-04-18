@@ -6,7 +6,7 @@ export function AppHeaderBar() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between bg-white px-3 text-foreground sm:px-4">
+    <header className="flex h-12 shrink-0 items-center justify-between bg-transparent px-3 text-foreground sm:px-4">
       <button
         type="button"
         onClick={toggleSidebar}
