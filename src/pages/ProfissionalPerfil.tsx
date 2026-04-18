@@ -302,7 +302,6 @@ export default function ProfissionalPerfil() {
   return (
     <AppLayout>
       <div className="flex flex-col gap-0">
-        {/* HEADER */}
         <div className="mx-6 mt-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-5">
@@ -337,7 +336,6 @@ export default function ProfissionalPerfil() {
           </div>
         </div>
 
-        {/* TABS */}
         <div className="mx-6 mt-4 border-b border-border">
           <div className="flex gap-6">
             {tabs.map((tab) => (
@@ -357,11 +355,9 @@ export default function ProfissionalPerfil() {
           </div>
         </div>
 
-        {/* CONTENT */}
         <div className="mx-6 mt-5 pb-10">
           {activeTab === "basicos" && (
             <div className="grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-              {/* Coluna principal */}
               <div className="grid gap-5">
                 <SectionBlock title="Dados básicos" description="Informações principais do profissional.">
                   <div className="grid max-w-3xl gap-4">
@@ -391,7 +387,6 @@ export default function ProfissionalPerfil() {
                 </SectionBlock>
               </div>
 
-              {/* Coluna lateral */}
               <div className="grid gap-5 self-start">
                 <SectionBlock
                   title="Permissões"
@@ -542,67 +537,94 @@ export default function ProfissionalPerfil() {
 
       {/* Modal Expediente */}
       <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
-        <DialogContent className="max-w-2xl gap-0 overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b border-border px-5 py-4">
-            <h2 className="text-base font-semibold text-foreground">Expediente de trabalho</h2>
+        <DialogContent className="max-w-3xl gap-0 overflow-hidden rounded-2xl p-0">
+          <div className="border-b border-border px-5 py-4">
+            <h2 className="text-base font-semibold text-foreground">Configurar expediente</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Defina os dias ativos e os horários de trabalho e almoço do profissional.
+            </p>
           </div>
 
-          <div className="max-h-[60vh] divide-y divide-border overflow-y-auto">
-            {diasSemana.map((dia) => {
-              const d = expediente[dia.key];
-              return (
-                <div key={dia.key} className="px-5 py-3">
-                  <div className="mb-2 flex items-center gap-3">
-                    <span className="w-10 text-sm font-semibold text-foreground">{dia.label}</span>
-                    <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
-                  </div>
-
-                  {d.ativo && (
-                    <div className="ml-[52px] flex flex-wrap gap-x-8 gap-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="shrink-0 text-xs font-medium text-muted-foreground">Trabalho:</span>
-                        <input
-                          type="time"
-                          value={d.trabalhoInicio}
-                          onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
-                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                        />
-                        <span className="text-xs text-muted-foreground">às</span>
-                        <input
-                          type="time"
-                          value={d.trabalhoFim}
-                          onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
-                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                        />
+          <div className="max-h-[70vh] overflow-y-auto p-5">
+            <div className="grid gap-3">
+              {diasSemana.map((dia) => {
+                const d = expediente[dia.key];
+                return (
+                  <div key={dia.key} className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{dia.label}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {d.ativo ? "Dia ativo para agendamento" : "Dia desativado"}
+                        </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <span className="shrink-0 text-xs font-medium text-muted-foreground">Almoço:</span>
-                        <input
-                          type="time"
-                          value={d.almocoInicio}
-                          onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
-                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                        />
-                        <span className="text-xs text-muted-foreground">às</span>
-                        <input
-                          type="time"
-                          value={d.almocoFim}
-                          onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
-                          className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                        />
-                      </div>
+                      <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    {d.ativo && (
+                      <div className="mt-4 grid gap-4 md:grid-cols-2">
+                        <div className="rounded-lg border border-border bg-background p-3">
+                          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Trabalho
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="time"
+                              value={d.trabalhoInicio}
+                              onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
+                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                            <span className="text-xs text-muted-foreground">às</span>
+                            <input
+                              type="time"
+                              value={d.trabalhoFim}
+                              onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
+                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="rounded-lg border border-border bg-background p-3">
+                          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Almoço
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="time"
+                              value={d.almocoInicio}
+                              onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
+                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                            <span className="text-xs text-muted-foreground">às</span>
+                            <input
+                              type="time"
+                              value={d.almocoFim}
+                              onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
+                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="flex justify-end gap-2 border-t border-border px-5 py-3">
+          <div className="flex justify-end gap-3 border-t border-border px-5 py-4">
             <button
+              type="button"
               onClick={() => setExpedienteOpen(false)}
-              className="inline-flex h-9 items-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-background px-5 text-sm font-medium text-foreground transition hover:bg-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => setExpedienteOpen(false)}
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
             >
               Salvar
             </button>
@@ -621,181 +643,214 @@ export default function ProfissionalPerfil() {
           }
         }}
       >
-        <DialogContent className="max-w-3xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          <FormModal
-            title="Configurar serviços"
-            subtitle="Adicione os serviços que o profissional realiza."
-            onClose={() => {
-              setServicosOpen(false);
-              setServicoBusca("");
-              setServicosDropdownOpen(false);
-            }}
-            size="lg"
-            footer={
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setServicosOpen(false)}
-                  className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 active:scale-[0.98]"
-                >
-                  Fechar
-                </button>
-              </div>
-            }
-          >
-            <div className="mb-3 flex items-end gap-3">
-              <div className="relative flex-1" ref={servicosDropdownRef}>
-                <label className="text-[13px] font-semibold text-foreground">Selecione os serviços</label>
-                <button
-                  type="button"
-                  onClick={() => setServicosDropdownOpen((p) => !p)}
-                  className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-card px-3 text-sm text-foreground transition-all hover:border-muted-foreground"
-                >
-                  <span className="text-muted-foreground">Buscar serviço...</span>
-                  <Search className="h-4 w-4 text-muted-foreground" />
-                </button>
+        <DialogContent className="max-w-4xl gap-0 overflow-hidden rounded-2xl p-0 [&>button]:hidden">
+          <div className="border-b border-border px-5 py-4">
+            <h2 className="text-base font-semibold text-foreground">Serviços vinculados</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Adicione os serviços que o profissional realiza e ajuste preço, tempo e comissão.
+            </p>
+          </div>
 
-                {servicosDropdownOpen && (
-                  <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
-                    <div className="border-b border-border p-2">
-                      <input
-                        placeholder="Buscar..."
-                        value={servicoBusca}
-                        onChange={(e) => setServicoBusca(e.target.value)}
-                        className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
-                        autoFocus
-                      />
-                    </div>
+          <div className="max-h-[75vh] overflow-y-auto p-5">
+            <div className="grid gap-4">
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="mb-3">
+                  <h3 className="text-sm font-semibold text-foreground">Adicionar serviços</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Pesquise os serviços disponíveis e adicione um ou vários de uma vez.
+                  </p>
+                </div>
 
-                    <div className="max-h-48 overflow-auto">
-                      <button
-                        type="button"
-                        onClick={handleAdicionarTodos}
-                        className="flex w-full items-center gap-3 border-b border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted"
-                      >
-                        Selecionar todos
-                      </button>
+                <div className="flex flex-col gap-3 md:flex-row md:items-end">
+                  <div className="relative flex-1" ref={servicosDropdownRef}>
+                    <label className="mb-1 block text-[13px] font-semibold text-foreground">Selecionar serviços</label>
+                    <button
+                      type="button"
+                      onClick={() => setServicosDropdownOpen((p) => !p)}
+                      className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-background px-3 text-sm text-foreground transition-all hover:border-muted-foreground"
+                    >
+                      <span className="text-muted-foreground">Buscar serviço...</span>
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                    </button>
 
-                      {servicosDispFiltrados.map((s) => (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => toggleServicoPendente(s.id)}
-                          className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
-                        >
-                          <Checkbox
-                            checked={servicosPendentes.includes(s.id)}
-                            className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                    {servicosDropdownOpen && (
+                      <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+                        <div className="border-b border-border p-2">
+                          <input
+                            placeholder="Buscar..."
+                            value={servicoBusca}
+                            onChange={(e) => setServicoBusca(e.target.value)}
+                            className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
+                            autoFocus
                           />
-                          <span>{s.nome}</span>
-                        </button>
-                      ))}
+                        </div>
 
-                      {servicosDispFiltrados.length === 0 && (
-                        <p className="px-4 py-3 text-center text-sm text-muted-foreground">Nenhum serviço encontrado</p>
-                      )}
+                        <div className="max-h-48 overflow-auto">
+                          <button
+                            type="button"
+                            onClick={handleAdicionarTodos}
+                            className="flex w-full items-center gap-3 border-b border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted"
+                          >
+                            Selecionar todos
+                          </button>
+
+                          {servicosDispFiltrados.map((s) => (
+                            <button
+                              key={s.id}
+                              type="button"
+                              onClick={() => toggleServicoPendente(s.id)}
+                              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
+                            >
+                              <Checkbox
+                                checked={servicosPendentes.includes(s.id)}
+                                className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                              />
+                              <span>{s.nome}</span>
+                            </button>
+                          ))}
+
+                          {servicosDispFiltrados.length === 0 && (
+                            <p className="px-4 py-3 text-center text-sm text-muted-foreground">
+                              Nenhum serviço encontrado
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={handleAdicionarSelecionados}
+                    className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="mb-3 flex items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">Serviços adicionados</h3>
+                    <p className="mt-1 text-xs text-muted-foreground">Edite os valores diretamente na tabela.</p>
+                  </div>
+
+                  {servicosAdicionados.length > 0 && (
+                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                      {servicosAdicionados.length} item(ns)
+                    </span>
+                  )}
+                </div>
+
+                <div className="overflow-hidden rounded-lg border border-border">
+                  <div className="max-h-[40vh] overflow-auto">
+                    <table className="w-full text-sm">
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-[hsl(0_0%_20%)] text-white">
+                          <th className="w-10 px-3 py-2 text-left">
+                            <Checkbox
+                              checked={
+                                servicosAdicionados.length > 0 &&
+                                servicosSelecionados.length === servicosAdicionados.length
+                              }
+                              onCheckedChange={toggleTodosServicos}
+                              className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
+                            />
+                          </th>
+                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Nome</th>
+                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Preço</th>
+                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Tempo</th>
+                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Comissão</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {servicosAdicionados.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
+                              Nenhum registro encontrado
+                            </td>
+                          </tr>
+                        ) : (
+                          servicosAdicionados.map((s) => (
+                            <tr key={s.id} className="border-t border-border transition-colors hover:bg-muted/50">
+                              <td className="px-3 py-2">
+                                <Checkbox
+                                  checked={servicosSelecionados.includes(s.id)}
+                                  onCheckedChange={() => toggleServicoSelecionado(s.id)}
+                                />
+                              </td>
+                              <td className="px-3 py-2 text-foreground">{s.nome}</td>
+                              <td className="px-3 py-2">
+                                <input
+                                  type="text"
+                                  value={s.preco}
+                                  onChange={(e) => updateServico(s.id, "preco", e.target.value)}
+                                  className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                                />
+                              </td>
+                              <td className="px-3 py-2">
+                                <input
+                                  type="text"
+                                  value={s.tempo}
+                                  onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
+                                  className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                                />
+                              </td>
+                              <td className="px-3 py-2">
+                                <input
+                                  type="text"
+                                  value={s.comissao}
+                                  onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
+                                  placeholder="Ex: 50%"
+                                  className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                                />
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {servicosSelecionados.length > 0 && (
+                  <div className="mt-4 flex items-center justify-center">
+                    <div className="inline-flex items-center gap-3 rounded-full border border-border bg-background px-4 py-2 shadow-sm">
+                      <span className="text-sm text-muted-foreground">
+                        {servicosSelecionados.length} selecionado(s)
+                      </span>
+                      <button
+                        onClick={handleRemoverServicos}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/20"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Remover
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
-
-              <button
-                onClick={handleAdicionarSelecionados}
-                className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-foreground bg-background px-4 text-sm font-semibold text-foreground transition hover:bg-muted active:scale-[0.98]"
-              >
-                <Plus className="h-4 w-4" />
-                Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
-              </button>
             </div>
+          </div>
 
-            <p className="mb-2 text-center text-[13px] font-semibold text-muted-foreground">Serviços Adicionados</p>
-
-            <div className="overflow-hidden rounded-lg border border-border">
-              <div className="max-h-[40vh] overflow-auto">
-                <table className="w-full text-sm">
-                  <thead className="sticky top-0 z-10">
-                    <tr className="bg-[hsl(0_0%_20%)] text-white">
-                      <th className="w-10 px-3 py-2 text-left">
-                        <Checkbox
-                          checked={
-                            servicosAdicionados.length > 0 && servicosSelecionados.length === servicosAdicionados.length
-                          }
-                          onCheckedChange={toggleTodosServicos}
-                          className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
-                        />
-                      </th>
-                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Nome</th>
-                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Preço</th>
-                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Tempo</th>
-                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Comissão</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {servicosAdicionados.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                          Nenhum registro encontrado
-                        </td>
-                      </tr>
-                    ) : (
-                      servicosAdicionados.map((s) => (
-                        <tr key={s.id} className="border-t border-border transition-colors hover:bg-muted/50">
-                          <td className="px-3 py-2">
-                            <Checkbox
-                              checked={servicosSelecionados.includes(s.id)}
-                              onCheckedChange={() => toggleServicoSelecionado(s.id)}
-                            />
-                          </td>
-                          <td className="px-3 py-2 text-foreground">{s.nome}</td>
-                          <td className="px-3 py-2">
-                            <input
-                              type="text"
-                              value={s.preco}
-                              onChange={(e) => updateServico(s.id, "preco", e.target.value)}
-                              className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </td>
-                          <td className="px-3 py-2">
-                            <input
-                              type="text"
-                              value={s.tempo}
-                              onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
-                              className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </td>
-                          <td className="px-3 py-2">
-                            <input
-                              type="text"
-                              value={s.comissao}
-                              onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
-                              placeholder="Ex: 50%"
-                              className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {servicosSelecionados.length > 0 && (
-              <div className="mt-3 flex items-center justify-center">
-                <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2 shadow-lg">
-                  <span className="text-sm text-muted-foreground">{servicosSelecionados.length} selecionado(s)</span>
-                  <button
-                    onClick={handleRemoverServicos}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/20"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Remover
-                  </button>
-                </div>
-              </div>
-            )}
-          </FormModal>
+          <div className="flex justify-end gap-3 border-t border-border px-5 py-4">
+            <button
+              type="button"
+              onClick={() => setServicosOpen(false)}
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-background px-5 text-sm font-medium text-foreground transition hover:bg-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => setServicosOpen(false)}
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
+            >
+              Salvar
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
     </AppLayout>
