@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { TextField, Dropdown, FormRow } from "@/components/FormModal";
+import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Plus, Trash2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -443,7 +443,7 @@ export default function ProfissionalPerfil() {
             <div className="grid max-w-5xl gap-5">
               <SectionBlock title="Informações pessoais" description="Dados complementares do profissional.">
                 <div className="grid gap-4">
-                  <FormRow cols={3}>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <TextField
                       label="Aniversário"
                       value={form.aniversario}
@@ -462,13 +462,13 @@ export default function ProfissionalPerfil() {
                       setValue={(v) => update("tipoLogradouro", v)}
                       options={tipoLogradouroOptions}
                     />
-                  </FormRow>
+                  </div>
                 </div>
               </SectionBlock>
 
               <SectionBlock title="Endereço" description="Localização e dados de endereço.">
                 <div className="grid gap-4">
-                  <FormRow cols={3}>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <TextField label="Endereço" value={form.endereco} onChange={(v) => update("endereco", v)} />
                     <TextField label="Nº" value={form.numero} onChange={(v) => update("numero", v)} />
                     <TextField
@@ -476,9 +476,9 @@ export default function ProfissionalPerfil() {
                       value={form.complemento}
                       onChange={(v) => update("complemento", v)}
                     />
-                  </FormRow>
+                  </div>
 
-                  <FormRow cols={3}>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <TextField
                       label="CEP"
                       value={form.cep}
@@ -492,13 +492,11 @@ export default function ProfissionalPerfil() {
                       setValue={(v) => update("estado", v)}
                       options={estadoOptions}
                     />
-                  </FormRow>
+                  </div>
 
-                  <FormRow cols={3}>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <TextField label="Cidade" value={form.cidade} onChange={(v) => update("cidade", v)} />
-                    <div />
-                    <div />
-                  </FormRow>
+                  </div>
                 </div>
               </SectionBlock>
 
@@ -531,7 +529,6 @@ export default function ProfissionalPerfil() {
         </div>
       </div>
 
-      {/* Modal Expediente */}
       <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
         <DialogContent className="w-[calc(100vw-24px)] max-w-4xl gap-0 overflow-hidden rounded-2xl p-0">
           <div className="border-b border-border px-4 py-4 sm:px-5">
@@ -545,39 +542,37 @@ export default function ProfissionalPerfil() {
                 const d = expediente[dia.key];
                 return (
                   <div key={dia.key} className="rounded-xl border border-border bg-card px-3 py-3 sm:px-4">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                      <div className="flex items-center justify-between gap-3 lg:min-w-[120px] lg:justify-start">
-                        <div>
-                          <p className="text-sm font-semibold text-foreground">{dia.label}</p>
-                        </div>
+                    <div className="grid gap-3 lg:grid-cols-[110px_auto_1fr] lg:items-center">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-semibold text-foreground">{dia.label}</p>
                         <div className="lg:hidden">
                           <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
                         </div>
                       </div>
 
-                      <div className="hidden lg:block">
+                      <div className="hidden lg:flex lg:justify-center">
                         <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
                       </div>
 
                       {d.ativo ? (
-                        <div className="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr]">
+                        <div className="grid gap-3 md:grid-cols-2">
                           <div className="grid gap-1.5">
                             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                               Trabalho
                             </span>
-                            <div className="flex items-center gap-2">
+                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                               <input
                                 type="time"
                                 value={d.trabalhoInicio}
                                 onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
-                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
                               />
-                              <span className="shrink-0 text-xs text-muted-foreground">às</span>
+                              <span className="text-xs text-muted-foreground">às</span>
                               <input
                                 type="time"
                                 value={d.trabalhoFim}
                                 onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
-                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
                               />
                             </div>
                           </div>
@@ -586,25 +581,25 @@ export default function ProfissionalPerfil() {
                             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                               Almoço
                             </span>
-                            <div className="flex items-center gap-2">
+                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                               <input
                                 type="time"
                                 value={d.almocoInicio}
                                 onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
-                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
                               />
-                              <span className="shrink-0 text-xs text-muted-foreground">às</span>
+                              <span className="text-xs text-muted-foreground">às</span>
                               <input
                                 type="time"
                                 value={d.almocoFim}
                                 onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
-                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
                               />
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex-1 rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+                        <div className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
                           Dia desativado
                         </div>
                       )}
@@ -634,7 +629,6 @@ export default function ProfissionalPerfil() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal Serviços */}
       <Dialog
         open={servicosOpen}
         onOpenChange={(open) => {
@@ -733,7 +727,7 @@ export default function ProfissionalPerfil() {
                 <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-foreground">Serviços adicionados</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">Edite os valores diretamente na tabela.</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Edite os valores diretamente.</p>
                   </div>
 
                   {servicosAdicionados.length > 0 && (
@@ -743,76 +737,131 @@ export default function ProfissionalPerfil() {
                   )}
                 </div>
 
-                <div className="overflow-x-auto rounded-lg border border-border">
-                  <div className="min-w-[720px]">
-                    <table className="w-full text-sm">
-                      <thead className="sticky top-0 z-10">
-                        <tr className="bg-[hsl(0_0%_20%)] text-white">
-                          <th className="w-10 px-3 py-2 text-left">
-                            <Checkbox
-                              checked={
-                                servicosAdicionados.length > 0 &&
-                                servicosSelecionados.length === servicosAdicionados.length
-                              }
-                              onCheckedChange={toggleTodosServicos}
-                              className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
-                            />
-                          </th>
-                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Nome</th>
-                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Preço</th>
-                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Tempo</th>
-                          <th className="px-3 py-2 text-left text-[13px] font-semibold">Comissão</th>
-                        </tr>
-                      </thead>
+                {/* MOBILE */}
+                <div className="grid gap-3 md:hidden">
+                  {servicosAdicionados.length === 0 ? (
+                    <div className="rounded-lg border border-border px-4 py-8 text-center text-sm text-muted-foreground">
+                      Nenhum registro encontrado
+                    </div>
+                  ) : (
+                    servicosAdicionados.map((s) => (
+                      <div key={s.id} className="rounded-lg border border-border p-3">
+                        <div className="mb-3 flex items-start gap-3">
+                          <Checkbox
+                            checked={servicosSelecionados.includes(s.id)}
+                            onCheckedChange={() => toggleServicoSelecionado(s.id)}
+                          />
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold text-foreground">{s.nome}</div>
+                          </div>
+                        </div>
 
-                      <tbody>
-                        {servicosAdicionados.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                              Nenhum registro encontrado
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          <div className="grid gap-1">
+                            <span className="text-xs font-medium text-muted-foreground">Preço</span>
+                            <input
+                              type="text"
+                              value={s.preco}
+                              onChange={(e) => updateServico(s.id, "preco", e.target.value)}
+                              className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </div>
+
+                          <div className="grid gap-1">
+                            <span className="text-xs font-medium text-muted-foreground">Tempo</span>
+                            <input
+                              type="text"
+                              value={s.tempo}
+                              onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
+                              className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </div>
+
+                          <div className="grid gap-1">
+                            <span className="text-xs font-medium text-muted-foreground">Comissão</span>
+                            <input
+                              type="text"
+                              value={s.comissao}
+                              onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
+                              placeholder="Ex: 50%"
+                              className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* DESKTOP */}
+                <div className="hidden overflow-x-auto rounded-lg border border-border md:block">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 z-10">
+                      <tr className="bg-[hsl(0_0%_20%)] text-white">
+                        <th className="w-10 px-3 py-2 text-left">
+                          <Checkbox
+                            checked={
+                              servicosAdicionados.length > 0 &&
+                              servicosSelecionados.length === servicosAdicionados.length
+                            }
+                            onCheckedChange={toggleTodosServicos}
+                            className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
+                          />
+                        </th>
+                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Nome</th>
+                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Preço</th>
+                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Tempo</th>
+                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Comissão</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {servicosAdicionados.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
+                            Nenhum registro encontrado
+                          </td>
+                        </tr>
+                      ) : (
+                        servicosAdicionados.map((s) => (
+                          <tr key={s.id} className="border-t border-border transition-colors hover:bg-muted/50">
+                            <td className="px-3 py-2">
+                              <Checkbox
+                                checked={servicosSelecionados.includes(s.id)}
+                                onCheckedChange={() => toggleServicoSelecionado(s.id)}
+                              />
+                            </td>
+                            <td className="px-3 py-2 text-foreground">{s.nome}</td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={s.preco}
+                                onChange={(e) => updateServico(s.id, "preco", e.target.value)}
+                                className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={s.tempo}
+                                onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
+                                className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={s.comissao}
+                                onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
+                                placeholder="Ex: 50%"
+                                className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                              />
                             </td>
                           </tr>
-                        ) : (
-                          servicosAdicionados.map((s) => (
-                            <tr key={s.id} className="border-t border-border transition-colors hover:bg-muted/50">
-                              <td className="px-3 py-2">
-                                <Checkbox
-                                  checked={servicosSelecionados.includes(s.id)}
-                                  onCheckedChange={() => toggleServicoSelecionado(s.id)}
-                                />
-                              </td>
-                              <td className="px-3 py-2 text-foreground">{s.nome}</td>
-                              <td className="px-3 py-2">
-                                <input
-                                  type="text"
-                                  value={s.preco}
-                                  onChange={(e) => updateServico(s.id, "preco", e.target.value)}
-                                  className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                                />
-                              </td>
-                              <td className="px-3 py-2">
-                                <input
-                                  type="text"
-                                  value={s.tempo}
-                                  onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
-                                  className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                                />
-                              </td>
-                              <td className="px-3 py-2">
-                                <input
-                                  type="text"
-                                  value={s.comissao}
-                                  onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
-                                  placeholder="Ex: 50%"
-                                  className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                                />
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
 
                 {servicosSelecionados.length > 0 && (
