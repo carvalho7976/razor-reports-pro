@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { TextField, Dropdown, FormRow, FormModal } from "@/components/FormModal";
+import { TextField, Dropdown, FormRow } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Plus, Trash2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -278,11 +278,9 @@ export default function ProfissionalPerfil() {
   const update = (field: keyof ProfissionalForm, value: string | boolean) => {
     setForm((prev) => {
       const next = { ...prev, [field]: value };
-
       if (value !== "" && value !== false) {
         toast({ title: "Alteração salva automaticamente" });
       }
-
       return next;
     });
   };
@@ -294,7 +292,6 @@ export default function ProfissionalPerfil() {
   const handleFotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const previewUrl = URL.createObjectURL(file);
     update("fotoPreview", previewUrl);
   };
@@ -316,7 +313,6 @@ export default function ProfissionalPerfil() {
                 ) : (
                   <Camera className="h-6 w-6 text-muted-foreground" />
                 )}
-
                 <div className="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[10px] font-medium text-white">
                   Alterar
                 </div>
@@ -537,83 +533,89 @@ export default function ProfissionalPerfil() {
 
       {/* Modal Expediente */}
       <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
-        <DialogContent className="max-w-3xl gap-0 overflow-hidden rounded-2xl p-0">
-          <div className="border-b border-border px-5 py-4">
+        <DialogContent className="w-[calc(100vw-24px)] max-w-4xl gap-0 overflow-hidden rounded-2xl p-0">
+          <div className="border-b border-border px-4 py-4 sm:px-5">
             <h2 className="text-base font-semibold text-foreground">Configurar expediente</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Defina os dias ativos e os horários de trabalho e almoço do profissional.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Defina os dias ativos e os horários de atendimento.</p>
           </div>
 
-          <div className="max-h-[70vh] overflow-y-auto p-5">
-            <div className="grid gap-3">
+          <div className="max-h-[70vh] overflow-y-auto p-4 sm:p-5">
+            <div className="grid gap-2.5">
               {diasSemana.map((dia) => {
                 const d = expediente[dia.key];
                 return (
-                  <div key={dia.key} className="rounded-xl border border-border bg-card p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{dia.label}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {d.ativo ? "Dia ativo para agendamento" : "Dia desativado"}
-                        </p>
+                  <div key={dia.key} className="rounded-xl border border-border bg-card px-3 py-3 sm:px-4">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="flex items-center justify-between gap-3 lg:min-w-[120px] lg:justify-start">
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">{dia.label}</p>
+                        </div>
+                        <div className="lg:hidden">
+                          <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
+                        </div>
                       </div>
 
-                      <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
+                      <div className="hidden lg:block">
+                        <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
+                      </div>
+
+                      {d.ativo ? (
+                        <div className="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr]">
+                          <div className="grid gap-1.5">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              Trabalho
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="time"
+                                value={d.trabalhoInicio}
+                                onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
+                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                              />
+                              <span className="shrink-0 text-xs text-muted-foreground">às</span>
+                              <input
+                                type="time"
+                                value={d.trabalhoFim}
+                                onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
+                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid gap-1.5">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              Almoço
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="time"
+                                value={d.almocoInicio}
+                                onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
+                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                              />
+                              <span className="shrink-0 text-xs text-muted-foreground">às</span>
+                              <input
+                                type="time"
+                                value={d.almocoFim}
+                                onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
+                                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1 rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+                          Dia desativado
+                        </div>
+                      )}
                     </div>
-
-                    {d.ativo && (
-                      <div className="mt-4 grid gap-4 md:grid-cols-2">
-                        <div className="rounded-lg border border-border bg-background p-3">
-                          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            Trabalho
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="time"
-                              value={d.trabalhoInicio}
-                              onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
-                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                            <span className="text-xs text-muted-foreground">às</span>
-                            <input
-                              type="time"
-                              value={d.trabalhoFim}
-                              onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
-                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="rounded-lg border border-border bg-background p-3">
-                          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            Almoço
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="time"
-                              value={d.almocoInicio}
-                              onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
-                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                            <span className="text-xs text-muted-foreground">às</span>
-                            <input
-                              type="time"
-                              value={d.almocoFim}
-                              onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
-                              className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-border px-5 py-4">
+          <div className="flex flex-col-reverse gap-2 border-t border-border px-4 py-4 sm:flex-row sm:justify-end sm:px-5">
             <button
               type="button"
               onClick={() => setExpedienteOpen(false)}
@@ -643,22 +645,20 @@ export default function ProfissionalPerfil() {
           }
         }}
       >
-        <DialogContent className="max-w-4xl gap-0 overflow-hidden rounded-2xl p-0 [&>button]:hidden">
-          <div className="border-b border-border px-5 py-4">
+        <DialogContent className="w-[calc(100vw-24px)] max-w-5xl gap-0 overflow-hidden rounded-2xl p-0 [&>button]:hidden">
+          <div className="border-b border-border px-4 py-4 sm:px-5">
             <h2 className="text-base font-semibold text-foreground">Serviços vinculados</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Adicione os serviços que o profissional realiza e ajuste preço, tempo e comissão.
+              Adicione os serviços do profissional e ajuste preço, tempo e comissão.
             </p>
           </div>
 
-          <div className="max-h-[75vh] overflow-y-auto p-5">
+          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-5">
             <div className="grid gap-4">
               <div className="rounded-xl border border-border bg-card p-4">
                 <div className="mb-3">
                   <h3 className="text-sm font-semibold text-foreground">Adicionar serviços</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Pesquise os serviços disponíveis e adicione um ou vários de uma vez.
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Pesquise e adicione um ou vários serviços.</p>
                 </div>
 
                 <div className="flex flex-col gap-3 md:flex-row md:items-end">
@@ -730,21 +730,21 @@ export default function ProfissionalPerfil() {
               </div>
 
               <div className="rounded-xl border border-border bg-card p-4">
-                <div className="mb-3 flex items-center justify-between gap-4">
+                <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-foreground">Serviços adicionados</h3>
                     <p className="mt-1 text-xs text-muted-foreground">Edite os valores diretamente na tabela.</p>
                   </div>
 
                   {servicosAdicionados.length > 0 && (
-                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                    <span className="w-fit rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
                       {servicosAdicionados.length} item(ns)
                     </span>
                   )}
                 </div>
 
-                <div className="overflow-hidden rounded-lg border border-border">
-                  <div className="max-h-[40vh] overflow-auto">
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <div className="min-w-[720px]">
                     <table className="w-full text-sm">
                       <thead className="sticky top-0 z-10">
                         <tr className="bg-[hsl(0_0%_20%)] text-white">
@@ -835,7 +835,7 @@ export default function ProfissionalPerfil() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-border px-5 py-4">
+          <div className="flex flex-col-reverse gap-2 border-t border-border px-4 py-4 sm:flex-row sm:justify-end sm:px-5">
             <button
               type="button"
               onClick={() => setServicosOpen(false)}
