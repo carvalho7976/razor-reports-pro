@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown, FormRow, FormModal } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
@@ -183,8 +183,8 @@ function SectionBlock({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-xl border border-border bg-card p-5", className)}>
-      <div className="mb-4">
+    <div className={cn("rounded-xl border border-border bg-card p-4", className)}>
+      <div className="mb-3">
         <h2 className="text-base font-semibold text-foreground">{title}</h2>
         {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
       </div>
@@ -194,7 +194,6 @@ function SectionBlock({
 }
 
 export default function ProfissionalPerfil() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -203,7 +202,6 @@ export default function ProfissionalPerfil() {
   const profEmail = searchParams.get("email") || "";
   const profCelular = searchParams.get("celular") || "";
   const profFuncao = searchParams.get("funcao") || "Profissional";
-  const isNew = !profNome;
 
   const [form, setForm] = useState<ProfissionalForm>(() => ({
     ...emptyForm(),
@@ -239,6 +237,7 @@ export default function ProfissionalPerfil() {
     const novos = servicosDisponiveis
       .filter((s) => servicosPendentes.includes(s.id) && !servicosAdicionados.some((a) => a.id === s.id))
       .map((s) => ({ ...s, comissao: "" }));
+
     setServicosAdicionados((prev) => [...prev, ...novos]);
     setServicosPendentes([]);
     setServicosDropdownOpen(false);
@@ -249,6 +248,7 @@ export default function ProfissionalPerfil() {
     const novos = servicosDisponiveis
       .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
       .map((s) => ({ ...s, comissao: "" }));
+
     setServicosAdicionados((prev) => [...prev, ...novos]);
     setServicosPendentes([]);
     setServicosDropdownOpen(false);
@@ -278,9 +278,11 @@ export default function ProfissionalPerfil() {
   const update = (field: keyof ProfissionalForm, value: string | boolean) => {
     setForm((prev) => {
       const next = { ...prev, [field]: value };
+
       if (value !== "" && value !== false) {
         toast({ title: "Alteração salva automaticamente" });
       }
+
       return next;
     });
   };
@@ -292,6 +294,7 @@ export default function ProfissionalPerfil() {
   const handleFotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
     const previewUrl = URL.createObjectURL(file);
     update("fotoPreview", previewUrl);
   };
@@ -357,41 +360,39 @@ export default function ProfissionalPerfil() {
         {/* CONTENT */}
         <div className="mx-6 mt-5 pb-10">
           {activeTab === "basicos" && (
-            <div className="grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+            <div className="grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
               {/* Coluna principal */}
               <div className="grid gap-5">
-                <SectionBlock title="Identificação" description="Informações principais do profissional.">
-                  <div className="max-w-xl">
-                    <TextField label="Nome *" value={form.nome} onChange={(v) => update("nome", v)} />
-                  </div>
-                </SectionBlock>
+                <SectionBlock title="Dados básicos" description="Informações principais do profissional.">
+                  <div className="grid max-w-3xl gap-4">
+                    <div className="max-w-xl">
+                      <TextField label="Nome *" value={form.nome} onChange={(v) => update("nome", v)} />
+                    </div>
 
-                <SectionBlock title="Contato" description="Dados de comunicação utilizados no sistema.">
-                  <div className="max-w-xl grid grid-cols-2 gap-4">
-                    <TextField label="Email *" value={form.email} onChange={(v) => update("email", v)} />
-                    <TextField
-                      label="Celular"
-                      value={form.celular}
-                      onChange={(v) => update("celular", v)}
-                      placeholder="(00) 00000-0000"
-                    />
-                  </div>
-                </SectionBlock>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <TextField label="Email *" value={form.email} onChange={(v) => update("email", v)} />
+                      <TextField
+                        label="Celular"
+                        value={form.celular}
+                        onChange={(v) => update("celular", v)}
+                        placeholder="(00) 00000-0000"
+                      />
+                    </div>
 
-                <SectionBlock title="Acesso" description="Defina o perfil de acesso do profissional.">
-                  <div className="max-w-xl">
-                    <Dropdown
-                      label="Nível de acesso"
-                      value={form.nivelAcesso}
-                      setValue={(v) => update("nivelAcesso", v)}
-                      options={nivelAcessoOptions}
-                    />
+                    <div className="max-w-sm">
+                      <Dropdown
+                        label="Nível de acesso"
+                        value={form.nivelAcesso}
+                        setValue={(v) => update("nivelAcesso", v)}
+                        options={nivelAcessoOptions}
+                      />
+                    </div>
                   </div>
                 </SectionBlock>
               </div>
 
               {/* Coluna lateral */}
-              <div className="grid gap-5">
+              <div className="grid gap-5 self-start">
                 <SectionBlock
                   title="Permissões"
                   description="Controle o comportamento do profissional dentro do sistema."
@@ -427,30 +428,8 @@ export default function ProfissionalPerfil() {
                   </div>
                 </SectionBlock>
 
-                <SectionBlock title="Configuração rápida" description="Resumo operacional do cadastro atual.">
-                  <div className="grid gap-3">
-                    <div className="rounded-lg bg-muted px-4 py-3">
-                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Status do cadastro
-                      </p>
-                      <p className="mt-1 text-sm font-medium text-foreground">
-                        {isNew ? "Novo profissional" : "Cadastro existente"}
-                      </p>
-                    </div>
-
-                    <div className="rounded-lg bg-muted px-4 py-3">
-                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Agendamento online
-                      </p>
-                      <p className="mt-1 text-sm font-medium text-foreground">
-                        {form.permitirAgendamentoOnline ? "Permitido" : "Bloqueado"}
-                      </p>
-                    </div>
-                  </div>
-                </SectionBlock>
-
                 <SectionBlock title="Ações" description="Configurações complementares do profissional.">
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-col gap-3">
                     <button
                       onClick={() => setServicosOpen(true)}
                       className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
@@ -563,17 +542,17 @@ export default function ProfissionalPerfil() {
 
       {/* Modal Expediente */}
       <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
-        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <DialogContent className="max-w-2xl gap-0 overflow-hidden p-0">
+          <div className="flex items-center justify-between border-b border-border px-5 py-4">
             <h2 className="text-base font-semibold text-foreground">Expediente de trabalho</h2>
           </div>
 
-          <div className="divide-y divide-border max-h-[60vh] overflow-y-auto">
+          <div className="max-h-[60vh] divide-y divide-border overflow-y-auto">
             {diasSemana.map((dia) => {
               const d = expediente[dia.key];
               return (
                 <div key={dia.key} className="px-5 py-3">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="mb-2 flex items-center gap-3">
                     <span className="w-10 text-sm font-semibold text-foreground">{dia.label}</span>
                     <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
                   </div>
@@ -581,14 +560,14 @@ export default function ProfissionalPerfil() {
                   {d.ativo && (
                     <div className="ml-[52px] flex flex-wrap gap-x-8 gap-y-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs font-medium shrink-0">Trabalho:</span>
+                        <span className="shrink-0 text-xs font-medium text-muted-foreground">Trabalho:</span>
                         <input
                           type="time"
                           value={d.trabalhoInicio}
                           onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
                           className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
-                        <span className="text-muted-foreground text-xs">às</span>
+                        <span className="text-xs text-muted-foreground">às</span>
                         <input
                           type="time"
                           value={d.trabalhoFim}
@@ -596,15 +575,16 @@ export default function ProfissionalPerfil() {
                           className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
                       </div>
+
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs font-medium shrink-0">Almoço:</span>
+                        <span className="shrink-0 text-xs font-medium text-muted-foreground">Almoço:</span>
                         <input
                           type="time"
                           value={d.almocoInicio}
                           onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
                           className="h-8 w-[100px] rounded-md border border-border bg-background px-2 text-sm text-foreground"
                         />
-                        <span className="text-muted-foreground text-xs">às</span>
+                        <span className="text-xs text-muted-foreground">às</span>
                         <input
                           type="time"
                           value={d.almocoFim}
@@ -619,7 +599,7 @@ export default function ProfissionalPerfil() {
             })}
           </div>
 
-          <div className="flex justify-end gap-2 px-5 py-3 border-t border-border">
+          <div className="flex justify-end gap-2 border-t border-border px-5 py-3">
             <button
               onClick={() => setExpedienteOpen(false)}
               className="inline-flex h-9 items-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
@@ -641,7 +621,7 @@ export default function ProfissionalPerfil() {
           }
         }}
       >
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden max-w-3xl">
+        <DialogContent className="max-w-3xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Configurar serviços"
             subtitle="Adicione os serviços que o profissional realiza."
@@ -663,7 +643,7 @@ export default function ProfissionalPerfil() {
               </div>
             }
           >
-            <div className="flex items-end gap-3 mb-3">
+            <div className="mb-3 flex items-end gap-3">
               <div className="relative flex-1" ref={servicosDropdownRef}>
                 <label className="text-[13px] font-semibold text-foreground">Selecione os serviços</label>
                 <button
@@ -686,14 +666,16 @@ export default function ProfissionalPerfil() {
                         autoFocus
                       />
                     </div>
+
                     <div className="max-h-48 overflow-auto">
                       <button
                         type="button"
                         onClick={handleAdicionarTodos}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted border-b border-border"
+                        className="flex w-full items-center gap-3 border-b border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted"
                       >
                         Selecionar todos
                       </button>
+
                       {servicosDispFiltrados.map((s) => (
                         <button
                           key={s.id}
@@ -708,8 +690,9 @@ export default function ProfissionalPerfil() {
                           <span>{s.nome}</span>
                         </button>
                       ))}
+
                       {servicosDispFiltrados.length === 0 && (
-                        <p className="px-4 py-3 text-sm text-muted-foreground text-center">Nenhum serviço encontrado</p>
+                        <p className="px-4 py-3 text-center text-sm text-muted-foreground">Nenhum serviço encontrado</p>
                       )}
                     </div>
                   </div>
@@ -725,13 +708,14 @@ export default function ProfissionalPerfil() {
               </button>
             </div>
 
-            <p className="text-[13px] font-semibold text-center text-muted-foreground mb-2">Serviços Adicionados</p>
-            <div className="border border-border rounded-lg overflow-hidden">
+            <p className="mb-2 text-center text-[13px] font-semibold text-muted-foreground">Serviços Adicionados</p>
+
+            <div className="overflow-hidden rounded-lg border border-border">
               <div className="max-h-[40vh] overflow-auto">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 z-10">
                     <tr className="bg-[hsl(0_0%_20%)] text-white">
-                      <th className="w-10 py-2 px-3 text-left">
+                      <th className="w-10 px-3 py-2 text-left">
                         <Checkbox
                           checked={
                             servicosAdicionados.length > 0 && servicosSelecionados.length === servicosAdicionados.length
@@ -740,30 +724,31 @@ export default function ProfissionalPerfil() {
                           className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
                         />
                       </th>
-                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Nome</th>
-                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Preço</th>
-                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Tempo</th>
-                      <th className="py-2 px-3 text-left font-semibold text-[13px]">Comissão</th>
+                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Nome</th>
+                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Preço</th>
+                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Tempo</th>
+                      <th className="px-3 py-2 text-left text-[13px] font-semibold">Comissão</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {servicosAdicionados.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="py-8 text-center text-muted-foreground text-sm">
+                        <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
                           Nenhum registro encontrado
                         </td>
                       </tr>
                     ) : (
                       servicosAdicionados.map((s) => (
-                        <tr key={s.id} className="border-t border-border hover:bg-muted/50 transition-colors">
-                          <td className="py-2 px-3">
+                        <tr key={s.id} className="border-t border-border transition-colors hover:bg-muted/50">
+                          <td className="px-3 py-2">
                             <Checkbox
                               checked={servicosSelecionados.includes(s.id)}
                               onCheckedChange={() => toggleServicoSelecionado(s.id)}
                             />
                           </td>
-                          <td className="py-2 px-3 text-foreground">{s.nome}</td>
-                          <td className="py-2 px-3">
+                          <td className="px-3 py-2 text-foreground">{s.nome}</td>
+                          <td className="px-3 py-2">
                             <input
                               type="text"
                               value={s.preco}
@@ -771,7 +756,7 @@ export default function ProfissionalPerfil() {
                               className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
                             />
                           </td>
-                          <td className="py-2 px-3">
+                          <td className="px-3 py-2">
                             <input
                               type="text"
                               value={s.tempo}
@@ -779,7 +764,7 @@ export default function ProfissionalPerfil() {
                               className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
                             />
                           </td>
-                          <td className="py-2 px-3">
+                          <td className="px-3 py-2">
                             <input
                               type="text"
                               value={s.comissao}
@@ -797,7 +782,7 @@ export default function ProfissionalPerfil() {
             </div>
 
             {servicosSelecionados.length > 0 && (
-              <div className="flex items-center justify-center mt-3">
+              <div className="mt-3 flex items-center justify-center">
                 <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2 shadow-lg">
                   <span className="text-sm text-muted-foreground">{servicosSelecionados.length} selecionado(s)</span>
                   <button
