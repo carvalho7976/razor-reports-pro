@@ -1,21 +1,35 @@
 import { Bell, Heart, CreditCard, Grid3X3, Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Link } from "react-router-dom";
+import frizzarLogo from "@/assets/frizzar-logo.png";
 
 export function AppHeaderBar() {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, state, isMobile } = useSidebar();
+  const collapsed = !isMobile && state === "collapsed";
 
   return (
     <header className="flex h-12 shrink-0 items-center justify-between bg-transparent px-3 text-foreground sm:px-4">
-      <button
-        type="button"
-        onClick={toggleSidebar}
-        className="rounded-lg p-1.5 hover:bg-black/5 transition-colors md:hidden"
-        aria-label="Menu"
-      >
-        <Menu className="h-5 w-5" />
-      </button>
-      <div className="hidden md:block" />
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="rounded-lg p-1.5 hover:bg-black/5 transition-colors md:hidden"
+          aria-label="Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        {!collapsed && (
+          <Link to="/" className="hidden md:flex items-center">
+            <img
+              src={frizzarLogo}
+              alt="Frizzar"
+              className="h-7 w-auto object-contain dark:invert"
+            />
+          </Link>
+        )}
+      </div>
+
 
       <div className="flex items-center gap-2 sm:gap-3">
         <button className="btn-action hidden border border-border bg-transparent py-1.5 text-xs text-foreground hover:bg-black/5 sm:inline-flex">
