@@ -60,9 +60,7 @@ const defaultDia = (ativo = true): DiaExpediente => ({
 type ExpedienteState = Record<string, DiaExpediente>;
 
 const defaultExpediente = (): ExpedienteState =>
-  Object.fromEntries(
-    diasSemana.map((d) => [d.key, defaultDia(d.key !== "dom")])
-  );
+  Object.fromEntries(diasSemana.map((d) => [d.key, defaultDia(d.key !== "dom")]));
 
 const nivelAcessoOptions = [
   { value: "Gerente", label: "Gerente" },
@@ -173,6 +171,28 @@ const tabs = [
   { id: "pessoais", label: "Dados pessoais" },
 ];
 
+function SectionBlock({
+  title,
+  description,
+  children,
+  className = "",
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("rounded-xl border border-border bg-card p-5", className)}>
+      <div className="mb-4">
+        <h2 className="text-base font-semibold text-foreground">{title}</h2>
+        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export default function ProfissionalPerfil() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -212,9 +232,7 @@ export default function ProfissionalPerfil() {
     .filter((s) => s.nome.toLowerCase().includes(servicoBusca.toLowerCase()));
 
   const toggleServicoPendente = (id: number) => {
-    setServicosPendentes((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setServicosPendentes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const handleAdicionarSelecionados = () => {
@@ -246,9 +264,7 @@ export default function ProfissionalPerfil() {
     setServicosAdicionados((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
 
   const toggleServicoSelecionado = (id: number) => {
-    setServicosSelecionados((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setServicosSelecionados((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const toggleTodosServicos = () => {
@@ -262,7 +278,6 @@ export default function ProfissionalPerfil() {
   const update = (field: keyof ProfissionalForm, value: string | boolean) => {
     setForm((prev) => {
       const next = { ...prev, [field]: value };
-      // Auto-save toast on meaningful changes
       if (value !== "" && value !== false) {
         toast({ title: "Alteração salva automaticamente" });
       }
@@ -277,7 +292,6 @@ export default function ProfissionalPerfil() {
   const handleFotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const previewUrl = URL.createObjectURL(file);
     update("fotoPreview", previewUrl);
   };
@@ -285,7 +299,7 @@ export default function ProfissionalPerfil() {
   return (
     <AppLayout>
       <div className="flex flex-col gap-0">
-        {/* HEADER SIMPLES */}
+        {/* HEADER */}
         <div className="mx-6 mt-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-5">
@@ -317,7 +331,6 @@ export default function ProfissionalPerfil() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -341,41 +354,48 @@ export default function ProfissionalPerfil() {
           </div>
         </div>
 
-        {/* TAB CONTENT */}
+        {/* CONTENT */}
         <div className="mx-6 mt-5 pb-10">
-          {/* ──── Dados Básicos ──── */}
           {activeTab === "basicos" && (
             <div className="grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-              {/* Coluna 1: dados básicos em coluna única */}
-              <div className="grid gap-4">
-                <div className="max-w-xl">
-                  <TextField label="Nome *" value={form.nome} onChange={(v) => update("nome", v)} />
-                </div>
+              {/* Coluna principal */}
+              <div className="grid gap-5">
+                <SectionBlock title="Identificação" description="Informações principais do profissional.">
+                  <div className="max-w-xl">
+                    <TextField label="Nome *" value={form.nome} onChange={(v) => update("nome", v)} />
+                  </div>
+                </SectionBlock>
 
-                <div className="max-w-xl grid grid-cols-2 gap-4">
-                  <TextField label="Email *" value={form.email} onChange={(v) => update("email", v)} />
-                  <TextField
-                    label="Celular"
-                    value={form.celular}
-                    onChange={(v) => update("celular", v)}
-                    placeholder="(00) 00000-0000"
-                  />
-                </div>
+                <SectionBlock title="Contato" description="Dados de comunicação utilizados no sistema.">
+                  <div className="max-w-xl grid grid-cols-2 gap-4">
+                    <TextField label="Email *" value={form.email} onChange={(v) => update("email", v)} />
+                    <TextField
+                      label="Celular"
+                      value={form.celular}
+                      onChange={(v) => update("celular", v)}
+                      placeholder="(00) 00000-0000"
+                    />
+                  </div>
+                </SectionBlock>
 
-                <div className="max-w-xl">
-                  <Dropdown
-                    label="Nível de acesso"
-                    value={form.nivelAcesso}
-                    setValue={(v) => update("nivelAcesso", v)}
-                    options={nivelAcessoOptions}
-                  />
-                </div>
+                <SectionBlock title="Acesso" description="Defina o perfil de acesso do profissional.">
+                  <div className="max-w-xl">
+                    <Dropdown
+                      label="Nível de acesso"
+                      value={form.nivelAcesso}
+                      setValue={(v) => update("nivelAcesso", v)}
+                      options={nivelAcessoOptions}
+                    />
+                  </div>
+                </SectionBlock>
               </div>
 
-              {/* Coluna 2: configurações */}
-              <div className="grid gap-8">
-                <div>
-                  <h2 className="mb-4 text-base font-semibold text-foreground">Permissões</h2>
+              {/* Coluna lateral */}
+              <div className="grid gap-5">
+                <SectionBlock
+                  title="Permissões"
+                  description="Controle o comportamento do profissional dentro do sistema."
+                >
                   <div className="grid gap-3">
                     {[
                       {
@@ -405,10 +425,31 @@ export default function ProfissionalPerfil() {
                       </label>
                     ))}
                   </div>
-                </div>
+                </SectionBlock>
 
-                <div>
-                  <h2 className="mb-4 text-base font-semibold text-foreground">Ações</h2>
+                <SectionBlock title="Configuração rápida" description="Resumo operacional do cadastro atual.">
+                  <div className="grid gap-3">
+                    <div className="rounded-lg bg-muted px-4 py-3">
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Status do cadastro
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-foreground">
+                        {isNew ? "Novo profissional" : "Cadastro existente"}
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg bg-muted px-4 py-3">
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Agendamento online
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-foreground">
+                        {form.permitirAgendamentoOnline ? "Permitido" : "Bloqueado"}
+                      </p>
+                    </div>
+                  </div>
+                </SectionBlock>
+
+                <SectionBlock title="Ações" description="Configurações complementares do profissional.">
                   <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() => setServicosOpen(true)}
@@ -423,71 +464,98 @@ export default function ProfissionalPerfil() {
                       Configurar expediente
                     </button>
                   </div>
-                </div>
+                </SectionBlock>
               </div>
             </div>
           )}
 
-          {/* ──── Dados Pessoais ──── */}
           {activeTab === "pessoais" && (
-            <div className="grid gap-4 max-w-5xl">
-              <FormRow cols={3}>
-                <TextField
-                  label="Aniversário"
-                  value={form.aniversario}
-                  onChange={(v) => update("aniversario", v)}
-                  placeholder="DD/MM/AAAA"
-                />
-                <Dropdown label="Sexo" value={form.sexo} setValue={(v) => update("sexo", v)} options={sexoOptions} />
-                <Dropdown
-                  label="Tipo logradouro"
-                  value={form.tipoLogradouro}
-                  setValue={(v) => update("tipoLogradouro", v)}
-                  options={tipoLogradouroOptions}
-                />
-              </FormRow>
+            <div className="grid max-w-5xl gap-5">
+              <SectionBlock title="Informações pessoais" description="Dados complementares do profissional.">
+                <div className="grid gap-4">
+                  <FormRow cols={3}>
+                    <TextField
+                      label="Aniversário"
+                      value={form.aniversario}
+                      onChange={(v) => update("aniversario", v)}
+                      placeholder="DD/MM/AAAA"
+                    />
+                    <Dropdown
+                      label="Sexo"
+                      value={form.sexo}
+                      setValue={(v) => update("sexo", v)}
+                      options={sexoOptions}
+                    />
+                    <Dropdown
+                      label="Tipo logradouro"
+                      value={form.tipoLogradouro}
+                      setValue={(v) => update("tipoLogradouro", v)}
+                      options={tipoLogradouroOptions}
+                    />
+                  </FormRow>
+                </div>
+              </SectionBlock>
 
-              <FormRow cols={3}>
-                <TextField label="Endereço" value={form.endereco} onChange={(v) => update("endereco", v)} />
-                <TextField label="Nº" value={form.numero} onChange={(v) => update("numero", v)} />
-                <TextField label="Complemento" value={form.complemento} onChange={(v) => update("complemento", v)} />
-              </FormRow>
+              <SectionBlock title="Endereço" description="Localização e dados de endereço.">
+                <div className="grid gap-4">
+                  <FormRow cols={3}>
+                    <TextField label="Endereço" value={form.endereco} onChange={(v) => update("endereco", v)} />
+                    <TextField label="Nº" value={form.numero} onChange={(v) => update("numero", v)} />
+                    <TextField
+                      label="Complemento"
+                      value={form.complemento}
+                      onChange={(v) => update("complemento", v)}
+                    />
+                  </FormRow>
 
-              <FormRow cols={3}>
-                <TextField label="CEP" value={form.cep} onChange={(v) => update("cep", v)} placeholder="00000-000" />
-                <TextField label="Bairro" value={form.bairro} onChange={(v) => update("bairro", v)} />
-                <Dropdown
-                  label="Estado"
-                  value={form.estado}
-                  setValue={(v) => update("estado", v)}
-                  options={estadoOptions}
-                />
-              </FormRow>
+                  <FormRow cols={3}>
+                    <TextField
+                      label="CEP"
+                      value={form.cep}
+                      onChange={(v) => update("cep", v)}
+                      placeholder="00000-000"
+                    />
+                    <TextField label="Bairro" value={form.bairro} onChange={(v) => update("bairro", v)} />
+                    <Dropdown
+                      label="Estado"
+                      value={form.estado}
+                      setValue={(v) => update("estado", v)}
+                      options={estadoOptions}
+                    />
+                  </FormRow>
 
-              <FormRow cols={3}>
-                <TextField label="Cidade" value={form.cidade} onChange={(v) => update("cidade", v)} />
-                <div />
-                <div />
-              </FormRow>
+                  <FormRow cols={3}>
+                    <TextField label="Cidade" value={form.cidade} onChange={(v) => update("cidade", v)} />
+                    <div />
+                    <div />
+                  </FormRow>
+                </div>
+              </SectionBlock>
 
-              <div className="mt-4 grid gap-4 max-w-xl">
-                <label className="flex cursor-pointer select-none items-center gap-3">
-                  <Checkbox
-                    checked={form.parceiro}
-                    onCheckedChange={(v) => update("parceiro", !!v)}
-                    className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
+              <SectionBlock
+                title="Parceria"
+                description="Configuração para profissionais parceiros."
+                className="max-w-xl"
+              >
+                <div className="grid gap-4">
+                  <label className="flex cursor-pointer select-none items-center gap-3">
+                    <Checkbox
+                      checked={form.parceiro}
+                      onCheckedChange={(v) => update("parceiro", !!v)}
+                      className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
+                    />
+                    <span className="text-sm font-medium text-foreground">Profissional parceiro</span>
+                  </label>
+
+                  <TextField
+                    label="CNPJ"
+                    value={form.cnpj}
+                    onChange={(v) => update("cnpj", v)}
+                    placeholder="00.000.000/0000-00"
+                    disabled={!form.parceiro}
                   />
-                  <span className="text-sm font-medium text-foreground">Profissional parceiro</span>
-                </label>
-
-                <TextField
-                  label="CNPJ"
-                  value={form.cnpj}
-                  onChange={(v) => update("cnpj", v)}
-                  placeholder="00.000.000/0000-00"
-                  disabled={!form.parceiro}
-                />
-              </div>
+                </div>
+              </SectionBlock>
             </div>
           )}
         </div>
@@ -507,10 +575,7 @@ export default function ProfissionalPerfil() {
                 <div key={dia.key} className="px-5 py-3">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="w-10 text-sm font-semibold text-foreground">{dia.label}</span>
-                    <Switch
-                      checked={d.ativo}
-                      onCheckedChange={(v) => updateDia(dia.key, "ativo", v)}
-                    />
+                    <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
                   </div>
 
                   {d.ativo && (
@@ -566,12 +631,25 @@ export default function ProfissionalPerfil() {
       </Dialog>
 
       {/* Modal Serviços */}
-      <Dialog open={servicosOpen} onOpenChange={(open) => { setServicosOpen(open); if (!open) { setServicoBusca(""); setServicosDropdownOpen(false); } }}>
+      <Dialog
+        open={servicosOpen}
+        onOpenChange={(open) => {
+          setServicosOpen(open);
+          if (!open) {
+            setServicoBusca("");
+            setServicosDropdownOpen(false);
+          }
+        }}
+      >
         <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden max-w-3xl">
           <FormModal
             title="Configurar serviços"
             subtitle="Adicione os serviços que o profissional realiza."
-            onClose={() => { setServicosOpen(false); setServicoBusca(""); setServicosDropdownOpen(false); }}
+            onClose={() => {
+              setServicosOpen(false);
+              setServicoBusca("");
+              setServicosDropdownOpen(false);
+            }}
             size="lg"
             footer={
               <div className="flex justify-end">
@@ -585,7 +663,6 @@ export default function ProfissionalPerfil() {
               </div>
             }
           >
-            {/* Selector with search */}
             <div className="flex items-end gap-3 mb-3">
               <div className="relative flex-1" ref={servicosDropdownRef}>
                 <label className="text-[13px] font-semibold text-foreground">Selecione os serviços</label>
@@ -648,7 +725,6 @@ export default function ProfissionalPerfil() {
               </button>
             </div>
 
-            {/* Table */}
             <p className="text-[13px] font-semibold text-center text-muted-foreground mb-2">Serviços Adicionados</p>
             <div className="border border-border rounded-lg overflow-hidden">
               <div className="max-h-[40vh] overflow-auto">
@@ -657,7 +733,9 @@ export default function ProfissionalPerfil() {
                     <tr className="bg-[hsl(0_0%_20%)] text-white">
                       <th className="w-10 py-2 px-3 text-left">
                         <Checkbox
-                          checked={servicosAdicionados.length > 0 && servicosSelecionados.length === servicosAdicionados.length}
+                          checked={
+                            servicosAdicionados.length > 0 && servicosSelecionados.length === servicosAdicionados.length
+                          }
                           onCheckedChange={toggleTodosServicos}
                           className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
                         />
@@ -718,13 +796,10 @@ export default function ProfissionalPerfil() {
               </div>
             </div>
 
-            {/* Pastilha flutuante de remoção */}
             {servicosSelecionados.length > 0 && (
               <div className="flex items-center justify-center mt-3">
                 <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2 shadow-lg">
-                  <span className="text-sm text-muted-foreground">
-                    {servicosSelecionados.length} selecionado(s)
-                  </span>
+                  <span className="text-sm text-muted-foreground">{servicosSelecionados.length} selecionado(s)</span>
                   <button
                     onClick={handleRemoverServicos}
                     className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/20"
