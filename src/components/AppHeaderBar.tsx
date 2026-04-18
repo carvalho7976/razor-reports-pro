@@ -19,15 +19,14 @@ export function AppHeaderBar() {
         >
           <Menu className="h-5 w-5" />
         </button>
-        {!collapsed && (
-          <Link to="/" className="hidden md:flex items-center">
-            <img
-              src={frizzarLogo}
-              alt="Frizzar"
-              className="h-7 w-auto object-contain dark:invert"
-            />
-          </Link>
-        )}
+        <Link to="/" className="flex items-center">
+          <img
+            src={frizzarLogo}
+            alt="Frizzar"
+            className="h-7 w-auto object-contain dark:invert"
+          />
+        </Link>
+
       </div>
 
 
