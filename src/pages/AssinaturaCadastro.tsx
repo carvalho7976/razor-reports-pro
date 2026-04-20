@@ -107,15 +107,15 @@ function statusBadge(status: PlanoAssinatura["status"]) {
 
 type ModalState = { type: "delete"; item: PlanoAssinatura } | null;
 
-export default function AssinaturaCadastro() {
+export default function ListaPlanos() {
   const navigate = useNavigate();
   const [allData, setAllData] = useState<PlanoAssinatura[]>(initialPlanos);
   const [modal, setModal] = useState<ModalState>(null);
   const { toast } = useToast();
 
-  const openNew = () => navigate("/planoPerfil");
+  const openNew = () => navigate("/assinaturaCadastro");
 
-  const openEdit = (item: PlanoAssinatura) => navigate(`/planoPerfil?id=${item.id}`);
+  const openEdit = (item: PlanoAssinatura) => navigate(`/assinaturaCadastro?id=${item.id}`);
 
   const openDelete = (item: PlanoAssinatura) => setModal({ type: "delete", item });
 
