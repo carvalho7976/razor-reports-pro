@@ -584,9 +584,9 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 4. Produtos ───── */}
-          {activeTab === "produtos" && (
-            <div className="grid max-w-5xl gap-5">
+          {/* ───── Produtos (dentro de Serviços) ───── */}
+          {activeTab === "servicos" && (
+            <div className="mt-5 grid max-w-5xl gap-5">
               <SectionBlock
                 title="Desconto em produtos"
                 description="Configure descontos opcionais que assinantes deste plano terão em produtos."
