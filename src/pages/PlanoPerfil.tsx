@@ -692,9 +692,9 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 5. Disponibilidade ───── */}
-          {activeTab === "disponibilidade" && (
-            <div className="grid max-w-5xl gap-5">
+          {/* ───── Disponibilidade (dentro de Detalhes) ───── */}
+          {activeTab === "detalhes" && (
+            <div className="mt-5 grid max-w-5xl gap-5">
               <SectionBlock
                 title="Dias disponíveis"
                 description="Em quais dias da semana os benefícios podem ser usados."
