@@ -132,12 +132,8 @@ function statusBadgeClasses(status: PlanoAssinatura["status"]) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const tabs = [
-  { id: "detalhes", label: "1. Detalhes" },
-  { id: "diferenciais", label: "2. Diferenciais" },
-  { id: "servicos", label: "3. Serviços" },
-  { id: "produtos", label: "4. Produtos" },
-  { id: "disponibilidade", label: "5. Disponibilidade" },
-  { id: "cancelamento", label: "6. Cancelamento" },
+  { id: "detalhes", label: "1. Detalhes do plano" },
+  { id: "servicos", label: "2. Serviços e produtos" },
 ];
 
 export default function PlanoPerfil() {
@@ -427,9 +423,9 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 2. Diferenciais ───── */}
-          {activeTab === "diferenciais" && (
-            <div className="grid max-w-3xl gap-5">
+          {/* ───── Diferenciais (dentro de Detalhes) ───── */}
+          {activeTab === "detalhes" && (
+            <div className="mt-5 grid max-w-3xl gap-5">
               <SectionBlock
                 title="Diferenciais do plano"
                 description="O que torna este plano atrativo? Esses itens aparecem na vitrine do cliente. Arraste para reordenar."
@@ -588,9 +584,9 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 4. Produtos ───── */}
-          {activeTab === "produtos" && (
-            <div className="grid max-w-5xl gap-5">
+          {/* ───── Produtos (dentro de Serviços) ───── */}
+          {activeTab === "servicos" && (
+            <div className="mt-5 grid max-w-5xl gap-5">
               <SectionBlock
                 title="Desconto em produtos"
                 description="Configure descontos opcionais que assinantes deste plano terão em produtos."
@@ -696,9 +692,9 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 5. Disponibilidade ───── */}
-          {activeTab === "disponibilidade" && (
-            <div className="grid max-w-5xl gap-5">
+          {/* ───── Disponibilidade (dentro de Detalhes) ───── */}
+          {activeTab === "detalhes" && (
+            <div className="mt-5 grid max-w-5xl gap-5">
               <SectionBlock
                 title="Dias disponíveis"
                 description="Em quais dias da semana os benefícios podem ser usados."
@@ -790,50 +786,7 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 6. Cancelamento ───── */}
-          {activeTab === "cancelamento" && (
-            <div className="grid max-w-3xl gap-5">
-              <SectionBlock title="Regras de cancelamento" description="Defina como o cliente pode encerrar a assinatura.">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Dropdown
-                    label="Carência para cancelar"
-                    value={form.cancelamentoCarencia}
-                    setValue={(v) => update("cancelamentoCarencia", v)}
-                    options={carenciaOptions}
-                  />
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {form.cancelamentoCarencia === "Sem carência"
-                    ? "O cliente pode cancelar a qualquer momento."
-                    : `O cliente só pode cancelar após ${form.cancelamentoCarencia} do início da assinatura.`}
-                </p>
-
-                <div className="mt-5 border-t border-border pt-4">
-                  <label className="flex cursor-pointer select-none items-center justify-between gap-3">
-                    <div>
-                      <div className="text-sm font-semibold text-foreground">Permitir pausa</div>
-                      <div className="text-xs text-muted-foreground">
-                        Cliente pode pausar a assinatura temporariamente
-                      </div>
-                    </div>
-                    <Switch
-                      checked={form.cancelamentoPausa}
-                      onCheckedChange={(v) => update("cancelamentoPausa", v)}
-                    />
-                  </label>
-                </div>
-              </SectionBlock>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={() => navigate("/planos")}
-                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-5 text-sm font-semibold text-foreground transition hover:bg-muted/40"
-                >
-                  Concluir e voltar para a lista
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Cancelamento removido */}
         </div>
       </div>
     </AppLayout>
