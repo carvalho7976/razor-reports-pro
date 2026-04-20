@@ -423,9 +423,9 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 2. Diferenciais ───── */}
-          {activeTab === "diferenciais" && (
-            <div className="grid max-w-3xl gap-5">
+          {/* ───── Diferenciais (dentro de Detalhes) ───── */}
+          {activeTab === "detalhes" && (
+            <div className="mt-5 grid max-w-3xl gap-5">
               <SectionBlock
                 title="Diferenciais do plano"
                 description="O que torna este plano atrativo? Esses itens aparecem na vitrine do cliente. Arraste para reordenar."
