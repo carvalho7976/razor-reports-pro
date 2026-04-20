@@ -786,50 +786,7 @@ export default function PlanoPerfil() {
             </div>
           )}
 
-          {/* ───── 6. Cancelamento ───── */}
-          {activeTab === "cancelamento" && (
-            <div className="grid max-w-3xl gap-5">
-              <SectionBlock title="Regras de cancelamento" description="Defina como o cliente pode encerrar a assinatura.">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Dropdown
-                    label="Carência para cancelar"
-                    value={form.cancelamentoCarencia}
-                    setValue={(v) => update("cancelamentoCarencia", v)}
-                    options={carenciaOptions}
-                  />
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {form.cancelamentoCarencia === "Sem carência"
-                    ? "O cliente pode cancelar a qualquer momento."
-                    : `O cliente só pode cancelar após ${form.cancelamentoCarencia} do início da assinatura.`}
-                </p>
-
-                <div className="mt-5 border-t border-border pt-4">
-                  <label className="flex cursor-pointer select-none items-center justify-between gap-3">
-                    <div>
-                      <div className="text-sm font-semibold text-foreground">Permitir pausa</div>
-                      <div className="text-xs text-muted-foreground">
-                        Cliente pode pausar a assinatura temporariamente
-                      </div>
-                    </div>
-                    <Switch
-                      checked={form.cancelamentoPausa}
-                      onCheckedChange={(v) => update("cancelamentoPausa", v)}
-                    />
-                  </label>
-                </div>
-              </SectionBlock>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={() => navigate("/planos")}
-                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-5 text-sm font-semibold text-foreground transition hover:bg-muted/40"
-                >
-                  Concluir e voltar para a lista
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Cancelamento removido */}
         </div>
       </div>
     </AppLayout>
