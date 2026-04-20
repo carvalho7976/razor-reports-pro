@@ -1,8 +1,12 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { ChevronLeft } from "lucide-react";
+import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
+import { Crown, Star, Check, Search, X, GripVertical, Plus, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { initialPlanos, PlanoAssinatura, ServicoPlano, ProdutoPlano } from "./AssinaturaCadastro";
 
 // ─── Mock catalogues ──────────────────────────────────────────────────────────
@@ -39,7 +43,33 @@ const PROFISSIONAIS = [
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 const USOS_OPTS = ["Ilimitado", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
-const CARENCIA_OPTS = ["Sem carência", "7 dias", "15 dias", "30 dias"];
+
+const recorrenciaOptions = [
+  { value: "Mensal", label: "Mensal" },
+  { value: "Trimestral", label: "Trimestral" },
+  { value: "Semestral", label: "Semestral" },
+  { value: "Anual", label: "Anual" },
+];
+
+const pagamentoOptions = [
+  { value: "Cartão de Crédito", label: "Cartão de Crédito" },
+  { value: "PIX", label: "PIX" },
+  { value: "Boleto", label: "Boleto" },
+  { value: "Múltiplos", label: "Múltiplos" },
+];
+
+const statusOptions = [
+  { value: "Ativo", label: "Ativo — visível na vitrine" },
+  { value: "Rascunho", label: "Rascunho — não visível" },
+  { value: "Arquivado", label: "Arquivado — desativado" },
+];
+
+const carenciaOptions = [
+  { value: "Sem carência", label: "Sem carência" },
+  { value: "7 dias", label: "7 dias" },
+  { value: "15 dias", label: "15 dias" },
+  { value: "30 dias", label: "30 dias" },
+];
 
 function emptyPlano(): PlanoAssinatura {
   return {
@@ -61,788 +91,750 @@ function emptyPlano(): PlanoAssinatura {
   };
 }
 
-// ─── Small reusable pieces ────────────────────────────────────────────────────
+// ─── Reusable section block (matches ProfissionalPerfil) ──────────────────────
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <label className="block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
-      {children}
-    </label>
-  );
-}
-
-function Input({
-  value, onChange, placeholder, type = "text", className = "",
+function SectionBlock({
+  title,
+  description,
+  children,
+  className = "",
+  action,
 }: {
-  value: string | number;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  type?: string;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
   className?: string;
+  action?: React.ReactNode;
 }) {
   return (
-    <input
-      type={type}
-      value={value}
-      placeholder={placeholder}
-      onChange={e => onChange(e.target.value)}
-      className={`w-full px-3 py-2 text-[13px] rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground outline-none focus:border-foreground transition-colors ${className}`}
-    />
-  );
-}
-
-function Select({
-  value, onChange, options, className = "",
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  options: { value: string; label: string }[];
-  className?: string;
-}) {
-  return (
-    <select
-      value={value}
-      onChange={e => onChange(e.target.value)}
-      className={`w-full px-3 py-2 text-[13px] rounded-md border border-border bg-background text-foreground outline-none focus:border-foreground transition-colors ${className}`}
-    >
-      {options.map(o => (
-        <option key={o.value} value={o.value}>{o.label}</option>
-      ))}
-    </select>
-  );
-}
-
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-[18px] w-8 rounded-full transition-colors flex-shrink-0 ${checked ? "bg-foreground" : "bg-border"}`}
-    >
-      <span className={`absolute top-[3px] h-3 w-3 rounded-full bg-white transition-all ${checked ? "left-[17px]" : "left-[3px]"}`} />
-    </button>
-  );
-}
-
-function SectionCard({ num, title, sub, children }: {
-  num: number; title: string; sub?: string; children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-2.5">
-        <div className="w-5 h-5 rounded-full bg-foreground text-background text-[10px] font-bold flex items-center justify-center flex-shrink-0">
-          {num}
+    <div className={cn("rounded-xl border border-border bg-card p-4", className)}>
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold text-foreground">{title}</h2>
+          {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
         </div>
-        <span className="text-[13px] font-semibold text-foreground">{title}</span>
-        {sub && <span className="text-[12px] text-muted-foreground ml-auto">{sub}</span>}
+        {action}
       </div>
-      <div className="rounded-lg border border-border bg-card p-4">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
 
-function Divider() {
-  return <div className="border-t border-border my-3" />;
-}
-
-function SearchInput({ value, onChange, placeholder }: {
-  value: string; onChange: (v: string) => void; placeholder: string;
-}) {
-  return (
-    <div className="relative flex-1">
-      <input
-        type="text"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full px-3 py-2 text-[13px] rounded-md border border-border bg-muted/40 text-foreground placeholder:text-muted-foreground outline-none focus:border-foreground focus:bg-background transition-colors"
-      />
-      {value && (
-        <button
-          onClick={() => onChange("")}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-[16px] leading-none"
-        >
-          ×
-        </button>
-      )}
-    </div>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
-      <path d="M2 6l2.5 2.5L10 3" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function Checkbox({ checked }: { checked: boolean }) {
-  return (
-    <div className={`w-4 h-4 rounded-[3px] border-[1.5px] flex items-center justify-center flex-shrink-0 transition-all ${checked ? "bg-foreground border-foreground" : "border-border"}`}>
-      {checked && <CheckIcon />}
-    </div>
-  );
+function statusBadgeClasses(status: PlanoAssinatura["status"]) {
+  const styles: Record<PlanoAssinatura["status"], string> = {
+    Ativo: "bg-green-100 text-green-800",
+    Rascunho: "bg-yellow-100 text-yellow-800",
+    Arquivado: "bg-gray-100 text-gray-600",
+  };
+  return styles[status];
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
+
+const tabs = [
+  { id: "detalhes", label: "1. Detalhes" },
+  { id: "diferenciais", label: "2. Diferenciais" },
+  { id: "servicos", label: "3. Serviços" },
+  { id: "produtos", label: "4. Produtos" },
+  { id: "disponibilidade", label: "5. Disponibilidade" },
+  { id: "cancelamento", label: "6. Cancelamento" },
+];
 
 export default function PlanoPerfil() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
-  // Load existing plan if editing
   const editId = searchParams.get("id") ? Number(searchParams.get("id")) : null;
-  const existing = editId ? initialPlanos.find(p => p.id === editId) : null;
+  const existing = editId ? initialPlanos.find((p) => p.id === editId) : null;
   const isEdit = !!existing;
 
   const [form, setForm] = useState<PlanoAssinatura>(existing ? { ...existing } : emptyPlano());
-  const [showErrors, setShowErrors] = useState(false);
+  const [activeTab, setActiveTab] = useState("detalhes");
 
-  // Search / filter state
   const [svcSearch, setSvcSearch] = useState("");
   const [svcOnlySel, setSvcOnlySel] = useState(false);
   const [prodSearch, setProdSearch] = useState("");
   const [prodOnlySel, setProdOnlySel] = useState(false);
 
-  // Benefit drag
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [newBeneficio, setNewBeneficio] = useState("");
 
-  const set = (patch: Partial<PlanoAssinatura>) => setForm(prev => ({ ...prev, ...patch }));
-
-  // ── Derived ────────────────────────────────────────────────────────────────
-
-  const errors = {
-    nome: !form.nome.trim() ? "Informe o nome do plano." : "",
-    servicos: !form.servicos.length ? "Selecione ao menos um serviço." : "",
+  const update = <K extends keyof PlanoAssinatura>(field: K, value: PlanoAssinatura[K]) => {
+    setForm((prev) => {
+      const next = { ...prev, [field]: value };
+      const isEmpty =
+        value === "" ||
+        value === false ||
+        value === 0 ||
+        (Array.isArray(value) && value.length === 0);
+      if (!isEmpty) toast({ title: "Alteração salva automaticamente" });
+      return next;
+    });
   };
 
-  const valorServicos = useMemo(() =>
-    form.servicos.reduce((acc, sp) => {
-      const s = SERVICOS.find(x => x.id === sp.servicoId);
-      return acc + (s ? s.preco * (sp.desconto / 100) : 0);
-    }, 0),
-    [form.servicos]
+  const setSilent = (patch: Partial<PlanoAssinatura>) => setForm((prev) => ({ ...prev, ...patch }));
+
+  const valorServicos = useMemo(
+    () =>
+      form.servicos.reduce((acc, sp) => {
+        const s = SERVICOS.find((x) => x.id === sp.servicoId);
+        return acc + (s ? s.preco * (sp.desconto / 100) : 0);
+      }, 0),
+    [form.servicos],
   );
 
-  const svcsVisiveis = SERVICOS.filter(s => {
+  const svcsVisiveis = SERVICOS.filter((s) => {
     const q = s.nome.toLowerCase().includes(svcSearch.toLowerCase());
-    const sel = !svcOnlySel || form.servicos.some(sp => sp.servicoId === s.id);
+    const sel = !svcOnlySel || form.servicos.some((sp) => sp.servicoId === s.id);
     return q && sel;
   });
 
-  const prodsVisiveis = PRODUTOS.filter(p => {
+  const prodsVisiveis = PRODUTOS.filter((p) => {
     const q = p.nome.toLowerCase().includes(prodSearch.toLowerCase());
-    const sel = !prodOnlySel || form.produtos.some(pp => pp.produtoId === p.id);
+    const sel = !prodOnlySel || form.produtos.some((pp) => pp.produtoId === p.id);
     return q && sel;
   });
 
-  const svcSelCount = form.servicos.length;
-  const prodSelCount = form.produtos.length;
   const allSvcsSel =
-    svcsVisiveis.length > 0 &&
-    svcsVisiveis.every(s => form.servicos.some(sp => sp.servicoId === s.id));
+    svcsVisiveis.length > 0 && svcsVisiveis.every((s) => form.servicos.some((sp) => sp.servicoId === s.id));
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
-
+  // ── Servicos ──
   const toggleServico = (id: number) => {
-    const exists = form.servicos.find(sp => sp.servicoId === id);
+    const exists = form.servicos.find((sp) => sp.servicoId === id);
     if (exists) {
-      set({ servicos: form.servicos.filter(sp => sp.servicoId !== id) });
+      setSilent({ servicos: form.servicos.filter((sp) => sp.servicoId !== id) });
     } else {
-      set({ servicos: [...form.servicos, { servicoId: id, desconto: 100, usosPorMes: "Ilimitado" }] });
+      update("servicos", [...form.servicos, { servicoId: id, desconto: 100, usosPorMes: "Ilimitado" }]);
     }
   };
-
   const updateServico = (id: number, patch: Partial<ServicoPlano>) =>
-    set({ servicos: form.servicos.map(sp => sp.servicoId === id ? { ...sp, ...patch } : sp) });
-
+    setSilent({
+      servicos: form.servicos.map((sp) => (sp.servicoId === id ? { ...sp, ...patch } : sp)),
+    });
   const selectAllSvcs = () => {
-    const allSel = svcsVisiveis.every(s => form.servicos.some(sp => sp.servicoId === s.id));
-    if (allSel) {
-      set({ servicos: form.servicos.filter(sp => !svcsVisiveis.some(s => s.id === sp.servicoId)) });
+    if (allSvcsSel) {
+      setSilent({ servicos: form.servicos.filter((sp) => !svcsVisiveis.some((s) => s.id === sp.servicoId)) });
     } else {
       const toAdd = svcsVisiveis
-        .filter(s => !form.servicos.some(sp => sp.servicoId === s.id))
-        .map(s => ({ servicoId: s.id, desconto: 100, usosPorMes: "Ilimitado" }));
-      set({ servicos: [...form.servicos, ...toAdd] });
+        .filter((s) => !form.servicos.some((sp) => sp.servicoId === s.id))
+        .map((s) => ({ servicoId: s.id, desconto: 100, usosPorMes: "Ilimitado" }));
+      update("servicos", [...form.servicos, ...toAdd]);
     }
   };
 
+  // ── Produtos ──
   const toggleProduto = (id: number) => {
-    const exists = form.produtos.find(pp => pp.produtoId === id);
+    const exists = form.produtos.find((pp) => pp.produtoId === id);
     if (exists) {
-      set({ produtos: form.produtos.filter(pp => pp.produtoId !== id) });
+      setSilent({ produtos: form.produtos.filter((pp) => pp.produtoId !== id) });
     } else {
-      set({ produtos: [...form.produtos, { produtoId: id, desconto: 20, limiteDescontoMes: null }] });
+      update("produtos", [...form.produtos, { produtoId: id, desconto: 20, limiteDescontoMes: null }]);
     }
   };
-
   const updateProduto = (id: number, patch: Partial<ProdutoPlano>) =>
-    set({ produtos: form.produtos.map(pp => pp.produtoId === id ? { ...pp, ...patch } : pp) });
+    setSilent({
+      produtos: form.produtos.map((pp) => (pp.produtoId === id ? { ...pp, ...patch } : pp)),
+    });
 
+  // ── Dias / profissionais ──
   const toggleDia = (i: number) => {
     const dias = form.diasDisponiveis.includes(i)
-      ? form.diasDisponiveis.filter(d => d !== i)
+      ? form.diasDisponiveis.filter((d) => d !== i)
       : [...form.diasDisponiveis, i];
-    set({ diasDisponiveis: dias });
+    update("diasDisponiveis", dias);
   };
 
   const toggleProf = (id: number) => {
     const ids = form.profissionaisIds.includes(id)
-      ? form.profissionaisIds.filter(p => p !== id)
+      ? form.profissionaisIds.filter((p) => p !== id)
       : [...form.profissionaisIds, id];
-    set({ profissionaisIds: ids });
+    update("profissionaisIds", ids);
   };
 
+  // ── Benefícios ──
   const addBeneficio = () => {
     if (!newBeneficio.trim()) return;
-    set({ beneficios: [...form.beneficios, newBeneficio.trim()] });
+    update("beneficios", [...form.beneficios, newBeneficio.trim()]);
     setNewBeneficio("");
   };
-
   const removeBeneficio = (i: number) =>
-    set({ beneficios: form.beneficios.filter((_, idx) => idx !== i) });
-
+    update("beneficios", form.beneficios.filter((_, idx) => idx !== i));
   const onDrop = (toIdx: number) => {
     if (dragIdx === null || dragIdx === toIdx) return;
     const arr = [...form.beneficios];
     const [moved] = arr.splice(dragIdx, 1);
     arr.splice(toIdx, 0, moved);
-    set({ beneficios: arr });
+    update("beneficios", arr);
     setDragIdx(null);
   };
 
-  const handleSave = () => {
-    setShowErrors(true);
-    if (errors.nome || errors.servicos) return;
-    toast({ title: isEdit ? "Plano atualizado" : "Plano criado com sucesso" });
-    navigate("/planos");
-  };
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-
+  // ── Render ──
   return (
     <AppLayout>
-      <div className="max-w-3xl mx-auto px-4 py-6 pb-20 space-y-5">
-
+      <div className="flex flex-col gap-0">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/planos")}
-              className="flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Voltar
-            </button>
-            <h1 className="text-[22px] font-bold text-foreground tracking-tight">
-              {isEdit ? "Editar Plano" : "Novo Plano"}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate("/planos")}
-              className="px-4 py-2 text-[13px] font-medium rounded-md border border-border bg-background text-foreground hover:bg-muted/40 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 text-[13px] font-semibold rounded-md bg-foreground text-background hover:opacity-85 transition-opacity"
-            >
-              Salvar plano
-            </button>
-          </div>
-        </div>
-
-        {/* Validation summary */}
-        {showErrors && (errors.nome || errors.servicos) && (
-          <div className="px-4 py-3 rounded-md bg-destructive/10 border border-destructive/30 text-[12px] text-destructive font-medium space-y-0.5">
-            {errors.nome && <p>· {errors.nome}</p>}
-            {errors.servicos && <p>· {errors.servicos}</p>}
-          </div>
-        )}
-
-        {/* ── 1. Detalhes ─────────────────────────────────────────────── */}
-        <SectionCard num={1} title="Detalhes do plano">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <FieldLabel>Nome do plano</FieldLabel>
-              <Input
-                value={form.nome}
-                onChange={v => set({ nome: v })}
-                placeholder="Ex: Clube Premium"
-                className={showErrors && errors.nome ? "border-destructive" : ""}
-              />
-            </div>
-            <div className="w-28">
-              <FieldLabel>Valor (R$)</FieldLabel>
-              <Input
-                type="number"
-                value={form.valor || ""}
-                onChange={v => set({ valor: parseFloat(v) || 0 })}
-              />
-            </div>
-            <div className="w-32">
-              <FieldLabel>Recorrência</FieldLabel>
-              <Select
-                value={form.recorrencia}
-                onChange={v => set({ recorrencia: v })}
-                options={[
-                  { value: "Mensal", label: "Mensal" },
-                  { value: "Trimestral", label: "Trimestral" },
-                  { value: "Semestral", label: "Semestral" },
-                  { value: "Anual", label: "Anual" },
-                ]}
-              />
-            </div>
-            <div className="w-44">
-              <FieldLabel>Pagamento</FieldLabel>
-              <Select
-                value={form.formaPagamento}
-                onChange={v => set({ formaPagamento: v })}
-                options={[
-                  { value: "Cartão de Crédito", label: "Cartão de Crédito" },
-                  { value: "PIX", label: "PIX" },
-                  { value: "Boleto", label: "Boleto" },
-                  { value: "Múltiplos", label: "Múltiplos" },
-                ]}
-              />
-            </div>
-          </div>
-
-          <Divider />
-
-          <div className="flex items-start gap-6">
-            <div className="w-56">
-              <FieldLabel>Status do plano</FieldLabel>
-              <Select
-                value={form.status}
-                onChange={v => set({ status: v as PlanoAssinatura["status"] })}
-                options={[
-                  { value: "Ativo", label: "Ativo — visível na vitrine" },
-                  { value: "Rascunho", label: "Rascunho — não visível" },
-                  { value: "Arquivado", label: "Arquivado — desativado" },
-                ]}
-              />
-            </div>
-
-            {form.status === "Ativo" && (
-              <div>
-                <FieldLabel>Desativar automaticamente em</FieldLabel>
-                <Input
-                  type="date"
-                  value={form.desativarEm}
-                  onChange={v => set({ desativarEm: v })}
-                  className="w-44"
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Deixe em branco para manter ativo indefinidamente.
-                </p>
+        <div className="mx-6 mt-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-5">
+              <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 border-border bg-muted shadow-sm">
+                <Crown className="h-8 w-8 text-muted-foreground" />
+                {form.destaque && (
+                  <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 shadow">
+                    <Star className="h-3.5 w-3.5 fill-white text-white" />
+                  </div>
+                )}
               </div>
-            )}
-
-            <div className="ml-auto flex items-center gap-2.5 pt-5">
-              <Toggle checked={form.destaque} onChange={v => set({ destaque: v })} />
-              <div>
-                <div className="text-[13px] font-semibold text-foreground">Plano destaque ★</div>
-                <div className="text-[11px] text-muted-foreground">Aparece primeiro na vitrine</div>
-              </div>
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* ── 2. Diferenciais ─────────────────────────────────────────── */}
-        <SectionCard num={2} title="Diferenciais do plano" sub="Opcional · arraste para reordenar">
-          <p className="text-[12px] text-muted-foreground mb-3">
-            O que torna este plano atrativo? Esses itens aparecem na vitrine do cliente.
-          </p>
-          <div className="space-y-1.5 mb-3">
-            {form.beneficios.map((b, i) => (
-              <div
-                key={i}
-                draggable
-                onDragStart={() => setDragIdx(i)}
-                onDragOver={e => e.preventDefault()}
-                onDrop={() => onDrop(i)}
-                className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-background cursor-grab active:opacity-50 hover:border-foreground/30 transition-colors"
-              >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-muted-foreground flex-shrink-0">
-                  <circle cx="4" cy="3" r="1" fill="currentColor" />
-                  <circle cx="8" cy="3" r="1" fill="currentColor" />
-                  <circle cx="4" cy="6" r="1" fill="currentColor" />
-                  <circle cx="8" cy="6" r="1" fill="currentColor" />
-                  <circle cx="4" cy="9" r="1" fill="currentColor" />
-                  <circle cx="8" cy="9" r="1" fill="currentColor" />
-                </svg>
-                <span className="flex-1 text-[13px] text-foreground font-medium">{b}</span>
-                <button
-                  onClick={() => removeBeneficio(i)}
-                  className="text-muted-foreground hover:text-destructive text-[16px] leading-none transition-colors"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <input
-              className="flex-1 px-3 py-2 text-[13px] rounded-md border border-border bg-muted/40 text-foreground placeholder:text-muted-foreground outline-none focus:border-foreground transition-colors"
-              placeholder="Ex: Prioridade no agendamento"
-              value={newBeneficio}
-              onChange={e => setNewBeneficio(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && addBeneficio()}
-            />
-            <button
-              onClick={addBeneficio}
-              className="px-4 py-2 text-[12px] font-semibold rounded-md border border-border bg-background text-foreground hover:border-foreground/60 transition-colors whitespace-nowrap"
-            >
-              + Adicionar
-            </button>
-          </div>
-        </SectionCard>
-
-        {/* ── 3. Serviços ─────────────────────────────────────────────── */}
-        <SectionCard
-          num={3}
-          title="Serviços inclusos"
-          sub={
-            svcSelCount > 0
-              ? `${svcSelCount} selecionado${svcSelCount !== 1 ? "s" : ""}`
-              : showErrors && errors.servicos ? "⚠ Obrigatório" : "Obrigatório"
-          }
-        >
-          {/* Indicador de valor calculado */}
-          {valorServicos > 0 && (
-            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-md bg-muted/60 border border-border text-[12px]">
-              <span className="text-muted-foreground">Valor incluso no plano:</span>
-              <span className="font-semibold text-foreground">R$ {valorServicos.toFixed(2)}</span>
-              {form.valor > 0 && valorServicos > form.valor && (
-                <>
-                  <span className="text-muted-foreground">·</span>
-                  <span className="text-muted-foreground">
-                    Cliente economiza{" "}
-                    <strong className="text-foreground">
-                      R$ {(valorServicos - form.valor).toFixed(2)}
-                    </strong>
-                    /mês
+              <div className="pt-1">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-foreground">
+                    {form.nome || (isEdit ? "Editar plano" : "Novo plano")}
+                  </h1>
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium",
+                      statusBadgeClasses(form.status),
+                    )}
+                  >
+                    {form.status}
                   </span>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Toolbar */}
-          <div className="flex items-center gap-2 mb-3">
-            <SearchInput value={svcSearch} onChange={setSvcSearch} placeholder="Buscar serviço..." />
-            {svcSelCount > 0 && (
-              <button
-                onClick={() => setSvcOnlySel(!svcOnlySel)}
-                className={`flex items-center gap-1.5 px-3 py-[7px] text-[12px] font-semibold rounded-md border-2 transition-colors whitespace-nowrap ${
-                  svcOnlySel
-                    ? "bg-foreground border-foreground text-background"
-                    : "bg-background border-foreground text-foreground"
-                }`}
-              >
-                {svcSelCount}
-                <CheckIcon />
-              </button>
-            )}
-            <button
-              onClick={selectAllSvcs}
-              className="px-3 py-[7px] text-[12px] font-medium rounded-md border border-border bg-background text-muted-foreground hover:border-foreground/60 hover:text-foreground transition-colors whitespace-nowrap"
-            >
-              {allSvcsSel ? "Desmarcar todos" : "Selecionar todos"}
-            </button>
-          </div>
-
-          {/* Lista com scroll */}
-          <div className="max-h-[220px] overflow-y-auto pr-0.5 space-y-1.5">
-            {svcsVisiveis.map(s => {
-              const sp = form.servicos.find(x => x.servicoId === s.id);
-              const sel = !!sp;
-              return (
-                <div
-                  key={s.id}
-                  onClick={() => toggleServico(s.id)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-md border cursor-pointer transition-all ${
-                    sel
-                      ? "border-foreground bg-muted/40"
-                      : "border-border bg-background hover:border-foreground/30"
-                  }`}
-                >
-                  <Checkbox checked={sel} />
-                  <span className="flex-1 text-[13px] font-medium text-foreground">{s.nome}</span>
-
-                  {sel && sp ? (
-                    <div
-                      className="flex items-end gap-3 flex-shrink-0"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Desconto</span>
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={sp.desconto}
-                            onChange={e => updateServico(s.id, { desconto: Number(e.target.value) })}
-                            className="w-14 text-[13px] font-medium text-center px-2 py-1 rounded-md border border-border bg-muted/40 text-foreground outline-none focus:border-foreground"
-                          />
-                          <span className="text-[12px] text-muted-foreground">%</span>
-                        </div>
-                      </div>
-                      <div className="w-px h-8 bg-border self-end mb-1 flex-shrink-0" />
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Usos/mês</span>
-                        <select
-                          value={sp.usosPorMes}
-                          onChange={e => updateServico(s.id, { usosPorMes: e.target.value })}
-                          className="text-[13px] font-medium px-2 py-1 rounded-md border border-border bg-muted/40 text-foreground outline-none focus:border-foreground cursor-pointer"
-                        >
-                          {USOS_OPTS.map(o => <option key={o}>{o}</option>)}
-                        </select>
-                      </div>
-                    </div>
-                  ) : (
-                    <span className="text-[12px] text-muted-foreground flex-shrink-0">
-                      R$ {s.preco}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-sm text-muted-foreground">
+                  <span>
+                    R$ {Number(form.valor || 0).toFixed(2).replace(".", ",")} / {form.recorrencia}
+                  </span>
+                  <span>
+                    {form.servicos.length} serviço{form.servicos.length !== 1 ? "s" : ""}
+                  </span>
+                  {form.produtos.length > 0 && (
+                    <span>
+                      {form.produtos.length} produto{form.produtos.length !== 1 ? "s" : ""}
                     </span>
                   )}
                 </div>
-              );
-            })}
-            {svcsVisiveis.length === 0 && (
-              <p className="text-[13px] text-muted-foreground text-center py-3">
-                Nenhum serviço encontrado
-              </p>
-            )}
-          </div>
-        </SectionCard>
-
-        {/* ── 4. Produtos ─────────────────────────────────────────────── */}
-        <SectionCard
-          num={4}
-          title="Desconto em produtos"
-          sub={prodSelCount > 0 ? `${prodSelCount} selecionado${prodSelCount !== 1 ? "s" : ""}` : "Opcional"}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <SearchInput value={prodSearch} onChange={setProdSearch} placeholder="Buscar produto..." />
-            {prodSelCount > 0 && (
-              <button
-                onClick={() => setProdOnlySel(!prodOnlySel)}
-                className={`flex items-center gap-1.5 px-3 py-[7px] text-[12px] font-semibold rounded-md border-2 transition-colors whitespace-nowrap ${
-                  prodOnlySel
-                    ? "bg-foreground border-foreground text-background"
-                    : "bg-background border-foreground text-foreground"
-                }`}
-              >
-                {prodSelCount}
-                <CheckIcon />
-              </button>
-            )}
-          </div>
-
-          <div className="max-h-[200px] overflow-y-auto pr-0.5 space-y-1.5">
-            {prodsVisiveis.map(p => {
-              const pp = form.produtos.find(x => x.produtoId === p.id);
-              const sel = !!pp;
-              return (
-                <div
-                  key={p.id}
-                  onClick={() => toggleProduto(p.id)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-md border cursor-pointer transition-all ${
-                    sel
-                      ? "border-foreground bg-muted/40"
-                      : "border-border bg-background hover:border-foreground/30"
-                  }`}
-                >
-                  <Checkbox checked={sel} />
-                  <span className="flex-1 text-[13px] font-medium text-foreground">{p.nome}</span>
-                  {sel && pp && (
-                    <div
-                      className="flex items-end gap-3 flex-shrink-0"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Desconto</span>
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={pp.desconto}
-                            onChange={e => updateProduto(p.id, { desconto: Number(e.target.value) })}
-                            className="w-14 text-[13px] font-medium text-center px-2 py-1 rounded-md border border-border bg-muted/40 text-foreground outline-none focus:border-foreground"
-                          />
-                          <span className="text-[12px] text-muted-foreground">%</span>
-                        </div>
-                      </div>
-                      <div className="w-px h-8 bg-border self-end mb-1 flex-shrink-0" />
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Limite desc./mês</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[12px] text-muted-foreground">R$</span>
-                          <input
-                            type="number"
-                            min={0}
-                            value={pp.limiteDescontoMes ?? ""}
-                            placeholder="Sem limite"
-                            onChange={e =>
-                              updateProduto(p.id, {
-                                limiteDescontoMes: e.target.value ? Number(e.target.value) : null,
-                              })
-                            }
-                            className="w-20 text-[13px] font-medium text-center px-2 py-1 rounded-md border border-border bg-muted/40 text-foreground outline-none focus:border-foreground placeholder:text-muted-foreground/60"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            {prodsVisiveis.length === 0 && (
-              <p className="text-[13px] text-muted-foreground text-center py-3">
-                Nenhum produto encontrado
-              </p>
-            )}
-          </div>
-        </SectionCard>
-
-        {/* ── 5. Dias disponíveis ─────────────────────────────────────── */}
-        <SectionCard num={5} title="Dias disponíveis">
-          <div className="flex gap-2 mb-3">
-            {[
-              { label: "Todos os dias", dias: [] as number[] },
-              { label: "Dias úteis", dias: [0, 1, 2, 3, 4] },
-              { label: "Fins de semana", dias: [5, 6] },
-            ].map(opt => {
-              const isActive =
-                JSON.stringify([...form.diasDisponiveis].sort()) ===
-                JSON.stringify([...opt.dias].sort());
-              return (
-                <button
-                  key={opt.label}
-                  onClick={() => set({ diasDisponiveis: opt.dias })}
-                  className={`px-3 py-1.5 text-[12px] font-medium rounded-md border transition-colors ${
-                    isActive
-                      ? "bg-foreground border-foreground text-background"
-                      : "border-border bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex gap-2">
-            {DAYS.map((d, i) => {
-              const allDays = form.diasDisponiveis.length === 0;
-              const explicit = form.diasDisponiveis.includes(i);
-              return (
-                <button
-                  key={i}
-                  onClick={() => toggleDia(i)}
-                  className={`flex-1 py-2 text-[11px] font-bold rounded-md border-2 transition-all ${
-                    allDays
-                      ? "border-border bg-muted/40 text-muted-foreground"
-                      : explicit
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border bg-background text-muted-foreground hover:border-foreground/30"
-                  }`}
-                >
-                  {d}
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-2">
-            Nenhum selecionado = aceito em todos os dias
-          </p>
-        </SectionCard>
-
-        {/* ── 6. Profissionais ────────────────────────────────────────── */}
-        <SectionCard num={6} title="Profissionais que atendem">
-          <div className="flex flex-wrap gap-2 mb-2">
-            {PROFISSIONAIS.map(p => {
-              const sel = form.profissionaisIds.includes(p.id);
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => toggleProf(p.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md border-2 text-[13px] font-semibold transition-all ${
-                    sel
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border bg-background text-foreground hover:border-foreground/40"
-                  }`}
-                >
-                  <span className={`w-5 h-5 rounded-full text-[9px] font-bold flex items-center justify-center flex-shrink-0 ${sel ? "bg-white/20 text-background" : "bg-muted text-muted-foreground"}`}>
-                    {p.iniciais}
-                  </span>
-                  {p.nome}
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-[11px] text-muted-foreground">
-            Nenhum selecionado = qualquer profissional pode atender
-          </p>
-        </SectionCard>
-
-        {/* ── 7. Cancelamento ─────────────────────────────────────────── */}
-        <SectionCard num={7} title="Regras de cancelamento">
-          <div className="flex items-end gap-6">
-            <div className="w-48">
-              <FieldLabel>Carência para cancelar</FieldLabel>
-              <Select
-                value={form.cancelamentoCarencia}
-                onChange={v => set({ cancelamentoCarencia: v })}
-                options={CARENCIA_OPTS.map(c => ({ value: c, label: c }))}
-              />
-            </div>
-            <div className="flex items-center gap-2.5 pb-[1px]">
-              <Toggle
-                checked={form.cancelamentoPausa}
-                onChange={v => set({ cancelamentoPausa: v })}
-              />
-              <div>
-                <div className="text-[13px] font-semibold text-foreground">Permitir pausa</div>
-                <div className="text-[11px] text-muted-foreground">
-                  Cliente pode pausar a assinatura temporariamente
-                </div>
               </div>
             </div>
           </div>
-          <p className="text-[11px] text-muted-foreground mt-3">
-            {form.cancelamentoCarencia === "Sem carência"
-              ? "O cliente pode cancelar a qualquer momento."
-              : `O cliente só pode cancelar após ${form.cancelamentoCarencia} do início da assinatura.`}
-          </p>
-        </SectionCard>
-
-        {/* Footer actions */}
-        <div className="flex justify-between pt-2">
-          <button
-            onClick={() => navigate("/planos")}
-            className="px-4 py-2 text-[13px] font-medium rounded-md border border-border bg-background text-foreground hover:bg-muted/40 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-6 py-2 text-[13px] font-semibold rounded-md bg-foreground text-background hover:opacity-85 transition-opacity"
-          >
-            Salvar plano
-          </button>
         </div>
 
+        {/* Tabs (etapas) */}
+        <div className="mx-6 mt-4 border-b border-border overflow-x-auto">
+          <div className="flex gap-6 min-w-max">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "relative pb-2.5 text-sm font-medium transition-colors whitespace-nowrap",
+                  activeTab === tab.id
+                    ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mx-6 mt-5 pb-10">
+          {/* ───── 1. Detalhes ───── */}
+          {activeTab === "detalhes" && (
+            <div className="grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+              <div className="grid gap-5">
+                <SectionBlock title="Detalhes do plano" description="Identificação e cobrança principal.">
+                  <div className="grid gap-4">
+                    <div className="max-w-xl">
+                      <TextField label="Nome do plano *" value={form.nome} onChange={(v) => update("nome", v)} placeholder="Ex: Clube Premium" />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <TextField
+                        label="Valor (R$)"
+                        type="number"
+                        value={form.valor ? String(form.valor) : ""}
+                        onChange={(v) => update("valor", parseFloat(v) || 0)}
+                      />
+                      <Dropdown
+                        label="Recorrência"
+                        value={form.recorrencia}
+                        setValue={(v) => update("recorrencia", v)}
+                        options={recorrenciaOptions}
+                      />
+                      <Dropdown
+                        label="Forma de pagamento"
+                        value={form.formaPagamento}
+                        setValue={(v) => update("formaPagamento", v)}
+                        options={pagamentoOptions}
+                      />
+                    </div>
+                  </div>
+                </SectionBlock>
+
+                <SectionBlock title="Status e visibilidade" description="Controle quando o plano fica disponível.">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Dropdown
+                      label="Status"
+                      value={form.status}
+                      setValue={(v) => update("status", v as PlanoAssinatura["status"])}
+                      options={statusOptions}
+                    />
+                    {form.status === "Ativo" && (
+                      <TextField
+                        label="Desativar automaticamente em"
+                        type="date"
+                        value={form.desativarEm}
+                        onChange={(v) => update("desativarEm", v)}
+                      />
+                    )}
+                  </div>
+                </SectionBlock>
+              </div>
+
+              <div className="grid gap-5 self-start">
+                <SectionBlock title="Destaque" description="Faça este plano aparecer primeiro na vitrine.">
+                  <label className="flex cursor-pointer select-none items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">Plano destaque</div>
+                      <div className="text-xs text-muted-foreground">Aparece com selo ★ na vitrine</div>
+                    </div>
+                    <Switch checked={form.destaque} onCheckedChange={(v) => update("destaque", v)} />
+                  </label>
+                </SectionBlock>
+
+                {valorServicos > 0 && (
+                  <SectionBlock title="Resumo de valor" description="Cálculo automático com base nos serviços inclusos.">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Valor incluso:</span>
+                        <span className="font-semibold text-foreground">R$ {valorServicos.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Cobrado:</span>
+                        <span className="font-semibold text-foreground">R$ {Number(form.valor || 0).toFixed(2)}</span>
+                      </div>
+                      {form.valor > 0 && valorServicos > form.valor && (
+                        <div className="flex justify-between border-t border-border pt-2">
+                          <span className="text-muted-foreground">Cliente economiza:</span>
+                          <span className="font-semibold text-green-700">
+                            R$ {(valorServicos - form.valor).toFixed(2)}/mês
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </SectionBlock>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ───── 2. Diferenciais ───── */}
+          {activeTab === "diferenciais" && (
+            <div className="grid max-w-3xl gap-5">
+              <SectionBlock
+                title="Diferenciais do plano"
+                description="O que torna este plano atrativo? Esses itens aparecem na vitrine do cliente. Arraste para reordenar."
+              >
+                {form.beneficios.length > 0 && (
+                  <div className="mb-3 space-y-1.5">
+                    {form.beneficios.map((b, i) => (
+                      <div
+                        key={i}
+                        draggable
+                        onDragStart={() => setDragIdx(i)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => onDrop(i)}
+                        className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 transition-colors hover:border-foreground/30 cursor-grab active:opacity-50"
+                      >
+                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                        <span className="flex-1 text-sm font-medium text-foreground">{b}</span>
+                        <button
+                          onClick={() => removeBeneficio(i)}
+                          className="text-muted-foreground transition-colors hover:text-destructive"
+                          aria-label="Remover"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <input
+                    className="h-10 flex-1 rounded-lg border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-foreground focus:ring-4 focus:ring-muted"
+                    placeholder="Ex: Prioridade no agendamento"
+                    value={newBeneficio}
+                    onChange={(e) => setNewBeneficio(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addBeneficio()}
+                  />
+                  <button
+                    onClick={addBeneficio}
+                    className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Adicionar
+                  </button>
+                </div>
+              </SectionBlock>
+            </div>
+          )}
+
+          {/* ───── 3. Serviços ───── */}
+          {activeTab === "servicos" && (
+            <div className="grid max-w-5xl gap-5">
+              <SectionBlock
+                title="Serviços inclusos *"
+                description="Selecione os serviços que farão parte do plano e configure desconto e quantidade de usos por mês."
+                action={
+                  form.servicos.length > 0 ? (
+                    <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                      {form.servicos.length} selecionado{form.servicos.length !== 1 ? "s" : ""}
+                    </span>
+                  ) : null
+                }
+              >
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <div className="relative min-w-[220px] flex-1">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      value={svcSearch}
+                      onChange={(e) => setSvcSearch(e.target.value)}
+                      placeholder="Buscar serviço..."
+                      className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none focus:border-foreground focus:ring-4 focus:ring-muted"
+                    />
+                  </div>
+                  {form.servicos.length > 0 && (
+                    <button
+                      onClick={() => setSvcOnlySel(!svcOnlySel)}
+                      className={cn(
+                        "inline-flex h-10 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition",
+                        svcOnlySel
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border bg-card text-foreground hover:border-foreground/40",
+                      )}
+                    >
+                      <Check className="h-4 w-4" />
+                      Selecionados
+                    </button>
+                  )}
+                  <button
+                    onClick={selectAllSvcs}
+                    className="inline-flex h-10 items-center rounded-lg border border-border bg-card px-3 text-sm font-medium text-muted-foreground transition hover:border-foreground/40 hover:text-foreground"
+                  >
+                    {allSvcsSel ? "Desmarcar todos" : "Selecionar todos"}
+                  </button>
+                </div>
+
+                <div className="max-h-[380px] space-y-1.5 overflow-y-auto pr-1">
+                  {svcsVisiveis.map((s) => {
+                    const sp = form.servicos.find((x) => x.servicoId === s.id);
+                    const sel = !!sp;
+                    return (
+                      <div
+                        key={s.id}
+                        onClick={() => toggleServico(s.id)}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 transition-all",
+                          sel ? "border-foreground bg-muted/40" : "border-border bg-background hover:border-foreground/30",
+                        )}
+                      >
+                        <Checkbox
+                          checked={sel}
+                          onCheckedChange={() => toggleServico(s.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-4 w-4 rounded-md border border-zinc-400 bg-background data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                        />
+                        <span className="flex-1 text-sm font-medium text-foreground">{s.nome}</span>
+                        {sel && sp ? (
+                          <div className="flex items-end gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Desconto</span>
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={100}
+                                  value={sp.desconto}
+                                  onChange={(e) => updateServico(s.id, { desconto: Number(e.target.value) })}
+                                  className="h-8 w-14 rounded-md border border-border bg-card px-2 text-center text-sm text-foreground outline-none focus:border-foreground"
+                                />
+                                <span className="text-xs text-muted-foreground">%</span>
+                              </div>
+                            </div>
+                            <div className="mb-1 h-8 w-px self-end bg-border" />
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Usos/mês</span>
+                              <select
+                                value={sp.usosPorMes}
+                                onChange={(e) => updateServico(s.id, { usosPorMes: e.target.value })}
+                                className="h-8 cursor-pointer rounded-md border border-border bg-card px-2 text-sm text-foreground outline-none focus:border-foreground"
+                              >
+                                {USOS_OPTS.map((o) => (
+                                  <option key={o}>{o}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="flex-shrink-0 text-xs text-muted-foreground">R$ {s.preco}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {svcsVisiveis.length === 0 && (
+                    <p className="py-6 text-center text-sm text-muted-foreground">Nenhum serviço encontrado</p>
+                  )}
+                </div>
+              </SectionBlock>
+            </div>
+          )}
+
+          {/* ───── 4. Produtos ───── */}
+          {activeTab === "produtos" && (
+            <div className="grid max-w-5xl gap-5">
+              <SectionBlock
+                title="Desconto em produtos"
+                description="Configure descontos opcionais que assinantes deste plano terão em produtos."
+                action={
+                  form.produtos.length > 0 ? (
+                    <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                      {form.produtos.length} selecionado{form.produtos.length !== 1 ? "s" : ""}
+                    </span>
+                  ) : null
+                }
+              >
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <div className="relative min-w-[220px] flex-1">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      value={prodSearch}
+                      onChange={(e) => setProdSearch(e.target.value)}
+                      placeholder="Buscar produto..."
+                      className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none focus:border-foreground focus:ring-4 focus:ring-muted"
+                    />
+                  </div>
+                  {form.produtos.length > 0 && (
+                    <button
+                      onClick={() => setProdOnlySel(!prodOnlySel)}
+                      className={cn(
+                        "inline-flex h-10 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition",
+                        prodOnlySel
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border bg-card text-foreground hover:border-foreground/40",
+                      )}
+                    >
+                      <Check className="h-4 w-4" />
+                      Selecionados
+                    </button>
+                  )}
+                </div>
+
+                <div className="max-h-[380px] space-y-1.5 overflow-y-auto pr-1">
+                  {prodsVisiveis.map((p) => {
+                    const pp = form.produtos.find((x) => x.produtoId === p.id);
+                    const sel = !!pp;
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => toggleProduto(p.id)}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 transition-all",
+                          sel ? "border-foreground bg-muted/40" : "border-border bg-background hover:border-foreground/30",
+                        )}
+                      >
+                        <Checkbox
+                          checked={sel}
+                          onCheckedChange={() => toggleProduto(p.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-4 w-4 rounded-md border border-zinc-400 bg-background data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                        />
+                        <span className="flex-1 text-sm font-medium text-foreground">{p.nome}</span>
+                        {sel && pp && (
+                          <div className="flex items-end gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Desconto</span>
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={100}
+                                  value={pp.desconto}
+                                  onChange={(e) => updateProduto(p.id, { desconto: Number(e.target.value) })}
+                                  className="h-8 w-14 rounded-md border border-border bg-card px-2 text-center text-sm text-foreground outline-none focus:border-foreground"
+                                />
+                                <span className="text-xs text-muted-foreground">%</span>
+                              </div>
+                            </div>
+                            <div className="mb-1 h-8 w-px self-end bg-border" />
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Limite/mês</span>
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs text-muted-foreground">R$</span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  value={pp.limiteDescontoMes ?? ""}
+                                  placeholder="Sem limite"
+                                  onChange={(e) =>
+                                    updateProduto(p.id, {
+                                      limiteDescontoMes: e.target.value ? Number(e.target.value) : null,
+                                    })
+                                  }
+                                  className="h-8 w-20 rounded-md border border-border bg-card px-2 text-center text-sm text-foreground outline-none focus:border-foreground placeholder:text-muted-foreground/60"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {prodsVisiveis.length === 0 && (
+                    <p className="py-6 text-center text-sm text-muted-foreground">Nenhum produto encontrado</p>
+                  )}
+                </div>
+              </SectionBlock>
+            </div>
+          )}
+
+          {/* ───── 5. Disponibilidade ───── */}
+          {activeTab === "disponibilidade" && (
+            <div className="grid max-w-5xl gap-5">
+              <SectionBlock
+                title="Dias disponíveis"
+                description="Em quais dias da semana os benefícios podem ser usados."
+              >
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {[
+                    { label: "Todos os dias", dias: [] as number[] },
+                    { label: "Dias úteis", dias: [0, 1, 2, 3, 4] },
+                    { label: "Fins de semana", dias: [5, 6] },
+                  ].map((opt) => {
+                    const isActive =
+                      JSON.stringify([...form.diasDisponiveis].sort()) === JSON.stringify([...opt.dias].sort());
+                    return (
+                      <button
+                        key={opt.label}
+                        onClick={() => update("diasDisponiveis", opt.dias)}
+                        className={cn(
+                          "rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors",
+                          isActive
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground",
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex gap-2">
+                  {DAYS.map((d, i) => {
+                    const allDays = form.diasDisponiveis.length === 0;
+                    const explicit = form.diasDisponiveis.includes(i);
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => toggleDia(i)}
+                        className={cn(
+                          "flex-1 rounded-lg border-2 py-2 text-xs font-bold transition-all",
+                          allDays
+                            ? "border-border bg-muted/40 text-muted-foreground"
+                            : explicit
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border bg-card text-muted-foreground hover:border-foreground/30",
+                        )}
+                      >
+                        {d}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">Nenhum selecionado = aceito em todos os dias.</p>
+              </SectionBlock>
+
+              <SectionBlock
+                title="Profissionais que atendem"
+                description="Restrinja o plano a profissionais específicos."
+              >
+                <div className="flex flex-wrap gap-2">
+                  {PROFISSIONAIS.map((p) => {
+                    const sel = form.profissionaisIds.includes(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => toggleProf(p.id)}
+                        className={cn(
+                          "inline-flex items-center gap-2 rounded-lg border-2 px-3 py-1.5 text-sm font-semibold transition-all",
+                          sel
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border bg-card text-foreground hover:border-foreground/40",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold",
+                            sel ? "bg-white/20 text-background" : "bg-muted text-muted-foreground",
+                          )}
+                        >
+                          {p.iniciais}
+                        </span>
+                        {p.nome}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Nenhum selecionado = qualquer profissional pode atender.
+                </p>
+              </SectionBlock>
+            </div>
+          )}
+
+          {/* ───── 6. Cancelamento ───── */}
+          {activeTab === "cancelamento" && (
+            <div className="grid max-w-3xl gap-5">
+              <SectionBlock title="Regras de cancelamento" description="Defina como o cliente pode encerrar a assinatura.">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Dropdown
+                    label="Carência para cancelar"
+                    value={form.cancelamentoCarencia}
+                    setValue={(v) => update("cancelamentoCarencia", v)}
+                    options={carenciaOptions}
+                  />
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {form.cancelamentoCarencia === "Sem carência"
+                    ? "O cliente pode cancelar a qualquer momento."
+                    : `O cliente só pode cancelar após ${form.cancelamentoCarencia} do início da assinatura.`}
+                </p>
+
+                <div className="mt-5 border-t border-border pt-4">
+                  <label className="flex cursor-pointer select-none items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">Permitir pausa</div>
+                      <div className="text-xs text-muted-foreground">
+                        Cliente pode pausar a assinatura temporariamente
+                      </div>
+                    </div>
+                    <Switch
+                      checked={form.cancelamentoPausa}
+                      onCheckedChange={(v) => update("cancelamentoPausa", v)}
+                    />
+                  </label>
+                </div>
+              </SectionBlock>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={() => navigate("/planos")}
+                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-5 text-sm font-semibold text-foreground transition hover:bg-muted/40"
+                >
+                  Concluir e voltar para a lista
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AppLayout>
   );
