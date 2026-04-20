@@ -132,12 +132,8 @@ function statusBadgeClasses(status: PlanoAssinatura["status"]) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const tabs = [
-  { id: "detalhes", label: "1. Detalhes" },
-  { id: "diferenciais", label: "2. Diferenciais" },
-  { id: "servicos", label: "3. Serviços" },
-  { id: "produtos", label: "4. Produtos" },
-  { id: "disponibilidade", label: "5. Disponibilidade" },
-  { id: "cancelamento", label: "6. Cancelamento" },
+  { id: "detalhes", label: "1. Detalhes do plano" },
+  { id: "servicos", label: "2. Serviços e produtos" },
 ];
 
 export default function PlanoPerfil() {
