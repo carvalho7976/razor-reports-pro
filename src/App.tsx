@@ -35,6 +35,7 @@ import ListaFormasPagamento from "./pages/ListaFormasPagamento";
 import ProfissionalPerfil from "./pages/ProfissionalPerfil";
 import NovaCompra from "./pages/NovaCompra";
 import AssinaturaCadastro from "./pages/AssinaturaCadastro";
+import PlanoPerfil from "./pages/PlanoPerfil";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,8 @@ const App = () => (
           <Route path="/profissionalPerfil" element={<ProfissionalPerfil />} />
           <Route path="/novaCompra" element={<NovaCompra />} />
           <Route path="/assinaturaCadastro" element={<AssinaturaCadastro />} />
+          <Route path="/planoPerfil" element={<PlanoPerfil />} />
+          <Route path="/planos" element={<AssinaturaCadastro />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
