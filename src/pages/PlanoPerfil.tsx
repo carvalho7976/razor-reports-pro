@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { ChevronLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { initialPlanos, PlanoAssinatura, ServicoPlano, ProdutoPlano } from "./ListaPlanos";
+import { initialPlanos, PlanoAssinatura, ServicoPlano, ProdutoPlano } from "./AssinaturaCadastro";
 
 // ─── Mock catalogues ──────────────────────────────────────────────────────────
 
