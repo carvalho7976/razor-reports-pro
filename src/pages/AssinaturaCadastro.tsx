@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, X, Search, Check, CalendarDays, Users, Sparkles, Trash2 } from "lucide-react";
+import { Plus, X, CalendarDays, Users, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -91,7 +91,6 @@ const tabs = [
   { id: "detalhes", label: "Detalhes" },
   { id: "servicos", label: "Serviços" },
   { id: "produtos", label: "Produtos" },
-  { id: "disponibilidade", label: "Disponibilidade" },
 ];
 
 function CurrencyInput({
