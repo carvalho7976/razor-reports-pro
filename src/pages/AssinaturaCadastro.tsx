@@ -87,6 +87,12 @@ interface ServicoIncluso {
   comissao: string;
 }
 
+interface ProdutoIncluso {
+  id: number;
+  quantidade: string;
+  desconto: string;
+}
+
 const tabs = [
   { id: "detalhes", label: "Detalhes" },
   { id: "servicos", label: "Serviços" },
