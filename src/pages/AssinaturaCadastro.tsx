@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, X, Search, Check, CalendarDays, Users, Package, Sparkles, Tag } from "lucide-react";
+import { Plus, X, Search, Check, CalendarDays, Users, Sparkles, Tag, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
