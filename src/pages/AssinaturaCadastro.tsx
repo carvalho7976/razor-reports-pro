@@ -736,15 +736,25 @@ export default function AssinaturaCadastro() {
           {activeTab === "produtos" && (
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               <div className="space-y-4 self-start">
-                <Dropdown
-                  label="Produto"
-                  value={produtoSelecionado}
-                  setValue={setProdutoSelecionado}
-                  options={produtosDisponiveisFiltrados.map((p) => ({
-                    value: String(p.id),
-                    label: p.nome,
-                  }))}
+                <MultiSelectSearch
+                  label="Produtos"
+                  placeholder="Buscar e selecionar..."
+                  options={produtosDisponiveisFiltrados}
+                  selected={produtosPendentes}
+                  onChange={setProdutosPendentes}
                 />
+
+                <div className="grid gap-1.5">
+                  <label className="text-sm font-medium text-foreground">Quantidade</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={quantidadeProdutoForm}
+                    onChange={(e) => setQuantidadeProdutoForm(e.target.value.replace(/\D/g, ""))}
+                    placeholder="1"
+                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
 
                 <div className="grid gap-1.5">
                   <label className="text-sm font-medium text-foreground">Desconto (%)</label>
@@ -762,9 +772,10 @@ export default function AssinaturaCadastro() {
                   <button
                     type="button"
                     onClick={adicionarProduto}
-                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                    disabled={produtosPendentes.length === 0}
+                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    Adicionar produto
+                    Adicionar{produtosPendentes.length > 0 ? ` (${produtosPendentes.length})` : ""}
                   </button>
                 </div>
               </div>
@@ -775,6 +786,7 @@ export default function AssinaturaCadastro() {
                     <thead className="bg-muted/40">
                       <tr>
                         <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
                         <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
                         <th className="w-14 px-2 py-3" />
                       </tr>
@@ -782,7 +794,7 @@ export default function AssinaturaCadastro() {
                     <tbody>
                       {produtosSelecionados.length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                          <td colSpan={4} className="px-4 py-16 text-center text-sm text-muted-foreground">
                             Adicione um produto para aplicar desconto.
                           </td>
                         </tr>
@@ -790,6 +802,7 @@ export default function AssinaturaCadastro() {
                         produtosSelecionados.map((p) => (
                           <tr key={p.id} className="border-t border-border bg-card">
                             <td className="px-4 py-3 text-sm text-foreground">{nomeProduto(p.id)}</td>
+                            <td className="px-4 py-3 text-center text-sm text-foreground">{p.quantidade}</td>
                             <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{p.desconto}%</td>
                             <td className="px-2 py-3 text-center">
                               <button
