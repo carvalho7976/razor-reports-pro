@@ -93,12 +93,6 @@ interface ProdutoIncluso {
   desconto: string;
 }
 
-const tabs = [
-  { id: "detalhes", label: "Detalhes" },
-  { id: "servicos", label: "Serviços" },
-  { id: "produtos", label: "Produtos" },
-];
-
 function CurrencyInput({
   label,
   value,
@@ -252,8 +246,6 @@ export default function AssinaturaCadastro() {
 
   const editing = searchParams.get("nome");
 
-  const [activeTab, setActiveTab] = useState("detalhes");
-
   // Detalhes
   const [nome, setNome] = useState(editing || "");
   const [valor, setValor] = useState("89,00");
@@ -369,7 +361,6 @@ export default function AssinaturaCadastro() {
   const handleSalvar = () => {
     setShowErrors(true);
     if (errors.nome) {
-      setActiveTab("detalhes");
       toast({ title: "Verifique os campos obrigatórios", variant: "destructive" });
       return;
     }
@@ -401,30 +392,10 @@ export default function AssinaturaCadastro() {
           </div>
         </div>
 
-        {/* TABS */}
-        <div className="mx-6 mt-4 border-b border-border">
-          <div className="flex gap-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "relative pb-2.5 text-sm font-medium transition-colors",
-                  activeTab === tab.id
-                    ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* CONTENT */}
-        <div className="mx-6 mt-5 pb-24">
+        <div className="mx-6 mt-5 flex flex-col gap-8 pb-24">
           {/* DETALHES */}
-          {activeTab === "detalhes" && (
+          <section>
             <div className="grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
               {/* Coluna principal */}
               <div className="grid gap-5">
@@ -633,10 +604,16 @@ export default function AssinaturaCadastro() {
                 </SectionBlock>
               </div>
             </div>
-          )}
+          </section>
 
           {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
-          {activeTab === "servicos" && (
+          <section>
+            <div className="mb-4 max-w-6xl border-b border-border pb-2">
+              <h2 className="text-base font-semibold text-foreground">Serviços</h2>
+              <p className="text-sm text-muted-foreground">
+                Selecione os serviços inclusos no plano e configure desconto, usos e comissão.
+              </p>
+            </div>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               {/* Form esquerda */}
               <div className="space-y-4 self-start">
@@ -730,10 +707,16 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </div>
-          )}
+          </section>
 
           {/* PRODUTOS - 2 colunas estilo NovaCompra */}
-          {activeTab === "produtos" && (
+          <section>
+            <div className="mb-4 max-w-6xl border-b border-border pb-2">
+              <h2 className="text-base font-semibold text-foreground">Produtos</h2>
+              <p className="text-sm text-muted-foreground">
+                Selecione os produtos inclusos no plano com quantidade e desconto.
+              </p>
+            </div>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               <div className="space-y-4 self-start">
                 <MultiSelectSearch
@@ -821,7 +804,7 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </div>
-          )}
+          </section>
         </div>
 
         {/* FOOTER único - sempre visível */}
