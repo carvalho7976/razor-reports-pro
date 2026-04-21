@@ -93,12 +93,6 @@ interface ProdutoIncluso {
   desconto: string;
 }
 
-const tabs = [
-  { id: "detalhes", label: "Detalhes" },
-  { id: "servicos", label: "Serviços" },
-  { id: "produtos", label: "Produtos" },
-];
-
 function CurrencyInput({
   label,
   value,
