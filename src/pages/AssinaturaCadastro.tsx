@@ -399,6 +399,8 @@ export default function AssinaturaCadastro() {
             { id: "detalhes", label: "Detalhes" },
             { id: "servicos", label: "Serviços" },
             { id: "produtos", label: "Produtos" },
+            { id: "beneficios", label: "Benefícios" },
+            { id: "disponibilidade", label: "Disponibilidade" },
           ].map((s) => (
             <a
               key={s.id}
