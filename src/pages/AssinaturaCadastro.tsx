@@ -1,16 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, CalendarDays, Users, Trash2, ArrowUp, ArrowDown, Search } from "lucide-react";
+import { Plus, X, CalendarDays, Users, Sparkles, Trash2, Scissors, Package, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
 
-interface ServicoOpt { id: number; nome: string; }
-interface ProdutoOpt { id: number; nome: string; }
-interface ProfissionalOpt { id: number; nome: string; iniciais: string; }
+interface ServicoOpt {
+  id: number;
+  nome: string;
+}
+interface ProdutoOpt {
+  id: number;
+  nome: string;
+}
+interface ProfissionalOpt {
+  id: number;
+  nome: string;
+  iniciais: string;
+}
 
 const servicosDisponiveis: ServicoOpt[] = [
   { id: 1, nome: "Barba + Sobrancelha" },
@@ -87,27 +96,13 @@ interface ServicoIncluso {
   comissao: string;
 }
 
-interface ProdutoIncluso {
-  id: number;
-  quantidade: string;
-  desconto: string;
-}
-
 const tabs = [
   { id: "detalhes", label: "Detalhes" },
   { id: "servicos", label: "Serviços" },
   { id: "produtos", label: "Produtos" },
 ];
 
-function CurrencyInput({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function CurrencyInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   const formatted = value || "0,00";
   return (
     <div className="grid gap-1.5">
@@ -128,119 +123,38 @@ function CurrencyInput({
   );
 }
 
-function SectionBlock({
+function SectionCard({
+  icon,
   title,
   description,
   children,
-  className = "",
 }: {
+  icon: React.ReactNode;
   title: string;
   description?: string;
   children: React.ReactNode;
-  className?: string;
 }) {
   return (
-    <div className={cn("rounded-xl border border-border bg-card p-4", className)}>
-      <div className="mb-3">
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
-        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted/30 text-foreground">
+          {icon}
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          {description ? <p className="mt-1 text-xs text-muted-foreground">{description}</p> : null}
+        </div>
       </div>
-      {children}
+      <div className="mt-4">{children}</div>
     </div>
   );
 }
 
-function MultiSelectSearch({
-  label,
-  placeholder,
-  options,
-  selected,
-  onChange,
-}: {
-  label: string;
-  placeholder?: string;
-  options: { id: number; nome: string }[];
-  selected: number[];
-  onChange: (ids: number[]) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [busca, setBusca] = useState("");
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const filtered = options.filter((o) => o.nome.toLowerCase().includes(busca.toLowerCase()));
-  const toggle = (id: number) =>
-    onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
-  const allSelected = filtered.length > 0 && filtered.every((o) => selected.includes(o.id));
-  const toggleAll = () => {
-    if (allSelected) onChange(selected.filter((id) => !filtered.some((o) => o.id === id)));
-    else onChange(Array.from(new Set([...selected, ...filtered.map((o) => o.id)])));
-  };
-
+function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="relative" ref={ref}>
-      <label className="mb-1 block text-sm font-medium text-foreground">{label}</label>
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-background px-3 text-sm text-foreground transition-all hover:border-muted-foreground"
-      >
-        <span className={cn("truncate", selected.length === 0 && "text-muted-foreground")}>
-          {selected.length === 0
-            ? placeholder || "Selecione..."
-            : `${selected.length} selecionado(s)`}
-        </span>
-        <Search className="h-4 w-4 text-muted-foreground" />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
-          <div className="border-b border-border p-2">
-            <input
-              placeholder="Buscar..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
-              autoFocus
-            />
-          </div>
-          <div className="max-h-60 overflow-auto">
-            {filtered.length > 0 && (
-              <button
-                type="button"
-                onClick={toggleAll}
-                className="flex w-full items-center gap-3 border-b border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted"
-              >
-                {allSelected ? "Desmarcar todos" : "Selecionar todos"}
-              </button>
-            )}
-            {filtered.map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                onClick={() => toggle(o.id)}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
-              >
-                <Checkbox
-                  checked={selected.includes(o.id)}
-                  className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
-                />
-                <span className="text-foreground">{o.nome}</span>
-              </button>
-            ))}
-            {filtered.length === 0 && (
-              <p className="px-4 py-3 text-center text-sm text-muted-foreground">Nenhum item encontrado</p>
-            )}
-          </div>
-        </div>
-      )}
+    <div className="px-4 py-14 text-center">
+      <p className="text-sm font-medium text-foreground">{title}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
@@ -267,8 +181,8 @@ export default function AssinaturaCadastro() {
   ]);
   const [novoBeneficio, setNovoBeneficio] = useState("");
 
-  // Serviços (multi-select)
-  const [servicosPendentes, setServicosPendentes] = useState<number[]>([]);
+  // Serviços
+  const [servicoSelecionado, setServicoSelecionado] = useState<string>("");
   const [descontoServico, setDescontoServico] = useState("100");
   const [usosServico, setUsosServico] = useState("ILIMITADO");
   const [comissaoServico, setComissaoServico] = useState("TEMPO");
@@ -277,76 +191,82 @@ export default function AssinaturaCadastro() {
     { id: 5, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
   ]);
 
-  // Produtos (multi-select)
-  const [produtosPendentes, setProdutosPendentes] = useState<number[]>([]);
-  const [quantidadeProdutoForm, setQuantidadeProdutoForm] = useState("1");
+  // Produtos
+  const [produtoSelecionado, setProdutoSelecionado] = useState<string>("");
   const [descontoProdutoForm, setDescontoProdutoForm] = useState("10");
-  const [produtosSelecionados, setProdutosSelecionados] = useState<ProdutoIncluso[]>([]);
+  const [produtosSelecionados, setProdutosSelecionados] = useState<{ id: number; desconto: string }[]>([]);
 
   // Disponibilidade
-  const [diasAceitos, setDiasAceitos] = useState<string[]>([
-    "seg", "ter", "qua", "qui", "sex",
-  ]);
+  const [diasAceitos, setDiasAceitos] = useState<string[]>(["seg", "ter", "qua", "qui", "sex"]);
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
   const [showErrors, setShowErrors] = useState(false);
+
   const errors = {
     nome: !nome.trim() ? "Informe o nome do plano" : "",
   };
+
   const showError = (k: keyof typeof errors) => (showErrors ? errors[k] : "");
 
-  // Helpers
   const servicosDisponiveisFiltrados = useMemo(
     () => servicosDisponiveis.filter((s) => !servicosInclusos.some((i) => i.id === s.id)),
     [servicosInclusos],
   );
+
   const produtosDisponiveisFiltrados = useMemo(
     () => produtosDisponiveis.filter((p) => !produtosSelecionados.some((i) => i.id === p.id)),
     [produtosSelecionados],
   );
 
-  const adicionarServico = () => {
-    if (servicosPendentes.length === 0) return;
-    const novos: ServicoIncluso[] = servicosPendentes
-      .filter((id) => !servicosInclusos.some((s) => s.id === id))
-      .map((id) => ({
-        id,
-        desconto: descontoServico || "0",
-        usos: usosServico,
-        comissao: comissaoServico,
-      }));
-    setServicosInclusos((prev) => [...prev, ...novos]);
-    setServicosPendentes([]);
+  const resumo = useMemo(() => {
+    const recorrenciaLabel = recorrenciaOptions.find((o) => o.value === recorrencia)?.label || recorrencia;
+
+    return {
+      recorrenciaLabel,
+      totalServicos: servicosInclusos.length,
+      totalProdutos: produtosSelecionados.length,
+      totalBeneficios: beneficios.length,
+    };
+  }, [recorrencia, servicosInclusos.length, produtosSelecionados.length, beneficios.length]);
+
+  const tabCounts = {
+    servicos: servicosInclusos.length,
+    produtos: produtosSelecionados.length,
   };
 
-  const removerServico = (id: number) =>
-    setServicosInclusos((prev) => prev.filter((s) => s.id !== id));
+  const adicionarServico = () => {
+    if (!servicoSelecionado) return;
+    const id = Number(servicoSelecionado);
+
+    setServicosInclusos((prev) => [
+      ...prev,
+      { id, desconto: descontoServico || "0", usos: usosServico, comissao: comissaoServico },
+    ]);
+
+    setServicoSelecionado("");
+    setDescontoServico("100");
+    setUsosServico("ILIMITADO");
+    setComissaoServico("TEMPO");
+  };
+
+  const removerServico = (id: number) => setServicosInclusos((prev) => prev.filter((s) => s.id !== id));
 
   const adicionarProduto = () => {
-    if (produtosPendentes.length === 0) return;
-    const novos: ProdutoIncluso[] = produtosPendentes
-      .filter((id) => !produtosSelecionados.some((p) => p.id === id))
-      .map((id) => ({
-        id,
-        quantidade: quantidadeProdutoForm || "1",
-        desconto: descontoProdutoForm || "0",
-      }));
-    setProdutosSelecionados((prev) => [...prev, ...novos]);
-    setProdutosPendentes([]);
+    if (!produtoSelecionado) return;
+    const id = Number(produtoSelecionado);
+
+    setProdutosSelecionados((prev) => [...prev, { id, desconto: descontoProdutoForm || "0" }]);
+    setProdutoSelecionado("");
+    setDescontoProdutoForm("10");
   };
 
-  const removerProduto = (id: number) =>
-    setProdutosSelecionados((prev) => prev.filter((p) => p.id !== id));
+  const removerProduto = (id: number) => setProdutosSelecionados((prev) => prev.filter((p) => p.id !== id));
 
   const toggleDia = (key: string) =>
-    setDiasAceitos((prev) =>
-      prev.includes(key) ? prev.filter((d) => d !== key) : [...prev, key],
-    );
+    setDiasAceitos((prev) => (prev.includes(key) ? prev.filter((d) => d !== key) : [...prev, key]));
 
   const toggleProfissional = (id: number) =>
-    setProfissionaisAtendem((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
-    );
+    setProfissionaisAtendem((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
 
   const adicionarBeneficio = () => {
     const t = novoBeneficio.trim();
@@ -354,33 +274,26 @@ export default function AssinaturaCadastro() {
     setBeneficios((prev) => [...prev, t]);
     setNovoBeneficio("");
   };
-  const removerBeneficio = (idx: number) =>
-    setBeneficios((prev) => prev.filter((_, i) => i !== idx));
 
-  const moverBeneficio = (idx: number, dir: -1 | 1) =>
-    setBeneficios((prev) => {
-      const novo = [...prev];
-      const j = idx + dir;
-      if (j < 0 || j >= novo.length) return prev;
-      [novo[idx], novo[j]] = [novo[j], novo[idx]];
-      return novo;
-    });
+  const removerBeneficio = (idx: number) => setBeneficios((prev) => prev.filter((_, i) => i !== idx));
 
   const handleSalvar = () => {
     setShowErrors(true);
+
     if (errors.nome) {
       setActiveTab("detalhes");
       toast({ title: "Verifique os campos obrigatórios", variant: "destructive" });
       return;
     }
+
     toast({ title: editing ? "Plano atualizado" : "Plano criado com sucesso" });
     navigate("/assinantePesquisa");
   };
 
-  const nomeServico = (id: number) =>
-    servicosDisponiveis.find((s) => s.id === id)?.nome || "";
-  const nomeProduto = (id: number) =>
-    produtosDisponiveis.find((p) => p.id === id)?.nome || "";
+  const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
+
+  const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
+
   const labelUsos = (v: string) => usosOptions.find((o) => o.value === v)?.label || v;
   const labelComissao = (v: string) => comissaoOptions.find((o) => o.value === v)?.label || v;
 
@@ -395,8 +308,23 @@ export default function AssinaturaCadastro() {
                 {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Configure os dados, serviços e produtos do plano.
+                Configure os dados, serviços, produtos e disponibilidade do plano.
               </p>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground">
+                  R$ {valor} / {resumo.recorrenciaLabel}
+                </span>
+                <span className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground">
+                  {resumo.totalServicos} serviço(s)
+                </span>
+                <span className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground">
+                  {resumo.totalProdutos} produto(s)
+                </span>
+                <span className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground">
+                  {resumo.totalBeneficios} benefício(s)
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -404,20 +332,34 @@ export default function AssinaturaCadastro() {
         {/* TABS */}
         <div className="mx-6 mt-4 border-b border-border">
           <div className="flex gap-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "relative pb-2.5 text-sm font-medium transition-colors",
-                  activeTab === tab.id
-                    ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
+            {tabs.map((tab) => {
+              const count = tab.id === "servicos" ? tabCounts.servicos : tab.id === "produtos" ? tabCounts.produtos : 0;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "relative flex items-center gap-2 pb-2.5 text-sm font-medium transition-colors",
+                    activeTab === tab.id
+                      ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {tab.label}
+                  {count > 0 && (
+                    <span
+                      className={cn(
+                        "inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[11px] font-semibold",
+                        activeTab === tab.id ? "bg-foreground text-background" : "bg-muted text-foreground",
+                      )}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -425,227 +367,200 @@ export default function AssinaturaCadastro() {
         <div className="mx-6 mt-5 pb-24">
           {/* DETALHES */}
           {activeTab === "detalhes" && (
-            <div className="grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-              {/* Coluna principal */}
-              <div className="grid gap-5">
-                <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
-                  <div className="grid gap-4">
-                    <TextField
-                      label="Nome do plano *"
-                      value={nome}
-                      onChange={setNome}
-                      placeholder="Ex: Plano Mensal Premium"
-                      error={showError("nome")}
-                    />
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <CurrencyInput label="Valor" value={valor} onChange={setValor} />
-                      <Dropdown
-                        label="Recorrência"
-                        value={recorrencia}
-                        setValue={setRecorrencia}
-                        options={recorrenciaOptions}
-                      />
-                      <Dropdown
-                        label="Forma de pagamento"
-                        value={formaPagamento}
-                        setValue={setFormaPagamento}
-                        options={formaPagamentoOptions}
-                      />
-                    </div>
-                  </div>
-                </SectionBlock>
-
-                <SectionBlock
-                  title="Benefícios"
-                  description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
-                >
-                  <div className="flex gap-2">
-                  <input
-                    value={novoBeneficio}
-                    onChange={(e) => setNovoBeneficio(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        adicionarBeneficio();
-                      }
-                    }}
-                    placeholder="Ex: Traga um amigo no aniversário"
-                    className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            <div className="grid max-w-4xl gap-4">
+              <SectionCard
+                icon={<Settings2 className="h-4 w-4" />}
+                title="Identificação e cobrança"
+                description="Defina os dados principais do plano."
+              >
+                <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px_180px]">
+                  <TextField
+                    label="Nome do plano *"
+                    value={nome}
+                    onChange={setNome}
+                    placeholder="Ex: Plano Mensal Premium"
+                    error={showError("nome")}
                   />
-                  <button
-                    type="button"
-                    onClick={adicionarBeneficio}
-                    className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Adicionar
-                  </button>
+                  <CurrencyInput label="Valor" value={valor} onChange={setValor} />
+                  <Dropdown
+                    label="Recorrência"
+                    value={recorrencia}
+                    setValue={setRecorrencia}
+                    options={recorrenciaOptions}
+                  />
                 </div>
 
-                <div className="mt-3 overflow-hidden rounded-lg border border-border bg-card">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-muted/40">
-                      <tr>
-                        <th className="w-14 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">#</th>
-                        <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Benefício</th>
-                        <th className="w-32 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ordem</th>
-                        <th className="w-14 px-2 py-2.5" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {beneficios.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                            Nenhum benefício adicionado.
-                          </td>
-                        </tr>
-                      ) : (
-                        beneficios.map((b, idx) => (
-                          <tr key={`${b}-${idx}`} className="border-t border-border">
-                            <td className="px-3 py-2.5 text-center text-sm font-medium text-muted-foreground">{idx + 1}</td>
-                            <td className="px-3 py-2.5 text-sm text-foreground">{b}</td>
-                            <td className="px-3 py-2.5">
-                              <div className="flex items-center justify-center gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => moverBeneficio(idx, -1)}
-                                  disabled={idx === 0}
-                                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
-                                  aria-label="Mover para cima"
-                                >
-                                  <ArrowUp className="h-4 w-4" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => moverBeneficio(idx, 1)}
-                                  disabled={idx === beneficios.length - 1}
-                                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
-                                  aria-label="Mover para baixo"
-                                >
-                                  <ArrowDown className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </td>
-                            <td className="px-2 py-2.5 text-center">
-                              <button
-                                type="button"
-                                onClick={() => removerBeneficio(idx)}
-                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
-                                aria-label="Remover benefício"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <Dropdown
+                    label="Forma de pagamento"
+                    value={formaPagamento}
+                    setValue={setFormaPagamento}
+                    options={formaPagamentoOptions}
+                  />
                 </div>
-                </SectionBlock>
-              </div>
+              </SectionCard>
 
-              {/* Coluna lateral */}
-              <div className="grid gap-5 self-start">
-                <SectionBlock title="Vitrine" description="Disponibilização do plano para venda.">
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">Disponível para venda</p>
-                      <p className="text-xs text-muted-foreground">Ative ou desative na vitrine</p>
+              <SectionCard
+                icon={<CalendarDays className="h-4 w-4" />}
+                title="Disponibilidade do plano"
+                description="Defina onde e com quem esse plano pode ser utilizado."
+              >
+                <div className="grid gap-5">
+                  <div className="flex items-end">
+                    <div className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Disponível para venda</p>
+                        <p className="text-xs text-muted-foreground">Ative ou desative na vitrine</p>
+                      </div>
+                      <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                     </div>
-                    <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                   </div>
-                </SectionBlock>
 
-                <SectionBlock
-                  title="Disponibilidade"
-                  description="Dias e profissionais que aceitam o plano."
-                >
-                  <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">
-                      Dias aceitos
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {diasSemana.map((d) => {
-                      const ativo = diasAceitos.includes(d.key);
-                      return (
-                        <button
-                          key={d.key}
-                          type="button"
-                          onClick={() => toggleDia(d.key)}
-                          className={cn(
-                            "inline-flex h-8 min-w-[44px] items-center justify-center rounded-md border px-2.5 text-xs font-semibold transition",
-                            ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
-                          )}
-                        >
-                          {d.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">Dias em que o plano é aceito</span>
+                    </div>
 
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">
-                      Profissionais que atendem
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {profissionaisDisponiveis.map((p) => {
-                      const ativo = profissionaisAtendem.includes(p.id);
-                      return (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => toggleProfissional(p.id)}
-                          className={cn(
-                            "inline-flex h-8 items-center gap-1.5 rounded-full border pl-1 pr-2.5 text-xs font-medium transition",
-                            ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
-                          )}
-                        >
-                          <span
+                    <div className="flex flex-wrap gap-2">
+                      {diasSemana.map((d) => {
+                        const ativo = diasAceitos.includes(d.key);
+                        return (
+                          <button
+                            key={d.key}
+                            type="button"
+                            onClick={() => toggleDia(d.key)}
                             className={cn(
-                              "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
+                              "inline-flex h-9 min-w-[64px] items-center justify-center rounded-lg border px-4 text-sm font-semibold transition",
                               ativo
-                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-                                : "bg-muted text-muted-foreground",
+                                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                             )}
                           >
-                            {p.iniciais}
-                          </span>
-                          {p.nome}
-                        </button>
-                      );
-                    })}
+                            {d.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">Clique para alternar. Verde = aceito.</p>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">Profissionais que atendem</span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {profissionaisDisponiveis.map((p) => {
+                        const ativo = profissionaisAtendem.includes(p.id);
+                        return (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => toggleProfissional(p.id)}
+                            className={cn(
+                              "inline-flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 text-sm font-medium transition",
+                              ativo
+                                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold",
+                                ativo
+                                  ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                                  : "bg-muted text-muted-foreground",
+                              )}
+                            >
+                              {p.iniciais}
+                            </span>
+                            {p.nome}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
+              </SectionCard>
+
+              <SectionCard
+                icon={<Sparkles className="h-4 w-4" />}
+                title="Benefícios do plano"
+                description="Liste vantagens que ajudam a vender esse plano."
+              >
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-foreground">Benefícios do plano</label>
+
+                  <div className="flex gap-2">
+                    <input
+                      value={novoBeneficio}
+                      onChange={(e) => setNovoBeneficio(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          adicionarBeneficio();
+                        }
+                      }}
+                      placeholder="Ex: Traga um amigo no aniversário"
+                      className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={adicionarBeneficio}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Adicionar
+                    </button>
                   </div>
-                </SectionBlock>
-              </div>
+
+                  {beneficios.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {beneficios.map((b, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background"
+                        >
+                          <Sparkles className="h-3 w-3" />
+                          {b}
+                          <button
+                            type="button"
+                            onClick={() => removerBeneficio(idx)}
+                            className="ml-0.5 rounded-full hover:bg-background/20"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </SectionCard>
             </div>
           )}
 
-          {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
+          {/* SERVIÇOS */}
           {activeTab === "servicos" && (
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
-              {/* Form esquerda */}
               <div className="space-y-4 self-start">
-                <MultiSelectSearch
-                  label="Serviços"
-                  placeholder="Buscar e selecionar..."
-                  options={servicosDisponiveisFiltrados}
-                  selected={servicosPendentes}
-                  onChange={setServicosPendentes}
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Configurar serviço</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Selecione o serviço e defina suas regras dentro do plano.
+                  </p>
+                </div>
+
+                <Dropdown
+                  label="Serviço"
+                  value={servicoSelecionado}
+                  setValue={setServicoSelecionado}
+                  options={servicosDisponiveisFiltrados.map((s) => ({
+                    value: String(s.id),
+                    label: s.nome,
+                  }))}
                 />
 
                 <div className="grid gap-1.5">
@@ -660,12 +575,7 @@ export default function AssinaturaCadastro() {
                   />
                 </div>
 
-                <Dropdown
-                  label="Usos / mês"
-                  value={usosServico}
-                  setValue={setUsosServico}
-                  options={usosOptions}
-                />
+                <Dropdown label="Usos / mês" value={usosServico} setValue={setUsosServico} options={usosOptions} />
 
                 <Dropdown
                   label="Comissionamento"
@@ -678,16 +588,19 @@ export default function AssinaturaCadastro() {
                   <button
                     type="button"
                     onClick={adicionarServico}
-                    disabled={servicosPendentes.length === 0}
-                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40"
+                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
                   >
-                    Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
+                    Adicionar serviço
                   </button>
                 </div>
               </div>
 
-              {/* Tabela direita */}
               <div className="space-y-4 self-start">
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Serviços incluídos no plano</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">Confira os serviços já configurados.</p>
+                </div>
+
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                   <table className="w-full border-collapse">
                     <thead className="bg-muted/40">
@@ -702,8 +615,11 @@ export default function AssinaturaCadastro() {
                     <tbody>
                       {servicosInclusos.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">
-                            Adicione um serviço para incluir no plano.
+                          <td colSpan={5}>
+                            <EmptyState
+                              title="Nenhum serviço adicionado"
+                              description="Selecione um serviço ao lado para incluir neste plano."
+                            />
                           </td>
                         </tr>
                       ) : (
@@ -712,7 +628,9 @@ export default function AssinaturaCadastro() {
                             <td className="px-4 py-3 text-sm text-foreground">{nomeServico(s.id)}</td>
                             <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{s.desconto}%</td>
                             <td className="px-4 py-3 text-center text-sm text-foreground">{labelUsos(s.usos)}</td>
-                            <td className="px-4 py-3 text-center text-sm text-foreground">{labelComissao(s.comissao)}</td>
+                            <td className="px-4 py-3 text-center text-sm text-foreground">
+                              {labelComissao(s.comissao)}
+                            </td>
                             <td className="px-2 py-3 text-center">
                               <button
                                 type="button"
@@ -732,29 +650,26 @@ export default function AssinaturaCadastro() {
             </div>
           )}
 
-          {/* PRODUTOS - 2 colunas estilo NovaCompra */}
+          {/* PRODUTOS */}
           {activeTab === "produtos" && (
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               <div className="space-y-4 self-start">
-                <MultiSelectSearch
-                  label="Produtos"
-                  placeholder="Buscar e selecionar..."
-                  options={produtosDisponiveisFiltrados}
-                  selected={produtosPendentes}
-                  onChange={setProdutosPendentes}
-                />
-
-                <div className="grid gap-1.5">
-                  <label className="text-sm font-medium text-foreground">Quantidade</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={quantidadeProdutoForm}
-                    onChange={(e) => setQuantidadeProdutoForm(e.target.value.replace(/\D/g, ""))}
-                    placeholder="1"
-                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  />
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Configurar produto</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Selecione o produto e defina o desconto aplicado.
+                  </p>
                 </div>
+
+                <Dropdown
+                  label="Produto"
+                  value={produtoSelecionado}
+                  setValue={setProdutoSelecionado}
+                  options={produtosDisponiveisFiltrados.map((p) => ({
+                    value: String(p.id),
+                    label: p.nome,
+                  }))}
+                />
 
                 <div className="grid gap-1.5">
                   <label className="text-sm font-medium text-foreground">Desconto (%)</label>
@@ -772,21 +687,26 @@ export default function AssinaturaCadastro() {
                   <button
                     type="button"
                     onClick={adicionarProduto}
-                    disabled={produtosPendentes.length === 0}
-                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40"
+                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
                   >
-                    Adicionar{produtosPendentes.length > 0 ? ` (${produtosPendentes.length})` : ""}
+                    Adicionar produto
                   </button>
                 </div>
               </div>
 
               <div className="space-y-4 self-start">
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Produtos incluídos no plano</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Confira os produtos com desconto já configurados.
+                  </p>
+                </div>
+
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                   <table className="w-full border-collapse">
                     <thead className="bg-muted/40">
                       <tr>
                         <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
                         <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
                         <th className="w-14 px-2 py-3" />
                       </tr>
@@ -794,15 +714,17 @@ export default function AssinaturaCadastro() {
                     <tbody>
                       {produtosSelecionados.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="px-4 py-16 text-center text-sm text-muted-foreground">
-                            Adicione um produto para aplicar desconto.
+                          <td colSpan={3}>
+                            <EmptyState
+                              title="Nenhum produto adicionado"
+                              description="Selecione um produto ao lado para aplicar desconto neste plano."
+                            />
                           </td>
                         </tr>
                       ) : (
                         produtosSelecionados.map((p) => (
                           <tr key={p.id} className="border-t border-border bg-card">
                             <td className="px-4 py-3 text-sm text-foreground">{nomeProduto(p.id)}</td>
-                            <td className="px-4 py-3 text-center text-sm text-foreground">{p.quantidade}</td>
                             <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{p.desconto}%</td>
                             <td className="px-2 py-3 text-center">
                               <button
@@ -824,7 +746,7 @@ export default function AssinaturaCadastro() {
           )}
         </div>
 
-        {/* FOOTER único - sempre visível */}
+        {/* FOOTER */}
         <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
           <div className="flex items-center justify-end gap-3">
             <button
@@ -832,7 +754,7 @@ export default function AssinaturaCadastro() {
               onClick={handleSalvar}
               className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
             >
-              {editing ? "Salvar alterações" : "Criar plano"}
+              Salvar
             </button>
           </div>
         </div>
