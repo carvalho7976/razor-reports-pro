@@ -393,43 +393,140 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 flex max-w-6xl flex-col gap-5 pb-24">
-          {/* DETALHES */}
-          <section>
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-              {/* Coluna principal */}
-              <div className="grid gap-5">
-                <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
-                  <div className="grid gap-4">
-                    <TextField
-                      label="Nome do plano *"
-                      value={nome}
-                      onChange={setNome}
-                      placeholder="Ex: Plano Mensal Premium"
-                      error={showError("nome")}
-                    />
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <CurrencyInput label="Valor" value={valor} onChange={setValor} />
-                      <Dropdown
-                        label="Recorrência"
-                        value={recorrencia}
-                        setValue={setRecorrencia}
-                        options={recorrenciaOptions}
-                      />
-                      <Dropdown
-                        label="Forma de pagamento"
-                        value={formaPagamento}
-                        setValue={setFormaPagamento}
-                        options={formaPagamentoOptions}
-                      />
-                    </div>
-                  </div>
-                </SectionBlock>
+        {/* Navegação âncora sticky */}
+        <div className="sticky top-0 z-30 mx-6 mt-4 flex gap-1 border-b border-border bg-background/80 pt-2 backdrop-blur">
+          {[
+            { id: "detalhes", label: "Detalhes" },
+            { id: "servicos", label: "Serviços" },
+            { id: "produtos", label: "Produtos" },
+          ].map((s) => (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              className="relative px-3 pb-2.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              {s.label}
+            </a>
+          ))}
+        </div>
 
-                <SectionBlock
-                  title="Benefícios"
-                  description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
-                >
+        {/* CONTENT */}
+        <div className="mx-6 mt-5 flex max-w-5xl flex-col gap-5 pb-24">
+          {/* DETALHES */}
+          <section id="detalhes" className="scroll-mt-20 grid gap-5">
+            <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
+              <div className="grid gap-4">
+                <div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                  <TextField
+                    label="Nome do plano *"
+                    value={nome}
+                    onChange={setNome}
+                    placeholder="Ex: Plano Mensal Premium"
+                    error={showError("nome")}
+                  />
+                  <CurrencyInput label="Valor" value={valor} onChange={setValor} />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Dropdown
+                    label="Recorrência"
+                    value={recorrencia}
+                    setValue={setRecorrencia}
+                    options={recorrenciaOptions}
+                  />
+                  <Dropdown
+                    label="Forma de pagamento"
+                    value={formaPagamento}
+                    setValue={setFormaPagamento}
+                    options={formaPagamentoOptions}
+                  />
+                </div>
+                <div className="mt-1 flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
+                    <p className="text-xs text-muted-foreground">
+                      Quando ativo, o plano fica disponível para venda aos clientes.
+                    </p>
+                  </div>
+                  <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
+                </div>
+              </div>
+            </SectionBlock>
+
+            <SectionBlock
+              title="Disponibilidade"
+              description="Dias e profissionais que aceitam o plano."
+            >
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">Dias aceitos</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {diasSemana.map((d) => {
+                      const ativo = diasAceitos.includes(d.key);
+                      return (
+                        <button
+                          key={d.key}
+                          type="button"
+                          onClick={() => toggleDia(d.key)}
+                          className={cn(
+                            "inline-flex h-8 min-w-[44px] items-center justify-center rounded-md border px-2.5 text-xs font-semibold transition",
+                            ativo
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+                          )}
+                        >
+                          {d.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">Profissionais que atendem</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {profissionaisDisponiveis.map((p) => {
+                      const ativo = profissionaisAtendem.includes(p.id);
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => toggleProfissional(p.id)}
+                          className={cn(
+                            "inline-flex h-8 items-center gap-1.5 rounded-full border pl-1 pr-2.5 text-xs font-medium transition",
+                            ativo
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
+                              ativo
+                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                                : "bg-muted text-muted-foreground",
+                            )}
+                          >
+                            {p.iniciais}
+                          </span>
+                          {p.nome}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </SectionBlock>
+
+            <SectionBlock
+              title="Benefícios"
+              description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
+            >
                   <div className="flex gap-2">
                   <input
                     value={novoBeneficio}
@@ -513,101 +610,11 @@ export default function AssinaturaCadastro() {
                     </tbody>
                   </table>
                 </div>
-                </SectionBlock>
-              </div>
-
-              {/* Coluna lateral */}
-              <div className="grid gap-5 self-start">
-                <SectionBlock title="Vitrine" description="Disponibilização do plano para venda.">
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">Disponível para venda</p>
-                      <p className="text-xs text-muted-foreground">Ative ou desative na vitrine</p>
-                    </div>
-                    <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
-                  </div>
-                </SectionBlock>
-
-                <SectionBlock
-                  title="Disponibilidade"
-                  description="Dias e profissionais que aceitam o plano."
-                >
-                  <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">
-                      Dias aceitos
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {diasSemana.map((d) => {
-                      const ativo = diasAceitos.includes(d.key);
-                      return (
-                        <button
-                          key={d.key}
-                          type="button"
-                          onClick={() => toggleDia(d.key)}
-                          className={cn(
-                            "inline-flex h-8 min-w-[44px] items-center justify-center rounded-md border px-2.5 text-xs font-semibold transition",
-                            ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
-                          )}
-                        >
-                          {d.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">
-                      Profissionais que atendem
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {profissionaisDisponiveis.map((p) => {
-                      const ativo = profissionaisAtendem.includes(p.id);
-                      return (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => toggleProfissional(p.id)}
-                          className={cn(
-                            "inline-flex h-8 items-center gap-1.5 rounded-full border pl-1 pr-2.5 text-xs font-medium transition",
-                            ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
-                          )}
-                        >
-                          <span
-                            className={cn(
-                              "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
-                              ativo
-                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-                                : "bg-muted text-muted-foreground",
-                            )}
-                          >
-                            {p.iniciais}
-                          </span>
-                          {p.nome}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                  </div>
-                </SectionBlock>
-              </div>
-            </div>
+            </SectionBlock>
           </section>
 
           {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
-          <section>
+          <section id="servicos" className="scroll-mt-20">
             <SectionBlock
               title="Serviços"
               description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão."
