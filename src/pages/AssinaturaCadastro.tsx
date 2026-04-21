@@ -424,6 +424,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT - 2 colunas: principal + sidebar */}
+        {layoutMode === "sidebar" ? (
         <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
