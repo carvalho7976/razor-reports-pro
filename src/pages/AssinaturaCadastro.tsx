@@ -97,39 +97,12 @@ interface ServicoIncluso {
   comissao: string;
 }
 
-function SectionBlock({
-  step,
-  title,
-  description,
-  rightSlot,
-  children,
-}: {
-  step: number;
-  title: string;
-  description?: string;
-  rightSlot?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
-            {step}
-          </div>
-          <div>
-            <h2 className="text-base font-semibold text-foreground">{title}</h2>
-            {description && (
-              <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
-            )}
-          </div>
-        </div>
-        {rightSlot}
-      </div>
-      {children}
-    </div>
-  );
-}
+const tabs = [
+  { id: "detalhes", label: "Detalhes" },
+  { id: "servicos", label: "Serviços" },
+  { id: "produtos", label: "Produtos" },
+  { id: "disponibilidade", label: "Disponibilidade" },
+];
 
 function CurrencyInput({
   label,
