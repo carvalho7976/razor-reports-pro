@@ -283,6 +283,7 @@ export default function AssinaturaCadastro() {
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
   const [showErrors, setShowErrors] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<"sidebar" | "tabs">("sidebar");
   const errors = {
     nome: !nome.trim() ? "Informe o nome do plano" : "",
   };
