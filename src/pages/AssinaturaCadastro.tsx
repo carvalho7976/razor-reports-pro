@@ -716,7 +716,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* PRODUTOS - 2 colunas estilo NovaCompra */}
-          <section>
+          <section id="produtos" className="scroll-mt-20">
             <SectionBlock
               title="Produtos"
               description="Selecione os produtos inclusos no plano com quantidade e desconto."
