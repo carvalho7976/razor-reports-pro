@@ -915,26 +915,20 @@ export default function AssinaturaCadastro() {
         </div>
         ) : (
         <div className="mx-6 mt-5 pb-24">
-          <Tabs defaultValue="detalhes" className="w-full">
+          <Tabs defaultValue="plano" className="w-full">
             <TabsList className="h-auto w-full justify-start gap-1 rounded-lg border border-border bg-card p-1">
-              <TabsTrigger value="detalhes" className="data-[state=active]:bg-muted">
-                Dados do plano
-              </TabsTrigger>
-              <TabsTrigger value="servicos" className="data-[state=active]:bg-muted">
-                Serviços ({servicosInclusos.length})
-              </TabsTrigger>
-              <TabsTrigger value="produtos" className="data-[state=active]:bg-muted">
-                Produtos ({produtosSelecionados.length})
+              <TabsTrigger value="plano" className="data-[state=active]:bg-muted">
+                Plano · Serviços ({servicosInclusos.length}) · Produtos ({produtosSelecionados.length})
               </TabsTrigger>
               <TabsTrigger value="beneficios" className="data-[state=active]:bg-muted">
                 Benefícios ({beneficios.length})
               </TabsTrigger>
               <TabsTrigger value="disponibilidade" className="data-[state=active]:bg-muted">
-                Disponibilidade
+                Disponibilidade ({diasAceitos.length}d / {profissionaisAtendem.length}p)
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="detalhes" className="mt-5">
+            <TabsContent value="plano" className="mt-5 flex flex-col gap-5">
               <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
                 <div className="grid gap-4">
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
@@ -960,9 +954,7 @@ export default function AssinaturaCadastro() {
                   </div>
                 </div>
               </SectionBlock>
-            </TabsContent>
 
-            <TabsContent value="servicos" className="mt-5">
               <SectionBlock title="Serviços" description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão.">
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
                   <div className="space-y-4 self-start">
