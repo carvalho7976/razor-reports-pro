@@ -302,6 +302,47 @@ export default function AssinaturaCadastro() {
   };
   const showError = (k: keyof typeof errors) => (showErrors ? errors[k] : "");
 
+  // Wizard
+  const steps = [
+    { id: "detalhes", label: "Dados do plano", icon: FileText, description: "Identificação e cobrança" },
+    { id: "servicos", label: "Serviços", icon: Scissors, description: "Serviços inclusos no plano" },
+    { id: "produtos", label: "Produtos", icon: Package, description: "Produtos com desconto" },
+    { id: "beneficios", label: "Benefícios", icon: Gift, description: "Vantagens exibidas" },
+    { id: "disponibilidade", label: "Disponibilidade", icon: CalendarDays, description: "Dias e profissionais" },
+  ] as const;
+  const [currentStep, setCurrentStep] = useState(0);
+  const isLastStep = currentStep === steps.length - 1;
+  const isFirstStep = currentStep === 0;
+
+  const stepCompleted = (idx: number) => {
+    switch (steps[idx].id) {
+      case "detalhes":
+        return nome.trim().length > 0;
+      case "servicos":
+        return servicosInclusos.length > 0;
+      case "produtos":
+        return produtosSelecionados.length > 0;
+      case "beneficios":
+        return beneficios.length > 0;
+      case "disponibilidade":
+        return diasAceitos.length > 0 && profissionaisAtendem.length > 0;
+      default:
+        return false;
+    }
+  };
+
+  const goToStep = (idx: number) => {
+    if (idx < 0 || idx >= steps.length) return;
+    // valida step atual antes de avançar
+    if (idx > currentStep && steps[currentStep].id === "detalhes" && !nome.trim()) {
+      setShowErrors(true);
+      toast({ title: "Informe o nome do plano antes de continuar", variant: "destructive" });
+      return;
+    }
+    setCurrentStep(idx);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   // Helpers
   const servicosDisponiveisFiltrados = useMemo(
     () => servicosDisponiveis.filter((s) => !servicosInclusos.some((i) => i.id === s.id)),
