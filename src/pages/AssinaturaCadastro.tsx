@@ -252,7 +252,7 @@ export default function AssinaturaCadastro() {
   const produtosDisponiveisFiltrados = produtosMock.filter((p) => !produtosSelecionados.find((x) => x.id === p.id));
 
   function handleSalvar() {
-    const erros = {};
+    const erros: Record<string, string> = {};
     if (!nome.trim()) erros.nome = "Campo obrigatório";
     setErrors(erros);
     if (Object.keys(erros).length > 0) return;
