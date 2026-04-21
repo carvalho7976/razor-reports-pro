@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, X, Search, Check, CalendarDays, Users, Sparkles, Trash2 } from "lucide-react";
+import { Plus, X, CalendarDays, Users, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -91,7 +91,6 @@ const tabs = [
   { id: "detalhes", label: "Detalhes" },
   { id: "servicos", label: "Serviços" },
   { id: "produtos", label: "Produtos" },
-  { id: "disponibilidade", label: "Disponibilidade" },
 ];
 
 function CurrencyInput({
@@ -228,6 +227,15 @@ export default function AssinaturaCadastro() {
   const removerBeneficio = (idx: number) =>
     setBeneficios((prev) => prev.filter((_, i) => i !== idx));
 
+  const moverBeneficio = (idx: number, dir: -1 | 1) =>
+    setBeneficios((prev) => {
+      const novo = [...prev];
+      const j = idx + dir;
+      if (j < 0 || j >= novo.length) return prev;
+      [novo[idx], novo[j]] = [novo[j], novo[idx]];
+      return novo;
+    });
+
   const handleSalvar = () => {
     setShowErrors(true);
     if (errors.nome) {
@@ -347,26 +355,141 @@ export default function AssinaturaCadastro() {
                     Adicionar
                   </button>
                 </div>
-                {beneficios.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {beneficios.map((b, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background"
-                      >
-                        <Sparkles className="h-3 w-3" />
-                        {b}
-                        <button
-                          type="button"
-                          onClick={() => removerBeneficio(idx)}
-                          className="ml-0.5 rounded-full hover:bg-background/20"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    ))}
+
+                <div className="overflow-hidden rounded-lg border border-border bg-card">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-muted/40">
+                      <tr>
+                        <th className="w-14 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">#</th>
+                        <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Benefício</th>
+                        <th className="w-32 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ordem</th>
+                        <th className="w-14 px-2 py-2.5" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {beneficios.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                            Nenhum benefício adicionado.
+                          </td>
+                        </tr>
+                      ) : (
+                        beneficios.map((b, idx) => (
+                          <tr key={`${b}-${idx}`} className="border-t border-border">
+                            <td className="px-3 py-2.5 text-center text-sm font-medium text-muted-foreground">{idx + 1}</td>
+                            <td className="px-3 py-2.5 text-sm text-foreground">{b}</td>
+                            <td className="px-3 py-2.5">
+                              <div className="flex items-center justify-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => moverBeneficio(idx, -1)}
+                                  disabled={idx === 0}
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+                                  aria-label="Mover para cima"
+                                >
+                                  <ArrowUp className="h-4 w-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moverBeneficio(idx, 1)}
+                                  disabled={idx === beneficios.length - 1}
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+                                  aria-label="Mover para baixo"
+                                >
+                                  <ArrowDown className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-2 py-2.5 text-center">
+                              <button
+                                type="button"
+                                onClick={() => removerBeneficio(idx)}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                                aria-label="Remover benefício"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* DISPONIBILIDADE integrada */}
+              <div className="mt-2 grid gap-6 border-t border-border pt-6">
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">
+                      Dias em que o plano é aceito
+                    </span>
                   </div>
-                )}
+                  <div className="flex flex-wrap gap-2">
+                    {diasSemana.map((d) => {
+                      const ativo = diasAceitos.includes(d.key);
+                      return (
+                        <button
+                          key={d.key}
+                          type="button"
+                          onClick={() => toggleDia(d.key)}
+                          className={cn(
+                            "inline-flex h-9 min-w-[64px] items-center justify-center rounded-lg border px-4 text-sm font-semibold transition",
+                            ativo
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+                          )}
+                        >
+                          {d.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Clique para alternar. Verde = aceito.
+                  </p>
+                </div>
+
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">
+                      Profissionais que atendem
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {profissionaisDisponiveis.map((p) => {
+                      const ativo = profissionaisAtendem.includes(p.id);
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => toggleProfissional(p.id)}
+                          className={cn(
+                            "inline-flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 text-sm font-medium transition",
+                            ativo
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold",
+                              ativo
+                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                                : "bg-muted text-muted-foreground",
+                            )}
+                          >
+                            {p.iniciais}
+                          </span>
+                          {p.nome}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -542,82 +665,6 @@ export default function AssinaturaCadastro() {
                       )}
                     </tbody>
                   </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* DISPONIBILIDADE */}
-          {activeTab === "disponibilidade" && (
-            <div className="grid gap-6 max-w-4xl">
-              <div className="grid gap-2">
-                <div className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">
-                    Dias em que o plano é aceito
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {diasSemana.map((d) => {
-                    const ativo = diasAceitos.includes(d.key);
-                    return (
-                      <button
-                        key={d.key}
-                        type="button"
-                        onClick={() => toggleDia(d.key)}
-                        className={cn(
-                          "inline-flex h-9 min-w-[64px] items-center justify-center rounded-lg border px-4 text-sm font-semibold transition",
-                          ativo
-                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                            : "border-border bg-card text-muted-foreground hover:border-foreground/40",
-                        )}
-                      >
-                        {d.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Clique para alternar. Verde = aceito.
-                </p>
-              </div>
-
-              <div className="grid gap-2">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">
-                    Profissionais que atendem
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {profissionaisDisponiveis.map((p) => {
-                    const ativo = profissionaisAtendem.includes(p.id);
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => toggleProfissional(p.id)}
-                        className={cn(
-                          "inline-flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 text-sm font-medium transition",
-                          ativo
-                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                            : "border-border bg-card text-muted-foreground hover:border-foreground/40",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold",
-                            ativo
-                              ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-                              : "bg-muted text-muted-foreground",
-                          )}
-                        >
-                          {p.iniciais}
-                        </span>
-                        {p.nome}
-                      </button>
-                    );
-                  })}
                 </div>
               </div>
             </div>
