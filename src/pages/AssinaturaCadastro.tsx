@@ -392,28 +392,10 @@ export default function AssinaturaCadastro() {
           </div>
         </div>
 
-        {/* CONTENT */}
-        {/* Navegação âncora sticky */}
-        <div className="sticky top-0 z-30 mx-6 mt-4 flex gap-1 border-b border-border bg-background/80 pt-2 backdrop-blur">
-          {[
-            { id: "detalhes", label: "Detalhes" },
-            { id: "servicos", label: "Serviços" },
-            { id: "produtos", label: "Produtos" },
-            { id: "beneficios", label: "Benefícios" },
-            { id: "disponibilidade", label: "Disponibilidade" },
-          ].map((s) => (
-            <a
-              key={s.id}
-              href={`#${s.id}`}
-              className="relative px-3 pb-2.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
-            >
-              {s.label}
-            </a>
-          ))}
-        </div>
-
-        {/* CONTENT */}
-        <div className="mx-6 mt-5 flex max-w-7xl flex-col gap-5 pb-24">
+        {/* CONTENT - 2 colunas: principal + sidebar */}
+        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
+          {/* COLUNA PRINCIPAL */}
+          <div className="flex flex-col gap-5">
           {/* DETALHES */}
           <section id="detalhes" className="scroll-mt-20 grid gap-5">
             <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
