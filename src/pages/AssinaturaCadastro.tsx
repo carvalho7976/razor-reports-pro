@@ -227,6 +227,15 @@ export default function AssinaturaCadastro() {
   const removerBeneficio = (idx: number) =>
     setBeneficios((prev) => prev.filter((_, i) => i !== idx));
 
+  const moverBeneficio = (idx: number, dir: -1 | 1) =>
+    setBeneficios((prev) => {
+      const novo = [...prev];
+      const j = idx + dir;
+      if (j < 0 || j >= novo.length) return prev;
+      [novo[idx], novo[j]] = [novo[j], novo[idx]];
+      return novo;
+    });
+
   const handleSalvar = () => {
     setShowErrors(true);
     if (errors.nome) {
