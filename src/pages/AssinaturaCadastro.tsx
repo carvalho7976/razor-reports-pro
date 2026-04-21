@@ -392,30 +392,10 @@ export default function AssinaturaCadastro() {
           </div>
         </div>
 
-        {/* TABS */}
-        <div className="mx-6 mt-4 border-b border-border">
-          <div className="flex gap-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "relative pb-2.5 text-sm font-medium transition-colors",
-                  activeTab === tab.id
-                    ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* CONTENT */}
-        <div className="mx-6 mt-5 pb-24">
+        <div className="mx-6 mt-5 flex flex-col gap-8 pb-24">
           {/* DETALHES */}
-          {activeTab === "detalhes" && (
+          <section>
             <div className="grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
               {/* Coluna principal */}
               <div className="grid gap-5">
