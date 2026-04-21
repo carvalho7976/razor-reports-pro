@@ -1007,9 +1007,7 @@ export default function AssinaturaCadastro() {
                   </div>
                 </div>
               </SectionBlock>
-            </TabsContent>
 
-            <TabsContent value="produtos" className="mt-5">
               <SectionBlock title="Produtos" description="Selecione os produtos inclusos no plano com quantidade e desconto.">
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
                   <div className="space-y-4 self-start">
