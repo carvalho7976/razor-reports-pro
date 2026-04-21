@@ -413,12 +413,12 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 flex max-w-5xl flex-col gap-5 pb-24">
+        <div className="mx-6 mt-5 flex max-w-7xl flex-col gap-5 pb-24">
           {/* DETALHES */}
           <section id="detalhes" className="scroll-mt-20 grid gap-5">
             <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
               <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
                   <TextField
                     label="Nome do plano *"
                     value={nome}
@@ -427,8 +427,6 @@ export default function AssinaturaCadastro() {
                     error={showError("nome")}
                   />
                   <CurrencyInput label="Valor" value={valor} onChange={setValor} />
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
                   <Dropdown
                     label="Recorrência"
                     value={recorrencia}
