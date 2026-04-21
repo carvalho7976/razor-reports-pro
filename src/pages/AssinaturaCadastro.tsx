@@ -393,10 +393,10 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 flex flex-col gap-8 pb-24">
+        <div className="mx-6 mt-5 flex max-w-6xl flex-col gap-5 pb-24">
           {/* DETALHES */}
           <section>
-            <div className="grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
               {/* Coluna principal */}
               <div className="grid gap-5">
                 <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
@@ -608,13 +608,11 @@ export default function AssinaturaCadastro() {
 
           {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
           <section>
-            <div className="mb-4 max-w-6xl border-b border-border pb-2">
-              <h2 className="text-base font-semibold text-foreground">Serviços</h2>
-              <p className="text-sm text-muted-foreground">
-                Selecione os serviços inclusos no plano e configure desconto, usos e comissão.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
+            <SectionBlock
+              title="Serviços"
+              description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão."
+            >
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
               {/* Form esquerda */}
               <div className="space-y-4 self-start">
                 <MultiSelectSearch
@@ -707,17 +705,16 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </div>
+            </SectionBlock>
           </section>
 
           {/* PRODUTOS - 2 colunas estilo NovaCompra */}
           <section>
-            <div className="mb-4 max-w-6xl border-b border-border pb-2">
-              <h2 className="text-base font-semibold text-foreground">Produtos</h2>
-              <p className="text-sm text-muted-foreground">
-                Selecione os produtos inclusos no plano com quantidade e desconto.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
+            <SectionBlock
+              title="Produtos"
+              description="Selecione os produtos inclusos no plano com quantidade e desconto."
+            >
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
               <div className="space-y-4 self-start">
                 <MultiSelectSearch
                   label="Produtos"
@@ -804,6 +801,7 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </div>
+            </SectionBlock>
           </section>
         </div>
 
