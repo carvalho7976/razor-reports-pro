@@ -604,10 +604,16 @@ export default function AssinaturaCadastro() {
                 </SectionBlock>
               </div>
             </div>
-          )}
+          </section>
 
           {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
-          {activeTab === "servicos" && (
+          <section>
+            <div className="mb-4 max-w-6xl border-b border-border pb-2">
+              <h2 className="text-base font-semibold text-foreground">Serviços</h2>
+              <p className="text-sm text-muted-foreground">
+                Selecione os serviços inclusos no plano e configure desconto, usos e comissão.
+              </p>
+            </div>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               {/* Form esquerda */}
               <div className="space-y-4 self-start">
@@ -701,10 +707,16 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </div>
-          )}
+          </section>
 
           {/* PRODUTOS - 2 colunas estilo NovaCompra */}
-          {activeTab === "produtos" && (
+          <section>
+            <div className="mb-4 max-w-6xl border-b border-border pb-2">
+              <h2 className="text-base font-semibold text-foreground">Produtos</h2>
+              <p className="text-sm text-muted-foreground">
+                Selecione os produtos inclusos no plano com quantidade e desconto.
+              </p>
+            </div>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               <div className="space-y-4 self-start">
                 <MultiSelectSearch
@@ -792,7 +804,7 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </div>
-          )}
+          </section>
         </div>
 
         {/* FOOTER único - sempre visível */}
