@@ -972,38 +972,84 @@ export default function AssinaturaCadastro() {
 
             {/* Navegação rápida */}
             <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="text-sm font-semibold text-foreground">Seções</h3>
+              <h3 className="text-sm font-semibold text-foreground">Passos</h3>
               <nav className="mt-3 flex flex-col gap-1">
-                {[
-                  { id: "detalhes", label: "Dados do plano" },
-                  { id: "servicos", label: `Serviços (${servicosInclusos.length})` },
-                  { id: "produtos", label: `Produtos (${produtosSelecionados.length})` },
-                  { id: "beneficios", label: `Benefícios (${beneficios.length})` },
-                  { id: "disponibilidade", label: `Disponibilidade (${diasAceitos.length}d / ${profissionaisAtendem.length}p)` },
-                ].map((s) => (
-                  <a
-                    key={s.id}
-                    href={`#${s.id}`}
-                    className="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                  >
-                    {s.label}
-                  </a>
-                ))}
+                {steps.map((s, idx) => {
+                  const isActive = idx === currentStep;
+                  const isDone = idx < currentStep || (idx !== currentStep && stepCompleted(idx));
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => goToStep(idx)}
+                      className={cn(
+                        "flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-sm transition",
+                        isActive
+                          ? "bg-primary/10 font-semibold text-foreground"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold",
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : isDone
+                                ? "bg-emerald-500 text-white"
+                                : "bg-muted text-muted-foreground",
+                          )}
+                        >
+                          {isDone && !isActive ? <Check className="h-3 w-3" /> : idx + 1}
+                        </span>
+                        {s.label}
+                      </span>
+                    </button>
+                  );
+                })}
               </nav>
             </div>
           </aside>
         </div>
 
-        {/* FOOTER único - sempre visível */}
+        {/* FOOTER WIZARD - Voltar / Próximo / Salvar */}
         <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={handleSalvar}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-            >
-              {editing ? "Salvar alterações" : "Criar plano"}
-            </button>
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs text-muted-foreground">
+              Passo <span className="font-semibold text-foreground">{currentStep + 1}</span> de {steps.length}
+              <span className="mx-2 text-border">•</span>
+              <span className="font-medium text-foreground">{steps[currentStep].label}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => goToStep(currentStep - 1)}
+                disabled={isFirstStep}
+                className="inline-flex h-11 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Voltar
+              </button>
+              {isLastStep ? (
+                <button
+                  type="button"
+                  onClick={handleSalvar}
+                  className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-foreground px-6 text-sm font-semibold text-background transition hover:opacity-90"
+                >
+                  <Check className="h-4 w-4" />
+                  {editing ? "Salvar alterações" : "Criar plano"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => goToStep(currentStep + 1)}
+                  className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+                >
+                  Próximo
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
