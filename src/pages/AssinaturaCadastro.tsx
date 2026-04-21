@@ -425,45 +425,41 @@ export default function AssinaturaCadastro() {
         <div className="mx-6 mt-5 pb-24">
           {/* DETALHES */}
           {activeTab === "detalhes" && (
-            <div className="grid gap-4 max-w-4xl">
-              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px_180px]">
-                <TextField
-                  label="Nome do plano *"
-                  value={nome}
-                  onChange={setNome}
-                  placeholder="Ex: Plano Mensal Premium"
-                  error={showError("nome")}
-                />
-                <CurrencyInput label="Valor" value={valor} onChange={setValor} />
-                <Dropdown
-                  label="Recorrência"
-                  value={recorrencia}
-                  setValue={setRecorrencia}
-                  options={recorrenciaOptions}
-                />
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <Dropdown
-                  label="Forma de pagamento"
-                  value={formaPagamento}
-                  setValue={setFormaPagamento}
-                  options={formaPagamentoOptions}
-                />
-                <div className="flex items-end">
-                  <div className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">Disponível para venda</p>
-                      <p className="text-xs text-muted-foreground">Ative ou desative na vitrine</p>
+            <div className="grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+              {/* Coluna principal */}
+              <div className="grid gap-5">
+                <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
+                  <div className="grid gap-4">
+                    <TextField
+                      label="Nome do plano *"
+                      value={nome}
+                      onChange={setNome}
+                      placeholder="Ex: Plano Mensal Premium"
+                      error={showError("nome")}
+                    />
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <CurrencyInput label="Valor" value={valor} onChange={setValor} />
+                      <Dropdown
+                        label="Recorrência"
+                        value={recorrencia}
+                        setValue={setRecorrencia}
+                        options={recorrenciaOptions}
+                      />
+                      <Dropdown
+                        label="Forma de pagamento"
+                        value={formaPagamento}
+                        setValue={setFormaPagamento}
+                        options={formaPagamentoOptions}
+                      />
                     </div>
-                    <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                   </div>
-                </div>
-              </div>
+                </SectionBlock>
 
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-foreground">Benefícios do plano</label>
-                <div className="flex gap-2">
+                <SectionBlock
+                  title="Benefícios"
+                  description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
+                >
+                  <div className="flex gap-2">
                   <input
                     value={novoBeneficio}
                     onChange={(e) => setNovoBeneficio(e.target.value)}
@@ -486,7 +482,7 @@ export default function AssinaturaCadastro() {
                   </button>
                 </div>
 
-                <div className="overflow-hidden rounded-lg border border-border bg-card">
+                <div className="mt-3 overflow-hidden rounded-lg border border-border bg-card">
                   <table className="w-full border-collapse">
                     <thead className="bg-muted/40">
                       <tr>
@@ -546,15 +542,31 @@ export default function AssinaturaCadastro() {
                     </tbody>
                   </table>
                 </div>
+                </SectionBlock>
               </div>
 
-              {/* DISPONIBILIDADE integrada */}
-              <div className="mt-2 grid gap-6 border-t border-border pt-6">
+              {/* Coluna lateral */}
+              <div className="grid gap-5 self-start">
+                <SectionBlock title="Vitrine" description="Disponibilização do plano para venda.">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Disponível para venda</p>
+                      <p className="text-xs text-muted-foreground">Ative ou desative na vitrine</p>
+                    </div>
+                    <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
+                  </div>
+                </SectionBlock>
+
+                <SectionBlock
+                  title="Disponibilidade"
+                  description="Dias e profissionais que aceitam o plano."
+                >
+                  <div className="grid gap-4">
                 <div className="grid gap-2">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-foreground">
-                      Dias em que o plano é aceito
+                      Dias aceitos
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -566,7 +578,7 @@ export default function AssinaturaCadastro() {
                           type="button"
                           onClick={() => toggleDia(d.key)}
                           className={cn(
-                            "inline-flex h-9 min-w-[64px] items-center justify-center rounded-lg border px-4 text-sm font-semibold transition",
+                            "inline-flex h-8 min-w-[44px] items-center justify-center rounded-md border px-2.5 text-xs font-semibold transition",
                             ativo
                               ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
@@ -577,9 +589,6 @@ export default function AssinaturaCadastro() {
                       );
                     })}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Clique para alternar. Verde = aceito.
-                  </p>
                 </div>
 
                 <div className="grid gap-2">
@@ -598,7 +607,7 @@ export default function AssinaturaCadastro() {
                           type="button"
                           onClick={() => toggleProfissional(p.id)}
                           className={cn(
-                            "inline-flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 text-sm font-medium transition",
+                            "inline-flex h-8 items-center gap-1.5 rounded-full border pl-1 pr-2.5 text-xs font-medium transition",
                             ativo
                               ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
@@ -606,7 +615,7 @@ export default function AssinaturaCadastro() {
                         >
                           <span
                             className={cn(
-                              "flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold",
+                              "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
                               ativo
                                 ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
                                 : "bg-muted text-muted-foreground",
@@ -620,6 +629,8 @@ export default function AssinaturaCadastro() {
                     })}
                   </div>
                 </div>
+                  </div>
+                </SectionBlock>
               </div>
             </div>
           )}
