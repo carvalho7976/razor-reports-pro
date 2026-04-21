@@ -246,8 +246,6 @@ export default function AssinaturaCadastro() {
 
   const editing = searchParams.get("nome");
 
-  const [activeTab, setActiveTab] = useState("detalhes");
-
   // Detalhes
   const [nome, setNome] = useState(editing || "");
   const [valor, setValor] = useState("89,00");
@@ -363,7 +361,6 @@ export default function AssinaturaCadastro() {
   const handleSalvar = () => {
     setShowErrors(true);
     if (errors.nome) {
-      setActiveTab("detalhes");
       toast({ title: "Verifique os campos obrigatórios", variant: "destructive" });
       return;
     }
