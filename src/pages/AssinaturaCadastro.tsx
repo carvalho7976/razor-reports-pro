@@ -548,7 +548,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
-          <section id="servicos" className="scroll-mt-20">
+          <section id="servicos" className={cn("scroll-mt-20", currentStep !== 1 && "hidden")}>
             <SectionBlock
               title="Serviços"
               description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão."
@@ -650,7 +650,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* PRODUTOS - 2 colunas estilo NovaCompra */}
-          <section id="produtos" className="scroll-mt-20">
+          <section id="produtos" className={cn("scroll-mt-20", currentStep !== 2 && "hidden")}>
             <SectionBlock
               title="Produtos"
               description="Selecione os produtos inclusos no plano com quantidade e desconto."
@@ -746,7 +746,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* BENEFÍCIOS */}
-          <section id="beneficios" className="scroll-mt-20">
+          <section id="beneficios" className={cn("scroll-mt-20", currentStep !== 3 && "hidden")}>
             <SectionBlock
               title="Benefícios"
               description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
@@ -838,7 +838,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* DISPONIBILIDADE */}
-          <section id="disponibilidade" className="scroll-mt-20">
+          <section id="disponibilidade" className={cn("scroll-mt-20", currentStep !== 4 && "hidden")}>
             <SectionBlock
               title="Disponibilidade"
               description="Dias e profissionais que aceitam o plano."
