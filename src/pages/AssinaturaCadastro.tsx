@@ -798,6 +798,88 @@ export default function AssinaturaCadastro() {
               </div>
             </SectionBlock>
           </section>
+          </div>
+
+          {/* SIDEBAR DIREITA */}
+          <aside className="flex flex-col gap-5 lg:sticky lg:top-4 lg:self-start">
+            {/* Resumo */}
+            <div className="rounded-xl border border-border bg-card p-4">
+              <h3 className="text-sm font-semibold text-foreground">Resumo do plano</h3>
+              <p className="mt-0.5 text-xs text-muted-foreground">Pré-visualização do que está configurado.</p>
+
+              <div className="mt-4 space-y-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Nome</p>
+                  <p className="mt-0.5 truncate text-sm font-semibold text-foreground">
+                    {nome.trim() || "Sem nome"}
+                  </p>
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs text-muted-foreground">R$</span>
+                  <span className="text-2xl font-bold text-foreground">{valor || "0,00"}</span>
+                  <span className="text-xs text-muted-foreground">
+                    / {recorrenciaOptions.find((r) => r.value === recorrencia)?.label.toLowerCase()}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Serviços</p>
+                    <p className="mt-0.5 text-lg font-bold text-foreground">{servicosInclusos.length}</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Produtos</p>
+                    <p className="mt-0.5 text-lg font-bold text-foreground">{produtosSelecionados.length}</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Benefícios</p>
+                    <p className="mt-0.5 text-lg font-bold text-foreground">{beneficios.length}</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Dias</p>
+                    <p className="mt-0.5 text-lg font-bold text-foreground">{diasAceitos.length}/7</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2">
+                  <span className="text-xs font-medium text-foreground">Vitrine</span>
+                  <span
+                    className={cn(
+                      "rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                      disponivelVenda
+                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {disponivelVenda ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Navegação rápida */}
+            <div className="rounded-xl border border-border bg-card p-4">
+              <h3 className="text-sm font-semibold text-foreground">Seções</h3>
+              <nav className="mt-3 flex flex-col gap-1">
+                {[
+                  { id: "detalhes", label: "Dados do plano" },
+                  { id: "servicos", label: `Serviços (${servicosInclusos.length})` },
+                  { id: "produtos", label: `Produtos (${produtosSelecionados.length})` },
+                  { id: "beneficios", label: `Benefícios (${beneficios.length})` },
+                  { id: "disponibilidade", label: `Disponibilidade (${diasAceitos.length}d / ${profissionaisAtendem.length}p)` },
+                ].map((s) => (
+                  <a
+                    key={s.id}
+                    href={`#${s.id}`}
+                    className="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  >
+                    {s.label}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </aside>
         </div>
 
         {/* FOOTER único - sempre visível */}
