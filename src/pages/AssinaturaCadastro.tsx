@@ -7,6 +7,7 @@ import { Plus, CalendarDays, Users, Trash2, ArrowUp, ArrowDown, Search } from "l
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface ServicoOpt { id: number; nome: string; }
 interface ProdutoOpt { id: number; nome: string; }
