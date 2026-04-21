@@ -267,8 +267,8 @@ export default function AssinaturaCadastro() {
   ]);
   const [novoBeneficio, setNovoBeneficio] = useState("");
 
-  // Serviços
-  const [servicoSelecionado, setServicoSelecionado] = useState<string>("");
+  // Serviços (multi-select)
+  const [servicosPendentes, setServicosPendentes] = useState<number[]>([]);
   const [descontoServico, setDescontoServico] = useState("100");
   const [usosServico, setUsosServico] = useState("ILIMITADO");
   const [comissaoServico, setComissaoServico] = useState("TEMPO");
@@ -277,10 +277,11 @@ export default function AssinaturaCadastro() {
     { id: 5, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
   ]);
 
-  // Produtos
-  const [produtoSelecionado, setProdutoSelecionado] = useState<string>("");
+  // Produtos (multi-select)
+  const [produtosPendentes, setProdutosPendentes] = useState<number[]>([]);
+  const [quantidadeProdutoForm, setQuantidadeProdutoForm] = useState("1");
   const [descontoProdutoForm, setDescontoProdutoForm] = useState("10");
-  const [produtosSelecionados, setProdutosSelecionados] = useState<{ id: number; desconto: string }[]>([]);
+  const [produtosSelecionados, setProdutosSelecionados] = useState<ProdutoIncluso[]>([]);
 
   // Disponibilidade
   const [diasAceitos, setDiasAceitos] = useState<string[]>([
@@ -305,27 +306,33 @@ export default function AssinaturaCadastro() {
   );
 
   const adicionarServico = () => {
-    if (!servicoSelecionado) return;
-    const id = Number(servicoSelecionado);
-    setServicosInclusos((prev) => [
-      ...prev,
-      { id, desconto: descontoServico || "0", usos: usosServico, comissao: comissaoServico },
-    ]);
-    setServicoSelecionado("");
-    setDescontoServico("100");
-    setUsosServico("ILIMITADO");
-    setComissaoServico("TEMPO");
+    if (servicosPendentes.length === 0) return;
+    const novos: ServicoIncluso[] = servicosPendentes
+      .filter((id) => !servicosInclusos.some((s) => s.id === id))
+      .map((id) => ({
+        id,
+        desconto: descontoServico || "0",
+        usos: usosServico,
+        comissao: comissaoServico,
+      }));
+    setServicosInclusos((prev) => [...prev, ...novos]);
+    setServicosPendentes([]);
   };
 
   const removerServico = (id: number) =>
     setServicosInclusos((prev) => prev.filter((s) => s.id !== id));
 
   const adicionarProduto = () => {
-    if (!produtoSelecionado) return;
-    const id = Number(produtoSelecionado);
-    setProdutosSelecionados((prev) => [...prev, { id, desconto: descontoProdutoForm || "0" }]);
-    setProdutoSelecionado("");
-    setDescontoProdutoForm("10");
+    if (produtosPendentes.length === 0) return;
+    const novos: ProdutoIncluso[] = produtosPendentes
+      .filter((id) => !produtosSelecionados.some((p) => p.id === id))
+      .map((id) => ({
+        id,
+        quantidade: quantidadeProdutoForm || "1",
+        desconto: descontoProdutoForm || "0",
+      }));
+    setProdutosSelecionados((prev) => [...prev, ...novos]);
+    setProdutosPendentes([]);
   };
 
   const removerProduto = (id: number) =>
