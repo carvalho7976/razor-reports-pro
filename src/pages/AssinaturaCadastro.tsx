@@ -391,6 +391,35 @@ export default function AssinaturaCadastro() {
                 Configure os dados, serviços e produtos do plano.
               </p>
             </div>
+            <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2">
+              <span className="text-xs font-medium text-muted-foreground">Layout:</span>
+              <div className="flex items-center gap-1.5 rounded-md bg-muted p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode("sidebar")}
+                  className={cn(
+                    "rounded px-2.5 py-1 text-xs font-semibold transition",
+                    layoutMode === "sidebar"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  Sidebar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode("tabs")}
+                  className={cn(
+                    "rounded px-2.5 py-1 text-xs font-semibold transition",
+                    layoutMode === "tabs"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  Abas
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
