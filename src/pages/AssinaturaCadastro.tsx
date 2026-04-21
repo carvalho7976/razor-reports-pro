@@ -442,9 +442,65 @@ export default function AssinaturaCadastro() {
                 {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Configure os dados, serviços e produtos do plano.
+                Siga os passos abaixo para configurar o plano.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* STEPPER */}
+        <div className="mx-6 mt-5">
+          <div className="rounded-xl border border-border bg-card p-4">
+            <ol className="flex flex-wrap items-center gap-y-3">
+              {steps.map((step, idx) => {
+                const Icon = step.icon;
+                const isActive = idx === currentStep;
+                const isDone = idx < currentStep || (idx !== currentStep && stepCompleted(idx));
+                return (
+                  <li key={step.id} className="flex flex-1 items-center gap-3 min-w-[180px]">
+                    <button
+                      type="button"
+                      onClick={() => goToStep(idx)}
+                      className="flex items-center gap-3 text-left transition"
+                    >
+                      <span
+                        className={cn(
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition",
+                          isActive
+                            ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                            : isDone
+                              ? "border-emerald-500 bg-emerald-500 text-white"
+                              : "border-border bg-card text-muted-foreground",
+                        )}
+                      >
+                        {isDone && !isActive ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Passo {idx + 1}
+                        </span>
+                        <span
+                          className={cn(
+                            "text-sm font-semibold transition",
+                            isActive ? "text-foreground" : isDone ? "text-foreground" : "text-muted-foreground",
+                          )}
+                        >
+                          {step.label}
+                        </span>
+                      </div>
+                    </button>
+                    {idx < steps.length - 1 && (
+                      <div
+                        className={cn(
+                          "mx-2 hidden h-0.5 flex-1 rounded-full transition md:block",
+                          idx < currentStep ? "bg-emerald-500" : "bg-border",
+                        )}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
           </div>
         </div>
 
