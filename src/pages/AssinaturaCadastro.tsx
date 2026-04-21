@@ -3,24 +3,14 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, X, Search, Check, CalendarDays, Users, Package, Sparkles, Tag } from "lucide-react";
+import { Plus, X, Search, Check, CalendarDays, Users, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface ServicoOpt {
-  id: number;
-  nome: string;
-}
-interface ProdutoOpt {
-  id: number;
-  nome: string;
-}
-interface ProfissionalOpt {
-  id: number;
-  nome: string;
-  iniciais: string;
-}
+interface ServicoOpt { id: number; nome: string; }
+interface ProdutoOpt { id: number; nome: string; }
+interface ProfissionalOpt { id: number; nome: string; iniciais: string; }
 
 const servicosDisponiveis: ServicoOpt[] = [
   { id: 1, nome: "Barba + Sobrancelha" },
@@ -97,39 +87,12 @@ interface ServicoIncluso {
   comissao: string;
 }
 
-function SectionBlock({
-  step,
-  title,
-  description,
-  rightSlot,
-  children,
-}: {
-  step: number;
-  title: string;
-  description?: string;
-  rightSlot?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
-            {step}
-          </div>
-          <div>
-            <h2 className="text-base font-semibold text-foreground">{title}</h2>
-            {description && (
-              <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
-            )}
-          </div>
-        </div>
-        {rightSlot}
-      </div>
-      {children}
-    </div>
-  );
-}
+const tabs = [
+  { id: "detalhes", label: "Detalhes" },
+  { id: "servicos", label: "Serviços" },
+  { id: "produtos", label: "Produtos" },
+  { id: "disponibilidade", label: "Disponibilidade" },
+];
 
 function CurrencyInput({
   label,
@@ -142,9 +105,9 @@ function CurrencyInput({
 }) {
   const formatted = value || "0,00";
   return (
-    <div className="grid gap-0.5">
-      <label className="text-[13px] font-semibold text-foreground">{label}</label>
-      <div className="flex h-10 items-center rounded-lg border border-border bg-card text-sm focus-within:border-foreground focus-within:ring-4 focus-within:ring-muted">
+    <div className="grid gap-1.5">
+      <label className="text-sm font-medium text-foreground">{label}</label>
+      <div className="flex h-10 items-center rounded-lg border border-border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/20">
         <span className="pl-3 pr-1 text-muted-foreground">R$</span>
         <input
           value={formatted}
@@ -167,7 +130,9 @@ export default function AssinaturaCadastro() {
 
   const editing = searchParams.get("nome");
 
-  // Step 1
+  const [activeTab, setActiveTab] = useState("detalhes");
+
+  // Detalhes
   const [nome, setNome] = useState(editing || "");
   const [valor, setValor] = useState("89,00");
   const [recorrencia, setRecorrencia] = useState("MENSAL");
@@ -180,76 +145,78 @@ export default function AssinaturaCadastro() {
   ]);
   const [novoBeneficio, setNovoBeneficio] = useState("");
 
-  // Step 2 - Serviços
-  const [servicosBusca, setServicosBusca] = useState("");
+  // Serviços
+  const [servicoSelecionado, setServicoSelecionado] = useState<string>("");
+  const [descontoServico, setDescontoServico] = useState("100");
+  const [usosServico, setUsosServico] = useState("ILIMITADO");
+  const [comissaoServico, setComissaoServico] = useState("TEMPO");
   const [servicosInclusos, setServicosInclusos] = useState<ServicoIncluso[]>([
     { id: 1, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
-    { id: 2, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
-    { id: 3, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
-    { id: 4, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
+    { id: 5, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
   ]);
 
-  // Step 3 - Produtos
-  const [produtosBusca, setProdutosBusca] = useState("");
-  const [produtosSelecionados, setProdutosSelecionados] = useState<number[]>([]);
-  const [descontoProdutos, setDescontoProdutos] = useState("10");
+  // Produtos
+  const [produtoSelecionado, setProdutoSelecionado] = useState<string>("");
+  const [descontoProdutoForm, setDescontoProdutoForm] = useState("10");
+  const [produtosSelecionados, setProdutosSelecionados] = useState<{ id: number; desconto: string }[]>([]);
 
-  // Step 4 - Disponibilidade
+  // Disponibilidade
   const [diasAceitos, setDiasAceitos] = useState<string[]>([
     "seg", "ter", "qua", "qui", "sex",
   ]);
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
-  // Errors
   const [showErrors, setShowErrors] = useState(false);
   const errors = {
     nome: !nome.trim() ? "Informe o nome do plano" : "",
   };
-
   const showError = (k: keyof typeof errors) => (showErrors ? errors[k] : "");
 
-  const toggleServico = (id: number) => {
-    setServicosInclusos((prev) =>
-      prev.some((s) => s.id === id)
-        ? prev.filter((s) => s.id !== id)
-        : [...prev, { id, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" }]
-    );
+  // Helpers
+  const servicosDisponiveisFiltrados = useMemo(
+    () => servicosDisponiveis.filter((s) => !servicosInclusos.some((i) => i.id === s.id)),
+    [servicosInclusos],
+  );
+  const produtosDisponiveisFiltrados = useMemo(
+    () => produtosDisponiveis.filter((p) => !produtosSelecionados.some((i) => i.id === p.id)),
+    [produtosSelecionados],
+  );
+
+  const adicionarServico = () => {
+    if (!servicoSelecionado) return;
+    const id = Number(servicoSelecionado);
+    setServicosInclusos((prev) => [
+      ...prev,
+      { id, desconto: descontoServico || "0", usos: usosServico, comissao: comissaoServico },
+    ]);
+    setServicoSelecionado("");
+    setDescontoServico("100");
+    setUsosServico("ILIMITADO");
+    setComissaoServico("TEMPO");
   };
 
-  const updateServico = (id: number, field: keyof ServicoIncluso, value: string) =>
-    setServicosInclusos((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, [field]: value } : s))
-    );
+  const removerServico = (id: number) =>
+    setServicosInclusos((prev) => prev.filter((s) => s.id !== id));
 
-  const selecionarTodosServicos = () => {
-    if (servicosInclusos.length === servicosDisponiveis.length) {
-      setServicosInclusos([]);
-    } else {
-      setServicosInclusos(
-        servicosDisponiveis.map((s) => ({
-          id: s.id,
-          desconto: "100",
-          usos: "ILIMITADO",
-          comissao: "TEMPO",
-        }))
-      );
-    }
+  const adicionarProduto = () => {
+    if (!produtoSelecionado) return;
+    const id = Number(produtoSelecionado);
+    setProdutosSelecionados((prev) => [...prev, { id, desconto: descontoProdutoForm || "0" }]);
+    setProdutoSelecionado("");
+    setDescontoProdutoForm("10");
   };
 
-  const toggleProduto = (id: number) => {
-    setProdutosSelecionados((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
-    );
-  };
+  const removerProduto = (id: number) =>
+    setProdutosSelecionados((prev) => prev.filter((p) => p.id !== id));
 
   const toggleDia = (key: string) =>
     setDiasAceitos((prev) =>
-      prev.includes(key) ? prev.filter((d) => d !== key) : [...prev, key]
+      prev.includes(key) ? prev.filter((d) => d !== key) : [...prev, key],
     );
 
   const toggleProfissional = (id: number) =>
     setProfissionaisAtendem((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
 
   const adicionarBeneficio = () => {
@@ -258,29 +225,13 @@ export default function AssinaturaCadastro() {
     setBeneficios((prev) => [...prev, t]);
     setNovoBeneficio("");
   };
-
   const removerBeneficio = (idx: number) =>
     setBeneficios((prev) => prev.filter((_, i) => i !== idx));
-
-  const servicosFiltrados = useMemo(
-    () =>
-      servicosDisponiveis.filter((s) =>
-        s.nome.toLowerCase().includes(servicosBusca.toLowerCase())
-      ),
-    [servicosBusca]
-  );
-
-  const produtosFiltrados = useMemo(
-    () =>
-      produtosDisponiveis.filter((p) =>
-        p.nome.toLowerCase().includes(produtosBusca.toLowerCase())
-      ),
-    [produtosBusca]
-  );
 
   const handleSalvar = () => {
     setShowErrors(true);
     if (errors.nome) {
+      setActiveTab("detalhes");
       toast({ title: "Verifique os campos obrigatórios", variant: "destructive" });
       return;
     }
@@ -288,546 +239,402 @@ export default function AssinaturaCadastro() {
     navigate("/assinantePesquisa");
   };
 
-  const handleCancelar = () => navigate(-1);
-
-  const getServicoIncluso = (id: number) =>
-    servicosInclusos.find((s) => s.id === id);
+  const nomeServico = (id: number) =>
+    servicosDisponiveis.find((s) => s.id === id)?.nome || "";
+  const nomeProduto = (id: number) =>
+    produtosDisponiveis.find((p) => p.id === id)?.nome || "";
+  const labelUsos = (v: string) => usosOptions.find((o) => o.value === v)?.label || v;
+  const labelComissao = (v: string) => comissaoOptions.find((o) => o.value === v)?.label || v;
 
   return (
     <AppLayout>
-      <div className="mx-auto flex max-w-6xl flex-col gap-5 pb-24">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleCancelar}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground transition hover:bg-muted"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </button>
-            <h1 className="text-xl font-bold text-foreground">
-              {editing ? "Editar plano" : "Novo plano"}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleCancelar}
-              className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleSalvar}
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
-            >
-              Salvar plano
-            </button>
+      <div className="flex flex-col gap-0">
+        {/* HEADER */}
+        <div className="mx-6 mt-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="pt-1">
+              <h1 className="text-xl font-bold text-foreground">
+                {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Configure os dados, serviços, produtos e disponibilidade do plano.
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-          {/* MAIN */}
-          <div className="grid gap-5">
-            {/* SECTION 1 - Detalhes */}
-            <SectionBlock
-              step={1}
-              title="Detalhes do plano"
-              description="Informações principais e configuração comercial."
-            >
-              <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_160px_160px]">
-                  <TextField
-                    label="Nome do plano *"
-                    value={nome}
-                    onChange={setNome}
-                    placeholder="Ex: Plano Mensal Premium"
-                    error={showError("nome")}
-                  />
-                  <CurrencyInput label="Valor" value={valor} onChange={setValor} />
-                  <Dropdown
-                    label="Recorrência"
-                    value={recorrencia}
-                    setValue={setRecorrencia}
-                    options={recorrenciaOptions}
-                  />
-                </div>
+        {/* TABS */}
+        <div className="mx-6 mt-4 border-b border-border">
+          <div className="flex gap-6">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "relative pb-2.5 text-sm font-medium transition-colors",
+                  activeTab === tab.id
+                    ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Dropdown
-                    label="Forma de pagamento"
-                    value={formaPagamento}
-                    setValue={setFormaPagamento}
-                    options={formaPagamentoOptions}
-                  />
-                  <div className="flex items-end">
-                    <div className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">
-                          Disponível para venda
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Ative ou desative este plano na vitrine
-                        </p>
-                      </div>
-                      <Switch
-                        checked={disponivelVenda}
-                        onCheckedChange={setDisponivelVenda}
-                      />
-                    </div>
-                  </div>
-                </div>
+        {/* CONTENT */}
+        <div className="mx-6 mt-5 pb-24">
+          {/* DETALHES */}
+          {activeTab === "detalhes" && (
+            <div className="grid gap-4 max-w-4xl">
+              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px_180px]">
+                <TextField
+                  label="Nome do plano *"
+                  value={nome}
+                  onChange={setNome}
+                  placeholder="Ex: Plano Mensal Premium"
+                  error={showError("nome")}
+                />
+                <CurrencyInput label="Valor" value={valor} onChange={setValor} />
+                <Dropdown
+                  label="Recorrência"
+                  value={recorrencia}
+                  setValue={setRecorrencia}
+                  options={recorrenciaOptions}
+                />
+              </div>
 
-                {/* Benefícios */}
-                <div className="grid gap-2">
-                  <label className="text-[13px] font-semibold text-foreground">
-                    Benefícios do plano
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      value={novoBeneficio}
-                      onChange={(e) => setNovoBeneficio(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          adicionarBeneficio();
-                        }
-                      }}
-                      placeholder="Ex: Traga um amigo no aniversário"
-                      className="h-10 flex-1 rounded-lg border border-border bg-card px-3 text-sm outline-none transition focus:border-foreground focus:ring-4 focus:ring-muted"
-                    />
-                    <button
-                      type="button"
-                      onClick={adicionarBeneficio}
-                      className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Adicionar
-                    </button>
-                  </div>
-                  {beneficios.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {beneficios.map((b, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background"
-                        >
-                          <Sparkles className="h-3 w-3" />
-                          {b}
-                          <button
-                            type="button"
-                            onClick={() => removerBeneficio(idx)}
-                            className="ml-0.5 rounded-full hover:bg-background/20"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </span>
-                      ))}
+              <div className="grid gap-4 md:grid-cols-2">
+                <Dropdown
+                  label="Forma de pagamento"
+                  value={formaPagamento}
+                  setValue={setFormaPagamento}
+                  options={formaPagamentoOptions}
+                />
+                <div className="flex items-end">
+                  <div className="flex w-full items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Disponível para venda</p>
+                      <p className="text-xs text-muted-foreground">Ative ou desative na vitrine</p>
                     </div>
-                  )}
+                    <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
+                  </div>
                 </div>
               </div>
-            </SectionBlock>
 
-            {/* SECTION 2 - Serviços */}
-            <SectionBlock
-              step={2}
-              title="Serviços inclusos"
-              description="Selecione os serviços que fazem parte do plano e configure desconto, limite de uso e comissionamento."
-              rightSlot={
-                <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground">
-                  {servicosInclusos.length} selecionado(s)
-                </span>
-              }
-            >
-              <div className="grid gap-3">
-                <div className="flex flex-wrap gap-2">
-                  <div className="relative flex-1 min-w-[200px]">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <input
-                      value={servicosBusca}
-                      onChange={(e) => setServicosBusca(e.target.value)}
-                      placeholder="Buscar serviço..."
-                      className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm outline-none transition focus:border-foreground focus:ring-4 focus:ring-muted"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={selecionarTodosServicos}
-                    className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
-                  >
-                    <Check className="h-4 w-4" />
-                    {servicosInclusos.length === servicosDisponiveis.length
-                      ? "Limpar todos"
-                      : "Selecionar todos"}
-                  </button>
-                </div>
-
-                <div className="max-h-[340px] overflow-y-auto rounded-lg border border-border">
-                  {servicosFiltrados.length === 0 ? (
-                    <div className="p-6 text-center text-sm text-muted-foreground">
-                      Nenhum serviço encontrado.
-                    </div>
-                  ) : (
-                    servicosFiltrados.map((s, idx) => {
-                      const incluso = getServicoIncluso(s.id);
-                      const isLast = idx === servicosFiltrados.length - 1;
-                      return (
-                        <div
-                          key={s.id}
-                          className={cn(
-                            "grid grid-cols-1 items-center gap-3 px-3 py-2.5 md:grid-cols-[minmax(0,1fr)_auto] transition",
-                            !isLast && "border-b border-border",
-                            incluso ? "bg-muted/40" : "bg-card"
-                          )}
-                        >
-                          <label className="flex cursor-pointer select-none items-center gap-3">
-                            <Checkbox
-                              checked={!!incluso}
-                              onCheckedChange={() => toggleServico(s.id)}
-                              className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
-                            />
-                            <span className="text-sm font-medium text-foreground">
-                              {s.nome}
-                            </span>
-                          </label>
-
-                          {incluso && (
-                            <div className="grid grid-cols-3 gap-2 md:w-[360px]">
-                              <div className="grid gap-0.5">
-                                <span className="text-[10px] font-semibold uppercase text-muted-foreground">
-                                  Desconto
-                                </span>
-                                <div className="flex h-9 items-center rounded-md border border-border bg-card text-sm">
-                                  <input
-                                    value={incluso.desconto}
-                                    onChange={(e) =>
-                                      updateServico(
-                                        s.id,
-                                        "desconto",
-                                        e.target.value.replace(/\D/g, "")
-                                      )
-                                    }
-                                    className="h-full w-full bg-transparent px-2 text-sm outline-none"
-                                  />
-                                  <span className="pr-2 text-xs text-muted-foreground">
-                                    %
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="grid gap-0.5">
-                                <span className="text-[10px] font-semibold uppercase text-muted-foreground">
-                                  Usos/mês
-                                </span>
-                                <select
-                                  value={incluso.usos}
-                                  onChange={(e) =>
-                                    updateServico(s.id, "usos", e.target.value)
-                                  }
-                                  className="h-9 rounded-md border border-border bg-card px-2 text-xs font-medium uppercase text-foreground outline-none"
-                                >
-                                  {usosOptions.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                      {o.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div className="grid gap-0.5">
-                                <span className="text-[10px] font-semibold uppercase text-muted-foreground">
-                                  Comissão
-                                </span>
-                                <select
-                                  value={incluso.comissao}
-                                  onChange={(e) =>
-                                    updateServico(s.id, "comissao", e.target.value)
-                                  }
-                                  className="h-9 rounded-md border border-border bg-card px-2 text-xs font-medium uppercase text-foreground outline-none"
-                                >
-                                  {comissaoOptions.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                      {o.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            </SectionBlock>
-
-            {/* SECTION 3 - Produtos */}
-            <SectionBlock
-              step={3}
-              title="Desconto em produtos"
-              description="Aplique um desconto nos produtos selecionados para assinantes deste plano."
-              rightSlot={
-                <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground">
-                  {produtosSelecionados.length} selecionado(s)
-                </span>
-              }
-            >
-              <div className="grid gap-3">
-                <div className="flex flex-wrap gap-2">
-                  <div className="relative flex-1 min-w-[200px]">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <input
-                      value={produtosBusca}
-                      onChange={(e) => setProdutosBusca(e.target.value)}
-                      placeholder="Buscar produto..."
-                      className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm outline-none transition focus:border-foreground focus:ring-4 focus:ring-muted"
-                    />
-                  </div>
-                  <div className="flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-3">
-                    <Tag className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-xs font-semibold text-muted-foreground">
-                      DESCONTO
-                    </span>
-                    <input
-                      value={descontoProdutos}
-                      onChange={(e) =>
-                        setDescontoProdutos(e.target.value.replace(/\D/g, ""))
-                      }
-                      className="h-full w-12 bg-transparent text-sm font-semibold text-foreground outline-none"
-                    />
-                    <span className="text-xs text-muted-foreground">%</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (produtosSelecionados.length === produtosDisponiveis.length) {
-                        setProdutosSelecionados([]);
-                      } else {
-                        setProdutosSelecionados(produtosDisponiveis.map((p) => p.id));
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-foreground">Benefícios do plano</label>
+                <div className="flex gap-2">
+                  <input
+                    value={novoBeneficio}
+                    onChange={(e) => setNovoBeneficio(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        adicionarBeneficio();
                       }
                     }}
+                    placeholder="Ex: Traga um amigo no aniversário"
+                    className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <button
+                    type="button"
+                    onClick={adicionarBeneficio}
                     className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
                   >
-                    <Check className="h-4 w-4" />
-                    {produtosSelecionados.length === produtosDisponiveis.length
-                      ? "Limpar"
-                      : "Todos"}
+                    <Plus className="h-4 w-4" />
+                    Adicionar
                   </button>
                 </div>
+                {beneficios.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {beneficios.map((b, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        {b}
+                        <button
+                          type="button"
+                          onClick={() => removerBeneficio(idx)}
+                          className="ml-0.5 rounded-full hover:bg-background/20"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
-                <div className="max-h-[260px] overflow-y-auto rounded-lg border border-border">
-                  {produtosFiltrados.map((p, idx) => {
-                    const isLast = idx === produtosFiltrados.length - 1;
-                    const sel = produtosSelecionados.includes(p.id);
+          {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
+          {activeTab === "servicos" && (
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
+              {/* Form esquerda */}
+              <div className="space-y-4 self-start">
+                <Dropdown
+                  label="Serviço"
+                  value={servicoSelecionado}
+                  setValue={setServicoSelecionado}
+                  options={servicosDisponiveisFiltrados.map((s) => ({
+                    value: String(s.id),
+                    label: s.nome,
+                  }))}
+                />
+
+                <div className="grid gap-1.5">
+                  <label className="text-sm font-medium text-foreground">Desconto (%)</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={descontoServico}
+                    onChange={(e) => setDescontoServico(e.target.value.replace(/\D/g, ""))}
+                    placeholder="100"
+                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+
+                <Dropdown
+                  label="Usos / mês"
+                  value={usosServico}
+                  setValue={setUsosServico}
+                  options={usosOptions}
+                />
+
+                <Dropdown
+                  label="Comissionamento"
+                  value={comissaoServico}
+                  setValue={setComissaoServico}
+                  options={comissaoOptions}
+                />
+
+                <div className="flex items-end gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={adicionarServico}
+                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                  >
+                    Adicionar serviço
+                  </button>
+                </div>
+              </div>
+
+              {/* Tabela direita */}
+              <div className="space-y-4 self-start">
+                <div className="overflow-hidden rounded-lg border border-border bg-card">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-muted/40">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Serviço</th>
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
+                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Usos</th>
+                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Comissão</th>
+                        <th className="w-14 px-2 py-3" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {servicosInclusos.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                            Adicione um serviço para incluir no plano.
+                          </td>
+                        </tr>
+                      ) : (
+                        servicosInclusos.map((s) => (
+                          <tr key={s.id} className="border-t border-border bg-card">
+                            <td className="px-4 py-3 text-sm text-foreground">{nomeServico(s.id)}</td>
+                            <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{s.desconto}%</td>
+                            <td className="px-4 py-3 text-center text-sm text-foreground">{labelUsos(s.usos)}</td>
+                            <td className="px-4 py-3 text-center text-sm text-foreground">{labelComissao(s.comissao)}</td>
+                            <td className="px-2 py-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => removerServico(s.id)}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PRODUTOS - 2 colunas estilo NovaCompra */}
+          {activeTab === "produtos" && (
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
+              <div className="space-y-4 self-start">
+                <Dropdown
+                  label="Produto"
+                  value={produtoSelecionado}
+                  setValue={setProdutoSelecionado}
+                  options={produtosDisponiveisFiltrados.map((p) => ({
+                    value: String(p.id),
+                    label: p.nome,
+                  }))}
+                />
+
+                <div className="grid gap-1.5">
+                  <label className="text-sm font-medium text-foreground">Desconto (%)</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={descontoProdutoForm}
+                    onChange={(e) => setDescontoProdutoForm(e.target.value.replace(/\D/g, ""))}
+                    placeholder="10"
+                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+
+                <div className="flex items-end gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={adicionarProduto}
+                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                  >
+                    Adicionar produto
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-4 self-start">
+                <div className="overflow-hidden rounded-lg border border-border bg-card">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-muted/40">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
+                        <th className="w-14 px-2 py-3" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {produtosSelecionados.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                            Adicione um produto para aplicar desconto.
+                          </td>
+                        </tr>
+                      ) : (
+                        produtosSelecionados.map((p) => (
+                          <tr key={p.id} className="border-t border-border bg-card">
+                            <td className="px-4 py-3 text-sm text-foreground">{nomeProduto(p.id)}</td>
+                            <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{p.desconto}%</td>
+                            <td className="px-2 py-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => removerProduto(p.id)}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* DISPONIBILIDADE */}
+          {activeTab === "disponibilidade" && (
+            <div className="grid gap-6 max-w-4xl">
+              <div className="grid gap-2">
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    Dias em que o plano é aceito
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {diasSemana.map((d) => {
+                    const ativo = diasAceitos.includes(d.key);
                     return (
-                      <label
-                        key={p.id}
+                      <button
+                        key={d.key}
+                        type="button"
+                        onClick={() => toggleDia(d.key)}
                         className={cn(
-                          "flex cursor-pointer select-none items-center gap-3 px-3 py-2.5 transition",
-                          !isLast && "border-b border-border",
-                          sel ? "bg-muted/40" : "bg-card hover:bg-muted/20"
+                          "inline-flex h-9 min-w-[64px] items-center justify-center rounded-lg border px-4 text-sm font-semibold transition",
+                          ativo
+                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                            : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                         )}
                       >
-                        <Checkbox
-                          checked={sel}
-                          onCheckedChange={() => toggleProduto(p.id)}
-                          className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
-                        />
-                        <span className="text-sm font-medium text-foreground">
-                          {p.nome}
+                        {d.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Clique para alternar. Verde = aceito.
+                </p>
+              </div>
+
+              <div className="grid gap-2">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    Profissionais que atendem
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {profissionaisDisponiveis.map((p) => {
+                    const ativo = profissionaisAtendem.includes(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => toggleProfissional(p.id)}
+                        className={cn(
+                          "inline-flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 text-sm font-medium transition",
+                          ativo
+                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                            : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold",
+                            ativo
+                              ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                              : "bg-muted text-muted-foreground",
+                          )}
+                        >
+                          {p.iniciais}
                         </span>
-                      </label>
+                        {p.nome}
+                      </button>
                     );
                   })}
                 </div>
               </div>
-            </SectionBlock>
-
-            {/* SECTION 4 - Disponibilidade */}
-            <SectionBlock
-              step={4}
-              title="Disponibilidade"
-              description="Defina quando o plano pode ser utilizado e quais profissionais atendem."
-            >
-              <div className="grid gap-5">
-                {/* Dias */}
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-[13px] font-semibold text-foreground">
-                      Dias em que o plano é aceito
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {diasSemana.map((d) => {
-                      const ativo = diasAceitos.includes(d.key);
-                      return (
-                        <button
-                          key={d.key}
-                          type="button"
-                          onClick={() => toggleDia(d.key)}
-                          className={cn(
-                            "inline-flex h-9 min-w-[64px] items-center justify-center rounded-lg border px-4 text-sm font-semibold transition",
-                            ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                              : "border-rose-500/30 bg-rose-500/5 text-rose-600 dark:text-rose-400 hover:border-rose-500/50"
-                          )}
-                        >
-                          {d.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    Verde = aceito · Vermelho = não aceito · Clique para alternar
-                  </p>
-                </div>
-
-                {/* Profissionais */}
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-[13px] font-semibold text-foreground">
-                      Profissionais que atendem
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {profissionaisDisponiveis.map((p) => {
-                      const ativo = profissionaisAtendem.includes(p.id);
-                      return (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => toggleProfissional(p.id)}
-                          className={cn(
-                            "inline-flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 text-sm font-medium transition",
-                            ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                              : "border-rose-500/30 bg-rose-500/5 text-rose-600 dark:text-rose-400 hover:border-rose-500/50"
-                          )}
-                        >
-                          <span
-                            className={cn(
-                              "flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold",
-                              ativo
-                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-                                : "bg-rose-500/15 text-rose-600 dark:text-rose-400"
-                            )}
-                          >
-                            {p.iniciais}
-                          </span>
-                          {p.nome}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </SectionBlock>
-          </div>
-
-          {/* SIDEBAR - Resumo sticky */}
-          <aside className="self-start lg:sticky lg:top-4">
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-3 flex items-center gap-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold text-foreground">
-                  Resumo do plano
-                </h3>
-              </div>
-
-              <div className="mb-4 rounded-lg bg-muted/40 p-3">
-                <p className="text-xs text-muted-foreground">
-                  {nome || "Novo plano"}
-                </p>
-                <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-xs text-foreground">R$</span>
-                  <span className="text-2xl font-bold text-foreground">
-                    {valor || "0,00"}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    /
-                    {recorrenciaOptions
-                      .find((r) => r.value === recorrencia)
-                      ?.label.toLowerCase()}
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid gap-2.5 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Serviços</span>
-                  <span className="font-semibold text-foreground">
-                    {servicosInclusos.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Produtos com desconto</span>
-                  <span className="font-semibold text-foreground">
-                    {produtosSelecionados.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Benefícios</span>
-                  <span className="font-semibold text-foreground">
-                    {beneficios.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Dias disponíveis</span>
-                  <span className="font-semibold text-foreground">
-                    {diasAceitos.length}/7
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Profissionais</span>
-                  <span className="font-semibold text-foreground">
-                    {profissionaisAtendem.length}/
-                    {profissionaisDisponiveis.length}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-4 border-t border-border pt-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-foreground">
-                    Status na vitrine
-                  </span>
-                  <span
-                    className={cn(
-                      "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase",
-                      disponivelVenda
-                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    {disponivelVenda ? "Ativo" : "Oculto"}
-                  </span>
-                </div>
-              </div>
             </div>
-          </aside>
+          )}
         </div>
 
-        {/* Footer fixo */}
-        <div className="flex items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={handleCancelar}
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={handleSalvar}
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
-          >
-            Salvar plano
-          </button>
+        {/* FOOTER único - sempre visível */}
+        <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
+          <div className="flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={handleSalvar}
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+            >
+              {editing ? "Salvar alterações" : "Criar plano"}
+            </button>
+          </div>
         </div>
       </div>
     </AppLayout>
