@@ -749,13 +749,13 @@ export default function AssinaturaCadastro() {
               title="Disponibilidade"
               description="Dias e profissionais que aceitam o plano."
             >
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="grid gap-2">
+              <div className="grid gap-6">
+                <div className="grid gap-3">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-foreground">Dias aceitos</span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-7 gap-2">
                     {diasSemana.map((d) => {
                       const ativo = diasAceitos.includes(d.key);
                       return (
@@ -764,7 +764,7 @@ export default function AssinaturaCadastro() {
                           type="button"
                           onClick={() => toggleDia(d.key)}
                           className={cn(
-                            "inline-flex h-8 min-w-[44px] items-center justify-center rounded-md border px-2.5 text-xs font-semibold transition",
+                            "inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition",
                             ativo
                               ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
@@ -777,7 +777,7 @@ export default function AssinaturaCadastro() {
                   </div>
                 </div>
 
-                <div className="grid gap-2">
+                <div className="grid gap-3">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-foreground">Profissionais que atendem</span>
