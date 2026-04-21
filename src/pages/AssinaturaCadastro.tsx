@@ -393,10 +393,10 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 flex flex-col gap-8 pb-24">
+        <div className="mx-6 mt-5 flex max-w-6xl flex-col gap-5 pb-24">
           {/* DETALHES */}
           <section>
-            <div className="grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
               {/* Coluna principal */}
               <div className="grid gap-5">
                 <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
