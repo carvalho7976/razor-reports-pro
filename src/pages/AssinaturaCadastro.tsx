@@ -640,14 +640,12 @@ export default function AssinaturaCadastro() {
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
               {/* Form esquerda */}
               <div className="space-y-4 self-start">
-                <Dropdown
-                  label="Serviço"
-                  value={servicoSelecionado}
-                  setValue={setServicoSelecionado}
-                  options={servicosDisponiveisFiltrados.map((s) => ({
-                    value: String(s.id),
-                    label: s.nome,
-                  }))}
+                <MultiSelectSearch
+                  label="Serviços"
+                  placeholder="Buscar e selecionar..."
+                  options={servicosDisponiveisFiltrados}
+                  selected={servicosPendentes}
+                  onChange={setServicosPendentes}
                 />
 
                 <div className="grid gap-1.5">
@@ -680,9 +678,10 @@ export default function AssinaturaCadastro() {
                   <button
                     type="button"
                     onClick={adicionarServico}
-                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                    disabled={servicosPendentes.length === 0}
+                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    Adicionar serviço
+                    Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
                   </button>
                 </div>
               </div>
