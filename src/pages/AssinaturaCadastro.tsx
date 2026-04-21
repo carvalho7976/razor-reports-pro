@@ -395,7 +395,7 @@ export default function AssinaturaCadastro() {
                 {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Configure os dados, serviços, produtos e disponibilidade do plano.
+                Configure os dados, serviços e produtos do plano.
               </p>
             </div>
           </div>
