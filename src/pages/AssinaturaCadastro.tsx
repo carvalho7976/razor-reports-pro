@@ -122,6 +122,123 @@ function CurrencyInput({
   );
 }
 
+function SectionBlock({
+  title,
+  description,
+  children,
+  className = "",
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("rounded-xl border border-border bg-card p-4", className)}>
+      <div className="mb-3">
+        <h2 className="text-base font-semibold text-foreground">{title}</h2>
+        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function MultiSelectSearch({
+  label,
+  placeholder,
+  options,
+  selected,
+  onChange,
+}: {
+  label: string;
+  placeholder?: string;
+  options: { id: number; nome: string }[];
+  selected: number[];
+  onChange: (ids: number[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [busca, setBusca] = useState("");
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filtered = options.filter((o) => o.nome.toLowerCase().includes(busca.toLowerCase()));
+  const toggle = (id: number) =>
+    onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
+  const allSelected = filtered.length > 0 && filtered.every((o) => selected.includes(o.id));
+  const toggleAll = () => {
+    if (allSelected) onChange(selected.filter((id) => !filtered.some((o) => o.id === id)));
+    else onChange(Array.from(new Set([...selected, ...filtered.map((o) => o.id)])));
+  };
+
+  return (
+    <div className="relative" ref={ref}>
+      <label className="mb-1 block text-sm font-medium text-foreground">{label}</label>
+      <button
+        type="button"
+        onClick={() => setOpen((p) => !p)}
+        className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-background px-3 text-sm text-foreground transition-all hover:border-muted-foreground"
+      >
+        <span className={cn("truncate", selected.length === 0 && "text-muted-foreground")}>
+          {selected.length === 0
+            ? placeholder || "Selecione..."
+            : `${selected.length} selecionado(s)`}
+        </span>
+        <Search className="h-4 w-4 text-muted-foreground" />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+          <div className="border-b border-border p-2">
+            <input
+              placeholder="Buscar..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
+              autoFocus
+            />
+          </div>
+          <div className="max-h-60 overflow-auto">
+            {filtered.length > 0 && (
+              <button
+                type="button"
+                onClick={toggleAll}
+                className="flex w-full items-center gap-3 border-b border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted"
+              >
+                {allSelected ? "Desmarcar todos" : "Selecionar todos"}
+              </button>
+            )}
+            {filtered.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                onClick={() => toggle(o.id)}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
+              >
+                <Checkbox
+                  checked={selected.includes(o.id)}
+                  className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
+                />
+                <span className="text-foreground">{o.nome}</span>
+              </button>
+            ))}
+            {filtered.length === 0 && (
+              <p className="px-4 py-3 text-center text-sm text-muted-foreground">Nenhum item encontrado</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AssinaturaCadastro() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
