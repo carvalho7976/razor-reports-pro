@@ -509,7 +509,7 @@ export default function AssinaturaCadastro() {
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
           {/* DETALHES */}
-          <section id="detalhes" className="scroll-mt-20 grid gap-5">
+          <section id="detalhes" className={cn("scroll-mt-20 grid gap-5", currentStep !== 0 && "hidden")}>
             <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
