@@ -7,6 +7,7 @@ import { Plus, CalendarDays, Users, Trash2, ArrowUp, ArrowDown, Search } from "l
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface ServicoOpt { id: number; nome: string; }
 interface ProdutoOpt { id: number; nome: string; }
@@ -282,6 +283,7 @@ export default function AssinaturaCadastro() {
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
   const [showErrors, setShowErrors] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<"sidebar" | "tabs">("sidebar");
   const errors = {
     nome: !nome.trim() ? "Informe o nome do plano" : "",
   };
@@ -389,10 +391,40 @@ export default function AssinaturaCadastro() {
                 Configure os dados, serviços e produtos do plano.
               </p>
             </div>
+            <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2">
+              <span className="text-xs font-medium text-muted-foreground">Layout:</span>
+              <div className="flex items-center gap-1.5 rounded-md bg-muted p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode("sidebar")}
+                  className={cn(
+                    "rounded px-2.5 py-1 text-xs font-semibold transition",
+                    layoutMode === "sidebar"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  Sidebar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode("tabs")}
+                  className={cn(
+                    "rounded px-2.5 py-1 text-xs font-semibold transition",
+                    layoutMode === "tabs"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  Abas
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* CONTENT - 2 colunas: principal + sidebar */}
+        {layoutMode === "sidebar" ? (
         <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
@@ -881,6 +913,260 @@ export default function AssinaturaCadastro() {
             </div>
           </aside>
         </div>
+        ) : (
+        <div className="mx-6 mt-5 pb-24">
+          <Tabs defaultValue="detalhes" className="w-full">
+            <TabsList className="h-auto w-full justify-start gap-1 rounded-lg border border-border bg-card p-1">
+              <TabsTrigger value="detalhes" className="data-[state=active]:bg-muted">
+                Dados do plano
+              </TabsTrigger>
+              <TabsTrigger value="servicos" className="data-[state=active]:bg-muted">
+                Serviços ({servicosInclusos.length})
+              </TabsTrigger>
+              <TabsTrigger value="produtos" className="data-[state=active]:bg-muted">
+                Produtos ({produtosSelecionados.length})
+              </TabsTrigger>
+              <TabsTrigger value="beneficios" className="data-[state=active]:bg-muted">
+                Benefícios ({beneficios.length})
+              </TabsTrigger>
+              <TabsTrigger value="disponibilidade" className="data-[state=active]:bg-muted">
+                Disponibilidade
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="detalhes" className="mt-5">
+              <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
+                <div className="grid gap-4">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
+                    <TextField
+                      label="Nome do plano *"
+                      value={nome}
+                      onChange={setNome}
+                      placeholder="Ex: Plano Mensal Premium"
+                      error={showError("nome")}
+                    />
+                    <CurrencyInput label="Valor" value={valor} onChange={setValor} />
+                    <Dropdown label="Recorrência" value={recorrencia} setValue={setRecorrencia} options={recorrenciaOptions} />
+                    <Dropdown label="Forma de pagamento" value={formaPagamento} setValue={setFormaPagamento} options={formaPagamentoOptions} />
+                  </div>
+                  <div className="mt-1 flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
+                      <p className="text-xs text-muted-foreground">
+                        Quando ativo, o plano fica disponível para venda aos clientes.
+                      </p>
+                    </div>
+                    <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
+                  </div>
+                </div>
+              </SectionBlock>
+            </TabsContent>
+
+            <TabsContent value="servicos" className="mt-5">
+              <SectionBlock title="Serviços" description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão.">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+                  <div className="space-y-4 self-start">
+                    <MultiSelectSearch label="Serviços" placeholder="Buscar e selecionar..." options={servicosDisponiveisFiltrados} selected={servicosPendentes} onChange={setServicosPendentes} />
+                    <div className="grid gap-1.5">
+                      <label className="text-sm font-medium text-foreground">Desconto (%)</label>
+                      <input type="text" inputMode="numeric" value={descontoServico} onChange={(e) => setDescontoServico(e.target.value.replace(/\D/g, ""))} placeholder="100" className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                    <Dropdown label="Usos / mês" value={usosServico} setValue={setUsosServico} options={usosOptions} />
+                    <Dropdown label="Comissionamento" value={comissaoServico} setValue={setComissaoServico} options={comissaoOptions} />
+                    <div className="flex items-end gap-3 pt-1">
+                      <button type="button" onClick={adicionarServico} disabled={servicosPendentes.length === 0} className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40">
+                        Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-4 self-start">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-muted/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Serviço</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Usos</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Comissão</th>
+                            <th className="w-14 px-2 py-3" />
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {servicosInclusos.length === 0 ? (
+                            <tr><td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">Adicione um serviço para incluir no plano.</td></tr>
+                          ) : (
+                            servicosInclusos.map((s) => (
+                              <tr key={s.id} className="border-t border-border bg-card">
+                                <td className="px-4 py-3 text-sm text-foreground">{nomeServico(s.id)}</td>
+                                <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{s.desconto}%</td>
+                                <td className="px-4 py-3 text-center text-sm text-foreground">{labelUsos(s.usos)}</td>
+                                <td className="px-4 py-3 text-center text-sm text-foreground">{labelComissao(s.comissao)}</td>
+                                <td className="px-2 py-3 text-center">
+                                  <button type="button" onClick={() => removerServico(s.id)} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10">
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </SectionBlock>
+            </TabsContent>
+
+            <TabsContent value="produtos" className="mt-5">
+              <SectionBlock title="Produtos" description="Selecione os produtos inclusos no plano com quantidade e desconto.">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+                  <div className="space-y-4 self-start">
+                    <MultiSelectSearch label="Produtos" placeholder="Buscar e selecionar..." options={produtosDisponiveisFiltrados} selected={produtosPendentes} onChange={setProdutosPendentes} />
+                    <div className="grid gap-1.5">
+                      <label className="text-sm font-medium text-foreground">Quantidade</label>
+                      <input type="text" inputMode="numeric" value={quantidadeProdutoForm} onChange={(e) => setQuantidadeProdutoForm(e.target.value.replace(/\D/g, ""))} placeholder="1" className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <label className="text-sm font-medium text-foreground">Desconto (%)</label>
+                      <input type="text" inputMode="numeric" value={descontoProdutoForm} onChange={(e) => setDescontoProdutoForm(e.target.value.replace(/\D/g, ""))} placeholder="10" className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                    <div className="flex items-end gap-3 pt-1">
+                      <button type="button" onClick={adicionarProduto} disabled={produtosPendentes.length === 0} className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40">
+                        Adicionar{produtosPendentes.length > 0 ? ` (${produtosPendentes.length})` : ""}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-4 self-start">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-muted/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
+                            <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
+                            <th className="w-14 px-2 py-3" />
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {produtosSelecionados.length === 0 ? (
+                            <tr><td colSpan={4} className="px-4 py-16 text-center text-sm text-muted-foreground">Adicione um produto para aplicar desconto.</td></tr>
+                          ) : (
+                            produtosSelecionados.map((p) => (
+                              <tr key={p.id} className="border-t border-border bg-card">
+                                <td className="px-4 py-3 text-sm text-foreground">{nomeProduto(p.id)}</td>
+                                <td className="px-4 py-3 text-center text-sm text-foreground">{p.quantidade}</td>
+                                <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{p.desconto}%</td>
+                                <td className="px-2 py-3 text-center">
+                                  <button type="button" onClick={() => removerProduto(p.id)} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10">
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </SectionBlock>
+            </TabsContent>
+
+            <TabsContent value="beneficios" className="mt-5">
+              <SectionBlock title="Benefícios" description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação.">
+                <div className="flex gap-2">
+                  <input value={novoBeneficio} onChange={(e) => setNovoBeneficio(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); adicionarBeneficio(); } }} placeholder="Ex: Traga um amigo no aniversário" className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                  <button type="button" onClick={adicionarBeneficio} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted">
+                    <Plus className="h-4 w-4" />
+                    Adicionar
+                  </button>
+                </div>
+                <div className="mt-3 overflow-hidden rounded-lg border border-border bg-card">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-muted/40">
+                      <tr>
+                        <th className="w-14 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">#</th>
+                        <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Benefício</th>
+                        <th className="w-32 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ordem</th>
+                        <th className="w-14 px-2 py-2.5" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {beneficios.length === 0 ? (
+                        <tr><td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">Nenhum benefício adicionado.</td></tr>
+                      ) : (
+                        beneficios.map((b, idx) => (
+                          <tr key={`${b}-${idx}`} className="border-t border-border">
+                            <td className="px-3 py-2.5 text-center text-sm font-medium text-muted-foreground">{idx + 1}</td>
+                            <td className="px-3 py-2.5 text-sm text-foreground">{b}</td>
+                            <td className="px-3 py-2.5">
+                              <div className="flex items-center justify-center gap-1">
+                                <button type="button" onClick={() => moverBeneficio(idx, -1)} disabled={idx === 0} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30">
+                                  <ArrowUp className="h-4 w-4" />
+                                </button>
+                                <button type="button" onClick={() => moverBeneficio(idx, 1)} disabled={idx === beneficios.length - 1} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30">
+                                  <ArrowDown className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-2 py-2.5 text-center">
+                              <button type="button" onClick={() => removerBeneficio(idx)} className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10">
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </SectionBlock>
+            </TabsContent>
+
+            <TabsContent value="disponibilidade" className="mt-5">
+              <SectionBlock title="Disponibilidade" description="Dias e profissionais que aceitam o plano.">
+                <div className="grid gap-6">
+                  <div className="grid gap-3">
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">Dias aceitos</span>
+                    </div>
+                    <div className="grid grid-cols-7 gap-2">
+                      {diasSemana.map((d) => {
+                        const ativo = diasAceitos.includes(d.key);
+                        return (
+                          <button key={d.key} type="button" onClick={() => toggleDia(d.key)} className={cn("inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition", ativo ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "border-border bg-card text-muted-foreground hover:border-foreground/40")}>
+                            {d.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="grid gap-3">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">Profissionais que atendem</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {profissionaisDisponiveis.map((p) => {
+                        const ativo = profissionaisAtendem.includes(p.id);
+                        return (
+                          <button key={p.id} type="button" onClick={() => toggleProfissional(p.id)} className={cn("inline-flex h-8 items-center gap-1.5 rounded-full border pl-1 pr-2.5 text-xs font-medium transition", ativo ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "border-border bg-card text-muted-foreground hover:border-foreground/40")}>
+                            <span className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold", ativo ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300" : "bg-muted text-muted-foreground")}>
+                              {p.iniciais}
+                            </span>
+                            {p.nome}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </SectionBlock>
+            </TabsContent>
+          </Tabs>
+        </div>
+        )}
 
         {/* FOOTER único - sempre visível */}
         <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
