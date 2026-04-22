@@ -282,6 +282,13 @@ export default function AssinaturaCadastro() {
   ]);
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
+  // Regras - bloqueio por atraso
+  const [bloqueioAtraso, setBloqueioAtraso] = useState(true);
+  const [diasAtraso, setDiasAtraso] = useState("5");
+
+  // Aba ativa
+  const [tab, setTab] = useState("dados");
+
   const [showErrors, setShowErrors] = useState(false);
   const errors = {
     nome: !nome.trim() ? "Informe o nome do plano" : "",
