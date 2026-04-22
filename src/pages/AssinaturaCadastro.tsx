@@ -404,8 +404,24 @@ export default function AssinaturaCadastro() {
         <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
-          {/* DETALHES */}
-          <section id="detalhes" className="scroll-mt-20 grid gap-5">
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
+            <TabsList className="grid h-11 w-full grid-cols-3 bg-muted/50 p-1">
+              <TabsTrigger value="dados" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Dados do plano
+              </TabsTrigger>
+              <TabsTrigger value="itens" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Itens
+                <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+                  {servicosInclusos.length + produtosSelecionados.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="regras" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Regras
+              </TabsTrigger>
+            </TabsList>
+
+            {/* ============ ABA: DADOS DO PLANO ============ */}
+            <TabsContent value="dados" className="mt-5 flex flex-col gap-5">
             <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
@@ -441,10 +457,10 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </SectionBlock>
-          </section>
+            </TabsContent>
 
-          {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
-          <section id="servicos" className="scroll-mt-20">
+            {/* ============ ABA: ITENS (Serviços + Produtos) ============ */}
+            <TabsContent value="itens" className="mt-5 flex flex-col gap-5">
             <SectionBlock
               title="Serviços"
               description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão."
