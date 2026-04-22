@@ -818,7 +818,44 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </SectionBlock>
-          </section>
+
+            {/* BLOQUEIO POR ATRASO */}
+            <SectionBlock
+              title="Bloqueio por atraso"
+              description="Suspenda automaticamente o uso do plano em caso de pagamento em atraso."
+            >
+              <div className="grid gap-4">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Bloquear assinatura em atraso</p>
+                    <p className="text-xs text-muted-foreground">
+                      Ao ativar, o cliente será impedido de utilizar os benefícios do plano após o período definido.
+                    </p>
+                  </div>
+                  <Switch checked={bloqueioAtraso} onCheckedChange={setBloqueioAtraso} />
+                </div>
+                {bloqueioAtraso && (
+                  <div className="grid gap-1.5 sm:max-w-xs">
+                    <label className="text-sm font-medium text-foreground">Dias de tolerância</label>
+                    <div className="flex h-10 items-center rounded-lg border border-border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/20">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={diasAtraso}
+                        onChange={(e) => setDiasAtraso(e.target.value.replace(/\D/g, ""))}
+                        className="h-full flex-1 bg-transparent px-3 text-sm outline-none"
+                      />
+                      <span className="pr-3 text-muted-foreground">dias</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Após {diasAtraso || "0"} dia(s) de atraso, a assinatura será bloqueada automaticamente.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </SectionBlock>
+            </TabsContent>
+          </Tabs>
           </div>
 
           {/* SIDEBAR DIREITA */}
