@@ -7,6 +7,7 @@ import { Plus, CalendarDays, Users, Trash2, ArrowUp, ArrowDown, Search } from "l
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface ServicoOpt { id: number; nome: string; }
 interface ProdutoOpt { id: number; nome: string; }
@@ -281,6 +282,13 @@ export default function AssinaturaCadastro() {
   ]);
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
+  // Regras - bloqueio por atraso
+  const [bloqueioAtraso, setBloqueioAtraso] = useState(true);
+  const [diasAtraso, setDiasAtraso] = useState("5");
+
+  // Aba ativa
+  const [tab, setTab] = useState("dados");
+
   const [showErrors, setShowErrors] = useState(false);
   const errors = {
     nome: !nome.trim() ? "Informe o nome do plano" : "",
@@ -396,8 +404,24 @@ export default function AssinaturaCadastro() {
         <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
-          {/* DETALHES */}
-          <section id="detalhes" className="scroll-mt-20 grid gap-5">
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
+            <TabsList className="grid h-11 w-full grid-cols-3 bg-muted/50 p-1">
+              <TabsTrigger value="dados" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Dados do plano
+              </TabsTrigger>
+              <TabsTrigger value="itens" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Itens
+                <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+                  {servicosInclusos.length + produtosSelecionados.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="regras" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Regras
+              </TabsTrigger>
+            </TabsList>
+
+            {/* ============ ABA: DADOS DO PLANO ============ */}
+            <TabsContent value="dados" className="mt-5 flex flex-col gap-5">
             <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
@@ -433,10 +457,10 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </SectionBlock>
-          </section>
+            </TabsContent>
 
-          {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
-          <section id="servicos" className="scroll-mt-20">
+            {/* ============ ABA: ITENS (Serviços + Produtos) ============ */}
+            <TabsContent value="itens" className="mt-5 flex flex-col gap-5">
             <SectionBlock
               title="Serviços"
               description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão."
@@ -535,10 +559,8 @@ export default function AssinaturaCadastro() {
               </div>
             </div>
             </SectionBlock>
-          </section>
 
           {/* PRODUTOS - 2 colunas estilo NovaCompra */}
-          <section id="produtos" className="scroll-mt-20">
             <SectionBlock
               title="Produtos"
               description="Selecione os produtos inclusos no plano com quantidade e desconto."
@@ -631,10 +653,11 @@ export default function AssinaturaCadastro() {
               </div>
             </div>
             </SectionBlock>
-          </section>
+            </TabsContent>
 
-          {/* BENEFÍCIOS */}
-          <section id="beneficios" className="scroll-mt-20">
+            {/* ============ ABA: REGRAS (Benefícios + Disponibilidade + Bloqueio) ============ */}
+            <TabsContent value="regras" className="mt-5 flex flex-col gap-5">
+            {/* BENEFÍCIOS */}
             <SectionBlock
               title="Benefícios"
               description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
@@ -723,10 +746,8 @@ export default function AssinaturaCadastro() {
                 </table>
               </div>
             </SectionBlock>
-          </section>
 
-          {/* DISPONIBILIDADE */}
-          <section id="disponibilidade" className="scroll-mt-20">
+            {/* DISPONIBILIDADE */}
             <SectionBlock
               title="Disponibilidade"
               description="Dias e profissionais que aceitam o plano."
@@ -797,7 +818,44 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </SectionBlock>
-          </section>
+
+            {/* BLOQUEIO POR ATRASO */}
+            <SectionBlock
+              title="Bloqueio por atraso"
+              description="Suspenda automaticamente o uso do plano em caso de pagamento em atraso."
+            >
+              <div className="grid gap-4">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Bloquear assinatura em atraso</p>
+                    <p className="text-xs text-muted-foreground">
+                      Ao ativar, o cliente será impedido de utilizar os benefícios do plano após o período definido.
+                    </p>
+                  </div>
+                  <Switch checked={bloqueioAtraso} onCheckedChange={setBloqueioAtraso} />
+                </div>
+                {bloqueioAtraso && (
+                  <div className="grid gap-1.5 sm:max-w-xs">
+                    <label className="text-sm font-medium text-foreground">Dias de tolerância</label>
+                    <div className="flex h-10 items-center rounded-lg border border-border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/20">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={diasAtraso}
+                        onChange={(e) => setDiasAtraso(e.target.value.replace(/\D/g, ""))}
+                        className="h-full flex-1 bg-transparent px-3 text-sm outline-none"
+                      />
+                      <span className="pr-3 text-muted-foreground">dias</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Após {diasAtraso || "0"} dia(s) de atraso, a assinatura será bloqueada automaticamente.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </SectionBlock>
+            </TabsContent>
+          </Tabs>
           </div>
 
           {/* SIDEBAR DIREITA */}
@@ -863,19 +921,24 @@ export default function AssinaturaCadastro() {
               <h3 className="text-sm font-semibold text-foreground">Seções</h3>
               <nav className="mt-3 flex flex-col gap-1">
                 {[
-                  { id: "detalhes", label: "Dados do plano" },
-                  { id: "servicos", label: `Serviços (${servicosInclusos.length})` },
-                  { id: "produtos", label: `Produtos (${produtosSelecionados.length})` },
-                  { id: "beneficios", label: `Benefícios (${beneficios.length})` },
-                  { id: "disponibilidade", label: `Disponibilidade (${diasAceitos.length}d / ${profissionaisAtendem.length}p)` },
+                  { id: "dados", label: "Dados do plano", hint: "" },
+                  { id: "itens", label: "Itens", hint: `${servicosInclusos.length} serv. · ${produtosSelecionados.length} prod.` },
+                  { id: "regras", label: "Regras", hint: `${beneficios.length} benef. · ${diasAceitos.length}d` },
                 ].map((s) => (
-                  <a
+                  <button
                     key={s.id}
-                    href={`#${s.id}`}
-                    className="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    type="button"
+                    onClick={() => setTab(s.id)}
+                    className={cn(
+                      "flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-sm transition",
+                      tab === s.id
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
                   >
-                    {s.label}
-                  </a>
+                    <span>{s.label}</span>
+                    {s.hint && <span className="text-[11px] text-muted-foreground">{s.hint}</span>}
+                  </button>
                 ))}
               </nav>
             </div>
