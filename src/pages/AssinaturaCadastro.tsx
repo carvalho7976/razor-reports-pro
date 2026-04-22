@@ -746,10 +746,8 @@ export default function AssinaturaCadastro() {
                 </table>
               </div>
             </SectionBlock>
-          </section>
 
-          {/* DISPONIBILIDADE */}
-          <section id="disponibilidade" className="scroll-mt-20">
+            {/* DISPONIBILIDADE */}
             <SectionBlock
               title="Disponibilidade"
               description="Dias e profissionais que aceitam o plano."
