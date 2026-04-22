@@ -3,22 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Plus,
-  CalendarDays,
-  Users,
-  Trash2,
-  ArrowUp,
-  ArrowDown,
-  Search,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  Scissors,
-  Package,
-  Gift,
-} from "lucide-react";
+import { Plus, CalendarDays, Users, Trash2, ArrowUp, ArrowDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -302,47 +287,6 @@ export default function AssinaturaCadastro() {
   };
   const showError = (k: keyof typeof errors) => (showErrors ? errors[k] : "");
 
-  // Wizard
-  const steps = [
-    { id: "detalhes", label: "Dados do plano", icon: FileText, description: "Identificação e cobrança" },
-    { id: "servicos", label: "Serviços", icon: Scissors, description: "Serviços inclusos no plano" },
-    { id: "produtos", label: "Produtos", icon: Package, description: "Produtos com desconto" },
-    { id: "beneficios", label: "Benefícios", icon: Gift, description: "Vantagens exibidas" },
-    { id: "disponibilidade", label: "Disponibilidade", icon: CalendarDays, description: "Dias e profissionais" },
-  ] as const;
-  const [currentStep, setCurrentStep] = useState(0);
-  const isLastStep = currentStep === steps.length - 1;
-  const isFirstStep = currentStep === 0;
-
-  const stepCompleted = (idx: number) => {
-    switch (steps[idx].id) {
-      case "detalhes":
-        return nome.trim().length > 0;
-      case "servicos":
-        return servicosInclusos.length > 0;
-      case "produtos":
-        return produtosSelecionados.length > 0;
-      case "beneficios":
-        return beneficios.length > 0;
-      case "disponibilidade":
-        return diasAceitos.length > 0 && profissionaisAtendem.length > 0;
-      default:
-        return false;
-    }
-  };
-
-  const goToStep = (idx: number) => {
-    if (idx < 0 || idx >= steps.length) return;
-    // valida step atual antes de avançar
-    if (idx > currentStep && steps[currentStep].id === "detalhes" && !nome.trim()) {
-      setShowErrors(true);
-      toast({ title: "Informe o nome do plano antes de continuar", variant: "destructive" });
-      return;
-    }
-    setCurrentStep(idx);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   // Helpers
   const servicosDisponiveisFiltrados = useMemo(
     () => servicosDisponiveis.filter((s) => !servicosInclusos.some((i) => i.id === s.id)),
@@ -442,65 +386,9 @@ export default function AssinaturaCadastro() {
                 {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Siga os passos abaixo para configurar o plano.
+                Configure os dados, serviços e produtos do plano.
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* STEPPER */}
-        <div className="mx-6 mt-5">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <ol className="flex flex-wrap items-center gap-y-3">
-              {steps.map((step, idx) => {
-                const Icon = step.icon;
-                const isActive = idx === currentStep;
-                const isDone = idx < currentStep || (idx !== currentStep && stepCompleted(idx));
-                return (
-                  <li key={step.id} className="flex flex-1 items-center gap-3 min-w-[180px]">
-                    <button
-                      type="button"
-                      onClick={() => goToStep(idx)}
-                      className="flex items-center gap-3 text-left transition"
-                    >
-                      <span
-                        className={cn(
-                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition",
-                          isActive
-                            ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                            : isDone
-                              ? "border-emerald-500 bg-emerald-500 text-white"
-                              : "border-border bg-card text-muted-foreground",
-                        )}
-                      >
-                        {isDone && !isActive ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
-                      </span>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                          Passo {idx + 1}
-                        </span>
-                        <span
-                          className={cn(
-                            "text-sm font-semibold transition",
-                            isActive ? "text-foreground" : isDone ? "text-foreground" : "text-muted-foreground",
-                          )}
-                        >
-                          {step.label}
-                        </span>
-                      </div>
-                    </button>
-                    {idx < steps.length - 1 && (
-                      <div
-                        className={cn(
-                          "mx-2 hidden h-0.5 flex-1 rounded-full transition md:block",
-                          idx < currentStep ? "bg-emerald-500" : "bg-border",
-                        )}
-                      />
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
           </div>
         </div>
 
@@ -509,7 +397,7 @@ export default function AssinaturaCadastro() {
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
           {/* DETALHES */}
-          <section id="detalhes" className={cn("scroll-mt-20 grid gap-5", currentStep !== 0 && "hidden")}>
+          <section id="detalhes" className="scroll-mt-20 grid gap-5">
             <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
@@ -548,7 +436,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* SERVIÇOS - 2 colunas estilo NovaCompra */}
-          <section id="servicos" className={cn("scroll-mt-20", currentStep !== 1 && "hidden")}>
+          <section id="servicos" className="scroll-mt-20">
             <SectionBlock
               title="Serviços"
               description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão."
@@ -650,7 +538,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* PRODUTOS - 2 colunas estilo NovaCompra */}
-          <section id="produtos" className={cn("scroll-mt-20", currentStep !== 2 && "hidden")}>
+          <section id="produtos" className="scroll-mt-20">
             <SectionBlock
               title="Produtos"
               description="Selecione os produtos inclusos no plano com quantidade e desconto."
@@ -746,7 +634,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* BENEFÍCIOS */}
-          <section id="beneficios" className={cn("scroll-mt-20", currentStep !== 3 && "hidden")}>
+          <section id="beneficios" className="scroll-mt-20">
             <SectionBlock
               title="Benefícios"
               description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
@@ -838,7 +726,7 @@ export default function AssinaturaCadastro() {
           </section>
 
           {/* DISPONIBILIDADE */}
-          <section id="disponibilidade" className={cn("scroll-mt-20", currentStep !== 4 && "hidden")}>
+          <section id="disponibilidade" className="scroll-mt-20">
             <SectionBlock
               title="Disponibilidade"
               description="Dias e profissionais que aceitam o plano."
@@ -972,84 +860,38 @@ export default function AssinaturaCadastro() {
 
             {/* Navegação rápida */}
             <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="text-sm font-semibold text-foreground">Passos</h3>
+              <h3 className="text-sm font-semibold text-foreground">Seções</h3>
               <nav className="mt-3 flex flex-col gap-1">
-                {steps.map((s, idx) => {
-                  const isActive = idx === currentStep;
-                  const isDone = idx < currentStep || (idx !== currentStep && stepCompleted(idx));
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => goToStep(idx)}
-                      className={cn(
-                        "flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-sm transition",
-                        isActive
-                          ? "bg-primary/10 font-semibold text-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span
-                          className={cn(
-                            "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold",
-                            isActive
-                              ? "bg-primary text-primary-foreground"
-                              : isDone
-                                ? "bg-emerald-500 text-white"
-                                : "bg-muted text-muted-foreground",
-                          )}
-                        >
-                          {isDone && !isActive ? <Check className="h-3 w-3" /> : idx + 1}
-                        </span>
-                        {s.label}
-                      </span>
-                    </button>
-                  );
-                })}
+                {[
+                  { id: "detalhes", label: "Dados do plano" },
+                  { id: "servicos", label: `Serviços (${servicosInclusos.length})` },
+                  { id: "produtos", label: `Produtos (${produtosSelecionados.length})` },
+                  { id: "beneficios", label: `Benefícios (${beneficios.length})` },
+                  { id: "disponibilidade", label: `Disponibilidade (${diasAceitos.length}d / ${profissionaisAtendem.length}p)` },
+                ].map((s) => (
+                  <a
+                    key={s.id}
+                    href={`#${s.id}`}
+                    className="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  >
+                    {s.label}
+                  </a>
+                ))}
               </nav>
             </div>
           </aside>
         </div>
 
-        {/* FOOTER WIZARD - Voltar / Próximo / Salvar */}
+        {/* FOOTER único - sempre visível */}
         <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-xs text-muted-foreground">
-              Passo <span className="font-semibold text-foreground">{currentStep + 1}</span> de {steps.length}
-              <span className="mx-2 text-border">•</span>
-              <span className="font-medium text-foreground">{steps[currentStep].label}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => goToStep(currentStep - 1)}
-                disabled={isFirstStep}
-                className="inline-flex h-11 items-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Voltar
-              </button>
-              {isLastStep ? (
-                <button
-                  type="button"
-                  onClick={handleSalvar}
-                  className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-foreground px-6 text-sm font-semibold text-background transition hover:opacity-90"
-                >
-                  <Check className="h-4 w-4" />
-                  {editing ? "Salvar alterações" : "Criar plano"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => goToStep(currentStep + 1)}
-                  className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-                >
-                  Próximo
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              )}
-            </div>
+          <div className="flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={handleSalvar}
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
+            >
+              {editing ? "Salvar alterações" : "Criar plano"}
+            </button>
           </div>
         </div>
       </div>
