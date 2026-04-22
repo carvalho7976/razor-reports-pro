@@ -921,19 +921,24 @@ export default function AssinaturaCadastro() {
               <h3 className="text-sm font-semibold text-foreground">Seções</h3>
               <nav className="mt-3 flex flex-col gap-1">
                 {[
-                  { id: "detalhes", label: "Dados do plano" },
-                  { id: "servicos", label: `Serviços (${servicosInclusos.length})` },
-                  { id: "produtos", label: `Produtos (${produtosSelecionados.length})` },
-                  { id: "beneficios", label: `Benefícios (${beneficios.length})` },
-                  { id: "disponibilidade", label: `Disponibilidade (${diasAceitos.length}d / ${profissionaisAtendem.length}p)` },
+                  { id: "dados", label: "Dados do plano", hint: "" },
+                  { id: "itens", label: "Itens", hint: `${servicosInclusos.length} serv. · ${produtosSelecionados.length} prod.` },
+                  { id: "regras", label: "Regras", hint: `${beneficios.length} benef. · ${diasAceitos.length}d` },
                 ].map((s) => (
-                  <a
+                  <button
                     key={s.id}
-                    href={`#${s.id}`}
-                    className="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    type="button"
+                    onClick={() => setTab(s.id)}
+                    className={cn(
+                      "flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-sm transition",
+                      tab === s.id
+                        ? "bg-muted font-semibold text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
                   >
-                    {s.label}
-                  </a>
+                    <span>{s.label}</span>
+                    {s.hint && <span className="text-[11px] text-muted-foreground">{s.hint}</span>}
+                  </button>
                 ))}
               </nav>
             </div>
