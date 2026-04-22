@@ -653,10 +653,11 @@ export default function AssinaturaCadastro() {
               </div>
             </div>
             </SectionBlock>
-          </section>
+            </TabsContent>
 
-          {/* BENEFÍCIOS */}
-          <section id="beneficios" className="scroll-mt-20">
+            {/* ============ ABA: REGRAS (Benefícios + Disponibilidade + Bloqueio) ============ */}
+            <TabsContent value="regras" className="mt-5 flex flex-col gap-5">
+            {/* BENEFÍCIOS */}
             <SectionBlock
               title="Benefícios"
               description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
