@@ -130,13 +130,18 @@ const SLOT_MIN = 30;
 const PX_POR_MIN = 1.6;
 
 // ── helper: calcula horários livres de um profissional ─────────────────────
-function horariosLivres(profId: string): string[] {
+// Se onlyFuture=true, descarta horários anteriores ao momento atual
+function horariosLivres(profId: string, onlyFuture = false): string[] {
   const ocupados = agendamentos
     .filter((a) => a.profissional === profId && a.status !== "folga")
     .map((a) => ({ ini: a.inicio, fim: a.inicio + a.duracao }));
 
+  const agora = new Date();
+  const minAgora = agora.getHours() * 60 + agora.getMinutes();
+
   const livres: string[] = [];
   for (let min = HORA_INICIO * 60; min < HORA_FIM * 60; min += SLOT_MIN) {
+    if (onlyFuture && min <= minAgora) continue;
     const minRelativo = min - HORA_INICIO * 60;
     const ocupado = ocupados.some((o) => minRelativo < o.fim && minRelativo + SLOT_MIN > o.ini);
     if (!ocupado) {
@@ -150,7 +155,7 @@ function horariosLivres(profId: string): string[] {
 
 // ── componente do story escalado ───────────────────────────────────────────
 function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Date; tema: "claro" | "escuro" }) {
-  const slots = horariosLivres(prof.id);
+  const slots = horariosLivres(prof.id, true);
   const dataFmt = format(data, "EEE, dd MMM", { locale: ptBR });
   const totalAg = agendamentos.filter((a) => a.profissional === prof.id).length;
 
@@ -166,13 +171,13 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
   const badgeBg = isDark ? "#F2F0ED" : "#111111";
   const badgeTxt = isDark ? "#111111" : "#F2F0ED";
 
-  // scale: 1080px → ~320px preview no modal
-  const SCALE = 320 / 1080;
+  // scale: 1080x1920 reduzido para caber no modal junto do toggle e do botão
+  const SCALE = 280 / 1080;
 
   return (
     <div
       style={{
-        width: 320,
+        width: 280,
         height: Math.round(1920 * SCALE),
         overflow: "hidden",
         borderRadius: 12,
@@ -451,24 +456,8 @@ export default function NovaAgenda2() {
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
         {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          {/* KPIs */}
-          <div className="flex items-center divide-x divide-border">
-            <div className="flex flex-col pr-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
-              <span className="text-[15px] font-semibold text-green-700 leading-snug">11</span>
-            </div>
-            <div className="flex flex-col pl-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
-              <span className="text-[15px] font-semibold text-amber-700 leading-snug">74%</span>
-            </div>
-          </div>
-
-          {/* Direita */}
-          <div className="ml-auto flex items-center gap-2">
+          {/* Esquerda — Ações */}
+          <div className="flex items-center gap-2">
             {/* Navegação de data */}
             <div className="flex items-center gap-1">
               <button
@@ -490,10 +479,9 @@ export default function NovaAgenda2() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 min-w-[200px] justify-center gap-2 px-3 text-xs font-medium"
+                    className="h-8 min-w-[170px] justify-center gap-2 px-3 text-xs font-medium hover:bg-muted hover:text-foreground"
                   >
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <span className="capitalize">{format(data, "EEE, dd MMM yyyy", { locale: ptBR })}</span>
+                    <span className="capitalize">{format(data, "EEEE, dd MMM", { locale: ptBR })}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="center" className="w-auto p-0">
@@ -692,6 +680,26 @@ export default function NovaAgenda2() {
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* Direita — KPIs */}
+          <div className="ml-auto flex items-center divide-x divide-border">
+            <div className="flex flex-col px-4 first:pl-0">
+              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
+            </div>
+            <div className="flex flex-col px-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">11</span>
+            </div>
+            <div className="flex flex-col px-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Horários Livres</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">7</span>
+            </div>
+            <div className="flex flex-col pl-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">74%</span>
+            </div>
+          </div>
         </div>
 
         {/* ── AGENDA ──────────────────────────────────────────────────────── */}
@@ -726,7 +734,7 @@ export default function NovaAgenda2() {
                 <button
                   type="button"
                   onClick={() => setStoryProf(p)}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-muted hover:text-foreground group-hover:opacity-100"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label={`Ver story de ${p.nome}`}
                 >
                   <Eye className="h-4 w-4" />
@@ -817,18 +825,18 @@ export default function NovaAgenda2() {
 
       {/* ── MODAL: story do profissional ─────────────────────────────────── */}
       <Dialog open={!!storyProf} onOpenChange={(o) => !o && setStoryProf(null)}>
-        <DialogContent className="max-w-fit gap-0 p-0 bg-transparent border-none shadow-none">
+        <DialogContent className="w-auto max-w-[360px] gap-0 border-none bg-transparent p-0 shadow-none">
           {storyProf && (
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-2">
               {/* Toggle tema */}
-              <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
-                {(["escuro", "claro"] as const).map((t) => (
+              <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1 shadow-sm">
+                {(["claro", "escuro"] as const).map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setStoryTema(t)}
                     className={cn(
-                      "rounded-md px-4 py-1.5 text-xs font-medium capitalize transition-colors",
+                      "rounded-md px-4 py-1 text-xs font-medium capitalize transition-colors",
                       storyTema === t ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
                     )}
                   >
@@ -839,7 +847,7 @@ export default function NovaAgenda2() {
               {/* Story */}
               <StoryProfissional prof={storyProf} data={data} tema={storyTema} />
               {/* Ação de compartilhar */}
-              <Button size="sm" className="gap-2 w-full">
+              <Button size="sm" className="w-full gap-2 shadow-sm">
                 Compartilhar story
               </Button>
             </div>
