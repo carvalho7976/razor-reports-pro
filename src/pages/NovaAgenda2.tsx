@@ -1,677 +1,538 @@
-import { useState } from "react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { AppLayout } from "@/components/AppLayout";
+import { useMemo, useState } from "react";
 import {
-  Calendar as CalendarIcon,
-  ChevronLeft,
+  Calendar,
+  Check,
   ChevronRight,
-  Clock,
+  Command,
+  CreditCard,
+  Gift,
+  Minus,
   Plus,
-  Users,
-  X,
-  Filter,
-  Smile,
-  Star,
-  Save,
+  Scissors,
+  Search,
+  Sparkles,
+  Wallet,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-type FilaItem = {
+type Comanda = {
   id: number;
   nome: string;
-  servico: string;
-  prefere?: string;
-  esperaMin: number;
+  hora: string;
+  valor: number;
+  ativa?: boolean;
 };
 
-const filaInicial: FilaItem[] = [
-  { id: 1, nome: "Ada Naama", servico: "Corte Feminino", prefere: "Claudia", esperaMin: 12 },
-  { id: 2, nome: "Marcos Vieira", servico: "Barba", esperaMin: 5 },
-  { id: 3, nome: "Juliana Reis", servico: "Coloração", prefere: "Marcia", esperaMin: 25 },
-];
-
-type Profissional = { id: string; nome: string; cargo: string; iniciais: string; corHeader: string };
-const profissionais: Profissional[] = [
-  { id: "cesar", nome: "Cesar", cargo: "Gerente", iniciais: "CE", corHeader: "bg-amber-700 text-white" },
-  { id: "claudia", nome: "Claudia", cargo: "Profissional", iniciais: "CL", corHeader: "bg-pink-500 text-white" },
-  { id: "marcia", nome: "Marcia Silva", cargo: "Assistente", iniciais: "MS", corHeader: "bg-rose-400 text-white" },
-  { id: "matheus", nome: "Matheus", cargo: "Profissional", iniciais: "MA", corHeader: "bg-stone-700 text-white" },
-  { id: "vini", nome: "Vini", cargo: "Auxiliar", iniciais: "VI", corHeader: "bg-indigo-500 text-white" },
-];
-
-const servicosOpcoes = ["Corte Feminino", "Corte Masculino", "Barba", "Coloração", "Manicure", "Pedicure", "Escova"];
-
-type StatusEvento = "confirmado" | "pendente" | "folga" | "destaque";
-
-type Agendamento = {
+type Item = {
   id: number;
+  nome: string;
   profissional: string;
-  inicio: number;
-  duracao: number;
-  cliente: string;
-  servico: string;
-  status?: StatusEvento;
+  valor: number;
+  quantidade: number;
 };
 
-const agendamentos: Agendamento[] = [
-  { id: 1, profissional: "cesar", inicio: 360, duracao: 30, cliente: "", servico: "Bloqueado", status: "folga" },
-  { id: 2, profissional: "cesar", inicio: 420, duracao: 60, cliente: "Daniel Lucas Santos Araújo", servico: "Luzes" },
-  { id: 3, profissional: "cesar", inicio: 480, duracao: 30, cliente: "Jean Carlos", servico: "corte social" },
-  { id: 4, profissional: "cesar", inicio: 510, duracao: 30, cliente: "José Ales Junior", servico: "Corte Masculino" },
-  {
-    id: 5,
-    profissional: "cesar",
-    inicio: 540,
-    duracao: 30,
-    cliente: "Victor Renan Cavalcante da mato",
-    servico: "Barba + Sobrancelha",
-  },
-  { id: 6, profissional: "cesar", inicio: 570, duracao: 30, cliente: "Pedro Henrique", servico: "Corte Masculino" },
-  { id: 7, profissional: "cesar", inicio: 615, duracao: 25, cliente: "cristian", servico: "corte social" },
-  { id: 10, profissional: "claudia", inicio: 360, duracao: 90, cliente: "", servico: "Disponível", status: "pendente" },
-  { id: 11, profissional: "claudia", inicio: 450, duracao: 30, cliente: "César", servico: "Corte Masculino" },
-  {
-    id: 12,
-    profissional: "claudia",
-    inicio: 480,
-    duracao: 45,
-    cliente: "Alice Costa Melis",
-    servico: "Corte Feminino",
-  },
-  { id: 13, profissional: "claudia", inicio: 525, duracao: 30, cliente: "César", servico: "Corte Masculino" },
-  { id: 14, profissional: "claudia", inicio: 540, duracao: 60, cliente: "Adriana Quiros", servico: "Mechas" },
-  {
-    id: 15,
-    profissional: "claudia",
-    inicio: 630,
-    duracao: 90,
-    cliente: "Promo do dia",
-    servico: "Pacote Especial",
-    status: "destaque",
-  },
-  { id: 20, profissional: "marcia", inicio: 390, duracao: 30, cliente: "Cristiane Soares Santos", servico: "Manicure" },
-  { id: 21, profissional: "marcia", inicio: 420, duracao: 30, cliente: "Sabrina Ramak", servico: "Pedicure" },
-  { id: 22, profissional: "marcia", inicio: 450, duracao: 60, cliente: "Luciana Cunha", servico: "Esmaltação em gel" },
-  { id: 23, profissional: "marcia", inicio: 510, duracao: 30, cliente: "Andréia Pérez Magalhães", servico: "Manicure" },
-  { id: 24, profissional: "marcia", inicio: 540, duracao: 30, cliente: "Sofia santos rocha", servico: "Pedicure" },
-  { id: 25, profissional: "marcia", inicio: 570, duracao: 30, cliente: "carmen leia", servico: "Manicure" },
-  { id: 26, profissional: "marcia", inicio: 630, duracao: 30, cliente: "", servico: "Disponível" },
-  { id: 30, profissional: "matheus", inicio: 390, duracao: 40, cliente: "Michael Nunes", servico: "Barba!" },
-  { id: 31, profissional: "matheus", inicio: 435, duracao: 40, cliente: "Rafael Anderson Machado", servico: "Barba!" },
-  { id: 32, profissional: "matheus", inicio: 480, duracao: 30, cliente: "Gabriel Correia", servico: "Corte Masculino" },
-  { id: 33, profissional: "matheus", inicio: 510, duracao: 45, cliente: "Enzo Ferreira", servico: "Corte na navalha" },
-  { id: 34, profissional: "matheus", inicio: 555, duracao: 40, cliente: "sergio lopes", servico: "Barba!" },
-  { id: 40, profissional: "vini", inicio: 375, duracao: 30, cliente: "Otavio Rodrigues", servico: "corte social" },
-  { id: 41, profissional: "vini", inicio: 405, duracao: 30, cliente: "Folga", servico: "da ao banco", status: "folga" },
-  { id: 42, profissional: "vini", inicio: 435, duracao: 25, cliente: "Claudio Aparecido", servico: "corte social" },
-  { id: 43, profissional: "vini", inicio: 465, duracao: 25, cliente: "Jonas Cavalin", servico: "corte social" },
-  { id: 44, profissional: "vini", inicio: 495, duracao: 40, cliente: "Glauber Rafael Silva Souza", servico: "Barba!" },
-  { id: 45, profissional: "vini", inicio: 540, duracao: 25, cliente: "Rômulo Alef Alvez de Sousa", servico: "" },
-  { id: 46, profissional: "vini", inicio: 570, duracao: 30, cliente: "Jonatas Cerqueira", servico: "Barba!" },
+type Sugestao = {
+  id: number;
+  nome: string;
+  motivo: string;
+  valor: number;
+};
+
+type Pagamento = "Dinheiro" | "Cartão" | "Pix" | "Crédito" | "Moedas";
+
+const comandasAbertas: Comanda[] = [
+  { id: 1, nome: "Teste da barbearia", hora: "18:45", valor: 75, ativa: true },
+  { id: 2, nome: "Frizzar Demonstração", hora: "18:30", valor: 120 },
+  { id: 3, nome: "Rogério Carvalho", hora: "18:15", valor: 80 },
+  { id: 4, nome: "César", hora: "17:50", valor: 60 },
+  { id: 5, nome: "Leandro Carvalho", hora: "17:20", valor: 90 },
 ];
 
-const HORA_INICIO = 8;
-const HORA_FIM = 20;
-const SLOT_MIN = 30;
-const PX_POR_MIN = 1.6;
+const sugestoesBase: Sugestao[] = [
+  { id: 1, nome: "Hidratação", motivo: "Última vez há 30 dias", valor: 40 },
+  { id: 2, nome: "Máscara Facial", motivo: "Boa oferta para hoje", valor: 20 },
+  { id: 3, nome: "Produto finalizador", motivo: "Combina com o atendimento", valor: 35 },
+];
 
-export default function NovaAgenda2() {
-  const [fila, setFila] = useState<FilaItem[]>(filaInicial);
-  const [data, setData] = useState<Date>(new Date(2026, 3, 22));
-  const [filtroProf, setFiltroProf] = useState<string>("todos");
-  const [filtroDias, setFiltroDias] = useState<string>("1");
-  const [addFilaOpen, setAddFilaOpen] = useState(false);
+const servicosRapidos = [
+  { nome: "Corte Masculino", valor: 50, profissional: "Claudia" },
+  { nome: "Barba", valor: 25, profissional: "Claudia" },
+  { nome: "Sobrancelha", valor: 15, profissional: "Claudia" },
+  { nome: "Hidratação", valor: 40, profissional: "Claudia" },
+];
 
-  // Form state — adicionar à fila
-  const [novoCliente, setNovoCliente] = useState("");
-  const [novoEmail, setNovoEmail] = useState("");
-  const [novoCelular, setNovoCelular] = useState("");
-  const [novoAniversario, setNovoAniversario] = useState("");
-  const [novoSexo, setNovoSexo] = useState("F");
-  const [novoServico, setNovoServico] = useState("");
-  const [novoProfPreferido, setNovoProfPreferido] = useState("");
+function moeda(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
-  const removerFila = (id: number) => setFila((prev) => prev.filter((f) => f.id !== id));
+function Section({
+  title,
+  subtitle,
+  action,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card shadow-sm">
+      <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          {subtitle ? <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p> : null}
+        </div>
+        {action ? <div className="shrink-0">{action}</div> : null}
+      </div>
+      <div className="p-4">{children}</div>
+    </div>
+  );
+}
 
-  const handleSalvarFila = () => {
-    if (!novoCliente.trim() || !novoServico) return;
-    setFila((prev) => [
+export default function MockupPDVFluxo() {
+  const [query, setQuery] = useState("");
+  const [pagamento, setPagamento] = useState<Pagamento>("Pix");
+  const [itens, setItens] = useState<Item[]>([
+    { id: 1, nome: "Corte Masculino", profissional: "Claudia", valor: 50, quantidade: 1 },
+    { id: 2, nome: "Barba", profissional: "Claudia", valor: 25, quantidade: 1 },
+  ]);
+
+  const total = useMemo(() => itens.reduce((acc, item) => acc + item.valor * item.quantidade, 0), [itens]);
+
+  const sugestoes = useMemo(() => {
+    const nomesExistentes = new Set(itens.map((item) => item.nome));
+    return sugestoesBase.filter((s) => !nomesExistentes.has(s.nome));
+  }, [itens]);
+
+  const aplicarComando = () => {
+    const texto = query.trim().toLowerCase();
+    if (!texto) return;
+
+    const servicoEncontrado = servicosRapidos.find((s) => texto.includes(s.nome.toLowerCase()));
+    if (servicoEncontrado) {
+      setItens((prev) => {
+        const existente = prev.find((item) => item.nome === servicoEncontrado.nome);
+        if (existente) {
+          return prev.map((item) =>
+            item.nome === servicoEncontrado.nome ? { ...item, quantidade: item.quantidade + 1 } : item,
+          );
+        }
+        return [
+          ...prev,
+          {
+            id: Date.now(),
+            nome: servicoEncontrado.nome,
+            profissional: servicoEncontrado.profissional,
+            valor: servicoEncontrado.valor,
+            quantidade: 1,
+          },
+        ];
+      });
+      setQuery("");
+      return;
+    }
+
+    if (texto.includes("pix")) {
+      setPagamento("Pix");
+      setQuery("");
+      return;
+    }
+    if (texto.includes("cart")) {
+      setPagamento("Cartão");
+      setQuery("");
+      return;
+    }
+    if (texto.includes("din")) {
+      setPagamento("Dinheiro");
+      setQuery("");
+      return;
+    }
+    if (texto.includes("cred")) {
+      setPagamento("Crédito");
+      setQuery("");
+      return;
+    }
+  };
+
+  const adicionarSugestao = (sugestao: Sugestao) => {
+    setItens((prev) => [
       ...prev,
       {
         id: Date.now(),
-        nome: novoCliente.trim(),
-        servico: novoServico,
-        prefere: novoProfPreferido || undefined,
-        esperaMin: 0,
+        nome: sugestao.nome,
+        profissional: "Claudia",
+        valor: sugestao.valor,
+        quantidade: 1,
       },
     ]);
-    // reset
-    setNovoCliente("");
-    setNovoEmail("");
-    setNovoCelular("");
-    setNovoAniversario("");
-    setNovoSexo("F");
-    setNovoServico("");
-    setNovoProfPreferido("");
-    setAddFilaOpen(false);
   };
 
-  const profissionaisVisiveis =
-    filtroProf === "todos" ? profissionais : profissionais.filter((p) => p.id === filtroProf);
-
-  const horarios: string[] = [];
-  for (let h = HORA_INICIO; h < HORA_FIM; h++) {
-    for (let m = 0; m < 60; m += SLOT_MIN) {
-      horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
-    }
-  }
-  const totalMin = (HORA_FIM - HORA_INICIO) * 60;
-
-  const formatHora = (minDesdeInicio: number) => {
-    const h = HORA_INICIO + Math.floor(minDesdeInicio / 60);
-    const m = minDesdeInicio % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  const alterarQuantidade = (id: number, delta: number) => {
+    setItens((prev) =>
+      prev
+        .map((item) => (item.id === id ? { ...item, quantidade: Math.max(0, item.quantidade + delta) } : item))
+        .filter((item) => item.quantidade > 0),
+    );
   };
 
   return (
-    <AppLayout>
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
-        {/* {/* TOOLBAR FIXA */}
-        <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          {/* Esquerda: KPIs */}
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto flex max-w-[1600px] flex-col gap-4 p-4 lg:p-5">
+        <div className="sticky top-0 z-20 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
           <div className="flex items-center divide-x divide-border">
-            <div className="flex flex-col pr-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
+            <div className="pr-4">
+              <p className="text-[11px] text-muted-foreground">Modo</p>
+              <p className="text-[15px] font-semibold">PDV rápido</p>
             </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
-              <span className="text-[15px] font-semibold text-green-700 leading-snug">11</span>
+            <div className="px-4">
+              <p className="text-[11px] text-muted-foreground">Cliente</p>
+              <p className="text-[15px] font-semibold">Teste da barbearia</p>
             </div>
-            <div className="flex flex-col pl-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
-              <span className="text-[15px] font-semibold text-amber-700 leading-snug">74%</span>
+            <div className="pl-4">
+              <p className="text-[11px] text-muted-foreground">Pagamento</p>
+              <p className="text-[15px] font-semibold text-emerald-700">{pagamento}</p>
             </div>
           </div>
 
-          {/* Direita: data + ações */}
           <div className="ml-auto flex items-center gap-2">
-            {/* Navegação de data */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() =>
-                  setData((d) => {
-                    const n = new Date(d);
-                    n.setDate(d.getDate() - 1);
-                    return n;
-                  })
-                }
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                aria-label="Dia anterior"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
+            <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+              <Calendar className="h-4 w-4" />
+              22/04/2026
+            </button>
+            <button className="inline-flex h-8 items-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground transition-colors hover:opacity-90">
+              <Plus className="h-4 w-4" />
+              Nova comanda
+            </button>
+          </div>
+        </div>
 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 min-w-[200px] justify-center gap-2 px-3 text-xs font-medium"
-                  >
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <span className="capitalize">{format(data, "EEE, dd MMM yyyy", { locale: ptBR })}</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="center" className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={data}
-                    onSelect={(d) => d && setData(d)}
-                    initialFocus
-                    locale={ptBR}
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setData((d) => {
-                    const n = new Date(d);
-                    n.setDate(d.getDate() + 1);
-                    return n;
-                  })
-                }
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                aria-label="Próximo dia"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
+        <div className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+          <aside className="flex min-h-[760px] flex-col rounded-xl border border-border bg-card shadow-sm">
+            <div className="border-b border-border p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Comandas abertas
+                  </p>
+                  <p className="mt-1 text-lg font-semibold text-foreground">Troca rápida</p>
+                </div>
+                <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+                  {comandasAbertas.length}
+                </span>
+              </div>
+              <div className="relative mt-4">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm outline-none transition-colors focus:border-foreground"
+                  placeholder="Buscar cliente"
+                />
+              </div>
             </div>
 
-            <div className="h-5 w-px bg-border" />
-
-            {/* Filtros */}
-            <Popover>
-              <PopoverTrigger asChild>
+            <div className="flex-1 space-y-2 overflow-y-auto p-3">
+              {comandasAbertas.map((comanda) => (
                 <button
-                  type="button"
-                  className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  aria-label="Filtros"
+                  key={comanda.id}
+                  className={`w-full rounded-lg border p-3 text-left transition-all ${
+                    comanda.ativa
+                      ? "border-primary/40 bg-primary/5 shadow-sm"
+                      : "border-border bg-background hover:bg-muted/50"
+                  }`}
                 >
-                  <Filter className="h-4 w-4" />
-                  {(filtroProf !== "todos" || filtroDias !== "1") && (
-                    <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
-                      {(filtroProf !== "todos" ? 1 : 0) + (filtroDias !== "1" ? 1 : 0)}
-                    </span>
-                  )}
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="end" sideOffset={8} className="w-[280px] p-3">
-                <div className="space-y-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-foreground">Profissional</Label>
-                    <Select value={filtroProf} onValueChange={setFiltroProf}>
-                      <SelectTrigger className="h-9 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todos" className="text-xs">
-                          Todos os profissionais
-                        </SelectItem>
-                        {profissionais.map((p) => (
-                          <SelectItem key={p.id} value={p.id} className="text-xs">
-                            {p.nome}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-foreground">Visualizar dias</Label>
-                    <Select value={filtroDias} onValueChange={setFiltroDias}>
-                      <SelectTrigger className="h-9 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1" className="text-xs">
-                          1 dia
-                        </SelectItem>
-                        <SelectItem value="2" className="text-xs">
-                          2 dias
-                        </SelectItem>
-                        <SelectItem value="3" className="text-xs">
-                          3 dias
-                        </SelectItem>
-                        <SelectItem value="5" className="text-xs">
-                          Semana útil
-                        </SelectItem>
-                        <SelectItem value="7" className="text-xs">
-                          Semana
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {(filtroProf !== "todos" || filtroDias !== "1") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFiltroProf("todos");
-                        setFiltroDias("1");
-                      }}
-                      className="w-full text-left text-xs font-medium text-muted-foreground hover:text-foreground"
-                    >
-                      Limpar filtros
-                    </button>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            {/* Fila de espera */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                >
-                  <Users className="h-4 w-4" />
-                  Fila
-                  <Badge variant="secondary" className="h-4 rounded-full px-1.5 text-[10px] font-semibold">
-                    {fila.length}
-                  </Badge>
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="end" sideOffset={8} className="w-[360px] p-0">
-                <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-muted">
-                      <Users className="h-4 w-4 text-foreground" />
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground">{comanda.nome}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{comanda.hora}</p>
                     </div>
-                    <span className="text-sm font-medium text-foreground">Fila de espera</span>
-                    <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
-                      {fila.length}
-                    </Badge>
+                    <div className="shrink-0 text-right">
+                      <p className="text-sm font-semibold text-foreground">{moeda(comanda.valor)}</p>
+                      {comanda.ativa ? (
+                        <span className="mt-1 inline-flex rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                          Ativa
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 gap-1 px-2 text-xs"
-                    onClick={() => setAddFilaOpen(true)}
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    Adicionar
-                  </Button>
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <main className="flex flex-col gap-4">
+            <Section
+              title="Comanda atual"
+              subtitle="Sem etapas. Adicione, ajuste, sugira e finalize no mesmo fluxo."
+              action={
+                <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+                  Rápido
+                </span>
+              }
+            >
+              <div className="space-y-4">
+                <div className="rounded-lg border border-border bg-muted/20 px-4 py-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Cliente</p>
+                      <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Teste da barbearia</h1>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Cliente recorrente · padrão: corte + barba · pagamento preferido: Pix
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-border bg-background px-3 py-2 text-right">
+                      <p className="text-[11px] text-muted-foreground">Data</p>
+                      <p className="text-sm font-semibold text-foreground">22/04/2026</p>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="max-h-[60vh] overflow-y-auto p-2">
-                  {fila.length === 0 ? (
-                    <p className="px-2 py-8 text-center text-sm text-muted-foreground">Ninguém na fila no momento.</p>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      {fila.map((item, idx) => (
-                        <div
-                          key={item.id}
-                          className="group relative flex items-start gap-3 rounded-md border border-border bg-background p-2.5 transition-shadow hover:shadow-sm"
-                        >
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-info/10 text-xs font-semibold text-info">
-                            {idx + 1}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="truncate text-sm font-medium text-foreground">{item.nome}</p>
-                              <button
-                                type="button"
-                                onClick={() => removerFila(item.id)}
-                                className="opacity-0 transition-opacity group-hover:opacity-100"
-                                aria-label="Remover da fila"
-                              >
-                                <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                              </button>
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background text-primary shadow-sm">
+                      <Command className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Comando rápido</p>
+                      <p className="text-xs text-muted-foreground">
+                        Digite serviço, profissional ou pagamento. Ex: “barba”, “pix”, “hidratação”.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex gap-3">
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") aplicarComando();
+                      }}
+                      className="h-12 flex-1 rounded-xl border border-primary/20 bg-background px-4 text-sm outline-none transition-colors focus:border-primary"
+                      placeholder="Digite um comando rápido..."
+                    />
+                    <button
+                      onClick={aplicarComando}
+                      className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
+                    >
+                      Aplicar
+                    </button>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {servicosRapidos.map((servico) => (
+                      <button
+                        key={servico.nome}
+                        onClick={() => setQuery(servico.nome)}
+                        className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        {servico.nome}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+                  <div className="rounded-xl border border-border bg-card">
+                    <div className="border-b border-border px-4 py-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">Itens da comanda</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Itens principais em destaque. Ajuste quantidade sem abrir tela extra.
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+                          {itens.length} item(ns)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 p-4">
+                      {itens.map((item) => (
+                        <div key={item.id} className="rounded-lg border border-border bg-background px-4 py-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <Scissors className="h-4 w-4 text-primary" />
+                                <p className="text-base font-semibold text-foreground">{item.nome}</p>
+                              </div>
+                              <p className="mt-1 text-sm text-muted-foreground">Profissional: {item.profissional}</p>
                             </div>
-                            <p className="truncate text-xs text-muted-foreground">
-                              {item.servico}
-                              {item.prefere && (
-                                <>
-                                  {" "}
-                                  {" · Prefere "}
-                                  <span className="text-foreground">{item.prefere}</span>
-                                </>
-                              )}
-                            </p>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                                <Clock className="h-3 w-3" />
-                                {item.esperaMin > 0 ? `${item.esperaMin} min` : "Agora"}
-                              </span>
-                              <Button
-                                size="sm"
-                                className="h-6 rounded-md bg-success px-2 text-[11px] font-semibold text-success-foreground hover:bg-success/90"
-                              >
-                                Chamar
-                              </Button>
+                            <div className="flex items-center gap-3">
+                              <div className="inline-flex items-center rounded-lg border border-border bg-muted/30">
+                                <button
+                                  onClick={() => alterarQuantidade(item.id, -1)}
+                                  className="inline-flex h-9 w-9 items-center justify-center text-muted-foreground hover:text-foreground"
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </button>
+                                <span className="min-w-[36px] text-center text-sm font-semibold text-foreground">
+                                  {item.quantidade}
+                                </span>
+                                <button
+                                  onClick={() => alterarQuantidade(item.id, 1)}
+                                  className="inline-flex h-9 w-9 items-center justify-center text-muted-foreground hover:text-foreground"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </button>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xl font-bold text-foreground">
+                                  {moeda(item.valor * item.quantidade)}
+                                </p>
+                              </div>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
+                  </div>
 
-        {/* AGENDA */}
-        <div className="rounded-lg border border-border bg-card shadow-sm">
-          <div
-            className="grid min-w-[900px]"
-            style={{ gridTemplateColumns: `56px repeat(${profissionaisVisiveis.length}, minmax(180px, 1fr))` }}
-          >
-            {/* Header sticky — colado abaixo da toolbar */}
-            <div className="sticky top-[53px] z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </div>
-            {profissionaisVisiveis.map((p) => (
-              <div
-                key={p.id}
-                className="sticky top-[53px] z-20 flex items-center gap-2 border-b border-r border-border bg-card px-3 py-2 last:border-r-0"
-              >
-                <div
-                  className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-                    p.corHeader,
-                  )}
-                >
-                  {p.iniciais}
-                </div>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-foreground">{p.nome}</p>
-                  <p className="truncate text-[11px] text-muted-foreground">{p.cargo}</p>
-                </div>
-              </div>
-            ))}
-
-            {/* Coluna de horários */}
-            <div className="relative border-r border-border bg-muted/20">
-              {horarios.map((h) => (
-                <div
-                  key={h}
-                  className="flex items-start justify-end pr-2 pt-0 text-[11px] font-medium text-muted-foreground"
-                  style={{ height: `${SLOT_MIN * PX_POR_MIN}px` }}
-                >
-                  <span className="-mt-1.5">{h}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Colunas dos profissionais */}
-            {profissionaisVisiveis.map((p) => (
-              <div
-                key={p.id}
-                className="relative border-r border-border last:border-r-0"
-                style={{ height: `${totalMin * PX_POR_MIN}px` }}
-              >
-                {horarios.map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute left-0 right-0 border-b border-border/50"
-                    style={{ top: `${i * SLOT_MIN * PX_POR_MIN}px`, height: `${SLOT_MIN * PX_POR_MIN}px` }}
-                  />
-                ))}
-
-                {agendamentos
-                  .filter((a) => a.profissional === p.id)
-                  .map((a) => {
-                    const isFolga = a.status === "folga";
-                    const isPendente = a.status === "pendente";
-                    const isDestaque = a.status === "destaque";
-
-                    return (
-                      <div
-                        key={a.id}
-                        className={cn(
-                          "absolute left-0 right-0 cursor-pointer overflow-hidden border-l-[3px] px-2 py-1 text-[11px] transition-all hover:z-10 hover:shadow-md",
-                          isFolga && "border-l-foreground bg-foreground text-background",
-                          isPendente && "border-l-sky-400 bg-sky-100 text-sky-900",
-                          isDestaque && "border-l-pink-600 bg-gradient-to-r from-pink-500 to-rose-500 text-white",
-                          !isFolga &&
-                            !isPendente &&
-                            !isDestaque &&
-                            "border-l-foreground/80 bg-card text-foreground hover:bg-muted/40",
-                        )}
-                        style={{
-                          top: `${a.inicio * PX_POR_MIN}px`,
-                          height: `${a.duracao * PX_POR_MIN - 1}px`,
-                        }}
-                      >
-                        <div className="flex items-start justify-between gap-1">
-                          <span
-                            className={cn(
-                              "text-[10px] font-medium",
-                              isFolga ? "text-background/70" : isDestaque ? "text-white/90" : "text-muted-foreground",
-                            )}
-                          >
-                            {formatHora(a.inicio)} - {formatHora(a.inicio + a.duracao)}
-                          </span>
-                          {!isFolga &&
-                            (isDestaque ? (
-                              <Star className="h-3 w-3 shrink-0 fill-yellow-300 text-yellow-300" />
-                            ) : (
-                              <Smile className="h-3 w-3 shrink-0 text-amber-400" />
-                            ))}
+                  <div className="rounded-xl border border-amber-200 bg-amber-50/50">
+                    <div className="border-b border-amber-200 px-4 py-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">Sugestões rápidas</p>
+                          <p className="mt-1 text-xs text-muted-foreground">Upsell sem poluir o fechamento.</p>
                         </div>
-                        <p
-                          className={cn(
-                            "truncate text-[11px] font-semibold leading-tight mt-0.5",
-                            isFolga ? "text-background" : isDestaque ? "text-white" : "text-foreground",
-                          )}
-                        >
-                          {a.cliente && a.servico ? `${a.cliente} - ${a.servico}` : a.cliente || a.servico}
-                        </p>
+                        <Sparkles className="h-4 w-4 text-amber-500" />
                       </div>
-                    );
-                  })}
+                    </div>
+                    <div className="space-y-3 p-4">
+                      {sugestoes.map((sugestao) => (
+                        <button
+                          key={sugestao.id}
+                          onClick={() => adicionarSugestao(sugestao)}
+                          className="w-full rounded-lg border border-amber-200 bg-background p-4 text-left transition-colors hover:bg-amber-100/50"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground">{sugestao.nome}</p>
+                              <p className="mt-1 text-xs text-muted-foreground">{sugestao.motivo}</p>
+                              <p className="mt-3 text-base font-bold text-foreground">{moeda(sugestao.valor)}</p>
+                            </div>
+                            <div className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-amber-300 bg-amber-50 text-amber-700">
+                              <Plus className="h-4 w-4" />
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
+                  <div className="rounded-xl border border-border bg-card p-4">
+                    <p className="text-sm font-semibold text-foreground">Pagamento</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Escolha rápido e finalize. Sem bloco técnico separado.
+                    </p>
+
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+                      {(["Dinheiro", "Cartão", "Pix", "Crédito", "Moedas"] as Pagamento[]).map((forma) => (
+                        <button
+                          key={forma}
+                          onClick={() => setPagamento(forma)}
+                          className={`inline-flex h-11 items-center justify-center rounded-lg border px-3 text-sm font-medium transition-colors ${
+                            pagamento === forma
+                              ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                              : "border-border bg-background text-foreground hover:bg-muted"
+                          }`}
+                        >
+                          {forma}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-lg border border-border bg-background p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          Recebimento
+                        </p>
+                        <p className="mt-2 text-2xl font-bold text-foreground">{moeda(total)}</p>
+                      </div>
+                      <div className="rounded-lg border border-border bg-background p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          Cliente costuma pagar
+                        </p>
+                        <p className="mt-2 text-base font-semibold text-foreground">Pix</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Atalho inteligente já selecionado.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Fechar agora</p>
+                    <div className="mt-4 space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm text-muted-foreground">Total</span>
+                        <span className="text-3xl font-bold text-foreground">{moeda(total)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm text-muted-foreground">Forma</span>
+                        <span className="text-base font-semibold text-foreground">{pagamento}</span>
+                      </div>
+                    </div>
+
+                    <button className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-4 text-base font-bold text-white transition-colors hover:bg-emerald-700">
+                      <Check className="h-5 w-5" />
+                      Finalizar comanda
+                    </button>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+            </Section>
+          </main>
+
+          <aside className="flex flex-col gap-4">
+            <Section title="Cliente" subtitle="Somente o que ajuda no fechamento e no retorno.">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-2xl font-bold leading-tight text-foreground">Teste da barbearia</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Última visita há 6 dias · alta chance de retorno</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <button className="rounded-lg border border-border bg-muted/20 p-3 text-left transition-colors hover:bg-muted/40">
+                    <p className="text-xs text-muted-foreground">Packs</p>
+                    <p className="mt-1 text-xl font-bold text-foreground">2</p>
+                  </button>
+                  <button className="rounded-lg border border-border bg-muted/20 p-3 text-left transition-colors hover:bg-muted/40">
+                    <p className="text-xs text-muted-foreground">Créditos</p>
+                    <p className="mt-1 text-xl font-bold text-foreground">R$ 80</p>
+                  </button>
+                </div>
+              </div>
+            </Section>
+
+            <Section title="Ações rápidas" subtitle="Sem card didático. Só o que muda venda ou retenção.">
+              <div className="space-y-3">
+                <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background p-4 text-left transition-colors hover:bg-muted/50">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Usar pack</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Aplicar pacote disponível</p>
+                  </div>
+                  <Gift className="h-4 w-4 text-primary" />
+                </button>
+
+                <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background p-4 text-left transition-colors hover:bg-muted/50">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Usar crédito</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Abater do valor total</p>
+                  </div>
+                  <Wallet className="h-4 w-4 text-primary" />
+                </button>
+
+                <button className="flex w-full items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-4 text-left transition-colors hover:bg-primary/10">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Agendar retorno</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Ação pós-fechamento para retenção</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-primary" />
+                </button>
+              </div>
+            </Section>
+          </aside>
         </div>
       </div>
-
-      {/* MODAL: Adicionar na fila de espera */}
-      <Dialog open={addFilaOpen} onOpenChange={setAddFilaOpen}>
-        <DialogContent className="max-w-md p-0 gap-0">
-          <div className="border-b border-border px-5 py-4">
-            <h2 className="text-lg font-semibold text-foreground">Adicionar na fila de espera</h2>
-          </div>
-
-          <div className="grid gap-3 px-5 py-4">
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Cliente</Label>
-              <Input
-                value={novoCliente}
-                onChange={(e) => setNovoCliente(e.target.value)}
-                placeholder="Buscar cliente..."
-                maxLength={100}
-                className="h-10"
-              />
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Email</Label>
-              <Input
-                type="email"
-                value={novoEmail}
-                onChange={(e) => setNovoEmail(e.target.value)}
-                maxLength={255}
-                className="h-10"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs font-semibold text-foreground">Celular</Label>
-                <Input
-                  value={novoCelular}
-                  onChange={(e) => setNovoCelular(e.target.value)}
-                  placeholder="(00) 00000-0000"
-                  maxLength={20}
-                  className="h-10"
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs font-semibold text-foreground">Aniversário</Label>
-                <Input
-                  type="date"
-                  value={novoAniversario}
-                  onChange={(e) => setNovoAniversario(e.target.value)}
-                  className="h-10"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Sexo</Label>
-              <RadioGroup value={novoSexo} onValueChange={setNovoSexo} className="flex gap-4">
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="M" id="sexo-m" />
-                  <Label htmlFor="sexo-m" className="text-sm font-normal">
-                    M
-                  </Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="F" id="sexo-f" />
-                  <Label htmlFor="sexo-f" className="text-sm font-normal">
-                    F
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Serviços</Label>
-              <Select value={novoServico} onValueChange={setNovoServico}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Selecione um serviço" />
-                </SelectTrigger>
-                <SelectContent>
-                  {servicosOpcoes.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Profissional preferido (opcional)</Label>
-              <Select value={novoProfPreferido} onValueChange={setNovoProfPreferido}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {profissionais.map((p) => (
-                    <SelectItem key={p.id} value={p.nome}>
-                      {p.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-5 py-3">
-            <Button variant="outline" size="sm" onClick={() => setAddFilaOpen(false)} className="h-9">
-              Cancelar
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSalvarFila}
-              disabled={!novoCliente.trim() || !novoServico}
-              className="h-9 gap-2 bg-success text-success-foreground hover:bg-success/90"
-            >
-              <Save className="h-3.5 w-3.5" />
-              Salvar
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </AppLayout>
+    </div>
   );
 }
