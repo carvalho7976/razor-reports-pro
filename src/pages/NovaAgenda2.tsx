@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
 import {
   Calendar as CalendarIcon,
@@ -730,22 +731,32 @@ export default function NovaAgenda2() {
           </div>
 
           {/* Direita — KPIs */}
-          <div className="ml-auto flex items-center gap-4">
-            {[
-              { emoji: "😌", label: "Agendado", valor: 8 },
-              { emoji: "😉", label: "Confirmado", valor: 5 },
-              { emoji: "🤗", label: "Chegou", valor: 2 },
-              { emoji: "💆🏻‍♂️", label: "Em atendimento", valor: 1 },
-              { emoji: "😍", label: "Finalizado", valor: 7 },
-              { emoji: "😱", label: "Faltou", valor: 1 },
-              { emoji: "😢", label: "Desmarcou", valor: 2 },
-            ].map((k) => (
-              <div key={k.label} title={k.label} className="flex items-center gap-1.5">
-                <span className="text-base leading-none">{k.emoji}</span>
-                <span className="text-[13px] font-semibold text-foreground leading-none">{k.valor}</span>
-              </div>
-            ))}
-          </div>
+          <TooltipProvider delayDuration={0}>
+            <div className="ml-auto flex items-center gap-4">
+              {[
+                { emoji: "😌", label: "Agendado", valor: 8 },
+                { emoji: "😉", label: "Confirmado", valor: 5 },
+                { emoji: "🤗", label: "Chegou", valor: 2 },
+                { emoji: "💆🏻‍♂️", label: "Em atendimento", valor: 1 },
+                { emoji: "😍", label: "Finalizado", valor: 7 },
+                { emoji: "😱", label: "Faltou", valor: 1 },
+                { emoji: "😢", label: "Desmarcou", valor: 2 },
+              ].map((k) => (
+                <Tooltip key={k.label}>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 cursor-default">
+                      <span className="text-base leading-none">{k.emoji}</span>
+                      <span className="text-[13px] font-semibold text-foreground leading-none">{k.valor}</span>
+                    </div>
+                  </TooltipTrigger>
+
+                  <TooltipContent className="bg-white text-black border border-border shadow-sm text-xs px-2 py-1">
+                    {k.label}
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
+          </TooltipProvider>
         </div>
 
         {/* ── AGENDA ──────────────────────────────────────────────────────── */}
