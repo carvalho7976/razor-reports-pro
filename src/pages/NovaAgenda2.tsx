@@ -182,7 +182,7 @@ export default function NovaAgenda2() {
 
   return (
     <AppLayout>
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-4">
+      <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
         {/* TOOLBAR FIXA */}
         <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
           {/* Esquerda: navegação data centralizada */}
@@ -385,20 +385,20 @@ export default function NovaAgenda2() {
         </div>
 
         {/* AGENDA */}
-        <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="rounded-lg border border-border bg-card shadow-sm">
+          <div className="overflow-x-auto rounded-lg">
             <div
               className="grid min-w-[900px]"
               style={{ gridTemplateColumns: `56px repeat(${profissionaisVisiveis.length}, minmax(180px, 1fr))` }}
             >
-              {/* Header sticky — abaixo da toolbar (toolbar tem ~52px) */}
-              <div className="sticky top-[52px] z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
+              {/* Header sticky — colado abaixo da toolbar */}
+              <div className="sticky top-[53px] z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </div>
               {profissionaisVisiveis.map((p) => (
                 <div
                   key={p.id}
-                  className="sticky top-[52px] z-20 flex items-center gap-2 border-b border-r border-border bg-card px-3 py-2 last:border-r-0"
+                  className="sticky top-[53px] z-20 flex items-center gap-2 border-b border-r border-border bg-card px-3 py-2 last:border-r-0"
                 >
                   <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold", p.corHeader)}>
                     {p.iniciais}
