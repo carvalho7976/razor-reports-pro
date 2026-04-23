@@ -2,8 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import {
   Calendar as CalendarIcon,
-  ChevronDown,
-  ChevronUp,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -15,15 +13,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type FilaItem = {
   id: number;
@@ -39,28 +35,8 @@ const filaInicial: FilaItem[] = [
   { id: 3, nome: "Juliana Reis", servico: "Coloração", prefere: "Marcia", esperaMin: 25 },
 ];
 
-const profissionais = [
-  { id: "todos", nome: "Todos os profissionais" },
-  { id: "cesar", nome: "Cesar" },
-  { id: "claudia", nome: "Claudia" },
-  { id: "marcia", nome: "Marcia Silva" },
-  { id: "matheus", nome: "Matheus" },
-  { id: "vini", nome: "Vini" },
-];
-
-const visualizacoes = [
-  { value: "1", label: "1 dia" },
-  { value: "2", label: "2 dias" },
-  { value: "3", label: "3 dias" },
-  { value: "5", label: "Semana útil" },
-  { value: "7", label: "Semana" },
-];
-
 export default function NovaAgenda2() {
-  const [filaAberta, setFilaAberta] = useState(false);
   const [fila, setFila] = useState<FilaItem[]>(filaInicial);
-  const [profissional, setProfissional] = useState("todos");
-  const [diasView, setDiasView] = useState("1");
   const [data, setData] = useState("22/04/2026");
 
   const removerFila = (id: number) =>
