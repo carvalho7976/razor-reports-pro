@@ -582,9 +582,7 @@ export default function NovaAgenda2() {
                           <Checkbox
                             checked={checked}
                             onCheckedChange={(v) => {
-                              setFiltroProfsSel((prev) =>
-                                v ? [...prev, p.id] : prev.filter((id) => id !== p.id),
-                              );
+                              setFiltroProfsSel((prev) => (v ? [...prev, p.id] : prev.filter((id) => id !== p.id)));
                             }}
                           />
                         </label>
@@ -606,7 +604,7 @@ export default function NovaAgenda2() {
                           className={cn(
                             "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
                             active
-                              ? "border-foreground bg-foreground text-background"
+                              ? "border-blue-500 bg-blue-500 text-white"
                               : "border-border bg-background text-muted-foreground hover:bg-muted",
                           )}
                         >
@@ -686,7 +684,9 @@ export default function NovaAgenda2() {
                             {idx + 1}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-[13px] font-medium text-foreground leading-tight">{item.nome}</p>
+                            <p className="truncate text-[13px] font-medium text-foreground leading-tight">
+                              {item.nome}
+                            </p>
                             <p className="truncate text-[11px] text-muted-foreground leading-tight mt-0.5">
                               {item.servico}
                               {item.prefere && (
@@ -737,11 +737,7 @@ export default function NovaAgenda2() {
               { emoji: "😱", label: "Faltou", valor: 1 },
               { emoji: "😢", label: "Desmarcou", valor: 2 },
             ].map((k) => (
-              <div
-                key={k.label}
-                title={k.label}
-                className="flex items-center gap-1.5"
-              >
+              <div key={k.label} title={k.label} className="flex items-center gap-1.5">
                 <span className="text-base leading-none">{k.emoji}</span>
                 <span className="text-[13px] font-semibold text-foreground leading-none">{k.valor}</span>
               </div>
