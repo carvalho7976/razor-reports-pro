@@ -7,7 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  Eye,too
+  Eye,
   Filter,
   Plus,
   Save,
@@ -450,89 +450,86 @@ export default function NovaAgenda2() {
 
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
         {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
- <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
+        <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
+          {/* ESQUERDA → BOTÕES (ANTES ERA DIREITA) */}
+          <div className="flex items-center gap-2">
+            {/* Navegação de data */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  const n = new Date(data);
+                  n.setDate(data.getDate() - 1);
+                  setData(n);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
 
-  {/* ESQUERDA → BOTÕES (ANTES ERA DIREITA) */}
-  <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 min-w-[200px] text-xs">
+                    {format(data, "EEE, dd MMM yyyy", { locale: ptBR })}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Calendar mode="single" selected={data} onSelect={(d) => d && setData(d)} />
+                </PopoverContent>
+              </Popover>
 
-    {/* Navegação de data */}
-    <div className="flex items-center gap-1">
-      <button
-        type="button"
-        onClick={() => {
-          const n = new Date(data);
-          n.setDate(data.getDate() - 1);
-          setData(n);
-        }}
-        className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const n = new Date(data);
+                  n.setDate(data.getDate() + 1);
+                  setData(n);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8 min-w-[200px] text-xs">
-            {format(data, "EEE, dd MMM yyyy", { locale: ptBR })}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent>
-          <Calendar mode="single" selected={data} onSelect={(d) => d && setData(d)} />
-        </PopoverContent>
-      </Popover>
+            {/* Filtro */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background">
+                  <Filter className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent>...</PopoverContent>
+            </Popover>
 
-      <button
-        type="button"
-        onClick={() => {
-          const n = new Date(data);
-          n.setDate(data.getDate() + 1);
-          setData(n);
-        }}
-        className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </button>
-    </div>
+            {/* Fila */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs">
+                  <Users className="h-4 w-4" />
+                  Fila
+                  <Badge>{fila.length}</Badge>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent>...</PopoverContent>
+            </Popover>
+          </div>
 
-    {/* Filtro */}
-    <Popover>
-      <PopoverTrigger asChild>
-        <button className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background">
-          <Filter className="h-4 w-4" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent>...</PopoverContent>
-    </Popover>
-
-    {/* Fila */}
-    <Popover>
-      <PopoverTrigger asChild>
-        <button className="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs">
-          <Users className="h-4 w-4" />
-          Fila
-          <Badge>{fila.length}</Badge>
-        </button>
-      </PopoverTrigger>
-      <PopoverContent>...</PopoverContent>
-    </Popover>
-
-  </div>
-
-  {/* DIREITA → KPIs (ANTES ERA ESQUERDA) */}
-  <div className="ml-auto flex items-center divide-x divide-border">
-    <div className="flex flex-col pr-4">
-      <span className="text-[11px] text-muted-foreground">Agendamentos</span>
-      <span className="text-[15px] font-semibold">18</span>
-    </div>
-    <div className="flex flex-col px-4">
-      <span className="text-[11px] text-muted-foreground">Concluídos</span>
-      <span className="text-[15px] font-semibold text-green-700">11</span>
-    </div>
-    <div className="flex flex-col pl-4">
-      <span className="text-[11px] text-muted-foreground">Ocupação</span>
-      <span className="text-[15px] font-semibold text-amber-700">74%</span>
-    </div>
-  </div>
-</div>
+          {/* DIREITA → KPIs (ANTES ERA ESQUERDA) */}
+          <div className="ml-auto flex items-center divide-x divide-border">
+            <div className="flex flex-col pr-4">
+              <span className="text-[11px] text-muted-foreground">Agendamentos</span>
+              <span className="text-[15px] font-semibold">18</span>
+            </div>
+            <div className="flex flex-col px-4">
+              <span className="text-[11px] text-muted-foreground">Concluídos</span>
+              <span className="text-[15px] font-semibold text-green-700">11</span>
+            </div>
+            <div className="flex flex-col pl-4">
+              <span className="text-[11px] text-muted-foreground">Ocupação</span>
+              <span className="text-[15px] font-semibold text-amber-700">74%</span>
+            </div>
+          </div>
+        </div>
         {/* ── AGENDA ──────────────────────────────────────────────────────── */}
         <div className="rounded-lg border border-border bg-card shadow-sm">
           <div
