@@ -736,25 +736,15 @@ export default function NovaAgenda2() {
           </div>
 
           {/* Direita — KPIs */}
-          <div className="ml-auto flex items-center divide-x divide-border">
-            <div className="flex flex-col px-4 first:pl-0">
-              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">11</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Horários Livres</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">7</span>
-            </div>
-            <div className="flex flex-col pl-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">74%</span>
-            </div>
-          </div>
-        </div>
+<div className="flex items-center gap-3">
+  <span className="text-sm font-semibold">😌 18</span>
+  <span className="text-sm font-semibold">😉 12</span>
+  <span className="text-sm font-semibold">🤗 9</span>
+  <span className="text-sm font-semibold">😱 2</span>
+  <span className="text-sm font-semibold">😢 3</span>
+  <span className="text-sm font-semibold">💆🏻‍♂️ 4</span>
+  <span className="text-sm font-semibold">😍 11</span>
+</div>
 
         {/* ── AGENDA ──────────────────────────────────────────────────────── */}
         <div className="rounded-lg border border-border bg-card shadow-sm">
