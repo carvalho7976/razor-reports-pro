@@ -825,18 +825,18 @@ export default function NovaAgenda2() {
 
       {/* ── MODAL: story do profissional ─────────────────────────────────── */}
       <Dialog open={!!storyProf} onOpenChange={(o) => !o && setStoryProf(null)}>
-        <DialogContent className="max-w-fit gap-0 p-0 bg-transparent border-none shadow-none">
+        <DialogContent className="w-auto max-w-[360px] gap-0 border-none bg-transparent p-0 shadow-none">
           {storyProf && (
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-2">
               {/* Toggle tema */}
-              <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
-                {(["escuro", "claro"] as const).map((t) => (
+              <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1 shadow-sm">
+                {(["claro", "escuro"] as const).map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setStoryTema(t)}
                     className={cn(
-                      "rounded-md px-4 py-1.5 text-xs font-medium capitalize transition-colors",
+                      "rounded-md px-4 py-1 text-xs font-medium capitalize transition-colors",
                       storyTema === t ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
                     )}
                   >
@@ -847,7 +847,7 @@ export default function NovaAgenda2() {
               {/* Story */}
               <StoryProfissional prof={storyProf} data={data} tema={storyTema} />
               {/* Ação de compartilhar */}
-              <Button size="sm" className="gap-2 w-full">
+              <Button size="sm" className="w-full gap-2 shadow-sm">
                 Compartilhar story
               </Button>
             </div>
