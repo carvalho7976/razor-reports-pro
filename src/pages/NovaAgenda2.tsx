@@ -670,63 +670,53 @@ export default function NovaAgenda2() {
                       {fila.length}
                     </Badge>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 gap-1 px-2 text-xs"
-                    onClick={() => setAddFilaOpen(true)}
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    Adicionar
-                  </Button>
+                  <NovoButton items={[{ label: "Adicionar", onClick: () => setAddFilaOpen(true) }]} />
                 </div>
                 <div className="max-h-[60vh] overflow-y-auto p-2">
                   {fila.length === 0 ? (
                     <p className="px-2 py-8 text-center text-sm text-muted-foreground">Ninguém na fila no momento.</p>
                   ) : (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1.5">
                       {fila.map((item, idx) => (
                         <div
                           key={item.id}
-                          className="group relative flex items-start gap-3 rounded-md border border-border bg-background p-2.5 transition-shadow hover:shadow-sm"
+                          className="group relative flex items-center gap-2.5 rounded-md border border-border bg-background px-2.5 py-2 transition-shadow hover:shadow-sm"
                         >
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-info/10 text-xs font-semibold text-info">
+                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-foreground">
                             {idx + 1}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="truncate text-sm font-medium text-foreground">{item.nome}</p>
-                              <button
-                                type="button"
-                                onClick={() => removerFila(item.id)}
-                                className="opacity-0 transition-opacity group-hover:opacity-100"
-                                aria-label="Remover da fila"
-                              >
-                                <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                              </button>
-                            </div>
-                            <p className="truncate text-xs text-muted-foreground">
+                            <p className="truncate text-[13px] font-medium text-foreground leading-tight">{item.nome}</p>
+                            <p className="truncate text-[11px] text-muted-foreground leading-tight mt-0.5">
                               {item.servico}
                               {item.prefere && (
                                 <>
-                                  {" "}
-                                  · Prefere <span className="text-foreground">{item.prefere}</span>
+                                  {" · "}
+                                  <span className="text-foreground">{item.prefere}</span>
                                 </>
                               )}
-                            </p>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                                <Clock className="h-3 w-3" />
-                                {item.esperaMin > 0 ? `${item.esperaMin} min` : "Agora"}
+                              <span className="mx-1">·</span>
+                              <span className="inline-flex items-center gap-0.5">
+                                <Clock className="h-2.5 w-2.5" />
+                                {item.esperaMin > 0 ? `${item.esperaMin}min` : "Agora"}
                               </span>
-                              <Button
-                                size="sm"
-                                className="h-6 rounded-md bg-success px-2 text-[11px] font-semibold text-success-foreground hover:bg-success/90"
-                              >
-                                Chamar
-                              </Button>
-                            </div>
+                            </p>
                           </div>
+                          <button
+                            type="button"
+                            className="inline-flex h-7 items-center gap-1 rounded-md border border-foreground bg-background px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
+                          >
+                            <Phone className="h-3 w-3" />
+                            Chamar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removerFila(item.id)}
+                            className="opacity-0 transition-opacity group-hover:opacity-100"
+                            aria-label="Remover da fila"
+                          >
+                            <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -737,23 +727,25 @@ export default function NovaAgenda2() {
           </div>
 
           {/* Direita — KPIs */}
-          <div className="ml-auto flex items-center divide-x divide-border">
-            <div className="flex flex-col px-4 first:pl-0">
-              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">11</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Horários Livres</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">7</span>
-            </div>
-            <div className="flex flex-col pl-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">74%</span>
-            </div>
+          <div className="ml-auto flex items-center gap-4">
+            {[
+              { emoji: "😌", label: "Agendado", valor: 8 },
+              { emoji: "😉", label: "Confirmado", valor: 5 },
+              { emoji: "🤗", label: "Chegou", valor: 2 },
+              { emoji: "💆🏻‍♂️", label: "Em atendimento", valor: 1 },
+              { emoji: "😍", label: "Finalizado", valor: 7 },
+              { emoji: "😱", label: "Faltou", valor: 1 },
+              { emoji: "😢", label: "Desmarcou", valor: 2 },
+            ].map((k) => (
+              <div
+                key={k.label}
+                title={k.label}
+                className="flex items-center gap-1.5"
+              >
+                <span className="text-base leading-none">{k.emoji}</span>
+                <span className="text-[13px] font-semibold text-foreground leading-none">{k.valor}</span>
+              </div>
+            ))}
           </div>
         </div>
 
