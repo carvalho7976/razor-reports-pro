@@ -581,6 +581,7 @@ export default function NovaAgenda2() {
                           <span className="flex-1 text-sm text-foreground">{p.nome}</span>
                           <Checkbox
                             checked={checked}
+                            className="h-4 w-4 rounded-[4px] border-blue-500 data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white"
                             onCheckedChange={(v) => {
                               setFiltroProfsSel((prev) => (v ? [...prev, p.id] : prev.filter((id) => id !== p.id)));
                             }}
@@ -595,7 +596,7 @@ export default function NovaAgenda2() {
                   <p className="mb-3 text-center text-sm font-semibold text-foreground">Dias visualizados</p>
                   <div className="flex items-center justify-center gap-1.5">
                     {["1", "2", "3", "4", "5", "6", "7"].map((n) => {
-                      const active = filtroDiasSel === n;
+                      const active = Number(n) <= Number(filtroDiasSel);
                       return (
                         <button
                           key={n}
