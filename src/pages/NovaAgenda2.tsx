@@ -11,6 +11,8 @@ import {
   Users,
   X,
   Filter,
+  Smile,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,14 +38,16 @@ const filaInicial: FilaItem[] = [
   { id: 3, nome: "Juliana Reis", servico: "Coloração", prefere: "Marcia", esperaMin: 25 },
 ];
 
-type Profissional = { id: string; nome: string; cor: string };
+type Profissional = { id: string; nome: string; cargo: string; iniciais: string; corHeader: string };
 const profissionais: Profissional[] = [
-  { id: "cesar", nome: "Cesar", cor: "bg-info/15 border-info/40 text-info" },
-  { id: "claudia", nome: "Claudia", cor: "bg-success/15 border-success/40 text-success" },
-  { id: "marcia", nome: "Marcia", cor: "bg-warning/15 border-warning/40 text-warning" },
-  { id: "matheus", nome: "Matheus", cor: "bg-accent/15 border-accent/40 text-accent" },
-  { id: "vini", nome: "Vini", cor: "bg-destructive/15 border-destructive/40 text-destructive" },
+  { id: "cesar", nome: "Cesar", cargo: "Gerente", iniciais: "CE", corHeader: "bg-amber-700 text-white" },
+  { id: "claudia", nome: "Claudia", cargo: "Profissional", iniciais: "CL", corHeader: "bg-pink-500 text-white" },
+  { id: "marcia", nome: "Marcia Silva", cargo: "Assistente", iniciais: "MS", corHeader: "bg-rose-400 text-white" },
+  { id: "matheus", nome: "Matheus", cargo: "Profissional", iniciais: "MA", corHeader: "bg-stone-700 text-white" },
+  { id: "vini", nome: "Vini", cargo: "Auxiliar", iniciais: "VI", corHeader: "bg-indigo-500 text-white" },
 ];
+
+type StatusEvento = "confirmado" | "pendente" | "folga" | "destaque";
 
 type Agendamento = {
   id: number;
@@ -52,23 +56,54 @@ type Agendamento = {
   duracao: number; // em minutos
   cliente: string;
   servico: string;
+  status?: StatusEvento;
 };
 
+// Eventos baseados no print de referência (08:00 base)
 const agendamentos: Agendamento[] = [
-  { id: 1, profissional: "cesar", inicio: 0, duracao: 45, cliente: "João P.", servico: "Corte + Barba" },
-  { id: 2, profissional: "cesar", inicio: 90, duracao: 30, cliente: "Lucas M.", servico: "Barba" },
-  { id: 3, profissional: "claudia", inicio: 30, duracao: 60, cliente: "Ada Naama", servico: "Corte Feminino" },
-  { id: 4, profissional: "claudia", inicio: 150, duracao: 90, cliente: "Mariana", servico: "Escova + Hidratação" },
-  { id: 5, profissional: "marcia", inicio: 60, duracao: 120, cliente: "Juliana R.", servico: "Coloração" },
-  { id: 6, profissional: "matheus", inicio: 15, duracao: 30, cliente: "Pedro H.", servico: "Corte" },
-  { id: 7, profissional: "matheus", inicio: 75, duracao: 45, cliente: "Rafael S.", servico: "Corte + Sobrancelha" },
-  { id: 8, profissional: "vini", inicio: 45, duracao: 60, cliente: "Carol L.", servico: "Manicure" },
+  // Cesar
+  { id: 1, profissional: "cesar", inicio: 360, duracao: 30, cliente: "", servico: "Bloqueado", status: "folga" }, // 14:00
+  { id: 2, profissional: "cesar", inicio: 420, duracao: 60, cliente: "Daniel Lucas Santos Araújo", servico: "Luzes" }, // 15:00
+  { id: 3, profissional: "cesar", inicio: 480, duracao: 30, cliente: "Jean Carlos", servico: "corte social" }, // 16:00
+  { id: 4, profissional: "cesar", inicio: 510, duracao: 30, cliente: "José Ales Junior", servico: "Corte Masculino" }, // 16:30
+  { id: 5, profissional: "cesar", inicio: 540, duracao: 30, cliente: "Victor Renan Cavalcante da mato", servico: "Barba + Sobrancelha" }, // 17:00
+  { id: 6, profissional: "cesar", inicio: 570, duracao: 30, cliente: "Pedro Henrique", servico: "Corte Masculino" }, // 17:30
+  { id: 7, profissional: "cesar", inicio: 615, duracao: 25, cliente: "cristian", servico: "corte social" }, // 18:15
+  // Claudia
+  { id: 10, profissional: "claudia", inicio: 360, duracao: 90, cliente: "", servico: "Disponível", status: "pendente" }, // 14:00 azul claro
+  { id: 11, profissional: "claudia", inicio: 450, duracao: 30, cliente: "César", servico: "Corte Masculino" }, // 15:30
+  { id: 12, profissional: "claudia", inicio: 480, duracao: 45, cliente: "Alice Costa Melis", servico: "Corte Feminino" }, // 16:00
+  { id: 13, profissional: "claudia", inicio: 525, duracao: 30, cliente: "César", servico: "Corte Masculino" }, // 16:45
+  { id: 14, profissional: "claudia", inicio: 540, duracao: 60, cliente: "Adriana Quiros", servico: "Mechas" }, // 17:00
+  { id: 15, profissional: "claudia", inicio: 630, duracao: 90, cliente: "Promo do dia", servico: "Pacote Especial", status: "destaque" }, // 18:30
+  // Marcia
+  { id: 20, profissional: "marcia", inicio: 390, duracao: 30, cliente: "Cristiane Soares Santos", servico: "Manicure" }, // 14:30
+  { id: 21, profissional: "marcia", inicio: 420, duracao: 30, cliente: "Sabrina Ramak", servico: "Pedicure" }, // 15:00
+  { id: 22, profissional: "marcia", inicio: 450, duracao: 60, cliente: "Luciana Cunha", servico: "Esmaltação em gel" }, // 15:30
+  { id: 23, profissional: "marcia", inicio: 510, duracao: 30, cliente: "Andréia Pérez Magalhães", servico: "Manicure" }, // 16:30
+  { id: 24, profissional: "marcia", inicio: 540, duracao: 30, cliente: "Sofia santos rocha", servico: "Pedicure" }, // 17:00
+  { id: 25, profissional: "marcia", inicio: 570, duracao: 30, cliente: "carmen leia", servico: "Manicure" }, // 17:30
+  { id: 26, profissional: "marcia", inicio: 630, duracao: 30, cliente: "", servico: "Disponível" }, // 18:30
+  // Matheus
+  { id: 30, profissional: "matheus", inicio: 390, duracao: 40, cliente: "Michael Nunes", servico: "Barba!" }, // 14:30
+  { id: 31, profissional: "matheus", inicio: 435, duracao: 40, cliente: "Rafael Anderson Machado", servico: "Barba!" }, // 15:15
+  { id: 32, profissional: "matheus", inicio: 480, duracao: 30, cliente: "Gabriel Correia", servico: "Corte Masculino" }, // 16:00
+  { id: 33, profissional: "matheus", inicio: 510, duracao: 45, cliente: "Enzo Ferreira", servico: "Corte na navalha" }, // 16:30
+  { id: 34, profissional: "matheus", inicio: 555, duracao: 40, cliente: "sergio lopes", servico: "Barba!" }, // 17:15
+  // Vini
+  { id: 40, profissional: "vini", inicio: 375, duracao: 30, cliente: "Otavio Rodrigues", servico: "corte social" }, // 14:15
+  { id: 41, profissional: "vini", inicio: 405, duracao: 30, cliente: "Folga", servico: "da ao banco", status: "folga" }, // 14:45
+  { id: 42, profissional: "vini", inicio: 435, duracao: 25, cliente: "Claudio Aparecido", servico: "corte social" }, // 15:15
+  { id: 43, profissional: "vini", inicio: 465, duracao: 25, cliente: "Jonas Cavalin", servico: "corte social" }, // 15:45
+  { id: 44, profissional: "vini", inicio: 495, duracao: 40, cliente: "Glauber Rafael Silva Souza", servico: "Barba!" }, // 16:15
+  { id: 45, profissional: "vini", inicio: 540, duracao: 25, cliente: "Rômulo Alef Alvez de Sousa", servico: "" }, // 17:00
+  { id: 46, profissional: "vini", inicio: 570, duracao: 30, cliente: "Jonatas Cerqueira", servico: "Barba!" }, // 17:30
 ];
 
 const HORA_INICIO = 8;
 const HORA_FIM = 20;
 const SLOT_MIN = 30;
-const PX_POR_MIN = 1.4; // altura por minuto
+const PX_POR_MIN = 1.6;
 
 export default function NovaAgenda2() {
   const [fila, setFila] = useState<FilaItem[]>(filaInicial);
@@ -85,12 +120,18 @@ export default function NovaAgenda2() {
   }
   const totalMin = (HORA_FIM - HORA_INICIO) * 60;
 
+  const formatHora = (minDesdeInicio: number) => {
+    const h = HORA_INICIO + Math.floor(minDesdeInicio / 60);
+    const m = minDesdeInicio % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  };
+
   return (
     <AppLayout>
       <div className="mx-auto flex max-w-[1600px] flex-col gap-4">
         {/* TOOLBAR ÚNICA */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          {/* Esquerda: navegação por data unificada */}
+          {/* Esquerda: navegação */}
           <div className="flex items-center gap-2">
             <div className="flex items-center rounded-md border border-border bg-background">
               <button
@@ -103,15 +144,8 @@ export default function NovaAgenda2() {
               </button>
               <button
                 type="button"
-                onClick={() => setData(new Date())}
-                className="border-l border-r border-border px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted h-8"
-              >
-                Hoje
-              </button>
-              <button
-                type="button"
                 onClick={() => setData((d) => { const n = new Date(d); n.setDate(d.getDate() + 1); return n; })}
-                className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex h-8 w-8 items-center justify-center border-l border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 aria-label="Próximo dia"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -144,7 +178,7 @@ export default function NovaAgenda2() {
             </Popover>
           </div>
 
-          {/* Direita: Filtros · Fila · Novo agendamento */}
+          {/* Direita: Filtros · Fila */}
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" className="h-8 gap-2">
               <Filter className="h-4 w-4" />
@@ -234,49 +268,44 @@ export default function NovaAgenda2() {
                 </div>
               </PopoverContent>
             </Popover>
-
-            <Button size="sm" className="h-8 gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="h-4 w-4" />
-              Novo agendamento
-            </Button>
           </div>
         </div>
 
-        {/* AGENDA SIMULADA — grade horários × profissionais */}
+        {/* AGENDA — modelo igual ao print de referência */}
         <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
           <div className="overflow-x-auto">
             <div
-              className="grid min-w-[800px]"
-              style={{ gridTemplateColumns: `64px repeat(${profissionais.length}, minmax(140px, 1fr))` }}
+              className="grid min-w-[900px]"
+              style={{ gridTemplateColumns: `56px repeat(${profissionais.length}, minmax(180px, 1fr))` }}
             >
-              {/* Header */}
-              <div className="sticky top-0 z-20 border-b border-r border-border bg-muted/40" />
+              {/* Header: ícone clock + cabeçalhos profissionais */}
+              <div className="sticky top-0 z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </div>
               {profissionais.map((p) => (
                 <div
                   key={p.id}
-                  className="sticky top-0 z-20 border-b border-r border-border bg-muted/40 px-3 py-2 text-center last:border-r-0"
+                  className="sticky top-0 z-20 flex items-center gap-2 border-b border-r border-border bg-card px-3 py-2 last:border-r-0"
                 >
-                  <div className="flex items-center justify-center gap-2">
-                    <span className={cn("flex h-6 w-6 items-center justify-center rounded-full border text-[11px] font-semibold", p.cor)}>
-                      {p.nome.charAt(0)}
-                    </span>
-                    <span className="text-xs font-medium text-foreground">{p.nome}</span>
+                  <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold", p.corHeader)}>
+                    {p.iniciais}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">{p.nome}</p>
+                    <p className="truncate text-[11px] text-muted-foreground">{p.cargo}</p>
                   </div>
                 </div>
               ))}
 
               {/* Coluna de horários */}
-              <div className="relative border-r border-border">
-                {horarios.map((h, i) => (
+              <div className="relative border-r border-border bg-muted/20">
+                {horarios.map((h) => (
                   <div
                     key={h}
-                    className={cn(
-                      "flex items-start justify-end pr-2 pt-1 text-[10px] font-medium text-muted-foreground",
-                      i % 2 === 0 ? "" : "text-muted-foreground/60"
-                    )}
+                    className="flex items-start justify-end pr-2 pt-0 text-[11px] font-medium text-muted-foreground"
                     style={{ height: `${SLOT_MIN * PX_POR_MIN}px` }}
                   >
-                    {h}
+                    <span className="-mt-1.5">{h}</span>
                   </div>
                 ))}
               </div>
@@ -288,43 +317,60 @@ export default function NovaAgenda2() {
                   className="relative border-r border-border last:border-r-0"
                   style={{ height: `${totalMin * PX_POR_MIN}px` }}
                 >
-                  {/* linhas de slot */}
-                  {horarios.map((h, i) => (
+                  {horarios.map((_, i) => (
                     <div
-                      key={h}
-                      className={cn(
-                        "absolute left-0 right-0 border-b border-border/60",
-                        i % 2 === 0 ? "" : "border-dashed"
-                      )}
+                      key={i}
+                      className="absolute left-0 right-0 border-b border-border/50"
                       style={{ top: `${i * SLOT_MIN * PX_POR_MIN}px`, height: `${SLOT_MIN * PX_POR_MIN}px` }}
                     />
                   ))}
 
-                  {/* Eventos */}
                   {agendamentos
                     .filter((a) => a.profissional === p.id)
-                    .map((a) => (
-                      <div
-                        key={a.id}
-                        className={cn(
-                          "absolute left-1 right-1 cursor-pointer overflow-hidden rounded-md border px-2 py-1 text-[11px] shadow-sm transition-all hover:shadow-md hover:z-10",
-                          p.cor
-                        )}
-                        style={{
-                          top: `${a.inicio * PX_POR_MIN}px`,
-                          height: `${a.duracao * PX_POR_MIN - 2}px`,
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <p className="truncate font-semibold text-foreground">{a.cliente}</p>
-                          <span className="shrink-0 text-[10px] text-muted-foreground">
-                            {String(HORA_INICIO + Math.floor(a.inicio / 60)).padStart(2, "0")}:
-                            {String(a.inicio % 60).padStart(2, "0")}
-                          </span>
+                    .map((a) => {
+                      const isFolga = a.status === "folga";
+                      const isPendente = a.status === "pendente";
+                      const isDestaque = a.status === "destaque";
+
+                      return (
+                        <div
+                          key={a.id}
+                          className={cn(
+                            "absolute left-0 right-0 cursor-pointer overflow-hidden border-l-[3px] px-2 py-1 text-[11px] transition-all hover:z-10 hover:shadow-md",
+                            isFolga && "border-l-foreground bg-foreground text-background",
+                            isPendente && "border-l-sky-400 bg-sky-100 text-sky-900",
+                            isDestaque && "border-l-pink-600 bg-gradient-to-r from-pink-500 to-rose-500 text-white",
+                            !isFolga && !isPendente && !isDestaque && "border-l-foreground/80 bg-card text-foreground hover:bg-muted/40"
+                          )}
+                          style={{
+                            top: `${a.inicio * PX_POR_MIN}px`,
+                            height: `${a.duracao * PX_POR_MIN - 1}px`,
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-1">
+                            <span className={cn(
+                              "text-[10px] font-medium",
+                              isFolga ? "text-background/70" : isDestaque ? "text-white/90" : "text-muted-foreground"
+                            )}>
+                              {formatHora(a.inicio)} - {formatHora(a.inicio + a.duracao)}
+                            </span>
+                            {!isFolga && (
+                              isDestaque ? (
+                                <Star className="h-3 w-3 shrink-0 fill-yellow-300 text-yellow-300" />
+                              ) : (
+                                <Smile className="h-3 w-3 shrink-0 text-amber-400" />
+                              )
+                            )}
+                          </div>
+                          <p className={cn(
+                            "truncate text-[11px] font-semibold leading-tight mt-0.5",
+                            isFolga ? "text-background" : isDestaque ? "text-white" : "text-foreground"
+                          )}>
+                            {a.cliente && a.servico ? `${a.cliente} - ${a.servico}` : a.cliente || a.servico}
+                          </p>
                         </div>
-                        <p className="truncate text-[10px] text-foreground/80">{a.servico}</p>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               ))}
             </div>
