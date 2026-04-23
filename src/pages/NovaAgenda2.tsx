@@ -605,7 +605,7 @@ export default function NovaAgenda2() {
                           className={cn(
                             "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
                             active
-                              ? "border-blue-500 bg-blue-500 text-white"
+                              ? "border-foreground bg-foreground text-background"
                               : "border-border bg-background text-muted-foreground hover:bg-muted",
                           )}
                         >
