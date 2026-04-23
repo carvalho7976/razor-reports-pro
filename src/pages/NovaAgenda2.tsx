@@ -395,6 +395,12 @@ export default function NovaAgenda2() {
   const [filtroDias, setFiltroDias] = useState<string>("1");
   const [addFilaOpen, setAddFilaOpen] = useState(false);
 
+  // filtro popover (estado temporário até confirmar)
+  const [filtroOpen, setFiltroOpen] = useState(false);
+  const [filtroBusca, setFiltroBusca] = useState("");
+  const [filtroProfsSel, setFiltroProfsSel] = useState<string[]>([]);
+  const [filtroDiasSel, setFiltroDiasSel] = useState<string>("1");
+
   // story
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
