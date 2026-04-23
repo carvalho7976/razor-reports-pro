@@ -171,8 +171,8 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
   const badgeBg = isDark ? "#F2F0ED" : "#111111";
   const badgeTxt = isDark ? "#111111" : "#F2F0ED";
 
-  // scale: 1080px → ~320px preview no modal
-  const SCALE = 320 / 1080;
+  // scale: 1080x1920 reduzido para caber no modal junto do toggle e do botão
+  const SCALE = 280 / 1080;
 
   return (
     <div
