@@ -28,7 +28,8 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search } from "lucide-react";
+import { Search, Phone } from "lucide-react";
+import { NovoButton } from "@/components/DataTable";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
 type FilaItem = {
