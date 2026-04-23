@@ -734,7 +734,7 @@ export default function NovaAgenda2() {
                 <button
                   type="button"
                   onClick={() => setStoryProf(p)}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-muted hover:text-foreground group-hover:opacity-100"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label={`Ver story de ${p.nome}`}
                 >
                   <Eye className="h-4 w-4" />
