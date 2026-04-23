@@ -386,11 +386,10 @@ export default function NovaAgenda2() {
 
         {/* AGENDA */}
         <div className="rounded-lg border border-border bg-card shadow-sm">
-          <div className="overflow-x-auto rounded-lg">
-            <div
-              className="grid min-w-[900px]"
-              style={{ gridTemplateColumns: `56px repeat(${profissionaisVisiveis.length}, minmax(180px, 1fr))` }}
-            >
+          <div
+            className="grid min-w-[900px]"
+            style={{ gridTemplateColumns: `56px repeat(${profissionaisVisiveis.length}, minmax(180px, 1fr))` }}
+          >
               {/* Header sticky — colado abaixo da toolbar */}
               <div className="sticky top-[53px] z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -486,7 +485,6 @@ export default function NovaAgenda2() {
                     })}
                 </div>
               ))}
-            </div>
           </div>
         </div>
       </div>
