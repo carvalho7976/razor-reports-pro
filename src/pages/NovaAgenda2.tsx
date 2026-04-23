@@ -489,7 +489,7 @@ export default function NovaAgenda2() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 min-w-[100px] justify-center gap-2 px-3 text-xs font-medium hover:bg-muted hover:text-foreground"
+                    className="h-8 min-w-[130px] justify-center gap-2 px-3 text-xs font-medium hover:bg-muted hover:text-foreground"
                   >
                     <span className="capitalize">
                       {format(data, "EEEE, dd MMM", { locale: ptBR }).replace("-feira", "")}
