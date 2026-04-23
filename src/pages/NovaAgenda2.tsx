@@ -491,7 +491,9 @@ export default function NovaAgenda2() {
                     size="sm"
                     className="h-8 min-w-[170px] justify-center gap-2 px-3 text-xs font-medium hover:bg-muted hover:text-foreground"
                   >
-                    <span className="capitalize">{format(data, "EEEE, dd MMM", { locale: ptBR })}</span>
+                    <span className="capitalize">
+                      {format(data, "EEEE, dd MMM", { locale: ptBR }).replace("-feira", "")}
+                    </span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="center" className="w-auto p-0">
