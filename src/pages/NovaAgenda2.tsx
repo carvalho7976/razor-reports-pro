@@ -493,16 +493,6 @@ export default function NovaAgenda2() {
                     className="absolute left-0 right-0 border-b border-border/50"
                     style={{ top: `${i * SLOT_MIN * PX_POR_MIN}px`, height: `${SLOT_MIN * PX_POR_MIN}px` }}
                   />
-                 {/* ÍCONE AQUI */}
-    <button
-      type="button"
-      onClick={() => abrirStory(p)}
-      className="opacity-0 transition-opacity group-hover:opacity-100 flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
-      aria-label={`Ver story de ${p.nome}`}
-    >
-      <Eye className="h-4 w-4 text-muted-foreground" />
-    </button>
-  </div>
                 ))}
 
                 {agendamentos
