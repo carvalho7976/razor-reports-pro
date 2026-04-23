@@ -456,24 +456,8 @@ export default function NovaAgenda2() {
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
         {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          {/* KPIs */}
-          <div className="flex items-center divide-x divide-border">
-            <div className="flex flex-col pr-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
-              <span className="text-[15px] font-semibold text-green-700 leading-snug">11</span>
-            </div>
-            <div className="flex flex-col pl-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
-              <span className="text-[15px] font-semibold text-amber-700 leading-snug">74%</span>
-            </div>
-          </div>
-
-          {/* Direita */}
-          <div className="ml-auto flex items-center gap-2">
+          {/* Esquerda — Ações */}
+          <div className="flex items-center gap-2">
             {/* Navegação de data */}
             <div className="flex items-center gap-1">
               <button
@@ -495,10 +479,9 @@ export default function NovaAgenda2() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 min-w-[200px] justify-center gap-2 px-3 text-xs font-medium"
+                    className="h-8 min-w-[170px] justify-center gap-2 px-3 text-xs font-medium hover:bg-muted hover:text-foreground"
                   >
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <span className="capitalize">{format(data, "EEE, dd MMM yyyy", { locale: ptBR })}</span>
+                    <span className="capitalize">{format(data, "EEEE, dd MMM", { locale: ptBR })}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="center" className="w-auto p-0">
@@ -696,6 +679,26 @@ export default function NovaAgenda2() {
                 </div>
               </PopoverContent>
             </Popover>
+          </div>
+
+          {/* Direita — KPIs */}
+          <div className="ml-auto flex items-center divide-x divide-border">
+            <div className="flex flex-col px-4 first:pl-0">
+              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
+            </div>
+            <div className="flex flex-col px-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">11</span>
+            </div>
+            <div className="flex flex-col px-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Horários Livres</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">7</span>
+            </div>
+            <div className="flex flex-col pl-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">74%</span>
+            </div>
           </div>
         </div>
 
