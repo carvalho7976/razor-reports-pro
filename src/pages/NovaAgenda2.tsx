@@ -523,7 +523,18 @@ export default function NovaAgenda2() {
             <div className="h-5 w-px bg-border" />
 
             {/* Filtros */}
-            <Popover>
+            <Popover
+              open={filtroOpen}
+              onOpenChange={(open) => {
+                setFiltroOpen(open);
+                if (open) {
+                  // sincroniza estado temporário com o aplicado
+                  setFiltroProfsSel(filtroProf === "todos" ? [] : [filtroProf]);
+                  setFiltroDiasSel(filtroDias);
+                  setFiltroBusca("");
+                }
+              }}
+            >
               <PopoverTrigger asChild>
                 <button
                   type="button"
@@ -538,63 +549,97 @@ export default function NovaAgenda2() {
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="end" sideOffset={8} className="w-[280px] p-3">
-                <div className="space-y-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-foreground">Profissional</Label>
-                    <Select value={filtroProf} onValueChange={setFiltroProf}>
-                      <SelectTrigger className="h-9 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todos" className="text-xs">
-                          Todos os profissionais
-                        </SelectItem>
-                        {profissionais.map((p) => (
-                          <SelectItem key={p.id} value={p.id} className="text-xs">
-                            {p.nome}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+              <PopoverContent align="end" sideOffset={8} className="w-[300px] p-0">
+                {/* Busca */}
+                <div className="relative border-b border-border px-4 pb-3 pt-4">
+                  <Input
+                    value={filtroBusca}
+                    onChange={(e) => setFiltroBusca(e.target.value)}
+                    placeholder="Profissional"
+                    className="h-9 border-0 px-0 pr-7 text-sm shadow-none focus-visible:ring-0"
+                  />
+                  <Search className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                </div>
+
+                {/* Lista de profissionais */}
+                <div className="max-h-[220px] overflow-y-auto px-2 py-2">
+                  {profissionais
+                    .filter((p) => p.nome.toLowerCase().includes(filtroBusca.toLowerCase()))
+                    .map((p) => {
+                      const checked = filtroProfsSel.includes(p.id);
+                      return (
+                        <label
+                          key={p.id}
+                          className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-muted"
+                        >
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className={cn("text-xs font-semibold", p.corHeader)}>
+                              {p.iniciais}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="flex-1 text-sm text-foreground">{p.nome}</span>
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(v) => {
+                              setFiltroProfsSel((prev) =>
+                                v ? [...prev, p.id] : prev.filter((id) => id !== p.id),
+                              );
+                            }}
+                          />
+                        </label>
+                      );
+                    })}
+                </div>
+
+                {/* Dias visualizados */}
+                <div className="border-t border-border px-4 py-3">
+                  <p className="mb-3 text-center text-sm font-semibold text-foreground">Dias visualizados</p>
+                  <div className="flex items-center justify-center gap-1.5">
+                    {["1", "2", "3", "4", "5", "6", "7"].map((n) => {
+                      const active = filtroDiasSel === n;
+                      return (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setFiltroDiasSel(n)}
+                          className={cn(
+                            "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
+                            active
+                              ? "border-foreground bg-foreground text-background"
+                              : "border-border bg-background text-muted-foreground hover:bg-muted",
+                          )}
+                        >
+                          {n}
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-foreground">Visualizar dias</Label>
-                    <Select value={filtroDias} onValueChange={setFiltroDias}>
-                      <SelectTrigger className="h-9 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1" className="text-xs">
-                          1 dia
-                        </SelectItem>
-                        <SelectItem value="2" className="text-xs">
-                          2 dias
-                        </SelectItem>
-                        <SelectItem value="3" className="text-xs">
-                          3 dias
-                        </SelectItem>
-                        <SelectItem value="5" className="text-xs">
-                          Semana útil
-                        </SelectItem>
-                        <SelectItem value="7" className="text-xs">
-                          Semana
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {(filtroProf !== "todos" || filtroDias !== "1") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFiltroProf("todos");
-                        setFiltroDias("1");
-                      }}
-                      className="w-full text-left text-xs font-medium text-muted-foreground hover:text-foreground"
-                    >
-                      Limpar filtros
-                    </button>
-                  )}
+                </div>
+
+                {/* Ações */}
+                <div className="flex items-center gap-2 border-t border-border p-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFiltroProfsSel([]);
+                      setFiltroDiasSel("1");
+                      setFiltroBusca("");
+                    }}
+                    className="flex-1 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wide text-foreground transition-colors hover:bg-muted"
+                  >
+                    Limpar filtro
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFiltroProf(filtroProfsSel.length === 1 ? filtroProfsSel[0] : "todos");
+                      setFiltroDias(filtroDiasSel);
+                      setFiltroOpen(false);
+                    }}
+                    className="flex-1 rounded-md bg-foreground px-3 py-2 text-xs font-semibold uppercase tracking-wide text-background transition-colors hover:bg-foreground/90"
+                  >
+                    Confirmar
+                  </button>
                 </div>
               </PopoverContent>
             </Popover>
