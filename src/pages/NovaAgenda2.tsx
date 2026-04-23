@@ -26,9 +26,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search } from "lucide-react";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
 type FilaItem = {
@@ -133,18 +130,13 @@ const SLOT_MIN = 30;
 const PX_POR_MIN = 1.6;
 
 // ── helper: calcula horários livres de um profissional ─────────────────────
-// Se onlyFuture=true, descarta horários anteriores ao momento atual
-function horariosLivres(profId: string, onlyFuture = false): string[] {
+function horariosLivres(profId: string): string[] {
   const ocupados = agendamentos
     .filter((a) => a.profissional === profId && a.status !== "folga")
     .map((a) => ({ ini: a.inicio, fim: a.inicio + a.duracao }));
 
-  const agora = new Date();
-  const minAgora = agora.getHours() * 60 + agora.getMinutes();
-
   const livres: string[] = [];
   for (let min = HORA_INICIO * 60; min < HORA_FIM * 60; min += SLOT_MIN) {
-    if (onlyFuture && min <= minAgora) continue;
     const minRelativo = min - HORA_INICIO * 60;
     const ocupado = ocupados.some((o) => minRelativo < o.fim && minRelativo + SLOT_MIN > o.ini);
     if (!ocupado) {
@@ -158,7 +150,7 @@ function horariosLivres(profId: string, onlyFuture = false): string[] {
 
 // ── componente do story escalado ───────────────────────────────────────────
 function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Date; tema: "claro" | "escuro" }) {
-  const slots = horariosLivres(prof.id, true);
+  const slots = horariosLivres(prof.id);
   const dataFmt = format(data, "EEE, dd MMM", { locale: ptBR });
   const totalAg = agendamentos.filter((a) => a.profissional === prof.id).length;
 
@@ -174,13 +166,13 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
   const badgeBg = isDark ? "#F2F0ED" : "#111111";
   const badgeTxt = isDark ? "#111111" : "#F2F0ED";
 
-  // scale: 1080x1920 reduzido para caber no modal junto do toggle e do botão
-  const SCALE = 280 / 1080;
+  // scale: 1080px → ~320px preview no modal
+  const SCALE = 320 / 1080;
 
   return (
     <div
       style={{
-        width: 280,
+        width: 320,
         height: Math.round(1920 * SCALE),
         overflow: "hidden",
         borderRadius: 12,
@@ -395,12 +387,6 @@ export default function NovaAgenda2() {
   const [filtroDias, setFiltroDias] = useState<string>("1");
   const [addFilaOpen, setAddFilaOpen] = useState(false);
 
-  // filtro popover (estado temporário até confirmar)
-  const [filtroOpen, setFiltroOpen] = useState(false);
-  const [filtroBusca, setFiltroBusca] = useState("");
-  const [filtroProfsSel, setFiltroProfsSel] = useState<string[]>([]);
-  const [filtroDiasSel, setFiltroDiasSel] = useState<string>("1");
-
   // story
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
@@ -464,9 +450,30 @@ export default function NovaAgenda2() {
 
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
         {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
-        <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          {/* Esquerda — Ações */}
-          <div className="flex items-center gap-2">
+        <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/95 px-4 py-3 shadow-sm backdrop-blur">
+          {/* KPIs */}
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              { emoji: "😌", valor: 18 },
+              { emoji: "😉", valor: 12 },
+              { emoji: "🤗", valor: 9 },
+              { emoji: "😱", valor: 2 },
+              { emoji: "😢", valor: 3 },
+              { emoji: "💆🏻‍♂️", valor: 4 },
+              { emoji: "😍", valor: 11 },
+            ].map((item) => (
+              <div
+                key={item.emoji}
+                className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-[1px] hover:shadow-sm"
+              >
+                <span className="text-base leading-none">{item.emoji}</span>
+                <span className="text-sm font-semibold text-foreground">{item.valor}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Direita */}
+          <div className="ml-auto flex items-center gap-2">
             {/* Navegação de data */}
             <div className="flex items-center gap-1">
               <button
@@ -478,32 +485,34 @@ export default function NovaAgenda2() {
                     return n;
                   })
                 }
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
                 aria-label="Dia anterior"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
+
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 min-w-[170px] justify-center gap-2 px-3 text-xs font-medium hover:bg-muted hover:text-foreground"
+                  <button
+                    type="button"
+                    className="flex h-10 min-w-[230px] items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none transition-all hover:bg-muted"
                   >
-                    <span className="capitalize">{format(data, "EEEE, dd MMM", { locale: ptBR })}</span>
-                  </Button>
+                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="capitalize">{format(data, "EEE, dd MMM yyyy", { locale: ptBR })}</span>
+                  </button>
                 </PopoverTrigger>
-                <PopoverContent align="center" className="w-auto p-0">
+                <PopoverContent align="center" className="w-auto rounded-2xl p-0">
                   <Calendar
                     mode="single"
                     selected={data}
                     onSelect={(d) => d && setData(d)}
                     initialFocus
                     locale={ptBR}
-                    className={cn("p-3 pointer-events-auto")}
+                    className={cn("pointer-events-auto p-3")}
                   />
                 </PopoverContent>
               </Popover>
+
               <button
                 type="button"
                 onClick={() =>
@@ -513,133 +522,95 @@ export default function NovaAgenda2() {
                     return n;
                   })
                 }
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
                 aria-label="Próximo dia"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="h-5 w-px bg-border" />
+            <div className="mx-1 h-6 w-px bg-border" />
 
             {/* Filtros */}
-            <Popover
-              open={filtroOpen}
-              onOpenChange={(open) => {
-                setFiltroOpen(open);
-                if (open) {
-                  // sincroniza estado temporário com o aplicado
-                  setFiltroProfsSel(filtroProf === "todos" ? [] : [filtroProf]);
-                  setFiltroDiasSel(filtroDias);
-                  setFiltroBusca("");
-                }
-              }}
-            >
+            <Popover>
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
                   aria-label="Filtros"
                 >
                   <Filter className="h-4 w-4" />
                   {(filtroProf !== "todos" || filtroDias !== "1") && (
-                    <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
+                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
                       {(filtroProf !== "todos" ? 1 : 0) + (filtroDias !== "1" ? 1 : 0)}
                     </span>
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="end" sideOffset={8} className="w-[300px] p-0">
-                {/* Busca */}
-                <div className="relative border-b border-border px-4 pb-3 pt-4">
-                  <Input
-                    value={filtroBusca}
-                    onChange={(e) => setFiltroBusca(e.target.value)}
-                    placeholder="Profissional"
-                    className="h-9 border-0 px-0 pr-7 text-sm shadow-none focus-visible:ring-0"
-                  />
-                  <Search className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                </div>
 
-                {/* Lista de profissionais */}
-                <div className="max-h-[220px] overflow-y-auto px-2 py-2">
-                  {profissionais
-                    .filter((p) => p.nome.toLowerCase().includes(filtroBusca.toLowerCase()))
-                    .map((p) => {
-                      const checked = filtroProfsSel.includes(p.id);
-                      return (
-                        <label
-                          key={p.id}
-                          className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-muted"
-                        >
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className={cn("text-xs font-semibold", p.corHeader)}>
-                              {p.iniciais}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="flex-1 text-sm text-foreground">{p.nome}</span>
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={(v) => {
-                              setFiltroProfsSel((prev) =>
-                                v ? [...prev, p.id] : prev.filter((id) => id !== p.id),
-                              );
-                            }}
-                          />
-                        </label>
-                      );
-                    })}
-                </div>
-
-                {/* Dias visualizados */}
-                <div className="border-t border-border px-4 py-3">
-                  <p className="mb-3 text-center text-sm font-semibold text-foreground">Dias visualizados</p>
-                  <div className="flex items-center justify-center gap-1.5">
-                    {["1", "2", "3", "4", "5", "6", "7"].map((n) => {
-                      const active = filtroDiasSel === n;
-                      return (
-                        <button
-                          key={n}
-                          type="button"
-                          onClick={() => setFiltroDiasSel(n)}
-                          className={cn(
-                            "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
-                            active
-                              ? "border-foreground bg-foreground text-background"
-                              : "border-border bg-background text-muted-foreground hover:bg-muted",
-                          )}
-                        >
-                          {n}
-                        </button>
-                      );
-                    })}
+              <PopoverContent
+                align="end"
+                sideOffset={10}
+                className="w-[310px] rounded-2xl border border-border p-4 shadow-lg"
+              >
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-foreground">Profissional</Label>
+                    <Select value={filtroProf} onValueChange={setFiltroProf}>
+                      <SelectTrigger className="h-11 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="todos" className="text-sm">
+                          Todos os profissionais
+                        </SelectItem>
+                        {profissionais.map((p) => (
+                          <SelectItem key={p.id} value={p.id} className="text-sm">
+                            {p.nome}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
 
-                {/* Ações */}
-                <div className="flex items-center gap-2 border-t border-border p-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFiltroProfsSel([]);
-                      setFiltroDiasSel("1");
-                      setFiltroBusca("");
-                    }}
-                    className="flex-1 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wide text-foreground transition-colors hover:bg-muted"
-                  >
-                    Limpar filtro
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFiltroProf(filtroProfsSel.length === 1 ? filtroProfsSel[0] : "todos");
-                      setFiltroDias(filtroDiasSel);
-                      setFiltroOpen(false);
-                    }}
-                    className="flex-1 rounded-md bg-foreground px-3 py-2 text-xs font-semibold uppercase tracking-wide text-background transition-colors hover:bg-foreground/90"
-                  >
-                    Confirmar
-                  </button>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-foreground">Visualizar dias</Label>
+                    <Select value={filtroDias} onValueChange={setFiltroDias}>
+                      <SelectTrigger className="h-11 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="1" className="text-sm">
+                          1 dia
+                        </SelectItem>
+                        <SelectItem value="2" className="text-sm">
+                          2 dias
+                        </SelectItem>
+                        <SelectItem value="3" className="text-sm">
+                          3 dias
+                        </SelectItem>
+                        <SelectItem value="5" className="text-sm">
+                          Semana útil
+                        </SelectItem>
+                        <SelectItem value="7" className="text-sm">
+                          Semana
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {(filtroProf !== "todos" || filtroDias !== "1") && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFiltroProf("todos");
+                        setFiltroDias("1");
+                      }}
+                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+                    >
+                      Limpar filtros
+                    </button>
+                  )}
                 </div>
               </PopoverContent>
             </Popover>
@@ -649,81 +620,95 @@ export default function NovaAgenda2() {
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex h-10 items-center gap-2 rounded-xl border border-border bg-background px-3.5 text-sm font-medium text-foreground transition-all hover:bg-muted"
                 >
                   <Users className="h-4 w-4" />
                   Fila
-                  <Badge variant="secondary" className="h-4 rounded-full px-1.5 text-[10px] font-semibold">
+                  <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
                     {fila.length}
                   </Badge>
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="end" sideOffset={8} className="w-[360px] p-0">
-                <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
+
+              <PopoverContent
+                align="end"
+                sideOffset={10}
+                className="w-[390px] rounded-2xl border border-border p-0 shadow-lg"
+              >
+                <div className="flex items-center justify-between border-b border-border px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-muted">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background">
                       <Users className="h-4 w-4 text-foreground" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">Fila de espera</span>
-                    <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
-                      {fila.length}
-                    </Badge>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Fila de espera</p>
+                      <p className="text-xs text-muted-foreground">{fila.length} cliente(s)</p>
+                    </div>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 gap-1 px-2 text-xs"
+
+                  <button
+                    type="button"
                     onClick={() => setAddFilaOpen(true)}
+                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-background px-3 text-sm font-medium text-foreground transition-all hover:bg-muted"
                   >
-                    <Plus className="h-3.5 w-3.5" />
-                    Adicionar
-                  </Button>
+                    <Plus className="h-4 w-4" />
+                    Novo
+                  </button>
                 </div>
-                <div className="max-h-[60vh] overflow-y-auto p-2">
+
+                <div className="max-h-[60vh] overflow-y-auto p-3">
                   {fila.length === 0 ? (
-                    <p className="px-2 py-8 text-center text-sm text-muted-foreground">Ninguém na fila no momento.</p>
+                    <p className="px-2 py-10 text-center text-sm text-muted-foreground">Ninguém na fila no momento.</p>
                   ) : (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-3">
                       {fila.map((item, idx) => (
                         <div
                           key={item.id}
-                          className="group relative flex items-start gap-3 rounded-md border border-border bg-background p-2.5 transition-shadow hover:shadow-sm"
+                          className="group rounded-2xl border border-border bg-background p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-[1px] hover:shadow-sm"
                         >
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-info/10 text-xs font-semibold text-info">
-                            {idx + 1}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="truncate text-sm font-medium text-foreground">{item.nome}</p>
-                              <button
-                                type="button"
-                                onClick={() => removerFila(item.id)}
-                                className="opacity-0 transition-opacity group-hover:opacity-100"
-                                aria-label="Remover da fila"
-                              >
-                                <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                              </button>
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/40 text-sm font-semibold text-foreground">
+                              {idx + 1}
                             </div>
-                            <p className="truncate text-xs text-muted-foreground">
-                              {item.servico}
-                              {item.prefere && (
-                                <>
-                                  {" "}
-                                  · Prefere <span className="text-foreground">{item.prefere}</span>
-                                </>
-                              )}
-                            </p>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                                <Clock className="h-3 w-3" />
-                                {item.esperaMin > 0 ? `${item.esperaMin} min` : "Agora"}
-                              </span>
-                              <Button
-                                size="sm"
-                                className="h-6 rounded-md bg-success px-2 text-[11px] font-semibold text-success-foreground hover:bg-success/90"
-                              >
-                                Chamar
-                              </Button>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-semibold text-foreground">{item.nome}</p>
+                                  <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.servico}</p>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => removerFila(item.id)}
+                                  className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground opacity-0 transition-all hover:bg-muted hover:text-destructive group-hover:opacity-100"
+                                  aria-label="Remover da fila"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+
+                              <div className="mt-3 flex flex-wrap items-center gap-2">
+                                {item.prefere && (
+                                  <span className="inline-flex h-7 items-center rounded-full border border-border bg-muted/30 px-2.5 text-[11px] font-medium text-foreground">
+                                    {item.prefere}
+                                  </span>
+                                )}
+
+                                <span className="inline-flex h-7 items-center gap-1 rounded-full border border-border bg-muted/30 px-2.5 text-[11px] font-medium text-muted-foreground">
+                                  <Clock className="h-3 w-3" />
+                                  {item.esperaMin > 0 ? `${item.esperaMin} min` : "Agora"}
+                                </span>
+                              </div>
+
+                              <div className="mt-3 flex justify-end">
+                                <button
+                                  type="button"
+                                  className="inline-flex h-9 items-center rounded-xl border border-black bg-white px-3.5 text-xs font-semibold text-black transition-all hover:bg-black hover:text-white"
+                                >
+                                  Chamar
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -733,26 +718,6 @@ export default function NovaAgenda2() {
                 </div>
               </PopoverContent>
             </Popover>
-          </div>
-
-          {/* Direita — KPIs */}
-          <div className="ml-auto flex items-center divide-x divide-border">
-            <div className="flex flex-col px-4 first:pl-0">
-              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">11</span>
-            </div>
-            <div className="flex flex-col px-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Horários Livres</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">7</span>
-            </div>
-            <div className="flex flex-col pl-4">
-              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
-              <span className="text-[15px] font-semibold text-foreground leading-snug">74%</span>
-            </div>
           </div>
         </div>
 
@@ -788,7 +753,7 @@ export default function NovaAgenda2() {
                 <button
                   type="button"
                   onClick={() => setStoryProf(p)}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-muted hover:text-foreground group-hover:opacity-100"
                   aria-label={`Ver story de ${p.nome}`}
                 >
                   <Eye className="h-4 w-4" />
@@ -879,18 +844,18 @@ export default function NovaAgenda2() {
 
       {/* ── MODAL: story do profissional ─────────────────────────────────── */}
       <Dialog open={!!storyProf} onOpenChange={(o) => !o && setStoryProf(null)}>
-        <DialogContent className="w-auto max-w-[360px] gap-0 border-none bg-transparent p-0 shadow-none">
+        <DialogContent className="max-w-fit gap-0 p-0 bg-transparent border-none shadow-none">
           {storyProf && (
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-3">
               {/* Toggle tema */}
-              <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1 shadow-sm">
-                {(["claro", "escuro"] as const).map((t) => (
+              <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
+                {(["escuro", "claro"] as const).map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setStoryTema(t)}
                     className={cn(
-                      "rounded-md px-4 py-1 text-xs font-medium capitalize transition-colors",
+                      "rounded-md px-4 py-1.5 text-xs font-medium capitalize transition-colors",
                       storyTema === t ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
                     )}
                   >
@@ -901,7 +866,7 @@ export default function NovaAgenda2() {
               {/* Story */}
               <StoryProfissional prof={storyProf} data={data} tema={storyTema} />
               {/* Ação de compartilhar */}
-              <Button size="sm" className="w-full gap-2 shadow-sm">
+              <Button size="sm" className="gap-2 w-full">
                 Compartilhar story
               </Button>
             </div>
