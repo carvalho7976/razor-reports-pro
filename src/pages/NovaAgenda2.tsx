@@ -160,7 +160,7 @@ function horariosLivres(profId: string, onlyFuture = false): string[] {
 // ── componente do story escalado ───────────────────────────────────────────
 function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Date; tema: "claro" | "escuro" }) {
   const slots = horariosLivres(prof.id, true);
-  const dataFmt = format(data, "EEE, dd MMM", { locale: ptBR });
+  const dataFmt = format(data, "EEEE", { locale: ptBR }).replace("-feira", "");
   const totalAg = agendamentos.filter((a) => a.profissional === prof.id).length;
 
   const isDark = tema === "escuro";
