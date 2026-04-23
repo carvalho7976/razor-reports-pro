@@ -130,13 +130,18 @@ const SLOT_MIN = 30;
 const PX_POR_MIN = 1.6;
 
 // ── helper: calcula horários livres de um profissional ─────────────────────
-function horariosLivres(profId: string): string[] {
+// Se onlyFuture=true, descarta horários anteriores ao momento atual
+function horariosLivres(profId: string, onlyFuture = false): string[] {
   const ocupados = agendamentos
     .filter((a) => a.profissional === profId && a.status !== "folga")
     .map((a) => ({ ini: a.inicio, fim: a.inicio + a.duracao }));
 
+  const agora = new Date();
+  const minAgora = agora.getHours() * 60 + agora.getMinutes();
+
   const livres: string[] = [];
   for (let min = HORA_INICIO * 60; min < HORA_FIM * 60; min += SLOT_MIN) {
+    if (onlyFuture && min <= minAgora) continue;
     const minRelativo = min - HORA_INICIO * 60;
     const ocupado = ocupados.some((o) => minRelativo < o.fim && minRelativo + SLOT_MIN > o.ini);
     if (!ocupado) {
