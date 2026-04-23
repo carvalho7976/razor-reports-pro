@@ -177,7 +177,7 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
   return (
     <div
       style={{
-        width: 320,
+        width: 280,
         height: Math.round(1920 * SCALE),
         overflow: "hidden",
         borderRadius: 12,
