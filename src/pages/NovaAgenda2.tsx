@@ -19,18 +19,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,15 +49,7 @@ const profissionais: Profissional[] = [
   { id: "vini", nome: "Vini", cargo: "Auxiliar", iniciais: "VI", corHeader: "bg-indigo-500 text-white" },
 ];
 
-const servicosOpcoes = [
-  "Corte Feminino",
-  "Corte Masculino",
-  "Barba",
-  "Coloração",
-  "Manicure",
-  "Pedicure",
-  "Escova",
-];
+const servicosOpcoes = ["Corte Feminino", "Corte Masculino", "Barba", "Coloração", "Manicure", "Pedicure", "Escova"];
 
 type StatusEvento = "confirmado" | "pendente" | "folga" | "destaque";
 
@@ -86,15 +68,37 @@ const agendamentos: Agendamento[] = [
   { id: 2, profissional: "cesar", inicio: 420, duracao: 60, cliente: "Daniel Lucas Santos Araújo", servico: "Luzes" },
   { id: 3, profissional: "cesar", inicio: 480, duracao: 30, cliente: "Jean Carlos", servico: "corte social" },
   { id: 4, profissional: "cesar", inicio: 510, duracao: 30, cliente: "José Ales Junior", servico: "Corte Masculino" },
-  { id: 5, profissional: "cesar", inicio: 540, duracao: 30, cliente: "Victor Renan Cavalcante da mato", servico: "Barba + Sobrancelha" },
+  {
+    id: 5,
+    profissional: "cesar",
+    inicio: 540,
+    duracao: 30,
+    cliente: "Victor Renan Cavalcante da mato",
+    servico: "Barba + Sobrancelha",
+  },
   { id: 6, profissional: "cesar", inicio: 570, duracao: 30, cliente: "Pedro Henrique", servico: "Corte Masculino" },
   { id: 7, profissional: "cesar", inicio: 615, duracao: 25, cliente: "cristian", servico: "corte social" },
   { id: 10, profissional: "claudia", inicio: 360, duracao: 90, cliente: "", servico: "Disponível", status: "pendente" },
   { id: 11, profissional: "claudia", inicio: 450, duracao: 30, cliente: "César", servico: "Corte Masculino" },
-  { id: 12, profissional: "claudia", inicio: 480, duracao: 45, cliente: "Alice Costa Melis", servico: "Corte Feminino" },
+  {
+    id: 12,
+    profissional: "claudia",
+    inicio: 480,
+    duracao: 45,
+    cliente: "Alice Costa Melis",
+    servico: "Corte Feminino",
+  },
   { id: 13, profissional: "claudia", inicio: 525, duracao: 30, cliente: "César", servico: "Corte Masculino" },
   { id: 14, profissional: "claudia", inicio: 540, duracao: 60, cliente: "Adriana Quiros", servico: "Mechas" },
-  { id: 15, profissional: "claudia", inicio: 630, duracao: 90, cliente: "Promo do dia", servico: "Pacote Especial", status: "destaque" },
+  {
+    id: 15,
+    profissional: "claudia",
+    inicio: 630,
+    duracao: 90,
+    cliente: "Promo do dia",
+    servico: "Pacote Especial",
+    status: "destaque",
+  },
   { id: 20, profissional: "marcia", inicio: 390, duracao: 30, cliente: "Cristiane Soares Santos", servico: "Manicure" },
   { id: 21, profissional: "marcia", inicio: 420, duracao: 30, cliente: "Sabrina Ramak", servico: "Pedicure" },
   { id: 22, profissional: "marcia", inicio: 450, duracao: 60, cliente: "Luciana Cunha", servico: "Esmaltação em gel" },
@@ -137,8 +141,7 @@ export default function NovaAgenda2() {
   const [novoServico, setNovoServico] = useState("");
   const [novoProfPreferido, setNovoProfPreferido] = useState("");
 
-  const removerFila = (id: number) =>
-    setFila((prev) => prev.filter((f) => f.id !== id));
+  const removerFila = (id: number) => setFila((prev) => prev.filter((f) => f.id !== id));
 
   const handleSalvarFila = () => {
     if (!novoCliente.trim() || !novoServico) return;
@@ -183,67 +186,99 @@ export default function NovaAgenda2() {
   return (
     <AppLayout>
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
-        {/* TOOLBAR FIXA */}
-        <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          {/* Esquerda: navegação data centralizada */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setData((d) => { const n = new Date(d); n.setDate(d.getDate() - 1); return n; })}
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label="Dia anterior"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 min-w-[220px] justify-center gap-2 px-3 text-xs font-medium"
-                >
-                  <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="capitalize">
-                    {format(data, "EEEE, dd 'de' MMM yyyy", { locale: ptBR })}
-                  </span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="center" className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={data}
-                  onSelect={(d) => d && setData(d)}
-                  initialFocus
-                  locale={ptBR}
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
-
-            <button
-              type="button"
-              onClick={() => setData((d) => { const n = new Date(d); n.setDate(d.getDate() + 1); return n; })}
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label="Próximo dia"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
+        {/* {/* TOOLBAR FIXA */}
+        <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
+          {/* Esquerda: KPIs */}
+          <div className="flex items-center divide-x divide-border">
+            <div className="flex flex-col pr-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Agendamentos</span>
+              <span className="text-[15px] font-semibold text-foreground leading-snug">18</span>
+            </div>
+            <div className="flex flex-col px-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Concluídos</span>
+              <span className="text-[15px] font-semibold text-green-700 leading-snug">11</span>
+            </div>
+            <div className="flex flex-col pl-4">
+              <span className="text-[11px] text-muted-foreground leading-tight">Ocupação</span>
+              <span className="text-[15px] font-semibold text-amber-700 leading-snug">74%</span>
+            </div>
           </div>
 
-          {/* Direita: Filtros · Fila */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Direita: data + ações */}
+          <div className="ml-auto flex items-center gap-2">
+            {/* Navegação de data */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() =>
+                  setData((d) => {
+                    const n = new Date(d);
+                    n.setDate(d.getDate() - 1);
+                    return n;
+                  })
+                }
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Dia anterior"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 min-w-[200px] justify-center gap-2 px-3 text-xs font-medium"
+                  >
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="capitalize">{format(data, "EEE, dd MMM yyyy", { locale: ptBR })}</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="center" className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={data}
+                    onSelect={(d) => d && setData(d)}
+                    initialFocus
+                    locale={ptBR}
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setData((d) => {
+                    const n = new Date(d);
+                    n.setDate(d.getDate() + 1);
+                    return n;
+                  })
+                }
+                className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Próximo dia"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="h-5 w-px bg-border" />
+
+            {/* Filtros */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-2">
+                <button
+                  type="button"
+                  className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  aria-label="Filtros"
+                >
                   <Filter className="h-4 w-4" />
-                  Filtros
                   {(filtroProf !== "todos" || filtroDias !== "1") && (
-                    <Badge variant="secondary" className="h-5 rounded-full px-1.5 text-[10px] font-semibold">
+                    <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
                       {(filtroProf !== "todos" ? 1 : 0) + (filtroDias !== "1" ? 1 : 0)}
-                    </Badge>
+                    </span>
                   )}
-                </Button>
+                </button>
               </PopoverTrigger>
               <PopoverContent align="end" sideOffset={8} className="w-[280px] p-3">
                 <div className="space-y-3">
@@ -254,7 +289,9 @@ export default function NovaAgenda2() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="todos" className="text-xs">Todos os profissionais</SelectItem>
+                        <SelectItem value="todos" className="text-xs">
+                          Todos os profissionais
+                        </SelectItem>
                         {profissionais.map((p) => (
                           <SelectItem key={p.id} value={p.id} className="text-xs">
                             {p.nome}
@@ -271,11 +308,21 @@ export default function NovaAgenda2() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1" className="text-xs">1 dia</SelectItem>
-                        <SelectItem value="2" className="text-xs">2 dias</SelectItem>
-                        <SelectItem value="3" className="text-xs">3 dias</SelectItem>
-                        <SelectItem value="5" className="text-xs">Semana útil</SelectItem>
-                        <SelectItem value="7" className="text-xs">Semana</SelectItem>
+                        <SelectItem value="1" className="text-xs">
+                          1 dia
+                        </SelectItem>
+                        <SelectItem value="2" className="text-xs">
+                          2 dias
+                        </SelectItem>
+                        <SelectItem value="3" className="text-xs">
+                          3 dias
+                        </SelectItem>
+                        <SelectItem value="5" className="text-xs">
+                          Semana útil
+                        </SelectItem>
+                        <SelectItem value="7" className="text-xs">
+                          Semana
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -283,7 +330,10 @@ export default function NovaAgenda2() {
                   {(filtroProf !== "todos" || filtroDias !== "1") && (
                     <button
                       type="button"
-                      onClick={() => { setFiltroProf("todos"); setFiltroDias("1"); }}
+                      onClick={() => {
+                        setFiltroProf("todos");
+                        setFiltroDias("1");
+                      }}
                       className="w-full text-left text-xs font-medium text-muted-foreground hover:text-foreground"
                     >
                       Limpar filtros
@@ -293,15 +343,19 @@ export default function NovaAgenda2() {
               </PopoverContent>
             </Popover>
 
+            {/* Fila de espera */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-2">
+                <button
+                  type="button"
+                  className="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
                   <Users className="h-4 w-4" />
-                  Fila de espera
-                  <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
+                  Fila
+                  <Badge variant="secondary" className="h-4 rounded-full px-1.5 text-[10px] font-semibold">
                     {fila.length}
                   </Badge>
-                </Button>
+                </button>
               </PopoverTrigger>
               <PopoverContent align="end" sideOffset={8} className="w-[360px] p-0">
                 <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
@@ -327,9 +381,7 @@ export default function NovaAgenda2() {
 
                 <div className="max-h-[60vh] overflow-y-auto p-2">
                   {fila.length === 0 ? (
-                    <p className="px-2 py-8 text-center text-sm text-muted-foreground">
-                      Ninguém na fila no momento.
-                    </p>
+                    <p className="px-2 py-8 text-center text-sm text-muted-foreground">Ninguém na fila no momento.</p>
                   ) : (
                     <div className="flex flex-col gap-2">
                       {fila.map((item, idx) => (
@@ -356,6 +408,7 @@ export default function NovaAgenda2() {
                               {item.servico}
                               {item.prefere && (
                                 <>
+                                  {" "}
                                   {" · Prefere "}
                                   <span className="text-foreground">{item.prefere}</span>
                                 </>
@@ -364,7 +417,7 @@ export default function NovaAgenda2() {
                             <div className="mt-2 flex items-center justify-between">
                               <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                                 <Clock className="h-3 w-3" />
-                                {item.esperaMin} min
+                                {item.esperaMin > 0 ? `${item.esperaMin} min` : "Agora"}
                               </span>
                               <Button
                                 size="sm"
@@ -390,101 +443,112 @@ export default function NovaAgenda2() {
             className="grid min-w-[900px]"
             style={{ gridTemplateColumns: `56px repeat(${profissionaisVisiveis.length}, minmax(180px, 1fr))` }}
           >
-              {/* Header sticky — colado abaixo da toolbar */}
-              <div className="sticky top-[53px] z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </div>
-              {profissionaisVisiveis.map((p) => (
+            {/* Header sticky — colado abaixo da toolbar */}
+            <div className="sticky top-[53px] z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </div>
+            {profissionaisVisiveis.map((p) => (
+              <div
+                key={p.id}
+                className="sticky top-[53px] z-20 flex items-center gap-2 border-b border-r border-border bg-card px-3 py-2 last:border-r-0"
+              >
                 <div
-                  key={p.id}
-                  className="sticky top-[53px] z-20 flex items-center gap-2 border-b border-r border-border bg-card px-3 py-2 last:border-r-0"
+                  className={cn(
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
+                    p.corHeader,
+                  )}
                 >
-                  <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold", p.corHeader)}>
-                    {p.iniciais}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{p.nome}</p>
-                    <p className="truncate text-[11px] text-muted-foreground">{p.cargo}</p>
-                  </div>
+                  {p.iniciais}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">{p.nome}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">{p.cargo}</p>
+                </div>
+              </div>
+            ))}
+
+            {/* Coluna de horários */}
+            <div className="relative border-r border-border bg-muted/20">
+              {horarios.map((h) => (
+                <div
+                  key={h}
+                  className="flex items-start justify-end pr-2 pt-0 text-[11px] font-medium text-muted-foreground"
+                  style={{ height: `${SLOT_MIN * PX_POR_MIN}px` }}
+                >
+                  <span className="-mt-1.5">{h}</span>
                 </div>
               ))}
+            </div>
 
-              {/* Coluna de horários */}
-              <div className="relative border-r border-border bg-muted/20">
-                {horarios.map((h) => (
+            {/* Colunas dos profissionais */}
+            {profissionaisVisiveis.map((p) => (
+              <div
+                key={p.id}
+                className="relative border-r border-border last:border-r-0"
+                style={{ height: `${totalMin * PX_POR_MIN}px` }}
+              >
+                {horarios.map((_, i) => (
                   <div
-                    key={h}
-                    className="flex items-start justify-end pr-2 pt-0 text-[11px] font-medium text-muted-foreground"
-                    style={{ height: `${SLOT_MIN * PX_POR_MIN}px` }}
-                  >
-                    <span className="-mt-1.5">{h}</span>
-                  </div>
+                    key={i}
+                    className="absolute left-0 right-0 border-b border-border/50"
+                    style={{ top: `${i * SLOT_MIN * PX_POR_MIN}px`, height: `${SLOT_MIN * PX_POR_MIN}px` }}
+                  />
                 ))}
-              </div>
 
-              {/* Colunas dos profissionais */}
-              {profissionaisVisiveis.map((p) => (
-                <div
-                  key={p.id}
-                  className="relative border-r border-border last:border-r-0"
-                  style={{ height: `${totalMin * PX_POR_MIN}px` }}
-                >
-                  {horarios.map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute left-0 right-0 border-b border-border/50"
-                      style={{ top: `${i * SLOT_MIN * PX_POR_MIN}px`, height: `${SLOT_MIN * PX_POR_MIN}px` }}
-                    />
-                  ))}
+                {agendamentos
+                  .filter((a) => a.profissional === p.id)
+                  .map((a) => {
+                    const isFolga = a.status === "folga";
+                    const isPendente = a.status === "pendente";
+                    const isDestaque = a.status === "destaque";
 
-                  {agendamentos
-                    .filter((a) => a.profissional === p.id)
-                    .map((a) => {
-                      const isFolga = a.status === "folga";
-                      const isPendente = a.status === "pendente";
-                      const isDestaque = a.status === "destaque";
-
-                      return (
-                        <div
-                          key={a.id}
-                          className={cn(
-                            "absolute left-0 right-0 cursor-pointer overflow-hidden border-l-[3px] px-2 py-1 text-[11px] transition-all hover:z-10 hover:shadow-md",
-                            isFolga && "border-l-foreground bg-foreground text-background",
-                            isPendente && "border-l-sky-400 bg-sky-100 text-sky-900",
-                            isDestaque && "border-l-pink-600 bg-gradient-to-r from-pink-500 to-rose-500 text-white",
-                            !isFolga && !isPendente && !isDestaque && "border-l-foreground/80 bg-card text-foreground hover:bg-muted/40"
-                          )}
-                          style={{
-                            top: `${a.inicio * PX_POR_MIN}px`,
-                            height: `${a.duracao * PX_POR_MIN - 1}px`,
-                          }}
-                        >
-                          <div className="flex items-start justify-between gap-1">
-                            <span className={cn(
+                    return (
+                      <div
+                        key={a.id}
+                        className={cn(
+                          "absolute left-0 right-0 cursor-pointer overflow-hidden border-l-[3px] px-2 py-1 text-[11px] transition-all hover:z-10 hover:shadow-md",
+                          isFolga && "border-l-foreground bg-foreground text-background",
+                          isPendente && "border-l-sky-400 bg-sky-100 text-sky-900",
+                          isDestaque && "border-l-pink-600 bg-gradient-to-r from-pink-500 to-rose-500 text-white",
+                          !isFolga &&
+                            !isPendente &&
+                            !isDestaque &&
+                            "border-l-foreground/80 bg-card text-foreground hover:bg-muted/40",
+                        )}
+                        style={{
+                          top: `${a.inicio * PX_POR_MIN}px`,
+                          height: `${a.duracao * PX_POR_MIN - 1}px`,
+                        }}
+                      >
+                        <div className="flex items-start justify-between gap-1">
+                          <span
+                            className={cn(
                               "text-[10px] font-medium",
-                              isFolga ? "text-background/70" : isDestaque ? "text-white/90" : "text-muted-foreground"
-                            )}>
-                              {formatHora(a.inicio)} - {formatHora(a.inicio + a.duracao)}
-                            </span>
-                            {!isFolga && (
-                              isDestaque ? (
-                                <Star className="h-3 w-3 shrink-0 fill-yellow-300 text-yellow-300" />
-                              ) : (
-                                <Smile className="h-3 w-3 shrink-0 text-amber-400" />
-                              )
+                              isFolga ? "text-background/70" : isDestaque ? "text-white/90" : "text-muted-foreground",
                             )}
-                          </div>
-                          <p className={cn(
-                            "truncate text-[11px] font-semibold leading-tight mt-0.5",
-                            isFolga ? "text-background" : isDestaque ? "text-white" : "text-foreground"
-                          )}>
-                            {a.cliente && a.servico ? `${a.cliente} - ${a.servico}` : a.cliente || a.servico}
-                          </p>
+                          >
+                            {formatHora(a.inicio)} - {formatHora(a.inicio + a.duracao)}
+                          </span>
+                          {!isFolga &&
+                            (isDestaque ? (
+                              <Star className="h-3 w-3 shrink-0 fill-yellow-300 text-yellow-300" />
+                            ) : (
+                              <Smile className="h-3 w-3 shrink-0 text-amber-400" />
+                            ))}
                         </div>
-                      );
-                    })}
-                </div>
-              ))}
+                        <p
+                          className={cn(
+                            "truncate text-[11px] font-semibold leading-tight mt-0.5",
+                            isFolga ? "text-background" : isDestaque ? "text-white" : "text-foreground",
+                          )}
+                        >
+                          {a.cliente && a.servico ? `${a.cliente} - ${a.servico}` : a.cliente || a.servico}
+                        </p>
+                      </div>
+                    );
+                  })}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -546,11 +610,15 @@ export default function NovaAgenda2() {
               <RadioGroup value={novoSexo} onValueChange={setNovoSexo} className="flex gap-4">
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="M" id="sexo-m" />
-                  <Label htmlFor="sexo-m" className="text-sm font-normal">M</Label>
+                  <Label htmlFor="sexo-m" className="text-sm font-normal">
+                    M
+                  </Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="F" id="sexo-f" />
-                  <Label htmlFor="sexo-f" className="text-sm font-normal">F</Label>
+                  <Label htmlFor="sexo-f" className="text-sm font-normal">
+                    F
+                  </Label>
                 </div>
               </RadioGroup>
             </div>
@@ -563,7 +631,9 @@ export default function NovaAgenda2() {
                 </SelectTrigger>
                 <SelectContent>
                   {servicosOpcoes.map((s) => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -577,7 +647,9 @@ export default function NovaAgenda2() {
                 </SelectTrigger>
                 <SelectContent>
                   {profissionais.map((p) => (
-                    <SelectItem key={p.id} value={p.nome}>{p.nome}</SelectItem>
+                    <SelectItem key={p.id} value={p.nome}>
+                      {p.nome}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -585,12 +657,7 @@ export default function NovaAgenda2() {
           </div>
 
           <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-5 py-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setAddFilaOpen(false)}
-              className="h-9"
-            >
+            <Button variant="outline" size="sm" onClick={() => setAddFilaOpen(false)} className="h-9">
               Cancelar
             </Button>
             <Button
