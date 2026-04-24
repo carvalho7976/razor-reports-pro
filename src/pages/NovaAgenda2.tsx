@@ -991,6 +991,7 @@ export default function NovaAgenda2() {
               setValue={setNovoProfPreferido}
               options={profissionais.map((p) => ({ value: p.nome, label: p.nome }))}
               openDirection="up"
+              searchable
             />
           </FormModal>
         </DialogContent>
