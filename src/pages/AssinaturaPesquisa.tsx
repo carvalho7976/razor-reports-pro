@@ -246,27 +246,16 @@ const data: Plano[] = [
   },
 ];
 
-type ModalState = { type: "new" } | { type: "edit"; item: Plano } | { type: "delete"; item: Plano } | null;
-
-const emptyForm = (): Plano => ({
-  cod: "",
-  nome: "",
-  preco: 0,
-  cortesIncluidos: 0,
-  barbasIncluidas: 0,
-  assinantes: 0,
-  vendas: 0,
-  desconto: 0,
-  destaque: false,
-  status: "ativo",
-});
+type ModalState =
+  | { type: "view"; item: Plano }
+  | { type: "delete"; item: Plano }
+  | null;
 
 export default function ListaPlanos() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("todos");
   const [allData, setAllData] = useState<Plano[]>(data);
   const [modal, setModal] = useState<ModalState>(null);
-  const [form, setForm] = useState<Plano | null>(null);
-  const [showErrors, setShowErrors] = useState(false);
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
@@ -274,40 +263,13 @@ export default function ListaPlanos() {
     return allData.filter((p) => p.status === activeTab);
   }, [activeTab, allData]);
 
-  const errors = { nome: !form?.nome ? "Informe o nome do plano." : "" };
-
-  const openNew = () => {
-    setForm(emptyForm());
-    setShowErrors(false);
-    setModal({ type: "new" });
-  };
-  const openEdit = (item: Plano) => {
-    setForm({ ...item });
-    setShowErrors(false);
-    setModal({ type: "edit", item });
-  };
+  const openView = (item: Plano) => setModal({ type: "view", item });
+  const openEdit = (item: Plano) =>
+    navigate(`/assinaturaCadastro?nome=${encodeURIComponent(item.nome)}`);
   const openDelete = (item: Plano) => setModal({ type: "delete", item });
+  const goAssinantes = () => navigate("/assinantePesquisa");
 
-  const closeModal = () => {
-    setModal(null);
-    setForm(null);
-    setShowErrors(false);
-  };
-
-  const handleSave = () => {
-    if (!form) return;
-    setShowErrors(true);
-    if (errors.nome) return;
-    if (modal?.type === "new") {
-      const nextCod = String(Math.max(...allData.map((d) => Number(d.cod) || 0)) + 1);
-      setAllData((prev) => [{ ...form, cod: nextCod }, ...prev]);
-      toast({ title: "Plano criado com sucesso" });
-    } else if (modal?.type === "edit") {
-      setAllData((prev) => prev.map((d) => (d.cod === form.cod ? form : d)));
-      toast({ title: "Plano atualizado" });
-    }
-    closeModal();
-  };
+  const closeModal = () => setModal(null);
 
   const handleDelete = () => {
     if (modal?.type !== "delete") return;
