@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
-import { DeleteModal, FormModal, Dropdown, TextField, DatePickerField, FormRow, SaveButton } from "@/components/FormModal";
+import { DeleteModal, FormModal, Dropdown, MultiDropdown, TextField, DatePickerField, FormRow, SaveButton } from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
@@ -397,19 +397,19 @@ export default function NovaAgenda2() {
   const [novoCelular, setNovoCelular] = useState("");
   const [novoAniversario, setNovoAniversario] = useState("");
   const [novoSexo, setNovoSexo] = useState("F");
-  const [novoServico, setNovoServico] = useState("");
+  const [novoServicos, setNovoServicos] = useState<string[]>([]);
   const [novoProfPreferido, setNovoProfPreferido] = useState("");
 
   const removerFila = (id: number) => setFila((prev) => prev.filter((f) => f.id !== id));
 
   const handleSalvarFila = () => {
-    if (!novoCliente.trim() || !novoServico) return;
+    if (!novoCliente.trim() || novoServicos.length === 0) return;
     setFila((prev) => [
       ...prev,
       {
         id: Date.now(),
         nome: novoCliente.trim(),
-        servico: novoServico,
+        servico: novoServicos.join(", "),
         prefere: novoProfPreferido || undefined,
         esperaMin: 0,
       },
@@ -419,7 +419,7 @@ export default function NovaAgenda2() {
     setNovoCelular("");
     setNovoAniversario("");
     setNovoSexo("F");
-    setNovoServico("");
+    setNovoServicos([]);
     setNovoProfPreferido("");
     setAddFilaOpen(false);
   };
@@ -977,11 +977,12 @@ export default function NovaAgenda2() {
                 ]}
               />
             </FormRow>
-            <Dropdown
+            <MultiDropdown
               label="Serviços"
-              value={novoServico}
-              setValue={setNovoServico}
+              values={novoServicos}
+              setValues={setNovoServicos}
               options={servicosOpcoes.map((s) => ({ value: s, label: s }))}
+              searchable
             />
             <Dropdown
               label="Profissional preferido (opcional)"
