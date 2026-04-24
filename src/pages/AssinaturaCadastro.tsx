@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import {
   Plus,
   CalendarDays,
@@ -482,6 +483,8 @@ export default function AssinaturaCadastro() {
 
   const editing = searchParams.get("nome");
 
+  const [aulaOpen, setAulaOpen] = useState(false);
+
   // Detalhes
   const [nome, setNome] = useState(editing || "");
   const [valor, setValor] = useState("250,00");
@@ -646,9 +649,12 @@ export default function AssinaturaCadastro() {
         <div className="mx-4 mt-4 sm:mx-6">
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="pt-1">
-              <h1 className="text-lg font-bold text-foreground sm:text-lg">
-                {editing ? "Editar Plano" : "Novo Plano"}
-              </h1>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+                  {editing ? "Editar Plano" : "Novo Plano"}
+                </h1>
+                <AulaButton onOpen={() => setAulaOpen(true)} />
+              </div>
               <p className="mt-1 text-xs text-muted-foreground sm:text-sm"></p>
             </div>
             <button
@@ -1073,6 +1079,12 @@ export default function AssinaturaCadastro() {
         </div>
 
       </div>
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Cadastro de Plano"
+      />
     </AppLayout>
   );
 }
