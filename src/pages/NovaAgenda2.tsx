@@ -983,12 +983,14 @@ export default function NovaAgenda2() {
               setValues={setNovoServicos}
               options={servicosOpcoes.map((s) => ({ value: s, label: s }))}
               searchable
+              openDirection="up"
             />
             <Dropdown
               label="Profissional preferido (opcional)"
               value={novoProfPreferido}
               setValue={setNovoProfPreferido}
               options={profissionais.map((p) => ({ value: p.nome, label: p.nome }))}
+              openDirection="up"
             />
           </FormModal>
         </DialogContent>
