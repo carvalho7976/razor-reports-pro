@@ -312,10 +312,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex h-10 shrink-0 items-center rounded-lg border border-border bg-card">
-                  <span className="pl-2.5 text-[11px] font-medium text-muted-foreground">
-                    desc. todos
-                  </span>
+                <div className="flex h-10 shrink-0 items-center rounded-lg border border-border bg-card pl-2">
                   <input
                     type="text"
                     inputMode="numeric"
@@ -329,22 +326,22 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                         applyBulkDiscount();
                       }
                     }}
-                    placeholder="0"
-                    className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                    placeholder="%"
+                    className="h-full w-9 bg-transparent text-right text-sm outline-none"
                   />
-                  <span className="text-xs text-muted-foreground">%</span>
+                  <span className="pr-1.5 text-xs text-muted-foreground">%</span>
                   <button
                     type="button"
                     onClick={applyBulkDiscount}
                     disabled={!bulkDiscount}
-                    className="ml-1 mr-1 inline-flex h-7 items-center rounded-md bg-foreground px-2 text-[11px] font-semibold text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="my-1 mr-1 inline-flex h-7 items-center rounded-md bg-foreground px-2 text-[11px] font-semibold text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Aplicar
                   </button>
                 </div>
               </TooltipTrigger>
               <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
-                Aplicar desconto em todos os selecionados
+                Aplicar desconto em todos os produtos selecionados
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
