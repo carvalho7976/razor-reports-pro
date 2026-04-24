@@ -134,9 +134,9 @@ interface ProdutoIncluso {
 
 const sections = [
   { id: "dados", label: "Dados" },
-   { id: "servicos", label: "Serviços (opcional)" },
-  { id: "produtos", label: "Produtos (opcional)" },
-  { id: "beneficios", label: "Benefícios Extras (opcional)" },
+  { id: "servicos", label: "Serviços" },
+  { id: "produtos", label: "Produtos" },
+  { id: "beneficios", label: "Benefícios Extras" },
   { id: "disponibilidade", label: "Disponibilidade" },
 ];
 
@@ -187,7 +187,7 @@ function SectionBlock({
   return (
     <section
       id={id}
-      className={cn("scroll-mt-24 rounded-xl border border-border bg-card p-4", className)}
+      className={cn("scroll-mt-24 rounded-xl border border-border bg-card p-4 px-[16px]", className)}
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
@@ -693,7 +693,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* SERVIÇOS */}
-             <SectionBlock id="servicos" title="Serviços (opcional) " rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
+            <SectionBlock id="servicos" title="Serviços" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={servicosDisponiveis}
                 selected={servicosMap}
@@ -703,7 +703,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* PRODUTOS */}
-             <SectionBlock id="produtos" title="Produtos (opcional) " rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{produtosArr.length} selecionado(s)</span>}>
+            <SectionBlock id="produtos" title="Produtos" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{produtosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={produtosDisponiveis}
                 selected={produtosMap}
@@ -714,7 +714,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* BENEFÍCIOS */}
-             <SectionBlock id="beneficios" title="Benefícios Extras (opcional) ">
+            <SectionBlock id="beneficios" title="Benefícios Extras">
               <div className="flex gap-2">
                 <input
                   value={novoBeneficio}
@@ -887,7 +887,7 @@ export default function AssinaturaCadastro() {
 
           {/* SIDEBAR DIREITA - PREVIEW DO PLANO */}
           <aside className="lg:sticky lg:top-16 lg:self-start">
-            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm mx-0 px-0">
               {/* Header */}
               <div className="border-b border-border p-5">
                 <div className="flex items-start justify-between gap-2">
