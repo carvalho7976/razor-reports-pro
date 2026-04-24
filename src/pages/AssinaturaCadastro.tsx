@@ -669,7 +669,7 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div>
                       <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
                       <p className="text-xs text-muted-foreground">
@@ -679,7 +679,7 @@ export default function AssinaturaCadastro() {
                     <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                   </div>
 
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <Star
                         className={cn(
