@@ -3,20 +3,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import {
-  Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Eye,
-  Filter,
-  Plus,
-  Save,
-  Smile,
-  Star,
-  Users,
-  X,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Eye, Filter, Save, Smile, Star, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,8 +16,9 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Phone } from "lucide-react";
+import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
+import { DeleteModal } from "@/components/FormModal";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
 type FilaItem = {
@@ -60,6 +48,15 @@ type Agendamento = {
   servico: string;
   status?: StatusEvento;
 };
+
+// ── ícone WhatsApp ─────────────────────────────────────────────────────────
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M16.04 3C9.39 3 4 8.29 4 14.82c0 2.31.69 4.47 1.87 6.29L4 29l8.12-1.83a12.26 12.26 0 0 0 3.92.64C22.69 27.81 28 22.52 28 15.99S22.69 3 16.04 3Zm0 22.78c-1.23 0-2.43-.32-3.49-.91l-.5-.28-4.82 1.09 1.11-4.6-.32-.53a9.24 9.24 0 0 1-1.42-4.91c0-5.1 4.24-9.25 9.45-9.25s9.45 4.15 9.45 9.25-4.24 9.24-9.46 9.24Zm5.19-6.89c-.28-.14-1.66-.8-1.91-.89-.26-.09-.45-.14-.64.14-.19.27-.73.89-.9 1.07-.16.18-.33.2-.61.07-.28-.14-1.19-.43-2.27-1.37-.84-.73-1.41-1.64-1.57-1.91-.16-.28-.02-.43.12-.57.13-.12.28-.32.42-.48.14-.16.19-.27.28-.46.09-.18.05-.34-.02-.48-.07-.14-.64-1.51-.88-2.07-.23-.55-.47-.47-.64-.48h-.55c-.19 0-.49.07-.75.34-.26.27-.98.94-.98 2.29s1.01 2.66 1.15 2.84c.14.18 1.98 2.97 4.8 4.16.67.28 1.2.45 1.61.58.68.21 1.29.18 1.78.11.54-.08 1.66-.66 1.89-1.3.23-.64.23-1.19.16-1.3-.07-.11-.26-.18-.54-.32Z" />
+    </svg>
+  );
+}
 
 // ── dados ──────────────────────────────────────────────────────────────────
 const filaInicial: FilaItem[] = [
@@ -128,14 +125,11 @@ const agendamentos: Agendamento[] = [
   { id: 46, profissional: "vini", inicio: 570, duracao: 30, cliente: "Jonatas Cerqueira", servico: "Barba!" },
 ];
 
-// ── constantes da agenda ───────────────────────────────────────────────────
 const HORA_INICIO = 8;
 const HORA_FIM = 20;
 const SLOT_MIN = 30;
 const PX_POR_MIN = 1.6;
 
-// ── helper: calcula horários livres de um profissional ─────────────────────
-// Se onlyFuture=true, descarta horários anteriores ao momento atual
 function horariosLivres(profId: string, onlyFuture = false): string[] {
   const ocupados = agendamentos
     .filter((a) => a.profissional === profId && a.status !== "folga")
@@ -155,10 +149,9 @@ function horariosLivres(profId: string, onlyFuture = false): string[] {
       livres.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
     }
   }
-  return livres.slice(0, 5); // máx 5 slots no story
+  return livres.slice(0, 5);
 }
 
-// ── componente do story escalado ───────────────────────────────────────────
 function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Date; tema: "claro" | "escuro" }) {
   const slots = horariosLivres(prof.id, true);
   const dataFmt = format(data, "EEEE", { locale: ptBR }).replace("-feira", "");
@@ -171,24 +164,13 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
   const txtMuted = isDark ? "#555555" : "#aaaaaa";
   const slotBg = isDark ? "#1e1e1e" : "#ffffff";
   const slotBdr = isDark ? "#2a2a2a" : "#dddddd";
-  const chipBg = isDark ? "#222222" : "#e5e2dd";
-  const chipTxt = isDark ? "#bbbbbb" : "#333333";
   const badgeBg = isDark ? "#F2F0ED" : "#111111";
   const badgeTxt = isDark ? "#111111" : "#F2F0ED";
 
-  // scale: 1080x1920 reduzido para caber no modal junto do toggle e do botão
   const SCALE = 280 / 1080;
 
   return (
-    <div
-      style={{
-        width: 280,
-        height: Math.round(1920 * SCALE),
-        overflow: "hidden",
-        borderRadius: 12,
-        flexShrink: 0,
-      }}
-    >
+    <div style={{ width: 280, height: Math.round(1920 * SCALE), overflow: "hidden", borderRadius: 12, flexShrink: 0 }}>
       <div
         style={{
           width: 1080,
@@ -201,7 +183,6 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
           fontFamily: "'Barlow Condensed', sans-serif",
         }}
       >
-        {/* Logo bar */}
         <div
           style={{
             background: "#111",
@@ -224,7 +205,6 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
           </div>
         </div>
 
-        {/* Body */}
         <div
           style={{
             flex: 1,
@@ -234,7 +214,6 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
             padding: "80px 96px 90px",
           }}
         >
-          {/* Topo: data + profissional */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span
               style={{
@@ -250,6 +229,7 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
             >
               {dataFmt}
             </span>
+
             <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
               <div
                 style={{
@@ -268,6 +248,7 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
               >
                 {prof.iniciais}
               </div>
+
               <div>
                 <div
                   style={{
@@ -296,7 +277,6 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
             </div>
           </div>
 
-          {/* Headline */}
           <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
             <h2
               style={{
@@ -315,9 +295,9 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
               <br />
               do dia.
             </h2>
+
             <div style={{ width: 120, height: 10, background: "#E63329" }} />
 
-            {/* Slots */}
             <div>
               <p
                 style={{
@@ -332,6 +312,7 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
               >
                 Horários disponíveis
               </p>
+
               <div style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
                 {slots.length === 0 ? (
                   <span style={{ fontSize: 44, fontWeight: 600, color: txtMuted }}>Agenda cheia</span>
@@ -358,7 +339,6 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
             </div>
           </div>
 
-          {/* Rodapé */}
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
             <div>
               <div style={{ fontSize: 60, fontWeight: 800, color: txtMain, lineHeight: 1 }}>{totalAg}</div>
@@ -366,6 +346,7 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
                 atendimentos hoje
               </div>
             </div>
+
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 32, fontWeight: 400, color: txtMuted, fontFamily: "'Barlow', sans-serif" }}>
                 @obarbeiro
@@ -389,25 +370,22 @@ function StoryProfissional({ prof, data, tema }: { prof: Profissional; data: Dat
   );
 }
 
-// ── componente principal ───────────────────────────────────────────────────
 export default function NovaAgenda2() {
   const [fila, setFila] = useState<FilaItem[]>(filaInicial);
   const [data, setData] = useState<Date>(new Date(2026, 3, 22));
   const [filtroProf, setFiltroProf] = useState<string>("todos");
   const [filtroDias, setFiltroDias] = useState<string>("1");
   const [addFilaOpen, setAddFilaOpen] = useState(false);
+  const [filaDeleteItem, setFilaDeleteItem] = useState<FilaItem | null>(null);
 
-  // filtro popover (estado temporário até confirmar)
   const [filtroOpen, setFiltroOpen] = useState(false);
   const [filtroBusca, setFiltroBusca] = useState("");
   const [filtroProfsSel, setFiltroProfsSel] = useState<string[]>([]);
   const [filtroDiasSel, setFiltroDiasSel] = useState<string>("1");
 
-  // story
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
 
-  // form fila
   const [novoCliente, setNovoCliente] = useState("");
   const [novoEmail, setNovoEmail] = useState("");
   const [novoCelular, setNovoCelular] = useState("");
@@ -457,7 +435,6 @@ export default function NovaAgenda2() {
 
   return (
     <AppLayout>
-      {/* Importa Barlow Condensed para o story */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link
         href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap"
@@ -465,11 +442,8 @@ export default function NovaAgenda2() {
       />
 
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
-        {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-          {/* Esquerda — Ações */}
           <div className="flex items-center gap-2">
-            {/* Navegação de data */}
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -485,6 +459,7 @@ export default function NovaAgenda2() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
+
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -508,6 +483,7 @@ export default function NovaAgenda2() {
                   />
                 </PopoverContent>
               </Popover>
+
               <button
                 type="button"
                 onClick={() =>
@@ -526,35 +502,42 @@ export default function NovaAgenda2() {
 
             <div className="h-5 w-px bg-border" />
 
-            {/* Filtros */}
             <Popover
               open={filtroOpen}
               onOpenChange={(open) => {
                 setFiltroOpen(open);
                 if (open) {
-                  // sincroniza estado temporário com o aplicado
                   setFiltroProfsSel(filtroProf === "todos" ? [] : [filtroProf]);
                   setFiltroDiasSel(filtroDias);
                   setFiltroBusca("");
                 }
               }}
             >
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  aria-label="Filtros"
-                >
-                  <Filter className="h-4 w-4" />
-                  {(filtroProf !== "todos" || filtroDias !== "1") && (
-                    <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
-                      {(filtroProf !== "todos" ? 1 : 0) + (filtroDias !== "1" ? 1 : 0)}
-                    </span>
-                  )}
-                </button>
-              </PopoverTrigger>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        aria-label="Filtros"
+                      >
+                        <Filter className="h-4 w-4" />
+                        {(filtroProf !== "todos" || filtroDias !== "1") && (
+                          <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
+                            {(filtroProf !== "todos" ? 1 : 0) + (filtroDias !== "1" ? 1 : 0)}
+                          </span>
+                        )}
+                      </button>
+                    </PopoverTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-white text-black border border-border shadow-sm text-xs px-2 py-1">
+                    Filtros
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               <PopoverContent align="end" sideOffset={8} className="w-[300px] p-0">
-                {/* Busca */}
                 <div className="relative border-b border-border px-4 pb-3 pt-4">
                   <Input
                     value={filtroBusca}
@@ -565,7 +548,6 @@ export default function NovaAgenda2() {
                   <Search className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 </div>
 
-                {/* Lista de profissionais */}
                 <div className="max-h-[220px] overflow-y-auto px-2 py-2">
                   {profissionais
                     .filter((p) => p.nome.toLowerCase().includes(filtroBusca.toLowerCase()))
@@ -594,7 +576,6 @@ export default function NovaAgenda2() {
                     })}
                 </div>
 
-                {/* Dias visualizados */}
                 <div className="border-t border-border px-4 py-3">
                   <p className="mb-3 text-center text-sm font-semibold text-foreground">Dias visualizados</p>
                   <div className="flex items-center justify-center gap-1.5">
@@ -619,7 +600,6 @@ export default function NovaAgenda2() {
                   </div>
                 </div>
 
-                {/* Ações */}
                 <div className="flex items-center gap-2 border-t border-border p-3">
                   <button
                     type="button"
@@ -647,7 +627,6 @@ export default function NovaAgenda2() {
               </PopoverContent>
             </Popover>
 
-            {/* Fila */}
             <Popover>
               <PopoverTrigger asChild>
                 <button
@@ -661,6 +640,7 @@ export default function NovaAgenda2() {
                   </Badge>
                 </button>
               </PopoverTrigger>
+
               <PopoverContent align="end" sideOffset={8} className="w-[360px] p-0">
                 <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
                   <div className="flex items-center gap-2">
@@ -674,7 +654,8 @@ export default function NovaAgenda2() {
                   </div>
                   <NovoButton items={[{ label: "Adicionar", onClick: () => setAddFilaOpen(true) }]} />
                 </div>
-                <div className="max-h-[60vh] overflow-y-auto p-2">
+
+                <div className="max-h-[60vh] overflow-y-auto bg-muted/20 p-2">
                   {fila.length === 0 ? (
                     <p className="px-2 py-8 text-center text-sm text-muted-foreground">Ninguém na fila no momento.</p>
                   ) : (
@@ -682,11 +663,12 @@ export default function NovaAgenda2() {
                       {fila.map((item, idx) => (
                         <div
                           key={item.id}
-                          className="group relative flex items-center gap-2.5 rounded-md border border-border bg-background px-2.5 py-2 transition-shadow hover:shadow-sm"
+                          className="group relative flex items-center gap-2.5 rounded-md border border-border bg-white px-2.5 py-2 transition-shadow hover:shadow-sm"
                         >
                           <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-foreground">
                             {idx + 1}
                           </div>
+
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-[13px] font-medium text-foreground leading-tight">
                               {item.nome}
@@ -706,16 +688,25 @@ export default function NovaAgenda2() {
                               </span>
                             </p>
                           </div>
+
                           <button
                             type="button"
-                            className="inline-flex h-7 items-center gap-1 rounded-md border border-foreground bg-background px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
+                            className="inline-flex h-7 items-center rounded-md border border-foreground bg-white px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
                           >
-                            <Phone className="h-3 w-3" />
                             Chamar
                           </button>
+
                           <button
                             type="button"
-                            onClick={() => removerFila(item.id)}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[#25D366]/25 bg-[#25D366]/10 text-[#128C7E] transition-colors hover:bg-[#25D366] hover:text-white"
+                            aria-label="Enviar mensagem no WhatsApp"
+                          >
+                            <WhatsAppIcon className="h-4 w-4" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setFilaDeleteItem(item)}
                             className="opacity-0 transition-opacity group-hover:opacity-100"
                             aria-label="Remover da fila"
                           >
@@ -730,7 +721,6 @@ export default function NovaAgenda2() {
             </Popover>
           </div>
 
-          {/* Direita — KPIs */}
           <TooltipProvider delayDuration={0}>
             <div className="ml-auto flex items-center gap-4">
               {[
@@ -749,7 +739,6 @@ export default function NovaAgenda2() {
                       <span className="text-[13px] font-semibold text-foreground leading-none">{k.valor}</span>
                     </div>
                   </TooltipTrigger>
-
                   <TooltipContent className="bg-white text-black border border-border shadow-sm text-xs px-2 py-1">
                     {k.label}
                   </TooltipContent>
@@ -759,13 +748,11 @@ export default function NovaAgenda2() {
           </TooltipProvider>
         </div>
 
-        {/* ── AGENDA ──────────────────────────────────────────────────────── */}
         <div className="rounded-lg border border-border bg-card shadow-sm">
           <div
             className="grid min-w-[900px]"
             style={{ gridTemplateColumns: `56px repeat(${profissionaisVisiveis.length}, minmax(180px, 1fr))` }}
           >
-            {/* Header sticky */}
             <div className="sticky top-[53px] z-20 flex items-center justify-center border-b border-r border-border bg-card py-3">
               <Clock className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -787,7 +774,6 @@ export default function NovaAgenda2() {
                   <p className="truncate text-sm font-semibold text-foreground">{p.nome}</p>
                   <p className="truncate text-[11px] text-muted-foreground">{p.cargo}</p>
                 </div>
-                {/* Ícone de olho — aparece no hover */}
                 <button
                   type="button"
                   onClick={() => setStoryProf(p)}
@@ -799,7 +785,6 @@ export default function NovaAgenda2() {
               </div>
             ))}
 
-            {/* Coluna de horários */}
             <div className="relative border-r border-border bg-muted/20">
               {horarios.map((h) => (
                 <div
@@ -812,7 +797,6 @@ export default function NovaAgenda2() {
               ))}
             </div>
 
-            {/* Colunas dos profissionais */}
             {profissionaisVisiveis.map((p) => (
               <div
                 key={p.id}
@@ -826,12 +810,14 @@ export default function NovaAgenda2() {
                     style={{ top: `${i * SLOT_MIN * PX_POR_MIN}px`, height: `${SLOT_MIN * PX_POR_MIN}px` }}
                   />
                 ))}
+
                 {agendamentos
                   .filter((a) => a.profissional === p.id)
                   .map((a) => {
                     const isFolga = a.status === "folga";
                     const isPendente = a.status === "pendente";
                     const isDestaque = a.status === "destaque";
+
                     return (
                       <div
                         key={a.id}
@@ -863,6 +849,7 @@ export default function NovaAgenda2() {
                               <Smile className="h-3 w-3 shrink-0 text-amber-400" />
                             ))}
                         </div>
+
                         <p
                           className={cn(
                             "truncate text-[11px] font-semibold leading-tight mt-0.5",
@@ -880,12 +867,10 @@ export default function NovaAgenda2() {
         </div>
       </div>
 
-      {/* ── MODAL: story do profissional ─────────────────────────────────── */}
       <Dialog open={!!storyProf} onOpenChange={(o) => !o && setStoryProf(null)}>
         <DialogContent className="w-auto max-w-[360px] gap-0 border-none bg-transparent p-0 shadow-none">
           {storyProf && (
             <div className="flex flex-col items-center gap-2">
-              {/* Toggle tema */}
               <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1 shadow-sm">
                 {(["claro", "escuro"] as const).map((t) => (
                   <button
@@ -901,9 +886,7 @@ export default function NovaAgenda2() {
                   </button>
                 ))}
               </div>
-              {/* Story */}
               <StoryProfissional prof={storyProf} data={data} tema={storyTema} />
-              {/* Ação de compartilhar */}
               <Button size="sm" className="w-full gap-2 shadow-sm">
                 Compartilhar story
               </Button>
@@ -912,12 +895,27 @@ export default function NovaAgenda2() {
         </DialogContent>
       </Dialog>
 
-      {/* ── MODAL: adicionar na fila ─────────────────────────────────────── */}
+      <Dialog open={!!filaDeleteItem} onOpenChange={(open) => !open && setFilaDeleteItem(null)}>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <DeleteModal
+            title="Remover da fila"
+            message={filaDeleteItem ? `Deseja remover "${filaDeleteItem.nome}" da fila de espera?` : ""}
+            onConfirm={() => {
+              if (!filaDeleteItem) return;
+              removerFila(filaDeleteItem.id);
+              setFilaDeleteItem(null);
+            }}
+            onClose={() => setFilaDeleteItem(null)}
+          />
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={addFilaOpen} onOpenChange={setAddFilaOpen}>
         <DialogContent className="max-w-md p-0 gap-0">
           <div className="border-b border-border px-5 py-4">
             <h2 className="text-lg font-semibold text-foreground">Adicionar na fila de espera</h2>
           </div>
+
           <div className="grid gap-3 px-5 py-4">
             <div className="grid gap-1.5">
               <Label className="text-xs font-semibold text-foreground">Cliente</Label>
@@ -929,6 +927,7 @@ export default function NovaAgenda2() {
                 className="h-10"
               />
             </div>
+
             <div className="grid gap-1.5">
               <Label className="text-xs font-semibold text-foreground">Email</Label>
               <Input
@@ -939,6 +938,7 @@ export default function NovaAgenda2() {
                 className="h-10"
               />
             </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1.5">
                 <Label className="text-xs font-semibold text-foreground">Celular</Label>
@@ -950,6 +950,7 @@ export default function NovaAgenda2() {
                   className="h-10"
                 />
               </div>
+
               <div className="grid gap-1.5">
                 <Label className="text-xs font-semibold text-foreground">Aniversário</Label>
                 <Input
@@ -960,6 +961,7 @@ export default function NovaAgenda2() {
                 />
               </div>
             </div>
+
             <div className="grid gap-1.5">
               <Label className="text-xs font-semibold text-foreground">Sexo</Label>
               <RadioGroup value={novoSexo} onValueChange={setNovoSexo} className="flex gap-4">
@@ -977,6 +979,7 @@ export default function NovaAgenda2() {
                 </div>
               </RadioGroup>
             </div>
+
             <div className="grid gap-1.5">
               <Label className="text-xs font-semibold text-foreground">Serviços</Label>
               <Select value={novoServico} onValueChange={setNovoServico}>
@@ -992,6 +995,7 @@ export default function NovaAgenda2() {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="grid gap-1.5">
               <Label className="text-xs font-semibold text-foreground">Profissional preferido (opcional)</Label>
               <Select value={novoProfPreferido} onValueChange={setNovoProfPreferido}>
@@ -1008,6 +1012,7 @@ export default function NovaAgenda2() {
               </Select>
             </div>
           </div>
+
           <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-5 py-3">
             <Button variant="outline" size="sm" onClick={() => setAddFilaOpen(false)} className="h-9">
               Cancelar
