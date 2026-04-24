@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import {
   Plus,
   CalendarDays,
