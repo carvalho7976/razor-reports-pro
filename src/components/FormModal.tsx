@@ -227,6 +227,8 @@ export function MultiDropdown({
     } else {
       setValues([...values, val]);
     }
+    setSearch("");
+    inputRef.current?.focus();
   };
 
   return (
