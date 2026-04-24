@@ -153,7 +153,7 @@ function CurrencyInput({
   return (
     <div className="grid min-w-0 gap-1.5">
       <label className="text-sm font-medium text-foreground">{label}</label>
-      <div className="flex h-10 w-full min-w-0 items-center overflow-hidden rounded-lg border border-border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/20">
+      <div className="flex h-10 w-full min-w-0 items-center overflow-hidden rounded-lg border border-border bg-card text-sm focus-within:border-info/60 focus-within:ring-2 focus-within:ring-info/40">
         <span className="shrink-0 pl-3 pr-1 text-muted-foreground">R$</span>
         <input
           value={formatted}
