@@ -974,12 +974,6 @@ export default function AssinaturaCadastro() {
                   </span>
                 </div>
 
-                <button
-                  type="button"
-                  className="mt-3 w-full rounded-lg bg-sky-500 py-2.5 text-sm font-bold uppercase tracking-wide text-white shadow-sm transition hover:bg-sky-600"
-                >
-                  Assinar
-                </button>
               </div>
             </div>
           </aside>
