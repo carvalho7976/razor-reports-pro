@@ -1093,16 +1093,17 @@ export default function NovaAgenda2() {
             <Button
               variant="outline"
               size="sm"
+              disabled={!chamarProf}
               onClick={() => {
+                if (chamarItem) removerFila(chamarItem.id);
                 setChamarItem(null);
                 setChamarProf("");
               }}
-              className="h-9"
+              className="h-9 border-foreground bg-card text-foreground hover:bg-accent"
             >
-              Cancelar
+              Atender e pagar
             </Button>
             <Button
-              variant="outline"
               size="sm"
               disabled={!chamarProf}
               onClick={() => {
@@ -1110,22 +1111,9 @@ export default function NovaAgenda2() {
                 setChamarItem(null);
                 setChamarProf("");
               }}
-              className="h-9"
+              className="h-9 gap-2 bg-foreground text-background hover:bg-foreground/90"
             >
               Atender
-            </Button>
-            <Button
-              size="sm"
-              disabled={!chamarProf}
-              onClick={() => {
-                if (chamarItem) removerFila(chamarItem.id);
-                setChamarItem(null);
-                setChamarProf("");
-              }}
-              className="h-9 gap-2 bg-success text-success-foreground hover:bg-success/90"
-            >
-              <Save className="h-3.5 w-3.5" />
-              Atender e pagar
             </Button>
           </div>
         </DialogContent>
