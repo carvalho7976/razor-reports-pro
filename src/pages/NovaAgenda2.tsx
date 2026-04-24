@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
-import { DeleteModal } from "@/components/FormModal";
+import { DeleteModal, FormModal, Dropdown } from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
