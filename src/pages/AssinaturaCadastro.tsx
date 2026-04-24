@@ -556,6 +556,32 @@ export default function AssinaturaCadastro() {
   const recorrenciaLabel =
     recorrenciaOptions.find((r) => r.value === recorrencia)?.label || "";
 
+  const diasValidosLabel = useMemo(() => {
+    const order = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"];
+    const labels: Record<string, string> = {
+      seg: "seg",
+      ter: "ter",
+      qua: "qua",
+      qui: "qui",
+      sex: "sex",
+      sab: "sáb",
+      dom: "dom",
+    };
+    const sel = order.filter((d) => diasAceitos.includes(d));
+    if (sel.length === 0) return "Nenhum dia selecionado";
+    if (sel.length === 7) return "Válido todos os dias";
+    // detecta sequência contígua
+    const idxs = sel.map((d) => order.indexOf(d));
+    const contiguous = idxs.every((v, i) => i === 0 || v === idxs[i - 1] + 1);
+    if (contiguous && sel.length >= 3) {
+      return `Válido de ${labels[sel[0]]} a ${labels[sel[sel.length - 1]]}`;
+    }
+    if (sel.length === 1) return `Válido ${labels[sel[0]]}`;
+    const last = labels[sel[sel.length - 1]];
+    const head = sel.slice(0, -1).map((d) => labels[d]).join(", ");
+    return `Válido ${head} e ${last}`;
+  }, [diasAceitos]);
+
   return (
     <AppLayout>
       <div className="flex flex-col gap-0">
@@ -820,7 +846,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition",
                             ativo
-                              ? "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                              ? "border-foreground bg-blue-500/10 text-blue-700 dark:text-blue-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                           )}
                         >
@@ -851,7 +877,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "group flex flex-col items-center gap-1.5 rounded-lg border p-2 transition",
                             ativo
-                              ? "border-blue-500/40 bg-blue-500/5"
+                              ? "border-foreground bg-blue-500/5"
                               : "border-border bg-card opacity-60 hover:opacity-100",
                           )}
                         >
@@ -904,28 +930,30 @@ export default function AssinaturaCadastro() {
               </div>
 
               {/* Body */}
-              <div className="space-y-4 p-5">
+              <div className="space-y-3 p-4">
                 {/* Inclusos */}
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-sky-500">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-sky-500">
                     Incluso:
                   </p>
 
-                  <ul className="mt-3 flex flex-col gap-2">
+                  <ul className="mt-2 flex flex-col gap-1.5">
                     {servicosArr.length === 0 && produtosArr.length === 0 && beneficios.length === 0 && (
-                      <li className="text-sm italic text-muted-foreground">
+                      <li className="text-xs italic text-muted-foreground">
                         Configure os itens do plano.
                       </li>
                     )}
 
                     {/* Serviços */}
                     {servicosArr.map((s) => (
-                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-xs font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>
-                          {s.usos === "ILIMITADO" ? "Ilimitado" : s.usos} {nomeServico(s.id)}
+                          {s.usos === "ILIMITADO"
+                            ? `${nomeServico(s.id)} ilimitado`
+                            : `${s.usos}x ${nomeServico(s.id)}`}
                           {s.desconto !== "0" && s.desconto !== "100" && (
-                            <span className="ml-1 normal-case text-muted-foreground">
+                            <span className="ml-1 text-muted-foreground">
                               ({s.desconto}% desc)
                             </span>
                           )}
@@ -935,19 +963,25 @@ export default function AssinaturaCadastro() {
 
                     {/* Produtos */}
                     {produtosArr.length > 0 && (
-                      <li className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li className="flex items-start gap-2 text-xs font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>Descontos em produtos</span>
                       </li>
                     )}
 
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => (
-                      <li key={`b-${idx}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li key={`b-${idx}`} className="flex items-start gap-2 text-xs font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>{b}</span>
                       </li>
                     ))}
+
+                    {/* Dias válidos */}
+                    <li className="flex items-start gap-2 text-xs font-medium text-foreground">
+                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <span>{diasValidosLabel}</span>
+                    </li>
                   </ul>
                 </div>
 
