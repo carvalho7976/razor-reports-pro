@@ -191,7 +191,8 @@ export function MultiDropdown({
   const [search, setSearch] = useState("");
   const [openUpward, setOpenUpward] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const selected = options.filter((o) => values.includes(o.value));
 
@@ -212,13 +213,13 @@ export function MultiDropdown({
   }, []);
 
   useEffect(() => {
-    if (!open || !buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
+    if (!open || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
-    const estimated = Math.min(320, (searchable ? 70 : 0) + filtered.length * 40 + 16);
+    const estimated = Math.min(280, filtered.length * 40 + 16);
     setOpenUpward(spaceBelow < estimated && spaceAbove > spaceBelow);
-  }, [open, filtered.length, searchable]);
+  }, [open, filtered.length]);
 
   const toggle = (val: string) => {
     if (values.includes(val)) {
@@ -231,43 +232,57 @@ export function MultiDropdown({
   return (
     <div className="relative grid gap-0.5" ref={wrapperRef}>
       <label className="text-[13px] font-semibold text-foreground">{label}</label>
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
+      <div
+        ref={containerRef}
+        onClick={() => {
+          setOpen(true);
+          inputRef.current?.focus();
+        }}
         className={cn(
-          "flex min-h-10 w-full items-center justify-between gap-2 rounded-lg border bg-card px-2 py-1 text-sm text-foreground transition-all",
-          error ? "border-destructive/50 focus:ring-destructive/10" : "border-border focus:ring-muted",
-          "hover:border-muted-foreground focus:border-foreground",
+          "flex min-h-10 w-full cursor-text items-center justify-between gap-2 rounded-lg border bg-card px-2 py-1 text-sm text-foreground transition-all",
+          error ? "border-destructive/50" : "border-border",
+          open ? "border-foreground ring-4 ring-muted" : "hover:border-muted-foreground",
         )}
       >
         <div className="flex flex-1 flex-wrap items-center gap-1">
-          {selected.length === 0 ? (
-            <span className="px-1 text-muted-foreground">{placeholder}</span>
-          ) : (
-            selected.map((opt) => (
+          {selected.map((opt) => (
+            <span
+              key={opt.value}
+              className="inline-flex items-center gap-1 rounded-md bg-foreground px-2 py-0.5 text-xs font-medium text-background"
+            >
+              {opt.label}
               <span
-                key={opt.value}
-                className="inline-flex items-center gap-1 rounded-md bg-foreground px-2 py-0.5 text-xs font-medium text-background"
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggle(opt.value);
+                }}
+                className="flex h-4 w-4 cursor-pointer items-center justify-center rounded-full hover:bg-background/20"
               >
-                {opt.label}
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggle(opt.value);
-                  }}
-                  className="flex h-4 w-4 cursor-pointer items-center justify-center rounded-full hover:bg-background/20"
-                >
-                  ✕
-                </span>
+                ✕
               </span>
-            ))
-          )}
+            </span>
+          ))}
+          <input
+            ref={inputRef}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Backspace" && !search && selected.length > 0) {
+                toggle(selected[selected.length - 1].value);
+              }
+            }}
+            placeholder={selected.length === 0 ? placeholder : ""}
+            className="min-w-[80px] flex-1 bg-transparent px-1 py-0.5 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          />
         </div>
         <svg
-          className="h-4 w-4 shrink-0 text-muted-foreground"
+          className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")}
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
@@ -275,7 +290,7 @@ export function MultiDropdown({
         >
           <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-      </button>
+      </div>
       <FieldError message={error} />
       {open && (
         <div
@@ -284,17 +299,10 @@ export function MultiDropdown({
             openUpward ? "bottom-full mb-2" : "top-full mt-2",
           )}
         >
-          {searchable && (
-            <div className="border-b border-border p-3">
-              <input
-                placeholder="Buscar..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
-              />
-            </div>
-          )}
           <div className="max-h-60 overflow-auto">
+            {filtered.length === 0 && (
+              <div className="px-4 py-3 text-sm text-muted-foreground">Nenhum resultado.</div>
+            )}
             {filtered.map((option) => {
               const checked = values.includes(option.value);
               return (
