@@ -223,6 +223,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   hideUsos = false,
   showOnlySelected = false,
   onToggleShowOnlySelected,
+  bulkDiscountEnabled = false,
 }: {
   items: T[];
   selected: Map<number, ServicoIncluso>;
@@ -232,8 +233,10 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   hideUsos?: boolean;
   showOnlySelected?: boolean;
   onToggleShowOnlySelected?: () => void;
+  bulkDiscountEnabled?: boolean;
 }) {
   const [busca, setBusca] = useState("");
+  const [bulkDiscount, setBulkDiscount] = useState("");
 
   const filtered = items.filter((i) => {
     if (showOnlySelected && !selected.has(i.id)) return false;
@@ -283,6 +286,15 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
     }
   };
 
+  const applyBulkDiscount = () => {
+    if (!bulkDiscount) return;
+    const next = new Map(selected);
+    next.forEach((cur, id) => {
+      next.set(id, { ...cur, desconto: bulkDiscount });
+    });
+    setSelected(next);
+  };
+
   return (
     <div className="rounded-xl border border-border bg-card">
       {/* Search header */}
@@ -296,6 +308,47 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
             className="h-10 w-full rounded-lg border border-info/50 bg-card pl-9 pr-3 text-sm text-foreground outline-none transition-all focus:border-info/60 focus:ring-2 focus:ring-info/40"
           />
         </div>
+        {bulkDiscountEnabled && selected.size > 0 && (
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex h-10 shrink-0 items-center rounded-lg border border-border bg-card">
+                  <span className="pl-2.5 text-[11px] font-medium text-muted-foreground">
+                    desc. todos
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={bulkDiscount}
+                    onChange={(e) =>
+                      setBulkDiscount(e.target.value.replace(/\D/g, "").slice(0, 3))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        applyBulkDiscount();
+                      }
+                    }}
+                    placeholder="0"
+                    className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                  />
+                  <span className="text-xs text-muted-foreground">%</span>
+                  <button
+                    type="button"
+                    onClick={applyBulkDiscount}
+                    disabled={!bulkDiscount}
+                    className="ml-1 mr-1 inline-flex h-7 items-center rounded-md bg-foreground px-2 text-[11px] font-semibold text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                Aplicar desconto em todos os selecionados
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
         <button
           type="button"
           onClick={toggleAll}
