@@ -3,44 +3,66 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { TextField, Dropdown } from "@/components/FormModal";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, CalendarDays, Users, Trash2, ArrowUp, ArrowDown, Search } from "lucide-react";
+import {
+  Plus,
+  CalendarDays,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Search,
+  Star,
+  CheckCircle2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-interface ServicoOpt { id: number; nome: string; }
-interface ProdutoOpt { id: number; nome: string; }
-interface ProfissionalOpt { id: number; nome: string; iniciais: string; }
+interface ServicoOpt {
+  id: number;
+  nome: string;
+  preco: string;
+  tempo: string;
+}
+interface ProdutoOpt {
+  id: number;
+  nome: string;
+  preco: string;
+}
+interface ProfissionalOpt {
+  id: number;
+  nome: string;
+  iniciais: string;
+  cor: string;
+}
 
 const servicosDisponiveis: ServicoOpt[] = [
-  { id: 1, nome: "Barba + Sobrancelha" },
-  { id: 2, nome: "Barba Pacote" },
-  { id: 3, nome: "Barba!" },
-  { id: 4, nome: "Bigode" },
-  { id: 5, nome: "Corte Masculino" },
-  { id: 6, nome: "Corte Feminino" },
-  { id: 7, nome: "Hidratação" },
-  { id: 8, nome: "Coloração" },
-  { id: 9, nome: "Manicure" },
-  { id: 10, nome: "Pedicure" },
+  { id: 1, nome: "Barba + Sobrancelha", preco: "R$ 50,00", tempo: "30 min" },
+  { id: 2, nome: "Barba Pacote", preco: "R$ 40,00", tempo: "25 min" },
+  { id: 3, nome: "Barba!", preco: "R$ 30,00", tempo: "20 min" },
+  { id: 4, nome: "Bigode", preco: "R$ 20,00", tempo: "15 min" },
+  { id: 5, nome: "Corte Masculino", preco: "R$ 45,00", tempo: "30 min" },
+  { id: 6, nome: "Corte Feminino", preco: "R$ 65,00", tempo: "45 min" },
+  { id: 7, nome: "Hidratação", preco: "R$ 80,00", tempo: "60 min" },
+  { id: 8, nome: "Coloração", preco: "R$ 120,00", tempo: "90 min" },
+  { id: 9, nome: "Manicure", preco: "R$ 35,00", tempo: "40 min" },
+  { id: 10, nome: "Pedicure", preco: "R$ 40,00", tempo: "50 min" },
 ];
 
 const produtosDisponiveis: ProdutoOpt[] = [
-  { id: 1, nome: "3030 Condicionador Lavado" },
-  { id: 2, nome: "Agua" },
-  { id: 3, nome: "Balm" },
-  { id: 4, nome: "Biscoito teste v" },
-  { id: 5, nome: "Botox" },
-  { id: 6, nome: "color dicolor 10.89" },
+  { id: 1, nome: "3030 Condicionador Lavado", preco: "R$ 35,00" },
+  { id: 2, nome: "Água", preco: "R$ 4,00" },
+  { id: 3, nome: "Balm", preco: "R$ 28,00" },
+  { id: 4, nome: "Pomada Modeladora", preco: "R$ 45,00" },
+  { id: 5, nome: "Botox Capilar", preco: "R$ 90,00" },
+  { id: 6, nome: "Color Dicolor 10.89", preco: "R$ 32,00" },
 ];
 
 const profissionaisDisponiveis: ProfissionalOpt[] = [
-  { id: 1, nome: "Cesar", iniciais: "CC" },
-  { id: 2, nome: "Claudia", iniciais: "CC" },
-  { id: 3, nome: "Marcia Silva", iniciais: "MS" },
-  { id: 4, nome: "Matheus", iniciais: "MM" },
-  { id: 5, nome: "Vini", iniciais: "VV" },
+  { id: 1, nome: "Cesar", iniciais: "CC", cor: "bg-blue-500" },
+  { id: 2, nome: "Claudia", iniciais: "CL", cor: "bg-pink-500" },
+  { id: 3, nome: "Marcia Silva", iniciais: "MS", cor: "bg-amber-500" },
+  { id: 4, nome: "Matheus", iniciais: "MM", cor: "bg-emerald-500" },
+  { id: 5, nome: "Vini", iniciais: "VV", cor: "bg-purple-500" },
 ];
 
 const recorrenciaOptions = [
@@ -58,17 +80,23 @@ const formaPagamentoOptions = [
 ];
 
 const usosOptions = [
-  { value: "ILIMITADO", label: "Ilimitado" },
-  { value: "1", label: "1x / mês" },
-  { value: "2", label: "2x / mês" },
-  { value: "4", label: "4x / mês" },
-  { value: "8", label: "8x / mês" },
+  { value: "ILIMITADO", label: "ILIMITADO" },
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+  { value: "6", label: "6" },
+  { value: "8", label: "8" },
+  { value: "10", label: "10" },
 ];
 
 const comissaoOptions = [
-  { value: "TEMPO", label: "Por tempo" },
-  { value: "VALOR", label: "Por valor" },
-  { value: "FIXO", label: "Valor fixo" },
+  { value: "TEMPO", label: "TEMPO" },
+  { value: "VALOR", label: "VALOR" },
+  { value: "FIXO", label: "FIXO" },
+  { value: "PORCENTAGEM", label: "PORCENTAGEM" },
+  { value: "PONTOS", label: "PONTOS" },
 ];
 
 const diasSemana = [
@@ -86,13 +114,24 @@ interface ServicoIncluso {
   desconto: string;
   usos: string;
   comissao: string;
+  comissaoValor: string;
 }
 
 interface ProdutoIncluso {
   id: number;
-  quantidade: string;
   desconto: string;
+  usos: string;
+  comissao: string;
+  comissaoValor: string;
 }
+
+const sections = [
+  { id: "dados", label: "Dados do plano" },
+  { id: "servicos", label: "Serviços" },
+  { id: "produtos", label: "Produtos" },
+  { id: "beneficios", label: "Benefícios" },
+  { id: "disponibilidade", label: "Disponibilidade" },
+];
 
 function CurrencyInput({
   label,
@@ -124,118 +163,254 @@ function CurrencyInput({
 }
 
 function SectionBlock({
+  id,
   title,
   description,
   children,
+  rightSlot,
   className = "",
 }: {
+  id?: string;
   title: string;
   description?: string;
   children: React.ReactNode;
+  rightSlot?: React.ReactNode;
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-xl border border-border bg-card p-4", className)}>
-      <div className="mb-3">
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
-        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+    <section
+      id={id}
+      className={cn("scroll-mt-24 rounded-xl border border-border bg-card p-4", className)}
+    >
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold text-foreground">{title}</h2>
+          {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+        </div>
+        {rightSlot}
       </div>
       {children}
-    </div>
+    </section>
   );
 }
 
-function MultiSelectSearch({
-  label,
-  placeholder,
-  options,
+/**
+ * Inline-edit list for services/products (style from reference image).
+ * - Each item is a row with a checkbox to include in the plan.
+ * - Selected rows show editable fields: desconto, usos, comissão (+ ponto/% se aplicável).
+ */
+function InlineSelectableList<T extends { id: number; nome: string }>({
+  items,
   selected,
-  onChange,
+  setSelected,
+  searchPlaceholder,
+  comissaoEnabled = true,
+  hideUsos = false,
 }: {
-  label: string;
-  placeholder?: string;
-  options: { id: number; nome: string }[];
-  selected: number[];
-  onChange: (ids: number[]) => void;
+  items: T[];
+  selected: Map<number, ServicoIncluso>;
+  setSelected: (m: Map<number, ServicoIncluso>) => void;
+  searchPlaceholder: string;
+  comissaoEnabled?: boolean;
+  hideUsos?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
   const [busca, setBusca] = useState("");
-  const ref = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const filtered = items.filter((i) => i.nome.toLowerCase().includes(busca.toLowerCase()));
+  const allSelected = filtered.length > 0 && filtered.every((i) => selected.has(i.id));
 
-  const filtered = options.filter((o) => o.nome.toLowerCase().includes(busca.toLowerCase()));
-  const toggle = (id: number) =>
-    onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
-  const allSelected = filtered.length > 0 && filtered.every((o) => selected.includes(o.id));
+  const toggle = (id: number) => {
+    const next = new Map(selected);
+    if (next.has(id)) next.delete(id);
+    else
+      next.set(id, {
+        id,
+        desconto: "100",
+        usos: "ILIMITADO",
+        comissao: "TEMPO",
+        comissaoValor: "0",
+      });
+    setSelected(next);
+  };
+
   const toggleAll = () => {
-    if (allSelected) onChange(selected.filter((id) => !filtered.some((o) => o.id === id)));
-    else onChange(Array.from(new Set([...selected, ...filtered.map((o) => o.id)])));
+    const next = new Map(selected);
+    if (allSelected) {
+      filtered.forEach((i) => next.delete(i.id));
+    } else {
+      filtered.forEach((i) => {
+        if (!next.has(i.id))
+          next.set(i.id, {
+            id: i.id,
+            desconto: "100",
+            usos: "ILIMITADO",
+            comissao: "TEMPO",
+            comissaoValor: "0",
+          });
+      });
+    }
+    setSelected(next);
+  };
+
+  const update = (id: number, field: keyof ServicoIncluso, value: string) => {
+    const next = new Map(selected);
+    const cur = next.get(id);
+    if (cur) {
+      next.set(id, { ...cur, [field]: value });
+      setSelected(next);
+    }
   };
 
   return (
-    <div className="relative" ref={ref}>
-      <label className="mb-1 block text-sm font-medium text-foreground">{label}</label>
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-background px-3 text-sm text-foreground transition-all hover:border-muted-foreground"
-      >
-        <span className={cn("truncate", selected.length === 0 && "text-muted-foreground")}>
-          {selected.length === 0
-            ? placeholder || "Selecione..."
-            : `${selected.length} selecionado(s)`}
-        </span>
-        <Search className="h-4 w-4 text-muted-foreground" />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
-          <div className="border-b border-border p-2">
-            <input
-              placeholder="Buscar..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
-              autoFocus
-            />
-          </div>
-          <div className="max-h-60 overflow-auto">
-            {filtered.length > 0 && (
-              <button
-                type="button"
-                onClick={toggleAll}
-                className="flex w-full items-center gap-3 border-b border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted"
-              >
-                {allSelected ? "Desmarcar todos" : "Selecionar todos"}
-              </button>
-            )}
-            {filtered.map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                onClick={() => toggle(o.id)}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
-              >
-                <Checkbox
-                  checked={selected.includes(o.id)}
-                  className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
-                />
-                <span className="text-foreground">{o.nome}</span>
-              </button>
-            ))}
-            {filtered.length === 0 && (
-              <p className="px-4 py-3 text-center text-sm text-muted-foreground">Nenhum item encontrado</p>
-            )}
-          </div>
+    <div className="rounded-xl border border-border bg-card">
+      {/* Search header */}
+      <div className="flex items-center gap-2 border-b border-border p-3">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder={searchPlaceholder}
+            className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+          />
         </div>
-      )}
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="h-10 shrink-0 rounded-lg border border-border bg-background px-4 text-sm font-medium text-foreground transition hover:bg-muted"
+        >
+          {allSelected ? "Desmarcar todos" : "Selecionar todos"}
+        </button>
+      </div>
+
+      {/* List */}
+      <div className="max-h-[420px] overflow-y-auto p-2">
+        {filtered.length === 0 ? (
+          <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+            Nenhum item encontrado.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {filtered.map((item) => {
+              const sel = selected.get(item.id);
+              const isSelected = !!sel;
+              return (
+                <li
+                  key={item.id}
+                  className={cn(
+                    "rounded-lg border transition",
+                    isSelected
+                      ? "border-blue-500/40 bg-blue-500/5"
+                      : "border-border bg-card hover:bg-muted/40",
+                  )}
+                >
+                  <div className="flex items-center gap-3 px-3 py-2.5">
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={() => toggle(item.id)}
+                      className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
+                    />
+                    <span className="flex-1 truncate text-sm font-medium text-foreground">
+                      {item.nome}
+                    </span>
+
+                    {isSelected && (
+                      <div className="flex flex-wrap items-end gap-2.5">
+                        {/* DESCONTO */}
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            Desconto
+                          </span>
+                          <div className="flex h-9 items-center rounded-md border border-border bg-background">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={sel.desconto}
+                              onChange={(e) =>
+                                update(item.id, "desconto", e.target.value.replace(/\D/g, ""))
+                              }
+                              className="h-full w-12 bg-transparent px-2 text-right text-sm outline-none"
+                            />
+                            <span className="pr-2 text-xs text-muted-foreground">%</span>
+                          </div>
+                        </div>
+
+                        {/* USOS */}
+                        {!hideUsos && (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              Usos/mês
+                            </span>
+                            <select
+                              value={sel.usos}
+                              onChange={(e) => update(item.id, "usos", e.target.value)}
+                              className="h-9 w-[110px] rounded-md border border-blue-500/40 bg-background px-2 text-xs font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                            >
+                              {usosOptions.map((o) => (
+                                <option key={o.value} value={o.value}>
+                                  {o.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+
+                        {/* COMISSÃO */}
+                        {comissaoEnabled && (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              Comissão
+                            </span>
+                            <select
+                              value={sel.comissao}
+                              onChange={(e) => update(item.id, "comissao", e.target.value)}
+                              className="h-9 w-[130px] rounded-md border border-blue-500/40 bg-background px-2 text-xs font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                            >
+                              {comissaoOptions.map((o) => (
+                                <option key={o.value} value={o.value}>
+                                  {o.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+
+                        {/* % COM. ou PONTOS  */}
+                        {comissaoEnabled &&
+                          (sel.comissao === "PORCENTAGEM" || sel.comissao === "PONTOS") && (
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                {sel.comissao === "PONTOS" ? "Pontos" : "% com."}
+                              </span>
+                              <div className="flex h-9 items-center rounded-md border border-border bg-background">
+                                <input
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={sel.comissaoValor}
+                                  onChange={(e) =>
+                                    update(
+                                      item.id,
+                                      "comissaoValor",
+                                      e.target.value.replace(/\D/g, ""),
+                                    )
+                                  }
+                                  className="h-full w-12 bg-transparent px-2 text-right text-sm outline-none"
+                                />
+                                <span className="pr-2 text-xs text-muted-foreground">
+                                  {sel.comissao === "PONTOS" ? "pts" : "%"}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
@@ -249,45 +424,51 @@ export default function AssinaturaCadastro() {
 
   // Detalhes
   const [nome, setNome] = useState(editing || "");
-  const [valor, setValor] = useState("89,00");
+  const [valor, setValor] = useState("250,00");
   const [recorrencia, setRecorrencia] = useState("MENSAL");
   const [formaPagamento, setFormaPagamento] = useState("CARTAO_CREDITO");
-  const [disponivelVenda, setDisponivelVenda] = useState(false);
+  const [disponivelVenda, setDisponivelVenda] = useState(true);
+  const [destaque, setDestaque] = useState(false);
+
   const [beneficios, setBeneficios] = useState<string[]>([
-    "Mesa de sinuca",
-    "10 % de desconto",
-    "Traga um amigo no aniversario",
+    "Venha quando precisar",
+    "Descontos em serviços",
+    "Desconto em produtos",
   ]);
   const [novoBeneficio, setNovoBeneficio] = useState("");
 
-  // Serviços (multi-select)
-  const [servicosPendentes, setServicosPendentes] = useState<number[]>([]);
-  const [descontoServico, setDescontoServico] = useState("100");
-  const [usosServico, setUsosServico] = useState("ILIMITADO");
-  const [comissaoServico, setComissaoServico] = useState("TEMPO");
-  const [servicosInclusos, setServicosInclusos] = useState<ServicoIncluso[]>([
-    { id: 1, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
-    { id: 5, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO" },
-  ]);
+  // Serviços
+  const [servicosMap, setServicosMap] = useState<Map<number, ServicoIncluso>>(
+    () =>
+      new Map<number, ServicoIncluso>([
+        [
+          1,
+          { id: 1, desconto: "10", usos: "ILIMITADO", comissao: "PORCENTAGEM", comissaoValor: "0" },
+        ],
+        [2, { id: 2, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO", comissaoValor: "0" }],
+      ]),
+  );
 
-  // Produtos (multi-select)
-  const [produtosPendentes, setProdutosPendentes] = useState<number[]>([]);
-  const [quantidadeProdutoForm, setQuantidadeProdutoForm] = useState("1");
-  const [descontoProdutoForm, setDescontoProdutoForm] = useState("10");
-  const [produtosSelecionados, setProdutosSelecionados] = useState<ProdutoIncluso[]>([]);
+  // Produtos
+  const [produtosMap, setProdutosMap] = useState<Map<number, ServicoIncluso>>(
+    () =>
+      new Map<number, ServicoIncluso>([
+        [1, { id: 1, desconto: "70", usos: "ILIMITADO", comissao: "TEMPO", comissaoValor: "0" }],
+      ]),
+  );
 
   // Disponibilidade
   const [diasAceitos, setDiasAceitos] = useState<string[]>([
-    "seg", "ter", "qua", "qui", "sex",
+    "seg",
+    "ter",
+    "qua",
+    "qui",
+    "sex",
   ]);
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
-  // Regras - bloqueio por atraso
-  const [bloqueioAtraso, setBloqueioAtraso] = useState(true);
-  const [diasAtraso, setDiasAtraso] = useState("5");
-
-  // Aba ativa
-  const [tab, setTab] = useState("dados");
+  // Aba ativa (anchor scroll)
+  const [activeSection, setActiveSection] = useState("dados");
 
   const [showErrors, setShowErrors] = useState(false);
   const errors = {
@@ -295,48 +476,31 @@ export default function AssinaturaCadastro() {
   };
   const showError = (k: keyof typeof errors) => (showErrors ? errors[k] : "");
 
-  // Helpers
-  const servicosDisponiveisFiltrados = useMemo(
-    () => servicosDisponiveis.filter((s) => !servicosInclusos.some((i) => i.id === s.id)),
-    [servicosInclusos],
-  );
-  const produtosDisponiveisFiltrados = useMemo(
-    () => produtosDisponiveis.filter((p) => !produtosSelecionados.some((i) => i.id === p.id)),
-    [produtosSelecionados],
-  );
-
-  const adicionarServico = () => {
-    if (servicosPendentes.length === 0) return;
-    const novos: ServicoIncluso[] = servicosPendentes
-      .filter((id) => !servicosInclusos.some((s) => s.id === id))
-      .map((id) => ({
-        id,
-        desconto: descontoServico || "0",
-        usos: usosServico,
-        comissao: comissaoServico,
-      }));
-    setServicosInclusos((prev) => [...prev, ...novos]);
-    setServicosPendentes([]);
+  // Smooth scroll handler
+  const handleNavClick = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveSection(id);
   };
 
-  const removerServico = (id: number) =>
-    setServicosInclusos((prev) => prev.filter((s) => s.id !== id));
-
-  const adicionarProduto = () => {
-    if (produtosPendentes.length === 0) return;
-    const novos: ProdutoIncluso[] = produtosPendentes
-      .filter((id) => !produtosSelecionados.some((p) => p.id === id))
-      .map((id) => ({
-        id,
-        quantidade: quantidadeProdutoForm || "1",
-        desconto: descontoProdutoForm || "0",
-      }));
-    setProdutosSelecionados((prev) => [...prev, ...novos]);
-    setProdutosPendentes([]);
-  };
-
-  const removerProduto = (id: number) =>
-    setProdutosSelecionados((prev) => prev.filter((p) => p.id !== id));
+  // Active section tracking via IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActiveSection(visible[0].target.id);
+      },
+      { rootMargin: "-30% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    sections.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
 
   const toggleDia = (key: string) =>
     setDiasAceitos((prev) =>
@@ -376,12 +540,16 @@ export default function AssinaturaCadastro() {
     navigate("/assinantePesquisa");
   };
 
-  const nomeServico = (id: number) =>
-    servicosDisponiveis.find((s) => s.id === id)?.nome || "";
-  const nomeProduto = (id: number) =>
-    produtosDisponiveis.find((p) => p.id === id)?.nome || "";
-  const labelUsos = (v: string) => usosOptions.find((o) => o.value === v)?.label || v;
-  const labelComissao = (v: string) => comissaoOptions.find((o) => o.value === v)?.label || v;
+  const servicosArr = useMemo(() => Array.from(servicosMap.values()), [servicosMap]);
+  const produtosArr = useMemo(() => Array.from(produtosMap.values()), [produtosMap]);
+
+  const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
+  const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
+  const labelUsos = (v: string) =>
+    v === "ILIMITADO" ? "Ilimitado" : `${v}x / mês`;
+
+  const recorrenciaLabel =
+    recorrenciaOptions.find((r) => r.value === recorrencia)?.label || "";
 
   return (
     <AppLayout>
@@ -400,36 +568,43 @@ export default function AssinaturaCadastro() {
           </div>
         </div>
 
-        {/* CONTENT - 2 colunas: principal + sidebar */}
-        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
+        {/* TAB BAR (anchor-style, profissionalPerfil pattern) */}
+        <div className="sticky top-0 z-20 mt-4 border-b border-border bg-background">
+          <div className="mx-6 flex gap-6 overflow-x-auto">
+            {sections.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => handleNavClick(s.id)}
+                className={cn(
+                  "relative whitespace-nowrap pb-2.5 pt-3 text-sm font-medium transition-colors",
+                  activeSection === s.id
+                    ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* CONTENT */}
+        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
-          <Tabs value={tab} onValueChange={setTab} className="w-full">
-            <TabsList className="grid h-11 w-full grid-cols-3 bg-muted/50 p-1">
-              <TabsTrigger value="dados" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                Dados do plano
-              </TabsTrigger>
-              <TabsTrigger value="itens" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                Itens
-                <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
-                  {servicosInclusos.length + produtosSelecionados.length}
-                </span>
-              </TabsTrigger>
-              <TabsTrigger value="regras" className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                Regras
-              </TabsTrigger>
-            </TabsList>
-
-            {/* ============ ABA: DADOS DO PLANO ============ */}
-            <TabsContent value="dados" className="mt-5 flex flex-col gap-5">
-            <SectionBlock title="Dados do plano" description="Identificação e cobrança do plano de assinatura.">
+            {/* DADOS DO PLANO */}
+            <SectionBlock
+              id="dados"
+              title="Dados do plano"
+              description="Identificação e cobrança do plano de assinatura."
+            >
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
                   <TextField
                     label="Nome do plano *"
                     value={nome}
                     onChange={setNome}
-                    placeholder="Ex: Plano Mensal Premium"
+                    placeholder="Ex: Francez Plano Master"
                     error={showError("nome")}
                   />
                   <CurrencyInput label="Valor" value={valor} onChange={setValor} />
@@ -446,221 +621,83 @@ export default function AssinaturaCadastro() {
                     options={formaPagamentoOptions}
                   />
                 </div>
-                <div className="mt-1 flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
-                    <p className="text-xs text-muted-foreground">
-                      Quando ativo, o plano fica disponível para venda aos clientes.
-                    </p>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
+                      <p className="text-xs text-muted-foreground">
+                        Quando ativo, fica disponível para venda.
+                      </p>
+                    </div>
+                    <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                   </div>
-                  <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
+
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <Star
+                        className={cn(
+                          "h-4 w-4",
+                          destaque ? "fill-amber-500 text-amber-500" : "text-muted-foreground",
+                        )}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Destaque</p>
+                        <p className="text-xs text-muted-foreground">
+                          Marca este plano como destaque na vitrine.
+                        </p>
+                      </div>
+                    </div>
+                    <Switch checked={destaque} onCheckedChange={setDestaque} />
+                  </div>
                 </div>
               </div>
             </SectionBlock>
-            </TabsContent>
 
-            {/* ============ ABA: ITENS (Serviços + Produtos) ============ */}
-            <TabsContent value="itens" className="mt-5 flex flex-col gap-5">
+            {/* SERVIÇOS */}
             <SectionBlock
-              title="Serviços"
-              description="Selecione os serviços inclusos no plano e configure desconto, usos e comissão."
+              id="servicos"
+              title="Serviços inclusos"
+              description="Selecione os serviços e configure desconto, usos e comissão."
+              rightSlot={
+                <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                  {servicosArr.length} selecionado(s)
+                </span>
+              }
             >
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-              {/* Form esquerda */}
-              <div className="space-y-4 self-start">
-                <MultiSelectSearch
-                  label="Serviços"
-                  placeholder="Buscar e selecionar..."
-                  options={servicosDisponiveisFiltrados}
-                  selected={servicosPendentes}
-                  onChange={setServicosPendentes}
-                />
-
-                <div className="grid gap-1.5">
-                  <label className="text-sm font-medium text-foreground">Desconto (%)</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={descontoServico}
-                    onChange={(e) => setDescontoServico(e.target.value.replace(/\D/g, ""))}
-                    placeholder="100"
-                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <Dropdown
-                  label="Usos / mês"
-                  value={usosServico}
-                  setValue={setUsosServico}
-                  options={usosOptions}
-                />
-
-                <Dropdown
-                  label="Comissionamento"
-                  value={comissaoServico}
-                  setValue={setComissaoServico}
-                  options={comissaoOptions}
-                />
-
-                <div className="flex items-end gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={adicionarServico}
-                    disabled={servicosPendentes.length === 0}
-                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
-                  </button>
-                </div>
-              </div>
-
-              {/* Tabela direita */}
-              <div className="space-y-4 self-start">
-                <div className="overflow-hidden rounded-lg border border-border bg-card">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-muted/40">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Serviço</th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Usos</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Comissão</th>
-                        <th className="w-14 px-2 py-3" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {servicosInclusos.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="px-4 py-16 text-center text-sm text-muted-foreground">
-                            Adicione um serviço para incluir no plano.
-                          </td>
-                        </tr>
-                      ) : (
-                        servicosInclusos.map((s) => (
-                          <tr key={s.id} className="border-t border-border bg-card">
-                            <td className="px-4 py-3 text-sm text-foreground">{nomeServico(s.id)}</td>
-                            <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{s.desconto}%</td>
-                            <td className="px-4 py-3 text-center text-sm text-foreground">{labelUsos(s.usos)}</td>
-                            <td className="px-4 py-3 text-center text-sm text-foreground">{labelComissao(s.comissao)}</td>
-                            <td className="px-2 py-3 text-center">
-                              <button
-                                type="button"
-                                onClick={() => removerServico(s.id)}
-                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+              <InlineSelectableList
+                items={servicosDisponiveis}
+                selected={servicosMap}
+                setSelected={setServicosMap}
+                searchPlaceholder="Buscar serviço..."
+              />
             </SectionBlock>
 
-          {/* PRODUTOS - 2 colunas estilo NovaCompra */}
+            {/* PRODUTOS */}
             <SectionBlock
-              title="Produtos"
-              description="Selecione os produtos inclusos no plano com quantidade e desconto."
+              id="produtos"
+              title="Desconto em produtos"
+              description="Selecione os produtos com desconto incluído no plano."
+              rightSlot={
+                <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                  {produtosArr.length} selecionado(s)
+                </span>
+              }
             >
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-              <div className="space-y-4 self-start">
-                <MultiSelectSearch
-                  label="Produtos"
-                  placeholder="Buscar e selecionar..."
-                  options={produtosDisponiveisFiltrados}
-                  selected={produtosPendentes}
-                  onChange={setProdutosPendentes}
-                />
-
-                <div className="grid gap-1.5">
-                  <label className="text-sm font-medium text-foreground">Quantidade</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={quantidadeProdutoForm}
-                    onChange={(e) => setQuantidadeProdutoForm(e.target.value.replace(/\D/g, ""))}
-                    placeholder="1"
-                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="grid gap-1.5">
-                  <label className="text-sm font-medium text-foreground">Desconto (%)</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={descontoProdutoForm}
-                    onChange={(e) => setDescontoProdutoForm(e.target.value.replace(/\D/g, ""))}
-                    placeholder="10"
-                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="flex items-end gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={adicionarProduto}
-                    disabled={produtosPendentes.length === 0}
-                    className="h-10 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Adicionar{produtosPendentes.length > 0 ? ` (${produtosPendentes.length})` : ""}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-4 self-start">
-                <div className="overflow-hidden rounded-lg border border-border bg-card">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-muted/40">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Produto</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-foreground">Quantidade</th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Desconto</th>
-                        <th className="w-14 px-2 py-3" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {produtosSelecionados.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} className="px-4 py-16 text-center text-sm text-muted-foreground">
-                            Adicione um produto para aplicar desconto.
-                          </td>
-                        </tr>
-                      ) : (
-                        produtosSelecionados.map((p) => (
-                          <tr key={p.id} className="border-t border-border bg-card">
-                            <td className="px-4 py-3 text-sm text-foreground">{nomeProduto(p.id)}</td>
-                            <td className="px-4 py-3 text-center text-sm text-foreground">{p.quantidade}</td>
-                            <td className="px-4 py-3 text-right text-sm font-medium text-emerald-600">{p.desconto}%</td>
-                            <td className="px-2 py-3 text-center">
-                              <button
-                                type="button"
-                                onClick={() => removerProduto(p.id)}
-                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive transition hover:bg-destructive/10"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+              <InlineSelectableList
+                items={produtosDisponiveis}
+                selected={produtosMap}
+                setSelected={setProdutosMap}
+                searchPlaceholder="Buscar produto..."
+                hideUsos
+              />
             </SectionBlock>
-            </TabsContent>
 
-            {/* ============ ABA: REGRAS (Benefícios + Disponibilidade + Bloqueio) ============ */}
-            <TabsContent value="regras" className="mt-5 flex flex-col gap-5">
             {/* BENEFÍCIOS */}
             <SectionBlock
+              id="beneficios"
               title="Benefícios"
-              description="Itens exibidos no plano. Use as setas para reorganizar a ordem de apresentação."
+              description="Itens exibidos no plano. Use as setas para reorganizar."
             >
               <div className="flex gap-2">
                 <input
@@ -689,9 +726,15 @@ export default function AssinaturaCadastro() {
                 <table className="w-full border-collapse">
                   <thead className="bg-muted/40">
                     <tr>
-                      <th className="w-14 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">#</th>
-                      <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Benefício</th>
-                      <th className="w-32 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ordem</th>
+                      <th className="w-14 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        #
+                      </th>
+                      <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Benefício
+                      </th>
+                      <th className="w-32 px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Ordem
+                      </th>
                       <th className="w-14 px-2 py-2.5" />
                     </tr>
                   </thead>
@@ -705,7 +748,9 @@ export default function AssinaturaCadastro() {
                     ) : (
                       beneficios.map((b, idx) => (
                         <tr key={`${b}-${idx}`} className="border-t border-border">
-                          <td className="px-3 py-2.5 text-center text-sm font-medium text-muted-foreground">{idx + 1}</td>
+                          <td className="px-3 py-2.5 text-center text-sm font-medium text-muted-foreground">
+                            {idx + 1}
+                          </td>
                           <td className="px-3 py-2.5 text-sm text-foreground">{b}</td>
                           <td className="px-3 py-2.5">
                             <div className="flex items-center justify-center gap-1">
@@ -749,6 +794,7 @@ export default function AssinaturaCadastro() {
 
             {/* DISPONIBILIDADE */}
             <SectionBlock
+              id="disponibilidade"
               title="Disponibilidade"
               description="Dias e profissionais que aceitam o plano."
             >
@@ -781,11 +827,15 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">Profissionais que atendem</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium text-foreground">
+                      Profissionais que atendem
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {profissionaisAtendem.length} de {profissionaisDisponiveis.length}
+                    </span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {profissionaisDisponiveis.map((p) => {
                       const ativo = profissionaisAtendem.includes(p.id);
                       return (
@@ -794,23 +844,33 @@ export default function AssinaturaCadastro() {
                           type="button"
                           onClick={() => toggleProfissional(p.id)}
                           className={cn(
-                            "inline-flex h-8 items-center gap-1.5 rounded-full border pl-1 pr-2.5 text-xs font-medium transition",
+                            "group flex flex-col items-center gap-1.5 rounded-lg border p-2 transition",
                             ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                              : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+                              ? "border-emerald-500/40 bg-emerald-500/5"
+                              : "border-border bg-card opacity-60 hover:opacity-100",
                           )}
                         >
+                          <div className="relative">
+                            <div
+                              className={cn(
+                                "flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm",
+                                p.cor,
+                              )}
+                            >
+                              {p.iniciais}
+                            </div>
+                            {ativo && (
+                              <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background fill-emerald-500 text-white" />
+                            )}
+                          </div>
                           <span
                             className={cn(
-                              "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
-                              ativo
-                                ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-                                : "bg-muted text-muted-foreground",
+                              "max-w-[80px] truncate text-xs font-medium",
+                              ativo ? "text-foreground" : "text-muted-foreground",
                             )}
                           >
-                            {p.iniciais}
+                            {p.nome}
                           </span>
-                          {p.nome}
                         </button>
                       );
                     })}
@@ -818,93 +878,109 @@ export default function AssinaturaCadastro() {
                 </div>
               </div>
             </SectionBlock>
+          </div>
 
-            {/* BLOQUEIO POR ATRASO */}
-            <SectionBlock
-              title="Bloqueio por atraso"
-              description="Suspenda automaticamente o uso do plano em caso de pagamento em atraso."
-            >
-              <div className="grid gap-4">
-                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Bloquear assinatura em atraso</p>
-                    <p className="text-xs text-muted-foreground">
-                      Ao ativar, o cliente será impedido de utilizar os benefícios do plano após o período definido.
-                    </p>
-                  </div>
-                  <Switch checked={bloqueioAtraso} onCheckedChange={setBloqueioAtraso} />
+          {/* SIDEBAR DIREITA - PREVIEW DO PLANO */}
+          <aside className="lg:sticky lg:top-16 lg:self-start">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+              {/* Header */}
+              <div className="border-b border-border p-5">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-xl font-bold uppercase leading-tight text-foreground">
+                    {nome.trim() || "Nome do plano"}
+                  </h3>
+                  {destaque && (
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-600">
+                      <Star className="h-3 w-3 fill-amber-500" />
+                      Destaque
+                    </span>
+                  )}
                 </div>
-                {bloqueioAtraso && (
-                  <div className="grid gap-1.5 sm:max-w-xs">
-                    <label className="text-sm font-medium text-foreground">Dias de tolerância</label>
-                    <div className="flex h-10 items-center rounded-lg border border-border bg-background text-sm focus-within:ring-2 focus-within:ring-primary/20">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={diasAtraso}
-                        onChange={(e) => setDiasAtraso(e.target.value.replace(/\D/g, ""))}
-                        className="h-full flex-1 bg-transparent px-3 text-sm outline-none"
-                      />
-                      <span className="pr-3 text-muted-foreground">dias</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Após {diasAtraso || "0"} dia(s) de atraso, a assinatura será bloqueada automaticamente.
+              </div>
+
+              {/* Body */}
+              <div className="space-y-4 p-5">
+                {/* Inclusos */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-sky-500">
+                    Incluso:
+                  </p>
+
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {servicosArr.length === 0 && produtosArr.length === 0 && beneficios.length === 0 && (
+                      <li className="text-sm italic text-muted-foreground">
+                        Configure os itens do plano.
+                      </li>
+                    )}
+
+                    {/* Serviços */}
+                    {servicosArr.map((s) => (
+                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <span>
+                          {s.usos === "ILIMITADO" ? "Ilimitado" : s.usos} {nomeServico(s.id)}
+                          {s.desconto !== "0" && s.desconto !== "100" && (
+                            <span className="ml-1 normal-case text-muted-foreground">
+                              ({s.desconto}% desc)
+                            </span>
+                          )}
+                        </span>
+                      </li>
+                    ))}
+
+                    {/* Produtos */}
+                    {produtosArr.length > 0 && (
+                      <li className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <span>Descontos em produtos</span>
+                      </li>
+                    )}
+
+                    {/* Benefícios extras */}
+                    {beneficios.map((b, idx) => (
+                      <li key={`b-${idx}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Produtos detalhe (collapse) */}
+                {produtosArr.length > 0 && (
+                  <div className="rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Produtos com desconto
                     </p>
+                    <ul className="flex flex-col gap-1">
+                      {produtosArr.map((p) => (
+                        <li
+                          key={`pd-${p.id}`}
+                          className="flex items-center justify-between gap-2 text-xs text-foreground"
+                        >
+                          <span className="truncate">{nomeProduto(p.id)}</span>
+                          <span className="shrink-0 font-semibold text-emerald-600">
+                            -{p.desconto}%
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>
-            </SectionBlock>
-            </TabsContent>
-          </Tabs>
-          </div>
 
-          {/* SIDEBAR DIREITA */}
-          <aside className="flex flex-col gap-5 lg:sticky lg:top-4 lg:self-start">
-            {/* Resumo */}
-            <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="text-sm font-semibold text-foreground">Resumo do plano</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">Pré-visualização do que está configurado.</p>
-
-              <div className="mt-4 space-y-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Nome</p>
-                  <p className="mt-0.5 truncate text-sm font-semibold text-foreground">
-                    {nome.trim() || "Sem nome"}
-                  </p>
-                </div>
-
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xs text-muted-foreground">R$</span>
-                  <span className="text-2xl font-bold text-foreground">{valor || "0,00"}</span>
-                  <span className="text-xs text-muted-foreground">
-                    / {recorrenciaOptions.find((r) => r.value === recorrencia)?.label.toLowerCase()}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Serviços</p>
-                    <p className="mt-0.5 text-lg font-bold text-foreground">{servicosInclusos.length}</p>
+              {/* Footer (preço + status) */}
+              <div className="border-t border-border bg-muted/20 px-5 py-4">
+                <div className="flex items-end justify-between gap-2">
+                  <div>
+                    <span className="text-xl font-bold text-foreground">
+                      R$ {valor || "0,00"}
+                    </span>
+                    <span className="ml-1 text-sm text-muted-foreground">{recorrenciaLabel}</span>
                   </div>
-                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Produtos</p>
-                    <p className="mt-0.5 text-lg font-bold text-foreground">{produtosSelecionados.length}</p>
-                  </div>
-                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Benefícios</p>
-                    <p className="mt-0.5 text-lg font-bold text-foreground">{beneficios.length}</p>
-                  </div>
-                  <div className="rounded-lg border border-border bg-muted/30 p-2.5">
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Dias</p>
-                    <p className="mt-0.5 text-lg font-bold text-foreground">{diasAceitos.length}/7</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2">
-                  <span className="text-xs font-medium text-foreground">Vitrine</span>
                   <span
                     className={cn(
-                      "rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                      "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
                       disponivelVenda
                         ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
                         : "bg-muted text-muted-foreground",
@@ -913,39 +989,19 @@ export default function AssinaturaCadastro() {
                     {disponivelVenda ? "Ativo" : "Inativo"}
                   </span>
                 </div>
-              </div>
-            </div>
 
-            {/* Navegação rápida */}
-            <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="text-sm font-semibold text-foreground">Seções</h3>
-              <nav className="mt-3 flex flex-col gap-1">
-                {[
-                  { id: "dados", label: "Dados do plano", hint: "" },
-                  { id: "itens", label: "Itens", hint: `${servicosInclusos.length} serv. · ${produtosSelecionados.length} prod.` },
-                  { id: "regras", label: "Regras", hint: `${beneficios.length} benef. · ${diasAceitos.length}d` },
-                ].map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => setTab(s.id)}
-                    className={cn(
-                      "flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-sm transition",
-                      tab === s.id
-                        ? "bg-muted font-semibold text-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                    )}
-                  >
-                    <span>{s.label}</span>
-                    {s.hint && <span className="text-[11px] text-muted-foreground">{s.hint}</span>}
-                  </button>
-                ))}
-              </nav>
+                <button
+                  type="button"
+                  className="mt-3 w-full rounded-lg bg-sky-500 py-2.5 text-sm font-bold uppercase tracking-wide text-white shadow-sm transition hover:bg-sky-600"
+                >
+                  Assinar
+                </button>
+              </div>
             </div>
           </aside>
         </div>
 
-        {/* FOOTER único - sempre visível */}
+        {/* FOOTER */}
         <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
           <div className="flex items-center justify-end gap-3">
             <button
