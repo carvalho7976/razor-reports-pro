@@ -134,7 +134,7 @@ interface ProdutoIncluso {
 
 const sections = [
   { id: "dados", label: "Dados" },
-  { id: "servicos", label: "Serviços" },
+   { id: "servicos", label: "Serviços (opcional)" },
   { id: "produtos", label: "Produtos (opcional)" },
   { id: "beneficios", label: "Benefícios Extras (opcional)" },
   { id: "disponibilidade", label: "Disponibilidade" },
@@ -648,7 +648,7 @@ export default function AssinaturaCadastro() {
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1.8fr)_minmax(140px,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)]">
                   <TextField
-                    label="Nome do Plano *"
+                     label="Nome do Plano"
                     value={nome}
                     onChange={setNome}
                     placeholder="Ex: Estagiário"
@@ -693,7 +693,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* SERVIÇOS */}
-            <SectionBlock id="servicos" title="Serviços" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
+             <SectionBlock id="servicos" title="Serviços (opcional) " rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={servicosDisponiveis}
                 selected={servicosMap}
@@ -703,7 +703,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* PRODUTOS */}
-            <SectionBlock id="produtos" title="Produtos (opcional)" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{produtosArr.length} selecionado(s)</span>}>
+             <SectionBlock id="produtos" title="Produtos (opcional) " rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{produtosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={produtosDisponiveis}
                 selected={produtosMap}
@@ -714,7 +714,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* BENEFÍCIOS */}
-            <SectionBlock id="beneficios" title="Benefícios Extras (opcional)">
+             <SectionBlock id="beneficios" title="Benefícios Extras (opcional) ">
               <div className="flex gap-2">
                 <input
                   value={novoBeneficio}
