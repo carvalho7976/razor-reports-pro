@@ -846,7 +846,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition",
                             ativo
-                              ? "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                              ? "border-foreground bg-blue-500/10 text-blue-700 dark:text-blue-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                           )}
                         >
@@ -877,7 +877,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "group flex flex-col items-center gap-1.5 rounded-lg border p-2 transition",
                             ativo
-                              ? "border-blue-500/40 bg-blue-500/5"
+                              ? "border-foreground bg-blue-500/5"
                               : "border-border bg-card opacity-60 hover:opacity-100",
                           )}
                         >
