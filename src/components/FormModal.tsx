@@ -624,7 +624,7 @@ export function DatePickerField({
       <label className="text-[13px] font-semibold text-foreground">{label}</label>
       <div
         className={cn(
-          "flex h-10 w-full items-center gap-1 rounded-lg border bg-card pl-3 pr-1 text-sm transition-all",
+          "relative flex h-10 w-full items-center rounded-lg border bg-card transition-all",
           error ? "border-destructive/50" : "border-border focus-within:border-foreground focus-within:ring-4 focus-within:ring-muted",
         )}
       >
@@ -633,14 +633,14 @@ export function DatePickerField({
           onChange={(e) => handleTextChange(e.target.value)}
           placeholder="dd/mm/aaaa"
           inputMode="numeric"
-          className="h-full flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          className="min-w-0 flex-1 rounded-lg border-0 bg-transparent pl-3 pr-9 text-sm text-foreground outline-none placeholder:text-muted-foreground"
         />
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <button
               type="button"
               aria-label="Abrir calendário"
-              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="absolute right-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <CalendarIcon className="h-4 w-4" />
             </button>
