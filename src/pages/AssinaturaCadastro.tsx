@@ -906,19 +906,19 @@ export default function AssinaturaCadastro() {
                           <div className="relative">
                             <div
                               className={cn(
-                                "flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm",
+                                "flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm",
                                 p.cor,
                               )}
                             >
                               {p.iniciais}
                             </div>
                             {ativo && (
-                              <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background fill-blue-500 text-white" />
+                              <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-background fill-blue-500 text-white" />
                             )}
                           </div>
                           <span
                             className={cn(
-                              "max-w-[80px] truncate text-xs font-medium",
+                              "max-w-[72px] truncate text-[11px] font-medium",
                               ativo ? "text-foreground" : "text-muted-foreground",
                             )}
                           >
