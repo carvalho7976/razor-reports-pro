@@ -940,19 +940,21 @@ export default function NovaAgenda2() {
             onClose={() => setAddFilaOpen(false)}
             footer={<SaveButton onClick={handleSalvarFila} />}
           >
-            <TextField
-              label="Cliente"
-              value={novoCliente}
-              onChange={setNovoCliente}
-              placeholder="Buscar cliente..."
-            />
-            <TextField
-              label="Email"
-              value={novoEmail}
-              onChange={setNovoEmail}
-              type="text"
-            />
             <FormRow>
+              <TextField
+                label="Nome"
+                value={novoCliente}
+                onChange={setNovoCliente}
+                placeholder="Buscar cliente..."
+              />
+              <TextField
+                label="Email"
+                value={novoEmail}
+                onChange={setNovoEmail}
+                type="text"
+              />
+            </FormRow>
+            <FormRow cols={3}>
               <TextField
                 label="Celular"
                 value={novoCelular}
@@ -964,20 +966,17 @@ export default function NovaAgenda2() {
                 value={novoAniversario}
                 onChange={setNovoAniversario}
               />
+              <Dropdown
+                label="Gênero"
+                value={novoSexo}
+                setValue={setNovoSexo}
+                options={[
+                  { value: "M", label: "Masculino" },
+                  { value: "F", label: "Feminino" },
+                  { value: "O", label: "Outro" },
+                ]}
+              />
             </FormRow>
-            <div className="grid gap-0.5">
-              <label className="text-[13px] font-semibold text-foreground">Sexo</label>
-              <RadioGroup value={novoSexo} onValueChange={setNovoSexo} className="flex gap-4 h-10 items-center">
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="M" id="sexo-m" />
-                  <Label htmlFor="sexo-m" className="text-sm font-normal">M</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="F" id="sexo-f" />
-                  <Label htmlFor="sexo-f" className="text-sm font-normal">F</Label>
-                </div>
-              </RadioGroup>
-            </div>
             <Dropdown
               label="Serviços"
               value={novoServico}
