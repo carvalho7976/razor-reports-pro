@@ -397,19 +397,19 @@ export default function NovaAgenda2() {
   const [novoCelular, setNovoCelular] = useState("");
   const [novoAniversario, setNovoAniversario] = useState("");
   const [novoSexo, setNovoSexo] = useState("F");
-  const [novoServico, setNovoServico] = useState("");
+  const [novoServicos, setNovoServicos] = useState<string[]>([]);
   const [novoProfPreferido, setNovoProfPreferido] = useState("");
 
   const removerFila = (id: number) => setFila((prev) => prev.filter((f) => f.id !== id));
 
   const handleSalvarFila = () => {
-    if (!novoCliente.trim() || !novoServico) return;
+    if (!novoCliente.trim() || novoServicos.length === 0) return;
     setFila((prev) => [
       ...prev,
       {
         id: Date.now(),
         nome: novoCliente.trim(),
-        servico: novoServico,
+        servico: novoServicos.join(", "),
         prefere: novoProfPreferido || undefined,
         esperaMin: 0,
       },
@@ -419,7 +419,7 @@ export default function NovaAgenda2() {
     setNovoCelular("");
     setNovoAniversario("");
     setNovoSexo("F");
-    setNovoServico("");
+    setNovoServicos([]);
     setNovoProfPreferido("");
     setAddFilaOpen(false);
   };
