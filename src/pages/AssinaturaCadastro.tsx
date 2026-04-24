@@ -226,6 +226,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   showOnlySelected = false,
   onToggleShowOnlySelected,
   bulkDiscountEnabled = false,
+  productMode = false,
 }: {
   items: T[];
   selected: Map<number, ServicoIncluso>;
@@ -236,6 +237,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   showOnlySelected?: boolean;
   onToggleShowOnlySelected?: () => void;
   bulkDiscountEnabled?: boolean;
+  productMode?: boolean;
 }) {
   const [busca, setBusca] = useState("");
   const [bulkDiscount, setBulkDiscount] = useState("");
@@ -421,7 +423,35 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                           </Tooltip>
 
                           {/* USOS */}
-                          {!hideUsos && (
+                          {productMode ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex h-9 items-center rounded-md border border-border bg-card">
+                                  <span className="pl-2 text-[11px] font-medium text-muted-foreground">
+                                    limite
+                                  </span>
+                                  <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={sel.usos === "ILIMITADO" ? "" : sel.usos}
+                                    onChange={(e) =>
+                                      update(
+                                        item.id,
+                                        "usos",
+                                        e.target.value.replace(/\D/g, "") || "ILIMITADO",
+                                      )
+                                    }
+                                    placeholder="∞"
+                                    className="h-full w-12 bg-transparent px-1 text-right text-sm outline-none placeholder:text-muted-foreground/60"
+                                  />
+                                  <span className="pr-2 text-[11px] text-muted-foreground">un.</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                                Limite de unidades por mês (vazio = ilimitado)
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : !hideUsos && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div>
@@ -452,7 +482,34 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                           )}
 
                           {/* COMISSÃO */}
-                          {comissaoEnabled && (
+                          {productMode && comissaoEnabled ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex h-9 items-center rounded-md border border-border bg-card">
+                                  <span className="pl-2 text-[11px] font-medium text-muted-foreground">
+                                    com.
+                                  </span>
+                                  <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={sel.comissaoValor}
+                                    onChange={(e) =>
+                                      update(
+                                        item.id,
+                                        "comissaoValor",
+                                        e.target.value.replace(/\D/g, ""),
+                                      )
+                                    }
+                                    className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                                  />
+                                  <span className="pr-2 text-xs text-muted-foreground">%</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                                Percentual de comissão
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : comissaoEnabled && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div>
@@ -483,7 +540,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                           )}
 
                           {/* % COM. ou PONTOS  */}
-                          {comissaoEnabled &&
+                          {!productMode && comissaoEnabled &&
                             (sel.comissao === "PORCENTAGEM" || sel.comissao === "PONTOS") && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -897,6 +954,7 @@ export default function AssinaturaCadastro() {
                 showOnlySelected={showOnlySelectedProdutos}
                 onToggleShowOnlySelected={() => setShowOnlySelectedProdutos((v) => !v)}
                 bulkDiscountEnabled
+                productMode
               />
             </SectionBlock>
 
