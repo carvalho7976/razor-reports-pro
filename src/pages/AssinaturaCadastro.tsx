@@ -14,6 +14,7 @@ import {
   Star,
   CheckCircle2,
   ShoppingBag,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -312,10 +313,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex h-10 shrink-0 items-center rounded-lg border border-border bg-card">
-                  <span className="pl-2.5 text-[11px] font-medium text-muted-foreground">
-                    desc. todos
-                  </span>
+                <div className="flex h-10 shrink-0 items-center rounded-lg border border-border bg-card pl-2">
                   <input
                     type="text"
                     inputMode="numeric"
@@ -329,22 +327,22 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                         applyBulkDiscount();
                       }
                     }}
-                    placeholder="0"
-                    className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                    placeholder="%"
+                    className="h-full w-9 bg-transparent text-right text-sm outline-none"
                   />
-                  <span className="text-xs text-muted-foreground">%</span>
+                  <span className="pr-1.5 text-xs text-muted-foreground">%</span>
                   <button
                     type="button"
                     onClick={applyBulkDiscount}
                     disabled={!bulkDiscount}
-                    className="ml-1 mr-1 inline-flex h-7 items-center rounded-md bg-foreground px-2 text-[11px] font-semibold text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="my-1 mr-1 inline-flex h-7 items-center rounded-md bg-foreground px-2 text-[11px] font-semibold text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Aplicar
                   </button>
                 </div>
               </TooltipTrigger>
               <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
-                Aplicar desconto em todos os selecionados
+                Aplicar desconto em todos os produtos selecionados
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -679,6 +677,28 @@ export default function AssinaturaCadastro() {
   const produtosArr = useMemo(() => Array.from(produtosMap.values()), [produtosMap]);
   const [showOnlySelectedServicos, setShowOnlySelectedServicos] = useState(false);
   const [showOnlySelectedProdutos, setShowOnlySelectedProdutos] = useState(false);
+
+  // Serviços 100% gratuitos = inclusos individualmente. Outros = "Descontos em serviços".
+  const servicosInclusos = useMemo(
+    () => servicosArr.filter((s) => s.desconto === "100"),
+    [servicosArr],
+  );
+  const servicosComDesconto = useMemo(
+    () => servicosArr.filter((s) => s.desconto !== "100"),
+    [servicosArr],
+  );
+
+  const removerServicoResumo = (id: number) => {
+    const next = new Map(servicosMap);
+    next.delete(id);
+    setServicosMap(next);
+  };
+  const removerTodosProdutos = () => setProdutosMap(new Map());
+  const removerTodosServicosComDesconto = () => {
+    const next = new Map(servicosMap);
+    servicosComDesconto.forEach((s) => next.delete(s.id));
+    setServicosMap(next);
+  };
 
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
@@ -1115,36 +1135,75 @@ export default function AssinaturaCadastro() {
                       </li>
                     )}
 
-                    {/* Serviços */}
-                    {servicosArr.map((s) => (
-                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                    {/* Serviços 100% gratuitos (inclusos individualmente) */}
+                    {servicosInclusos.map((s) => (
+                      <li key={`s-${s.id}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span>
+                        <span className="flex-1">
                           {s.usos === "ILIMITADO"
                             ? `${nomeServico(s.id)} ilimitado`
                             : `${s.usos}x ${nomeServico(s.id)}`}
-                          {s.desconto !== "0" && s.desconto !== "100" && (
-                            <span className="ml-1 text-muted-foreground">
-                              ({s.desconto}% desc)
-                            </span>
-                          )}
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => removerServicoResumo(s.id)}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover do plano"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </li>
                     ))}
 
+                    {/* Serviços com desconto (% < 100) agrupados */}
+                    {servicosComDesconto.length > 0 && (
+                      <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                        <span className="flex-1">Descontos em serviços</span>
+                        <button
+                          type="button"
+                          onClick={removerTodosServicosComDesconto}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover descontos em serviços"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
+                      </li>
+                    )}
+
                     {/* Produtos */}
                     {produtosArr.length > 0 && (
-                      <li className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                      <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span>Descontos em produtos</span>
+                        <span className="flex-1">Descontos em produtos</span>
+                        <button
+                          type="button"
+                          onClick={removerTodosProdutos}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover descontos em produtos"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </li>
                     )}
 
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => (
-                      <li key={`b-${idx}`} className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                      <li key={`b-${idx}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span>{b}</span>
+                        <span className="flex-1">{b}</span>
+                        <button
+                          type="button"
+                          onClick={() => removerBeneficio(idx)}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover benefício"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </li>
                     ))}
 
