@@ -154,7 +154,7 @@ shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
   /* Scrollbar moderna (padrão Frizzar clean) */
   *::-webkit-scrollbar {
     width: 6px;
-    height: 6px;
+    height: 8px;
   }
 
   *::-webkit-scrollbar-track {
@@ -167,7 +167,7 @@ shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
     border-radius: 999px;
 
     /* cria espaçamento lateral (efeito "longe do conteúdo") */
-    border: 4px solid transparent;
+    border: 1px solid transparent;
     background-clip: content-box;
   }
 
