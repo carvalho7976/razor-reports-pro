@@ -1010,7 +1010,7 @@ export default function AssinaturaCadastro() {
               </div>
 
               {/* Footer (preço + status) */}
-              <div className="border-t border-border bg-muted/20 px-5 py-4">
+              <div className="border-t border-border bg-card px-5 py-4">
                 <div className="flex items-end justify-between gap-2">
                   <div>
                     <span className="text-xl font-bold text-foreground">
