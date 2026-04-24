@@ -895,7 +895,7 @@ export default function AssinaturaCadastro() {
                     {nome.trim() || "Nome do plano"}
                   </h3>
                   {destaque && (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 font-bold uppercase tracking-wide text-amber-600 text-xs">
+                    <span className="inline-flex shrink-0 items-center gap-1 bg-amber-500/15 px-2 py-0.5 font-bold uppercase tracking-wide text-amber-600 text-xs rounded-full">
                       <Star className="h-3 w-3 fill-amber-500" />
                       Destaque
                     </span>
