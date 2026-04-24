@@ -255,7 +255,7 @@ export function MultiDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [openUpward, setOpenUpward] = useState(false);
+  const [openUpward, setOpenUpward] = useState(openDirection === "up");
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
