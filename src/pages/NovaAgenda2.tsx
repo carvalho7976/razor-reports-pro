@@ -539,30 +539,12 @@ export default function NovaAgenda2() {
                 }
               }}
             >
-             <PopoverTrigger asChild>
-  <TooltipProvider delayDuration={0}>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Filtros"
-        >
-          <Filter className="h-4 w-4" />
-          {(filtroProf !== "todos" || filtroDias !== "1") && (
-            <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
-              {(filtroProf !== "todos" ? 1 : 0) + (filtroDias !== "1" ? 1 : 0)}
-            </span>
-          )}
-        </button>
-      </TooltipTrigger>
-
-      <TooltipContent className="bg-white text-black border border-border shadow-sm text-xs px-2 py-1">
-        Filtros
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-</PopoverTrigger>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  aria-label="Filtros"
+                >
                   <Filter className="h-4 w-4" />
                   {(filtroProf !== "todos" || filtroDias !== "1") && (
                     <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
