@@ -63,6 +63,7 @@ export function Dropdown({
   searchable = false,
   error,
   openDirection = "auto",
+  placeholder = "Selecione...",
 }: {
   label: string;
   value: string;
@@ -71,12 +72,14 @@ export function Dropdown({
   searchable?: boolean;
   error?: string;
   openDirection?: "auto" | "up" | "down";
+  placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [openUpward, setOpenUpward] = useState(false);
+  const [openUpward, setOpenUpward] = useState(openDirection === "up");
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const selected = options.find((o) => o.value === value);
 
@@ -103,9 +106,76 @@ export function Dropdown({
     const rect = buttonRef.current.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
-    const estimated = Math.min(280, (searchable ? 70 : 0) + filtered.length * 44 + 16);
+    const estimated = Math.min(280, filtered.length * 44 + 16);
     setOpenUpward(spaceBelow < estimated && spaceAbove > spaceBelow);
   }, [open, filtered.length, searchable, openDirection]);
+
+  if (searchable) {
+    return (
+      <div className="relative grid gap-0.5" ref={wrapperRef}>
+        <label className="text-[13px] font-semibold text-foreground">{label}</label>
+        <div
+          ref={(el) => { (buttonRef as any).current = el; }}
+          onClick={() => { setOpen(true); inputRef.current?.focus(); }}
+          className={cn(
+            "flex h-10 w-full cursor-text items-center justify-between gap-2 rounded-lg border bg-card px-3 text-sm text-foreground transition-all",
+            error ? "border-destructive/50" : "border-border",
+            open ? "border-foreground ring-4 ring-muted" : "hover:border-muted-foreground",
+          )}
+        >
+          <input
+            ref={inputRef}
+            value={open ? search : (selected?.label ?? "")}
+            onChange={(e) => { setSearch(e.target.value); setOpen(true); }}
+            onFocus={() => { setSearch(""); setOpen(true); }}
+            placeholder={selected ? "" : placeholder}
+            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          />
+          <svg
+            className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")}
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <FieldError message={error} />
+        {open && (
+          <div
+            className={cn(
+              "absolute left-0 z-50 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl",
+              openUpward ? "bottom-full mb-2" : "top-full mt-2",
+            )}
+          >
+            <div className="max-h-60 overflow-auto">
+              {filtered.length === 0 && (
+                <div className="px-4 py-3 text-sm text-muted-foreground">Nenhum resultado.</div>
+              )}
+              {filtered.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setValue(option.value);
+                    setOpen(false);
+                    setSearch("");
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-3 px-4 py-2.5 text-sm transition",
+                    option.value === value ? "bg-foreground text-background" : "hover:bg-muted",
+                  )}
+                >
+                  <span className="truncate text-left">{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="relative grid gap-0.5" ref={wrapperRef}>
@@ -120,7 +190,7 @@ export function Dropdown({
           "hover:border-muted-foreground focus:border-foreground",
         )}
       >
-        <span className="truncate">{selected?.label || "Selecione..."}</span>
+        <span className="truncate">{selected?.label || placeholder}</span>
         <svg
           className="h-4 w-4 text-muted-foreground"
           viewBox="0 0 20 20"
@@ -139,16 +209,6 @@ export function Dropdown({
             openUpward ? "bottom-full mb-2" : "top-full mt-2",
           )}
         >
-          {searchable && (
-            <div className="border-b border-border p-3">
-              <input
-                placeholder="Buscar..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
-              />
-            </div>
-          )}
           <div className="max-h-60 overflow-auto">
             {filtered.map((option) => (
               <button
@@ -195,7 +255,7 @@ export function MultiDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [openUpward, setOpenUpward] = useState(false);
+  const [openUpward, setOpenUpward] = useState(openDirection === "up");
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -527,6 +587,7 @@ export function DatePickerField({
   error?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
 
   const dateValue = useMemo(() => {
     if (!value) return undefined;
@@ -537,25 +598,53 @@ export function DatePickerField({
     }
   }, [value]);
 
+  useEffect(() => {
+    setText(dateValue ? format(dateValue, "dd/MM/yyyy") : "");
+  }, [dateValue]);
+
+  const handleTextChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 8);
+    let masked = digits;
+    if (digits.length > 4) masked = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    else if (digits.length > 2) masked = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    setText(masked);
+    if (digits.length === 8) {
+      const dd = digits.slice(0, 2);
+      const mm = digits.slice(2, 4);
+      const yyyy = digits.slice(4);
+      const d = new Date(`${yyyy}-${mm}-${dd}T12:00:00`);
+      if (!isNaN(d.getTime())) onChange(`${yyyy}-${mm}-${dd}`);
+    } else if (digits.length === 0) {
+      onChange("");
+    }
+  };
+
   return (
     <div className="grid gap-0.5">
       <label className="text-[13px] font-semibold text-foreground">{label}</label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className={cn(
-              "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm transition-all",
-              error
-                ? "border-destructive/50 focus:ring-destructive/10"
-                : "border-border focus:ring-muted",
-              value ? "text-foreground" : "text-muted-foreground",
-            )}
-          >
-            <span>{dateValue ? format(dateValue, "dd/MM/yyyy") : "Selecione a data"}</span>
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-          </button>
-        </PopoverTrigger>
+      <div
+        className={cn(
+          "flex h-10 w-full items-center gap-1 rounded-lg border bg-card pl-3 pr-1 text-sm transition-all",
+          error ? "border-destructive/50" : "border-border focus-within:border-foreground focus-within:ring-4 focus-within:ring-muted",
+        )}
+      >
+        <input
+          value={text}
+          onChange={(e) => handleTextChange(e.target.value)}
+          placeholder="dd/mm/aaaa"
+          inputMode="numeric"
+          className="h-full flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        />
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-label="Abrir calendário"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <CalendarIcon className="h-4 w-4" />
+            </button>
+          </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start" sideOffset={4} style={{ zIndex: 9999 }}>
           <CalendarComponent
             mode="single"
@@ -586,7 +675,8 @@ export function DatePickerField({
             </button>
           </div>
         </PopoverContent>
-      </Popover>
+        </Popover>
+      </div>
       <FieldError message={error} />
     </div>
   );
