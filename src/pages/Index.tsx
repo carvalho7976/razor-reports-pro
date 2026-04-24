@@ -56,6 +56,25 @@ const groups: ShortcutGroup[] = [
   },
 ];
 
+/* Scrollbar global da aplicação */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
 const Index = () => (
   <AppLayout>
     <div className="max-w-5xl mx-auto space-y-8">
