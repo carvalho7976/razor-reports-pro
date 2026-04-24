@@ -12,6 +12,7 @@ import {
   Ticket,
   CheckCircle2,
   X,
+  Copy,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -355,6 +356,11 @@ export default function ListaPlanos() {
   const openDelete = (item: Plano) => setModal({ type: "delete", item });
   const goAssinantes = () => navigate("/assinantePesquisa");
 
+  const duplicatePlano = (item: Plano) => {
+    const novoNome = `${item.nome} (cópia)`;
+    navigate(`/assinaturaCadastro?nome=${encodeURIComponent(novoNome)}&duplicar=${encodeURIComponent(item.cod)}`);
+  };
+
   const closeModal = () => setModal(null);
 
   const handleDelete = () => {
@@ -489,6 +495,7 @@ export default function ListaPlanos() {
           items={[
             { label: "Visualizar", icon: <Eye className="h-4 w-4" />, onClick: () => openView(row) },
             { label: "Editar", icon: <Pencil className="h-4 w-4" />, onClick: () => openEdit(row) },
+            { label: "Duplicar", icon: <Copy className="h-4 w-4" />, onClick: () => duplicatePlano(row) },
             {
               label: "Assinantes",
               icon: <Users className="h-4 w-4" />,
