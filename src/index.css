@@ -151,6 +151,25 @@ shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
            hover:bg-muted;
   }
 
+  /* Scrollbar global da aplicação */
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
   .date-preset-btn-active {
     @apply bg-primary text-primary-foreground shadow-sm shadow-primary/20;
   }

@@ -1,9 +1,26 @@
 import { AppLayout } from "@/components/AppLayout";
 import { Link } from "react-router-dom";
 import {
-  Wallet, CreditCard, Users, BarChart3, Scissors, FileText, UserMinus, CalendarX,
-  ClipboardList, Star, Calendar, PackageX, ShoppingCart, TrendingDown, DollarSign,
-  List, Tag, Package, Banknote, LayoutGrid,
+  Wallet,
+  CreditCard,
+  Users,
+  BarChart3,
+  Scissors,
+  FileText,
+  UserMinus,
+  CalendarX,
+  ClipboardList,
+  Star,
+  Calendar,
+  PackageX,
+  ShoppingCart,
+  TrendingDown,
+  DollarSign,
+  List,
+  Tag,
+  Package,
+  Banknote,
+  LayoutGrid,
 } from "lucide-react";
 
 interface ShortcutGroup {
@@ -42,7 +59,12 @@ const groups: ShortcutGroup[] = [
   {
     title: "Relatórios",
     items: [
-      { icon: BarChart3, label: "Relatório Profissionais", path: "/relatorioDesempenhoFuncionario", color: "bg-warning" },
+      {
+        icon: BarChart3,
+        label: "Relatório Profissionais",
+        path: "/relatorioDesempenhoFuncionario",
+        color: "bg-warning",
+      },
       { icon: Users, label: "Relatório de Clientes", path: "/relatorioClientes", color: "bg-info" },
       { icon: Calendar, label: "Relatório de Agendamentos", path: "/relatorioAgendamentos", color: "bg-info" },
       { icon: LayoutGrid, label: "Relatório de Pacotes", path: "/relatorioCombos", color: "bg-accent" },
@@ -50,30 +72,21 @@ const groups: ShortcutGroup[] = [
       { icon: Package, label: "Relatório de Produtos", path: "/relatorioProdutos", color: "bg-accent" },
       { icon: Star, label: "Avaliações", path: "/avaliacoes", color: "bg-warning" },
       { icon: UserMinus, label: "Exclusão de Clientes", path: "/relatorioExclusaoCliente", color: "bg-destructive" },
-      { icon: CalendarX, label: "Exclusão de Agendamentos", path: "/relatorioExclusaoAgendamento", color: "bg-destructive" },
-      { icon: PackageX, label: "Cancelamento de Assinaturas", path: "/relatorioExclusaoAssinante", color: "bg-destructive" },
+      {
+        icon: CalendarX,
+        label: "Exclusão de Agendamentos",
+        path: "/relatorioExclusaoAgendamento",
+        color: "bg-destructive",
+      },
+      {
+        icon: PackageX,
+        label: "Cancelamento de Assinaturas",
+        path: "/relatorioExclusaoAssinante",
+        color: "bg-destructive",
+      },
     ],
   },
 ];
-
-/* Scrollbar global da aplicação */
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 999px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
 
 const Index = () => (
   <AppLayout>
