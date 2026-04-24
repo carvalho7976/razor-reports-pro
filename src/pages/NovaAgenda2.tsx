@@ -1051,6 +1051,85 @@ export default function NovaAgenda2() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={!!chamarItem}
+        onOpenChange={(open) => {
+          if (!open) {
+            setChamarItem(null);
+            setChamarProf("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md p-0 gap-0">
+          <div className="border-b border-border px-5 py-4">
+            <h2 className="text-lg font-semibold text-foreground">Confirme o profissional</h2>
+            {chamarItem && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {chamarItem.nome} · {chamarItem.servico}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-3 px-5 py-4">
+            <div className="grid gap-1.5">
+              <Label className="text-xs font-semibold text-foreground">Profissional</Label>
+              <Select value={chamarProf} onValueChange={setChamarProf}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {profissionais.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-5 py-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setChamarItem(null);
+                setChamarProf("");
+              }}
+              className="h-9"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!chamarProf}
+              onClick={() => {
+                if (chamarItem) removerFila(chamarItem.id);
+                setChamarItem(null);
+                setChamarProf("");
+              }}
+              className="h-9"
+            >
+              Atender
+            </Button>
+            <Button
+              size="sm"
+              disabled={!chamarProf}
+              onClick={() => {
+                if (chamarItem) removerFila(chamarItem.id);
+                setChamarItem(null);
+                setChamarProf("");
+              }}
+              className="h-9 gap-2 bg-success text-success-foreground hover:bg-success/90"
+            >
+              <Save className="h-3.5 w-3.5" />
+              Atender e pagar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
