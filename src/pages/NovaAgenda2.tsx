@@ -385,6 +385,8 @@ export default function NovaAgenda2() {
   const [filtroProfsSel, setFiltroProfsSel] = useState<string[]>([]);
   const [filtroDiasSel, setFiltroDiasSel] = useState<string>("1");
 
+  const [filaOpen, setFilaOpen] = useState(false);
+
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
 
@@ -444,6 +446,12 @@ export default function NovaAgenda2() {
       />
 
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
+        {(filtroOpen || filaOpen) && (
+          <div
+            className="fixed inset-0 z-40 bg-black/80 animate-in fade-in-0"
+            aria-hidden="true"
+          />
+        )}
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
@@ -629,7 +637,7 @@ export default function NovaAgenda2() {
               </PopoverContent>
             </Popover>
 
-            <Popover>
+            <Popover open={filaOpen} onOpenChange={setFilaOpen}>
               <PopoverTrigger asChild>
                 <button
                   type="button"
