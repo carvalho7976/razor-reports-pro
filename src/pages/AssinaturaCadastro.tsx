@@ -326,101 +326,102 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
 
                     {isSelected && (
                       <div
-                        className="flex w-full flex-wrap items-end gap-2.5 sm:w-auto"
+                        className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {/* DESCONTO */}
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                            Desconto
+                        <div className="flex h-9 items-center rounded-md border border-border bg-card" title="Desconto">
+                          <span className="pl-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            Desc.
                           </span>
-                          <div className="flex h-9 items-center rounded-md border border-border bg-background">
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              value={sel.desconto}
-                              onChange={(e) =>
-                                update(item.id, "desconto", e.target.value.replace(/\D/g, ""))
-                              }
-                              className="h-full w-12 bg-transparent px-2 text-right text-sm outline-none"
-                            />
-                            <span className="pr-2 text-xs text-muted-foreground">%</span>
-                          </div>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={sel.desconto}
+                            onChange={(e) =>
+                              update(item.id, "desconto", e.target.value.replace(/\D/g, ""))
+                            }
+                            className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                          />
+                          <span className="pr-2 text-xs text-muted-foreground">%</span>
                         </div>
 
                         {/* USOS */}
                         {!hideUsos && (
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                              Usos/mês
-                            </span>
-                            <Select
-                              value={sel.usos}
-                              onValueChange={(v) => update(item.id, "usos", v)}
+                          <Select
+                            value={sel.usos}
+                            onValueChange={(v) => update(item.id, "usos", v)}
+                          >
+                            <SelectTrigger
+                              className="h-9 w-[150px] rounded-md border-border bg-card px-2 text-xs font-semibold"
+                              title="Usos/mês"
                             >
-                              <SelectTrigger className="h-9 w-[120px] rounded-md border-border bg-background px-2 text-xs font-semibold">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {usosOptions.map((o) => (
-                                  <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
-                                    {o.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                              <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                Usos
+                              </span>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {usosOptions.map((o) => (
+                                <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                  {o.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         )}
 
                         {/* COMISSÃO */}
                         {comissaoEnabled && (
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                              Comissão
-                            </span>
-                            <Select
-                              value={sel.comissao}
-                              onValueChange={(v) => update(item.id, "comissao", v)}
+                          <Select
+                            value={sel.comissao}
+                            onValueChange={(v) => update(item.id, "comissao", v)}
+                          >
+                            <SelectTrigger
+                              className="h-9 w-[170px] rounded-md border-border bg-card px-2 text-xs font-semibold"
+                              title="Comissão"
                             >
-                              <SelectTrigger className="h-9 w-[140px] rounded-md border-border bg-background px-2 text-xs font-semibold">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {comissaoOptions.map((o) => (
-                                  <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
-                                    {o.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                              <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                Com.
+                              </span>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {comissaoOptions.map((o) => (
+                                <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                  {o.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         )}
 
                         {/* % COM. ou PONTOS  */}
                         {comissaoEnabled &&
                           (sel.comissao === "PORCENTAGEM" || sel.comissao === "PONTOS") && (
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                {sel.comissao === "PONTOS" ? "Pontos" : "% com."}
+                            <div
+                              className="flex h-9 items-center rounded-md border border-border bg-card"
+                              title={sel.comissao === "PONTOS" ? "Pontos" : "% com."}
+                            >
+                              <span className="pl-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                {sel.comissao === "PONTOS" ? "Pts" : "%"}
                               </span>
-                              <div className="flex h-9 items-center rounded-md border border-border bg-background">
-                                <input
-                                  type="text"
-                                  inputMode="numeric"
-                                  value={sel.comissaoValor}
-                                  onChange={(e) =>
-                                    update(
-                                      item.id,
-                                      "comissaoValor",
-                                      e.target.value.replace(/\D/g, ""),
-                                    )
-                                  }
-                                  className="h-full w-12 bg-transparent px-2 text-right text-sm outline-none"
-                                />
-                                <span className="pr-2 text-xs text-muted-foreground">
-                                  {sel.comissao === "PONTOS" ? "pts" : "%"}
-                                </span>
-                              </div>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                value={sel.comissaoValor}
+                                onChange={(e) =>
+                                  update(
+                                    item.id,
+                                    "comissaoValor",
+                                    e.target.value.replace(/\D/g, ""),
+                                  )
+                                }
+                                className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                              />
+                              <span className="pr-2 text-xs text-muted-foreground">
+                                {sel.comissao === "PONTOS" ? "pts" : "%"}
+                              </span>
                             </div>
                           )}
                       </div>
