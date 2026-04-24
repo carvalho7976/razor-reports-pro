@@ -1027,7 +1027,7 @@ export default function AssinaturaCadastro() {
             <SectionBlock id="disponibilidade" title="Disponibilidade">
               <div className="grid gap-6 lg:grid-cols-2">
                 <div className="grid gap-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex h-5 items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-foreground">Dias Válidos</span>
                   </div>
@@ -1054,7 +1054,7 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex h-5 items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-foreground">Profissionais do Plano</span>
                   </div>
