@@ -569,7 +569,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* TAB BAR (anchor-style, profissionalPerfil pattern) */}
-        <div className="sticky top-0 z-20 mt-4 border-b border-border bg-background">
+        <div className="mt-4 border-b border-border bg-background">
           <div className="mx-6 flex gap-6 overflow-x-auto">
             {sections.map((s) => (
               <button
@@ -1002,7 +1002,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* FOOTER */}
-        <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
+        <div className="border-t border-border bg-card px-6 py-4">
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
