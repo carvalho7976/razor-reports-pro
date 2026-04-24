@@ -648,7 +648,7 @@ export default function AssinaturaCadastro() {
         {/* HEADER */}
         <div>
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-            <div className="pt-1">
+            <div>
               <div className="flex items-center gap-2.5">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                   {editing ? "Editar Plano" : "Novo Plano"}
