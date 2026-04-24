@@ -151,30 +151,6 @@ shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
            hover:bg-muted;
   }
 
-  /* Scrollbar moderna (padrão Frizzar clean) */
-  *::-webkit-scrollbar {
-    width: 6px;
-    height: 8px;
-  }
-
-  *::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 8px 0; /* afasta do topo e do fundo */
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background: rgba(37, 99, 235, 0.6); /* azul elegante */
-    border-radius: 999px;
-
-    /* cria espaçamento lateral (efeito "longe do conteúdo") */
-    border: 1px solid transparent;
-    background-clip: content-box;
-  }
-
-  *::-webkit-scrollbar-thumb:hover {
-    background: rgba(37, 99, 235, 0.9);
-  }
-
   .date-preset-btn-active {
     @apply bg-primary text-primary-foreground shadow-sm shadow-primary/20;
   }
