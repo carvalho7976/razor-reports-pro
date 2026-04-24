@@ -18,7 +18,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
-import { DeleteModal, FormModal, Dropdown, TextField, DatePickerField, FormRow, SaveButton } from "@/components/FormModal";
+import {
+  DeleteModal,
+  FormModal,
+  Dropdown,
+  TextField,
+  DatePickerField,
+  FormRow,
+  SaveButton,
+} from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
@@ -449,10 +457,7 @@ export default function NovaAgenda2() {
 
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
         {(filtroOpen || filaOpen) && (
-          <div
-            className="fixed inset-0 z-40 bg-black/80 animate-in fade-in-0"
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-40 bg-black/80 animate-in fade-in-0" aria-hidden="true" />
         )}
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
           <div className="flex items-center gap-2">
@@ -543,9 +548,9 @@ export default function NovaAgenda2() {
                       </button>
                     </PopoverTrigger>
                   </TooltipTrigger>
-                   <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
-                     Filtros
-                   </TooltipContent>
+                  <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                    Filtros
+                  </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
 
@@ -706,9 +711,7 @@ export default function NovaAgenda2() {
                             onClick={() => {
                               setChamarItem(item);
                               setChamarProf(
-                                item.prefere
-                                  ? profissionais.find((p) => p.nome === item.prefere)?.id ?? ""
-                                  : ""
+                                item.prefere ? (profissionais.find((p) => p.nome === item.prefere)?.id ?? "") : "",
                               );
                             }}
                             className="inline-flex h-7 items-center rounded-md border border-foreground bg-card px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
@@ -940,41 +943,26 @@ export default function NovaAgenda2() {
             onClose={() => setAddFilaOpen(false)}
             footer={<SaveButton onClick={handleSalvarFila} />}
           >
-            <TextField
-              label="Cliente"
-              value={novoCliente}
-              onChange={setNovoCliente}
-              placeholder="Buscar cliente..."
-            />
-            <TextField
-              label="Email"
-              value={novoEmail}
-              onChange={setNovoEmail}
-              type="text"
-            />
+            <TextField label="Cliente" value={novoCliente} onChange={setNovoCliente} placeholder="Buscar cliente..." />
+
             <FormRow>
-              <TextField
-                label="Celular"
-                value={novoCelular}
-                onChange={setNovoCelular}
-                placeholder="(00) 00000-0000"
-              />
-              <DatePickerField
-                label="Aniversário"
-                value={novoAniversario}
-                onChange={setNovoAniversario}
-              />
+              <TextField label="Celular" value={novoCelular} onChange={setNovoCelular} placeholder="(00) 00000-0000" />
+              <DatePickerField label="Aniversário" value={novoAniversario} onChange={setNovoAniversario} />
             </FormRow>
             <div className="grid gap-0.5">
               <label className="text-[13px] font-semibold text-foreground">Sexo</label>
               <RadioGroup value={novoSexo} onValueChange={setNovoSexo} className="flex gap-4 h-10 items-center">
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="M" id="sexo-m" />
-                  <Label htmlFor="sexo-m" className="text-sm font-normal">M</Label>
+                  <Label htmlFor="sexo-m" className="text-sm font-normal">
+                    M
+                  </Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="F" id="sexo-f" />
-                  <Label htmlFor="sexo-f" className="text-sm font-normal">F</Label>
+                  <Label htmlFor="sexo-f" className="text-sm font-normal">
+                    F
+                  </Label>
                 </div>
               </RadioGroup>
             </div>
