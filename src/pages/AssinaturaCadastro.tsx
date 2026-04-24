@@ -750,7 +750,7 @@ export default function AssinaturaCadastro() {
               onClick={handleSalvar}
               className="inline-flex h-8 shrink-0 items-center justify-center rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
             >
-              {editing ? "Salvar alterações" : "Criar plano"}
+              {editing ? "Salvar alterações" : "Salvar Plano"}
             </button>
           </div>
         </div>
