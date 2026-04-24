@@ -249,7 +249,7 @@ export default function NovaCompra() {
                       onChange={(e) => setXmlFile(e.target.files?.[0] || null)}
                       className="hidden"
                     />
-                    <span className="inline-flex h-10 items-center justify-center rounded-lg border border-black bg-white px-4 text-sm font-semibold text-black">
+                    <span className="inline-flex h-10 items-center justify-center rounded-lg border border-foreground bg-card px-4 text-sm font-semibold text-foreground">
                       Importar XML
                     </span>
                   </label>

@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
 import { DeleteModal } from "@/components/FormModal";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
 type FilaItem = {
@@ -27,6 +28,7 @@ type FilaItem = {
   servico: string;
   prefere?: string;
   esperaMin: number;
+  telefone?: string;
 };
 
 type Profissional = {
@@ -531,9 +533,9 @@ export default function NovaAgenda2() {
                       </button>
                     </PopoverTrigger>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-white text-black border border-border shadow-sm text-xs px-2 py-1">
-                    Filtros
-                  </TooltipContent>
+                   <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                     Filtros
+                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
 
@@ -663,7 +665,7 @@ export default function NovaAgenda2() {
                       {fila.map((item, idx) => (
                         <div
                           key={item.id}
-                          className="group relative flex items-center gap-2.5 rounded-md border border-border bg-white px-2.5 py-2 transition-shadow hover:shadow-sm"
+                          className="group relative flex items-center gap-2.5 rounded-md border border-border bg-card px-2.5 py-2 transition-shadow hover:shadow-sm"
                         >
                           <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-foreground">
                             {idx + 1}
@@ -691,18 +693,12 @@ export default function NovaAgenda2() {
 
                           <button
                             type="button"
-                            className="inline-flex h-7 items-center rounded-md border border-foreground bg-white px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
+                            className="inline-flex h-7 items-center rounded-md border border-foreground bg-card px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
                           >
                             Chamar
                           </button>
 
-                          <button
-                            type="button"
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[#25D366]/25 bg-[#25D366]/10 text-[#128C7E] transition-colors hover:bg-[#25D366] hover:text-white"
-                            aria-label="Enviar mensagem no WhatsApp"
-                          >
-                            <WhatsAppIcon className="h-4 w-4" />
-                          </button>
+                          <WhatsAppButton telefone={item.telefone || "11999999999"} nome={item.nome} />
 
                           <button
                             type="button"
@@ -739,7 +735,7 @@ export default function NovaAgenda2() {
                       <span className="text-[13px] font-semibold text-foreground leading-none">{k.valor}</span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-white text-black border border-border shadow-sm text-xs px-2 py-1">
+                  <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
                     {k.label}
                   </TooltipContent>
                 </Tooltip>
