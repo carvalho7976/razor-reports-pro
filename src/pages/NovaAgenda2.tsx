@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
-import { DeleteModal, FormModal, Dropdown } from "@/components/FormModal";
+import { DeleteModal, FormModal, Dropdown, TextField, DatePickerField, FormRow, SaveButton } from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
@@ -933,122 +933,64 @@ export default function NovaAgenda2() {
       </Dialog>
 
       <Dialog open={addFilaOpen} onOpenChange={setAddFilaOpen}>
-        <DialogContent className="max-w-md p-0 gap-0">
-          <div className="border-b border-border px-5 py-4">
-            <h2 className="text-lg font-semibold text-foreground">Adicionar na fila de espera</h2>
-          </div>
-
-          <div className="grid gap-3 px-5 py-4">
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Cliente</Label>
-              <Input
-                value={novoCliente}
-                onChange={(e) => setNovoCliente(e.target.value)}
-                placeholder="Buscar cliente..."
-                maxLength={100}
-                className="h-10"
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden max-w-xl">
+          <FormModal
+            title="Adicionar na fila de espera"
+            subtitle="Preencha os dados do cliente"
+            onClose={() => setAddFilaOpen(false)}
+            footer={<SaveButton onClick={handleSalvarFila} />}
+          >
+            <TextField
+              label="Cliente"
+              value={novoCliente}
+              onChange={setNovoCliente}
+              placeholder="Buscar cliente..."
+            />
+            <TextField
+              label="Email"
+              value={novoEmail}
+              onChange={setNovoEmail}
+              type="text"
+            />
+            <FormRow>
+              <TextField
+                label="Celular"
+                value={novoCelular}
+                onChange={setNovoCelular}
+                placeholder="(00) 00000-0000"
               />
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Email</Label>
-              <Input
-                type="email"
-                value={novoEmail}
-                onChange={(e) => setNovoEmail(e.target.value)}
-                maxLength={255}
-                className="h-10"
+              <DatePickerField
+                label="Aniversário"
+                value={novoAniversario}
+                onChange={setNovoAniversario}
               />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs font-semibold text-foreground">Celular</Label>
-                <Input
-                  value={novoCelular}
-                  onChange={(e) => setNovoCelular(e.target.value)}
-                  placeholder="(00) 00000-0000"
-                  maxLength={20}
-                  className="h-10"
-                />
-              </div>
-
-              <div className="grid gap-1.5">
-                <Label className="text-xs font-semibold text-foreground">Aniversário</Label>
-                <Input
-                  type="date"
-                  value={novoAniversario}
-                  onChange={(e) => setNovoAniversario(e.target.value)}
-                  className="h-10"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Sexo</Label>
-              <RadioGroup value={novoSexo} onValueChange={setNovoSexo} className="flex gap-4">
+            </FormRow>
+            <div className="grid gap-0.5">
+              <label className="text-[13px] font-semibold text-foreground">Sexo</label>
+              <RadioGroup value={novoSexo} onValueChange={setNovoSexo} className="flex gap-4 h-10 items-center">
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="M" id="sexo-m" />
-                  <Label htmlFor="sexo-m" className="text-sm font-normal">
-                    M
-                  </Label>
+                  <Label htmlFor="sexo-m" className="text-sm font-normal">M</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="F" id="sexo-f" />
-                  <Label htmlFor="sexo-f" className="text-sm font-normal">
-                    F
-                  </Label>
+                  <Label htmlFor="sexo-f" className="text-sm font-normal">F</Label>
                 </div>
               </RadioGroup>
             </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Serviços</Label>
-              <Select value={novoServico} onValueChange={setNovoServico}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Selecione um serviço" />
-                </SelectTrigger>
-                <SelectContent>
-                  {servicosOpcoes.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Profissional preferido (opcional)</Label>
-              <Select value={novoProfPreferido} onValueChange={setNovoProfPreferido}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {profissionais.map((p) => (
-                    <SelectItem key={p.id} value={p.nome}>
-                      {p.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-5 py-3">
-            <Button variant="outline" size="sm" onClick={() => setAddFilaOpen(false)} className="h-9">
-              Cancelar
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSalvarFila}
-              disabled={!novoCliente.trim() || !novoServico}
-              className="h-9 gap-2 bg-success text-success-foreground hover:bg-success/90"
-            >
-              <Save className="h-3.5 w-3.5" />
-              Salvar
-            </Button>
-          </div>
+            <Dropdown
+              label="Serviços"
+              value={novoServico}
+              setValue={setNovoServico}
+              options={servicosOpcoes.map((s) => ({ value: s, label: s }))}
+            />
+            <Dropdown
+              label="Profissional preferido (opcional)"
+              value={novoProfPreferido}
+              setValue={setNovoProfPreferido}
+              options={profissionais.map((p) => ({ value: p.nome, label: p.nome }))}
+            />
+          </FormModal>
         </DialogContent>
       </Dialog>
 
