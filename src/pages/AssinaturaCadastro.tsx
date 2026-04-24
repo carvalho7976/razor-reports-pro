@@ -226,6 +226,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   showOnlySelected = false,
   onToggleShowOnlySelected,
   bulkDiscountEnabled = false,
+  productMode = false,
 }: {
   items: T[];
   selected: Map<number, ServicoIncluso>;
@@ -236,6 +237,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   showOnlySelected?: boolean;
   onToggleShowOnlySelected?: () => void;
   bulkDiscountEnabled?: boolean;
+  productMode?: boolean;
 }) {
   const [busca, setBusca] = useState("");
   const [bulkDiscount, setBulkDiscount] = useState("");
