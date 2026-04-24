@@ -689,17 +689,14 @@ export default function AssinaturaCadastro() {
     [servicosArr],
   );
 
-  const removerServicoResumo = (id: number) => {
-    const next = new Map(servicosMap);
-    next.delete(id);
-    setServicosMap(next);
-  };
-  const removerTodosProdutos = () => setProdutosMap(new Map());
-  const removerTodosServicosComDesconto = () => {
-    const next = new Map(servicosMap);
-    servicosComDesconto.forEach((s) => next.delete(s.id));
-    setServicosMap(next);
-  };
+  // O X no card resumo apenas oculta a linha do preview, sem alterar a configuração do plano.
+  const [hiddenResumo, setHiddenResumo] = useState<Set<string>>(new Set());
+  const ocultarResumo = (key: string) =>
+    setHiddenResumo((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
 
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
