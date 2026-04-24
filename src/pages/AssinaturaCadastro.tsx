@@ -646,7 +646,7 @@ export default function AssinaturaCadastro() {
     <AppLayout>
       <div className="flex flex-col gap-0">
         {/* HEADER */}
-        <div className="mx-4 mt-4 sm:mx-6">
+        <div>
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="pt-1">
               <div className="flex items-center gap-2.5">
@@ -669,7 +669,7 @@ export default function AssinaturaCadastro() {
 
         {/* TAB BAR (anchor-style, profissionalPerfil pattern) */}
         <div className="mt-4 border-b border-border bg-background">
-          <div className="mx-4 flex gap-5 overflow-x-auto sm:mx-6 sm:gap-6">
+          <div className="flex gap-5 overflow-x-auto sm:gap-6">
             {sections.map((s) => (
               <button
                 key={s.id}
@@ -688,7 +688,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-4 mt-5 grid grid-cols-1 gap-5 pb-12 sm:mx-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="mt-5 grid grid-cols-1 gap-5 pb-12 lg:grid-cols-[minmax(0,1fr)_280px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
             {/* DADOS DO PLANO */}
