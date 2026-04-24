@@ -1079,6 +1079,12 @@ export default function AssinaturaCadastro() {
         </div>
 
       </div>
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Cadastro de Plano"
+      />
     </AppLayout>
   );
 }
