@@ -483,6 +483,8 @@ export default function AssinaturaCadastro() {
 
   const editing = searchParams.get("nome");
 
+  const [aulaOpen, setAulaOpen] = useState(false);
+
   // Detalhes
   const [nome, setNome] = useState(editing || "");
   const [valor, setValor] = useState("250,00");
