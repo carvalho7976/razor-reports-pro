@@ -14,6 +14,7 @@ import {
   Star,
   CheckCircle2,
   ShoppingBag,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
