@@ -42,7 +42,7 @@ export function TextField({
           disabled && "cursor-default opacity-100",
           error
             ? "border-destructive/50 focus:border-destructive focus:ring-4 focus:ring-destructive/10"
-            : "border-border focus:border-foreground focus:ring-4 focus:ring-muted",
+            : "border-info/50 focus:border-info focus:ring-4 focus:ring-info/20",
         )}
       />
       <FieldError message={error} />
@@ -119,8 +119,8 @@ export function Dropdown({
           onClick={() => { setOpen(true); inputRef.current?.focus(); }}
           className={cn(
             "flex h-10 w-full cursor-text items-center justify-between gap-2 rounded-lg border bg-card px-3 text-sm text-foreground transition-all",
-            error ? "border-destructive/50" : "border-border",
-            open ? "border-foreground ring-4 ring-muted" : "hover:border-muted-foreground",
+            error ? "border-destructive/50" : "border-info/50",
+            open ? "border-info ring-4 ring-info/20" : "hover:border-info",
           )}
         >
           <input
@@ -186,8 +186,8 @@ export function Dropdown({
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
           "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm text-foreground transition-all",
-          error ? "border-destructive/50 focus:ring-destructive/10" : "border-border focus:ring-muted",
-          "hover:border-muted-foreground focus:border-foreground",
+          error ? "border-destructive/50 focus:ring-destructive/10" : "border-info/50 focus:ring-info/20",
+          "hover:border-info focus:border-info",
         )}
       >
         <span className="truncate">{selected?.label || placeholder}</span>
