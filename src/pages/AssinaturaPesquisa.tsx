@@ -440,101 +440,23 @@ export default function ListaPlanos() {
         selectable
         selectionActions={selectionActions}
         pageSize={15}
-        novoMenuItems={[{ label: "Novo plano", onClick: openNew }]}
+        novoMenuItems={[
+          { label: "Novo plano", onClick: () => navigate("/assinaturaCadastro") },
+        ]}
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tableId="lista_planos"
       />
 
-      {/* Modal novo/editar */}
-      <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          {form && (
-            <div className="overflow-hidden rounded-[24px] bg-background shadow-2xl">
-              <div className="flex items-start justify-between border-b border-border px-8 pb-5 pt-7">
-                <div>
-                  <h2 className="text-[24px] font-semibold leading-none tracking-tight">
-                    {modal?.type === "new" ? "Novo plano" : "Editar plano"}
-                  </h2>
-                  <p className="mt-3 text-[14px] text-muted-foreground">
-                    Configure os benefícios e condições do plano.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                >
-                  <span className="sr-only">Fechar</span>✕
-                </button>
-              </div>
-
-              <div className="px-8 pb-8 pt-6 space-y-4">
-                <TextField
-                  label="Nome do plano"
-                  value={form.nome}
-                  onChange={(v) => setForm({ ...form, nome: v })}
-                  error={showErrors ? errors.nome : ""}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    label="Preço mensal (R$)"
-                    value={String(form.preco)}
-                    onChange={(v) => setForm({ ...form, preco: Number(v.replace(",", ".")) || 0 })}
-                    placeholder="0,00"
-                  />
-                  <TextField
-                    label="Desconto em produtos (%)"
-                    value={String(form.desconto)}
-                    onChange={(v) => setForm({ ...form, desconto: Number(v) || 0 })}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    label="Cortes incluídos"
-                    value={String(form.cortesIncluidos)}
-                    onChange={(v) => setForm({ ...form, cortesIncluidos: Number(v) || 0 })}
-                    placeholder="0"
-                  />
-                  <TextField
-                    label="Barbas incluídas"
-                    value={String(form.barbasIncluidas)}
-                    onChange={(v) => setForm({ ...form, barbasIncluidas: Number(v) || 0 })}
-                    placeholder="0"
-                  />
-                </div>
-
-                <Dropdown
-                  label="Status"
-                  value={form.status}
-                  setValue={(v) => setForm({ ...form, status: v as StatusPlano })}
-                  options={[
-                    { value: "ativo", label: "Ativo" },
-                    { value: "inativo", label: "Inativo" },
-                  ]}
-                />
-
-                <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
-                  <div>
-                    <p className="text-sm font-medium">Marcar como destaque</p>
-                    <p className="text-xs text-muted-foreground">Exibe badge de destaque na listagem</p>
-                  </div>
-                  <Switch
-                    checked={form.destaque}
-                    onCheckedChange={(v) => setForm({ ...form, destaque: v })}
-                    className="data-[state=checked]:bg-amber-500"
-                  />
-                </div>
-              </div>
-
-              <div className="border-t border-border px-8 py-4">
-                <SaveButton onClick={handleSave} />
-              </div>
-            </div>
+      {/* Modal de Visualização (resumo do plano) */}
+      <Dialog open={modal?.type === "view"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="max-w-sm border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          {modal?.type === "view" && (
+            <PlanoResumoCard
+              plano={modal.item}
+              onClose={closeModal}
+            />
           )}
         </DialogContent>
       </Dialog>
