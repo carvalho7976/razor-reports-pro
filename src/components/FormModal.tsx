@@ -62,6 +62,7 @@ export function Dropdown({
   options,
   searchable = false,
   error,
+  openDirection = "auto",
 }: {
   label: string;
   value: string;
@@ -69,6 +70,7 @@ export function Dropdown({
   options: DropdownOption[];
   searchable?: boolean;
   error?: string;
+  openDirection?: "auto" | "up" | "down";
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -96,12 +98,14 @@ export function Dropdown({
 
   useEffect(() => {
     if (!open || !buttonRef.current) return;
+    if (openDirection === "up") { setOpenUpward(true); return; }
+    if (openDirection === "down") { setOpenUpward(false); return; }
     const rect = buttonRef.current.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
     const estimated = Math.min(280, (searchable ? 70 : 0) + filtered.length * 44 + 16);
     setOpenUpward(spaceBelow < estimated && spaceAbove > spaceBelow);
-  }, [open, filtered.length, searchable]);
+  }, [open, filtered.length, searchable, openDirection]);
 
   return (
     <div className="relative grid gap-0.5" ref={wrapperRef}>
