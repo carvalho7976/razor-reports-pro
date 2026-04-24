@@ -1,12 +1,26 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction, TabDef, SummaryCard } from "@/components/DataTable";
-import { Trash2, Pencil, ToggleLeft, ToggleRight, Users, DollarSign, TrendingUp, Star } from "lucide-react";
+import {
+  Trash2,
+  Pencil,
+  ToggleLeft,
+  ToggleRight,
+  Users,
+  DollarSign,
+  Star,
+  Eye,
+  Ticket,
+  CheckCircle2,
+  X,
+} from "lucide-react";
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { FormModal, TextField, Dropdown, DeleteModal, SaveButton } from "@/components/FormModal";
+import { DeleteModal } from "@/components/FormModal";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
