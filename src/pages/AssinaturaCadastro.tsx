@@ -611,6 +611,13 @@ export default function AssinaturaCadastro() {
                 Configure os dados, serviços e produtos do plano.
               </p>
             </div>
+            <button
+              type="button"
+              onClick={handleSalvar}
+              className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background"
+            >
+              {editing ? "Salvar alterações" : "Criar plano"}
+            </button>
           </div>
         </div>
 
