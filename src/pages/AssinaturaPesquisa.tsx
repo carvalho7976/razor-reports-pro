@@ -307,15 +307,16 @@ export default function ListaPlanos() {
   // KPI cards
   const summaryCards = (filtered: Plano[]): SummaryCard[] => {
     const totalAssinantes = filtered.reduce((s, p) => s + p.assinantes, 0);
-    const totalVendas = filtered.reduce((s, p) => s + p.vendas, 0);
-    const receitaMensal = filtered.filter((p) => p.status === "ativo").reduce((s, p) => s + p.preco * p.assinantes, 0);
+    const receitaMensal = filtered
+      .filter((p) => p.status === "ativo")
+      .reduce((s, p) => s + p.preco * p.assinantes, 0);
     const ticketMedio = totalAssinantes > 0 ? receitaMensal / totalAssinantes : 0;
 
     return [
       {
         label: "Total de Assinantes",
         value: String(totalAssinantes),
-        icon: <Users className="h-4 w-4" />,
+        icon: <Star className="h-4 w-4" />,
         size: "compact",
         color: "blue",
       },
@@ -327,16 +328,9 @@ export default function ListaPlanos() {
         color: "blue",
       },
       {
-        label: "Total de Vendas",
-        value: String(totalVendas),
-        icon: <TrendingUp className="h-4 w-4" />,
-        size: "compact",
-        color: "blue",
-      },
-      {
         label: "Ticket Médio",
         value: R$(ticketMedio),
-        icon: <Star className="h-4 w-4" />,
+        icon: <Ticket className="h-4 w-4" />,
         size: "compact",
         color: "blue",
       },
