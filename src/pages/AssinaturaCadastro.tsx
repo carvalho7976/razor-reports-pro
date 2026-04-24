@@ -859,6 +859,7 @@ export default function AssinaturaCadastro() {
                 hideUsos
                 showOnlySelected={showOnlySelectedProdutos}
                 onToggleShowOnlySelected={() => setShowOnlySelectedProdutos((v) => !v)}
+                bulkDiscountEnabled
               />
             </SectionBlock>
 
