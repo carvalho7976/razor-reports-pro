@@ -607,9 +607,7 @@ export default function AssinaturaCadastro() {
               <h1 className="text-lg font-bold text-foreground sm:text-xl">
                 {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
               </h1>
-              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-                Configure os dados, serviços e produtos do plano.
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">​</p>
             </div>
             <button
               type="button"
@@ -943,7 +941,7 @@ export default function AssinaturaCadastro() {
                     {nome.trim() || "Nome do plano"}
                   </h3>
                   {destaque && (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-600">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 font-bold uppercase tracking-wide text-amber-600 text-xs">
                       <Star className="h-3 w-3 fill-amber-500" />
                       Destaque
                     </span>
