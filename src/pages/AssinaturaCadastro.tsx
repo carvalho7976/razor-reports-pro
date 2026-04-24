@@ -134,7 +134,7 @@ interface ProdutoIncluso {
 
 const sections = [
   { id: "dados", label: "Dados" },
-  { id: "servicos", label: "Serviços" },
+  { id: "servicos", label: "Serviços (opcional)" },
   { id: "produtos", label: "Produtos (opcional)" },
   { id: "beneficios", label: "Benefícios Extras (opcional)" },
   { id: "disponibilidade", label: "Disponibilidade" },
@@ -602,7 +602,7 @@ export default function AssinaturaCadastro() {
       <div className="flex flex-col gap-0">
         {/* HEADER */}
         <div className="mx-4 mt-4 sm:mx-6">
-          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="flex flex-col items-stretch gap-3 sm:items-start sm:justify-between sm:gap-4">
             <div className="pt-1">
               <h1 className="text-lg font-bold text-foreground sm:text-lg">
                 {editing ? "Editar Plano" : "Novo Plano"}
