@@ -271,7 +271,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   return (
     <div className="rounded-xl border border-border bg-card">
       {/* Search header */}
-      <div className="flex items-center gap-2 border-b border-border p-3">
+      <div className="flex flex-col gap-2 border-b border-border p-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -312,20 +312,20 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                       : "border-border bg-card hover:bg-muted/40",
                   )}
                 >
-                  <div className="flex items-center gap-3 px-3 py-2.5">
+                  <div className="flex flex-wrap items-center gap-3 px-3 py-2.5 sm:flex-nowrap">
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggle(item.id)}
                       onClick={(e) => e.stopPropagation()}
                       className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                     />
-                    <span className="flex-1 truncate text-sm font-medium text-foreground">
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
                       {item.nome}
                     </span>
 
                     {isSelected && (
                       <div
-                        className="flex flex-wrap items-end gap-2.5"
+                        className="flex w-full flex-wrap items-end gap-2.5 sm:w-auto"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {/* DESCONTO */}
@@ -601,20 +601,20 @@ export default function AssinaturaCadastro() {
     <AppLayout>
       <div className="flex flex-col gap-0">
         {/* HEADER */}
-        <div className="mx-6 mt-4">
-          <div className="flex items-start justify-between gap-4">
+        <div className="mx-4 mt-4 sm:mx-6">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="pt-1">
-              <h1 className="text-xl font-bold text-foreground">
+              <h1 className="text-lg font-bold text-foreground sm:text-xl">
                 {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
               </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
                 Configure os dados, serviços e produtos do plano.
               </p>
             </div>
             <button
               type="button"
               onClick={handleSalvar}
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background"
+              className="inline-flex h-10 w-full shrink-0 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background sm:w-auto"
             >
               {editing ? "Salvar alterações" : "Criar plano"}
             </button>
@@ -623,7 +623,7 @@ export default function AssinaturaCadastro() {
 
         {/* TAB BAR (anchor-style, profissionalPerfil pattern) */}
         <div className="mt-4 border-b border-border bg-background">
-          <div className="mx-6 flex gap-6 overflow-x-auto">
+          <div className="mx-4 flex gap-5 overflow-x-auto sm:mx-6 sm:gap-6">
             {sections.map((s) => (
               <button
                 key={s.id}
@@ -642,7 +642,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="mx-4 mt-5 grid grid-cols-1 gap-5 pb-12 sm:mx-6 lg:grid-cols-[minmax(0,1fr)_280px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
             {/* DADOS DO PLANO */}
