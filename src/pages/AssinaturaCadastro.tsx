@@ -594,7 +594,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_280px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
             {/* DADOS DO PLANO */}
