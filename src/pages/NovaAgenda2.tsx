@@ -954,7 +954,7 @@ export default function NovaAgenda2() {
                 type="text"
               />
             </FormRow>
-            <FormRow cols={3}>
+            <div className="grid gap-3" style={{ gridTemplateColumns: "1.4fr 1fr 1fr" }}>
               <TextField
                 label="Celular"
                 value={novoCelular}
@@ -976,7 +976,7 @@ export default function NovaAgenda2() {
                   { value: "O", label: "Outro" },
                 ]}
               />
-            </FormRow>
+            </div>
             <MultiDropdown
               label="Serviços"
               values={novoServicos}
