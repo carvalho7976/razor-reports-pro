@@ -727,6 +727,14 @@ export default function NovaAgenda2() {
 
           <TooltipProvider delayDuration={0}>
             <div className="ml-auto flex items-center gap-4">
+              <div className="flex items-center gap-1.5 border-r border-border pr-4">
+                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  Agendamentos
+                </span>
+                <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
+                  {agendamentos.filter((a) => a.status !== "folga").length}
+                </Badge>
+              </div>
               {[
                 { emoji: "😌", label: "Agendado", valor: 8 },
                 { emoji: "😉", label: "Confirmado", valor: 5 },
