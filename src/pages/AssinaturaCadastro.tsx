@@ -810,13 +810,13 @@ export default function AssinaturaCadastro() {
 
             {/* DISPONIBILIDADE */}
             <SectionBlock id="disponibilidade" title="Disponibilidade">
-              <div className="grid gap-6">
+              <div className="grid gap-6 lg:grid-cols-2">
                 <div className="grid gap-3">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-foreground">Dias Válidos</span>
                   </div>
-                  <div className="grid grid-cols-7 gap-2">
+                  <div className="grid grid-cols-7 gap-1.5">
                     {diasSemana.map((d) => {
                       const ativo = diasAceitos.includes(d.key);
                       return (
@@ -825,7 +825,7 @@ export default function AssinaturaCadastro() {
                           type="button"
                           onClick={() => toggleDia(d.key)}
                           className={cn(
-                            "inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition",
+                            "inline-flex h-10 min-w-0 items-center justify-center rounded-lg border px-1 text-xs font-semibold transition",
                             ativo
                               ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
