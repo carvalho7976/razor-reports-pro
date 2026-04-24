@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   ShoppingBag,
   X,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -297,9 +298,9 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="rounded-xl bg-card">
       {/* Search header */}
-      <div className="flex flex-col gap-2 border-b border-border p-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 pb-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -327,7 +328,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                         applyBulkDiscount();
                       }
                     }}
-                    placeholder="%"
+                    placeholder="0"
                     className="h-full w-9 bg-transparent text-right text-sm outline-none"
                   />
                   <span className="pr-1.5 text-xs text-muted-foreground">%</span>
@@ -357,7 +358,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
       </div>
 
       {/* List */}
-      <div className="max-h-[225px] overflow-y-auto p-2">
+      <div className="max-h-[225px] overflow-y-auto px-0 py-0">
         {filtered.length === 0 ? (
           <p className="px-4 py-8 text-center text-sm text-muted-foreground">
             Nenhum item encontrado.
@@ -688,17 +689,14 @@ export default function AssinaturaCadastro() {
     [servicosArr],
   );
 
-  const removerServicoResumo = (id: number) => {
-    const next = new Map(servicosMap);
-    next.delete(id);
-    setServicosMap(next);
-  };
-  const removerTodosProdutos = () => setProdutosMap(new Map());
-  const removerTodosServicosComDesconto = () => {
-    const next = new Map(servicosMap);
-    servicosComDesconto.forEach((s) => next.delete(s.id));
-    setServicosMap(next);
-  };
+  // O X no card resumo apenas oculta a linha do preview, sem alterar a configuração do plano.
+  const [hiddenResumo, setHiddenResumo] = useState<Set<string>>(new Set());
+  const ocultarResumo = (key: string) =>
+    setHiddenResumo((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
 
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
@@ -1056,7 +1054,10 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center justify-between gap-2"><span className="text-sm font-medium text-foreground">Profissionais do Plano </span></div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">Profissionais do Plano</span>
+                  </div>
                   <div className="flex flex-wrap gap-3">
                     {profissionaisDisponiveis.map((p) => {
                       const ativo = profissionaisAtendem.includes(p.id);
@@ -1136,7 +1137,7 @@ export default function AssinaturaCadastro() {
                     )}
 
                     {/* Serviços 100% gratuitos (inclusos individualmente) */}
-                    {servicosInclusos.map((s) => (
+                    {servicosInclusos.filter((s) => !hiddenResumo.has(`s-${s.id}`)).map((s) => (
                       <li key={`s-${s.id}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span className="flex-1">
@@ -1146,10 +1147,10 @@ export default function AssinaturaCadastro() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => removerServicoResumo(s.id)}
+                          onClick={() => ocultarResumo(`s-${s.id}`)}
                           className="opacity-0 transition group-hover:opacity-100"
-                          aria-label="Remover do plano"
-                          title="Remover"
+                          aria-label="Ocultar do resumo"
+                          title="Ocultar do resumo"
                         >
                           <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                         </button>
@@ -1157,16 +1158,16 @@ export default function AssinaturaCadastro() {
                     ))}
 
                     {/* Serviços com desconto (% < 100) agrupados */}
-                    {servicosComDesconto.length > 0 && (
+                    {servicosComDesconto.length > 0 && !hiddenResumo.has("desc-servicos") && (
                       <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span className="flex-1">Descontos em serviços</span>
                         <button
                           type="button"
-                          onClick={removerTodosServicosComDesconto}
+                          onClick={() => ocultarResumo("desc-servicos")}
                           className="opacity-0 transition group-hover:opacity-100"
-                          aria-label="Remover descontos em serviços"
-                          title="Remover"
+                          aria-label="Ocultar do resumo"
+                          title="Ocultar do resumo"
                         >
                           <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                         </button>
@@ -1174,16 +1175,16 @@ export default function AssinaturaCadastro() {
                     )}
 
                     {/* Produtos */}
-                    {produtosArr.length > 0 && (
+                    {produtosArr.length > 0 && !hiddenResumo.has("desc-produtos") && (
                       <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span className="flex-1">Descontos em produtos</span>
                         <button
                           type="button"
-                          onClick={removerTodosProdutos}
+                          onClick={() => ocultarResumo("desc-produtos")}
                           className="opacity-0 transition group-hover:opacity-100"
-                          aria-label="Remover descontos em produtos"
-                          title="Remover"
+                          aria-label="Ocultar do resumo"
+                          title="Ocultar do resumo"
                         >
                           <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                         </button>
@@ -1191,16 +1192,16 @@ export default function AssinaturaCadastro() {
                     )}
 
                     {/* Benefícios extras */}
-                    {beneficios.map((b, idx) => (
+                    {beneficios.map((b, idx) => !hiddenResumo.has(`b-${idx}`) && (
                       <li key={`b-${idx}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span className="flex-1">{b}</span>
                         <button
                           type="button"
-                          onClick={() => removerBeneficio(idx)}
+                          onClick={() => ocultarResumo(`b-${idx}`)}
                           className="opacity-0 transition group-hover:opacity-100"
-                          aria-label="Remover benefício"
-                          title="Remover"
+                          aria-label="Ocultar do resumo"
+                          title="Ocultar do resumo"
                         >
                           <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                         </button>
