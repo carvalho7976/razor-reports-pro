@@ -1,12 +1,26 @@
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, ActionsMenu, SelectionAction, TabDef, SummaryCard } from "@/components/DataTable";
-import { Trash2, Pencil, ToggleLeft, ToggleRight, Users, DollarSign, TrendingUp, Star } from "lucide-react";
+import {
+  Trash2,
+  Pencil,
+  ToggleLeft,
+  ToggleRight,
+  Users,
+  DollarSign,
+  Star,
+  Eye,
+  Ticket,
+  CheckCircle2,
+  X,
+} from "lucide-react";
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { FormModal, TextField, Dropdown, DeleteModal, SaveButton } from "@/components/FormModal";
+import { DeleteModal } from "@/components/FormModal";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -232,27 +246,102 @@ const data: Plano[] = [
   },
 ];
 
-type ModalState = { type: "new" } | { type: "edit"; item: Plano } | { type: "delete"; item: Plano } | null;
+type ModalState =
+  | { type: "view"; item: Plano }
+  | { type: "delete"; item: Plano }
+  | null;
 
-const emptyForm = (): Plano => ({
-  cod: "",
-  nome: "",
-  preco: 0,
-  cortesIncluidos: 0,
-  barbasIncluidas: 0,
-  assinantes: 0,
-  vendas: 0,
-  desconto: 0,
-  destaque: false,
-  status: "ativo",
-});
+function PlanoResumoCard({ plano, onClose }: { plano: Plano; onClose: () => void }) {
+  // Lista mock de itens inclusos baseada no plano
+  const inclusos: string[] = [];
+  if (plano.cortesIncluidos > 0)
+    inclusos.push(
+      plano.cortesIncluidos > 4
+        ? "Cortes ilimitados"
+        : `${plano.cortesIncluidos}x corte`,
+    );
+  if (plano.barbasIncluidas > 0)
+    inclusos.push(
+      plano.barbasIncluidas > 4
+        ? "Barbas ilimitadas"
+        : `${plano.barbasIncluidas}x barba`,
+    );
+  if (plano.desconto > 0) inclusos.push("Descontos em produtos");
+  inclusos.push("Válido todos os dias");
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2 border-b border-border p-4">
+        <h3 className="text-lg font-bold uppercase leading-tight text-foreground">
+          {plano.nome}
+        </h3>
+        <div className="flex items-center gap-1.5">
+          {plano.destaque && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-600">
+              <Star className="h-3 w-3 fill-amber-500" />
+              Destaque
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            aria-label="Fechar"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="space-y-3 p-4">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-sky-500">
+          Incluso:
+        </p>
+        <ul className="flex flex-col gap-1.5">
+          {inclusos.map((b, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2 text-[13px] font-medium text-foreground"
+            >
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-border bg-card px-4 py-3">
+        <div className="flex items-end justify-between gap-2">
+          <div>
+            <span className="text-lg font-bold text-foreground">
+              {R$(plano.preco)}
+            </span>
+            <span className="ml-1 text-xs text-muted-foreground">Mensal</span>
+          </div>
+          <span
+            className={cn(
+              "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+              plano.status === "ativo"
+                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
+            {plano.status === "ativo" ? "Ativo" : "Inativo"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ListaPlanos() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("todos");
   const [allData, setAllData] = useState<Plano[]>(data);
   const [modal, setModal] = useState<ModalState>(null);
-  const [form, setForm] = useState<Plano | null>(null);
-  const [showErrors, setShowErrors] = useState(false);
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
@@ -260,40 +349,13 @@ export default function ListaPlanos() {
     return allData.filter((p) => p.status === activeTab);
   }, [activeTab, allData]);
 
-  const errors = { nome: !form?.nome ? "Informe o nome do plano." : "" };
-
-  const openNew = () => {
-    setForm(emptyForm());
-    setShowErrors(false);
-    setModal({ type: "new" });
-  };
-  const openEdit = (item: Plano) => {
-    setForm({ ...item });
-    setShowErrors(false);
-    setModal({ type: "edit", item });
-  };
+  const openView = (item: Plano) => setModal({ type: "view", item });
+  const openEdit = (item: Plano) =>
+    navigate(`/assinaturaCadastro?nome=${encodeURIComponent(item.nome)}`);
   const openDelete = (item: Plano) => setModal({ type: "delete", item });
+  const goAssinantes = () => navigate("/assinantePesquisa");
 
-  const closeModal = () => {
-    setModal(null);
-    setForm(null);
-    setShowErrors(false);
-  };
-
-  const handleSave = () => {
-    if (!form) return;
-    setShowErrors(true);
-    if (errors.nome) return;
-    if (modal?.type === "new") {
-      const nextCod = String(Math.max(...allData.map((d) => Number(d.cod) || 0)) + 1);
-      setAllData((prev) => [{ ...form, cod: nextCod }, ...prev]);
-      toast({ title: "Plano criado com sucesso" });
-    } else if (modal?.type === "edit") {
-      setAllData((prev) => prev.map((d) => (d.cod === form.cod ? form : d)));
-      toast({ title: "Plano atualizado" });
-    }
-    closeModal();
-  };
+  const closeModal = () => setModal(null);
 
   const handleDelete = () => {
     if (modal?.type !== "delete") return;
@@ -331,15 +393,16 @@ export default function ListaPlanos() {
   // KPI cards
   const summaryCards = (filtered: Plano[]): SummaryCard[] => {
     const totalAssinantes = filtered.reduce((s, p) => s + p.assinantes, 0);
-    const totalVendas = filtered.reduce((s, p) => s + p.vendas, 0);
-    const receitaMensal = filtered.filter((p) => p.status === "ativo").reduce((s, p) => s + p.preco * p.assinantes, 0);
+    const receitaMensal = filtered
+      .filter((p) => p.status === "ativo")
+      .reduce((s, p) => s + p.preco * p.assinantes, 0);
     const ticketMedio = totalAssinantes > 0 ? receitaMensal / totalAssinantes : 0;
 
     return [
       {
         label: "Total de Assinantes",
         value: String(totalAssinantes),
-        icon: <Users className="h-4 w-4" />,
+        icon: <Star className="h-4 w-4" />,
         size: "compact",
         color: "blue",
       },
@@ -351,16 +414,9 @@ export default function ListaPlanos() {
         color: "blue",
       },
       {
-        label: "Total de Vendas",
-        value: String(totalVendas),
-        icon: <TrendingUp className="h-4 w-4" />,
-        size: "compact",
-        color: "blue",
-      },
-      {
         label: "Ticket Médio",
         value: R$(ticketMedio),
-        icon: <Star className="h-4 w-4" />,
+        icon: <Ticket className="h-4 w-4" />,
         size: "compact",
         color: "blue",
       },
@@ -384,7 +440,7 @@ export default function ListaPlanos() {
       pinned: true,
       render: (v, row) => (
         <div className="flex items-center gap-2">
-          <span className="font-medium text-foreground">{v}</span>
+          <span className="font-bold text-foreground">{v}</span>
           {row.destaque && (
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-amber-100 text-amber-700 border-0">
               destaque
@@ -397,32 +453,7 @@ export default function ListaPlanos() {
       key: "preco",
       label: "Preço",
       align: "right",
-      render: (v) => <span className="font-medium tabular-nums">{R$(v)}</span>,
-    },
-    {
-      key: "cortesIncluidos",
-      label: "Cortes",
-      align: "center",
-      render: (v) => <span className="text-muted-foreground tabular-nums">{v > 0 ? `${v}x` : "—"}</span>,
-    },
-    {
-      key: "barbasIncluidas",
-      label: "Barbas",
-      align: "center",
-      render: (v) => <span className="text-muted-foreground tabular-nums">{v > 0 ? `${v}x` : "—"}</span>,
-    },
-    {
-      key: "desconto",
-      label: "Desconto",
-      align: "center",
-      render: (v) =>
-        v > 0 ? (
-          <Badge variant="secondary" className="text-[11px] font-medium bg-emerald-50 text-emerald-700 border-0">
-            {v}% off
-          </Badge>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        ),
+      render: (v) => <span className="tabular-nums">{R$(v)}</span>,
     },
     {
       key: "assinantes",
@@ -430,16 +461,10 @@ export default function ListaPlanos() {
       align: "center",
       render: (v) => (
         <div className="flex items-center justify-center gap-1">
-          <Users className="h-3 w-3 text-muted-foreground" />
-          <span className="font-medium tabular-nums">{v}</span>
+          <Star className="h-3 w-3 text-muted-foreground" />
+          <span className="tabular-nums">{v}</span>
         </div>
       ),
-    },
-    {
-      key: "vendas",
-      label: "Vendas",
-      align: "center",
-      render: (v) => <span className="tabular-nums text-muted-foreground">{v}</span>,
     },
     {
       key: "status",
@@ -449,7 +474,7 @@ export default function ListaPlanos() {
         <Switch
           checked={v === "ativo"}
           onCheckedChange={() => toggleStatus(row)}
-          className="data-[state=checked]:bg-emerald-500"
+          className="scale-90 data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300"
         />
       ),
     },
@@ -462,7 +487,13 @@ export default function ListaPlanos() {
       render: (_, row) => (
         <ActionsMenu
           items={[
+            { label: "Visualizar", icon: <Eye className="h-4 w-4" />, onClick: () => openView(row) },
             { label: "Editar", icon: <Pencil className="h-4 w-4" />, onClick: () => openEdit(row) },
+            {
+              label: "Assinantes",
+              icon: <Users className="h-4 w-4" />,
+              onClick: goAssinantes,
+            },
             {
               label: row.destaque ? "Remover destaque" : "Marcar destaque",
               icon: <Star className="h-4 w-4" />,
@@ -495,101 +526,23 @@ export default function ListaPlanos() {
         selectable
         selectionActions={selectionActions}
         pageSize={15}
-        novoMenuItems={[{ label: "Novo plano", onClick: openNew }]}
+        novoMenuItems={[
+          { label: "Novo plano", onClick: () => navigate("/assinaturaCadastro") },
+        ]}
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tableId="lista_planos"
       />
 
-      {/* Modal novo/editar */}
-      <Dialog open={modal?.type === "new" || modal?.type === "edit"} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
-          {form && (
-            <div className="overflow-hidden rounded-[24px] bg-background shadow-2xl">
-              <div className="flex items-start justify-between border-b border-border px-8 pb-5 pt-7">
-                <div>
-                  <h2 className="text-[24px] font-semibold leading-none tracking-tight">
-                    {modal?.type === "new" ? "Novo plano" : "Editar plano"}
-                  </h2>
-                  <p className="mt-3 text-[14px] text-muted-foreground">
-                    Configure os benefícios e condições do plano.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                >
-                  <span className="sr-only">Fechar</span>✕
-                </button>
-              </div>
-
-              <div className="px-8 pb-8 pt-6 space-y-4">
-                <TextField
-                  label="Nome do plano"
-                  value={form.nome}
-                  onChange={(v) => setForm({ ...form, nome: v })}
-                  error={showErrors ? errors.nome : ""}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    label="Preço mensal (R$)"
-                    value={String(form.preco)}
-                    onChange={(v) => setForm({ ...form, preco: Number(v.replace(",", ".")) || 0 })}
-                    placeholder="0,00"
-                  />
-                  <TextField
-                    label="Desconto em produtos (%)"
-                    value={String(form.desconto)}
-                    onChange={(v) => setForm({ ...form, desconto: Number(v) || 0 })}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    label="Cortes incluídos"
-                    value={String(form.cortesIncluidos)}
-                    onChange={(v) => setForm({ ...form, cortesIncluidos: Number(v) || 0 })}
-                    placeholder="0"
-                  />
-                  <TextField
-                    label="Barbas incluídas"
-                    value={String(form.barbasIncluidas)}
-                    onChange={(v) => setForm({ ...form, barbasIncluidas: Number(v) || 0 })}
-                    placeholder="0"
-                  />
-                </div>
-
-                <Dropdown
-                  label="Status"
-                  value={form.status}
-                  setValue={(v) => setForm({ ...form, status: v as StatusPlano })}
-                  options={[
-                    { value: "ativo", label: "Ativo" },
-                    { value: "inativo", label: "Inativo" },
-                  ]}
-                />
-
-                <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
-                  <div>
-                    <p className="text-sm font-medium">Marcar como destaque</p>
-                    <p className="text-xs text-muted-foreground">Exibe badge de destaque na listagem</p>
-                  </div>
-                  <Switch
-                    checked={form.destaque}
-                    onCheckedChange={(v) => setForm({ ...form, destaque: v })}
-                    className="data-[state=checked]:bg-amber-500"
-                  />
-                </div>
-              </div>
-
-              <div className="border-t border-border px-8 py-4">
-                <SaveButton onClick={handleSave} />
-              </div>
-            </div>
+      {/* Modal de Visualização (resumo do plano) */}
+      <Dialog open={modal?.type === "view"} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="max-w-sm border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          {modal?.type === "view" && (
+            <PlanoResumoCard
+              plano={modal.item}
+              onClose={closeModal}
+            />
           )}
         </DialogContent>
       </Dialog>
