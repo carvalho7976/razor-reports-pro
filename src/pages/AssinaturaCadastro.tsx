@@ -292,7 +292,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
       </div>
 
       {/* List */}
-      <div className="max-h-[170px] overflow-y-auto p-2">
+      <div className="max-h-[225px] overflow-y-auto p-2">
         {filtered.length === 0 ? (
           <p className="px-4 py-8 text-center text-sm text-muted-foreground">
             Nenhum item encontrado.
