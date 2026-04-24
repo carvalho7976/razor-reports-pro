@@ -220,6 +220,8 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   searchPlaceholder,
   comissaoEnabled = true,
   hideUsos = false,
+  showOnlySelected = false,
+  onToggleShowOnlySelected,
 }: {
   items: T[];
   selected: Map<number, ServicoIncluso>;
@@ -227,10 +229,15 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   searchPlaceholder: string;
   comissaoEnabled?: boolean;
   hideUsos?: boolean;
+  showOnlySelected?: boolean;
+  onToggleShowOnlySelected?: () => void;
 }) {
   const [busca, setBusca] = useState("");
 
-  const filtered = items.filter((i) => i.nome.toLowerCase().includes(busca.toLowerCase()));
+  const filtered = items.filter((i) => {
+    if (showOnlySelected && !selected.has(i.id)) return false;
+    return i.nome.toLowerCase().includes(busca.toLowerCase());
+  });
   const allSelected = filtered.length > 0 && filtered.every((i) => selected.has(i.id));
 
   const toggle = (id: number) => {
