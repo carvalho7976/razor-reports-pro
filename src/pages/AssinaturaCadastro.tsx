@@ -556,6 +556,32 @@ export default function AssinaturaCadastro() {
   const recorrenciaLabel =
     recorrenciaOptions.find((r) => r.value === recorrencia)?.label || "";
 
+  const diasValidosLabel = useMemo(() => {
+    const order = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"];
+    const labels: Record<string, string> = {
+      seg: "seg",
+      ter: "ter",
+      qua: "qua",
+      qui: "qui",
+      sex: "sex",
+      sab: "sáb",
+      dom: "dom",
+    };
+    const sel = order.filter((d) => diasAceitos.includes(d));
+    if (sel.length === 0) return "Nenhum dia selecionado";
+    if (sel.length === 7) return "Válido todos os dias";
+    // detecta sequência contígua
+    const idxs = sel.map((d) => order.indexOf(d));
+    const contiguous = idxs.every((v, i) => i === 0 || v === idxs[i - 1] + 1);
+    if (contiguous && sel.length >= 3) {
+      return `Válido de ${labels[sel[0]]} a ${labels[sel[sel.length - 1]]}`;
+    }
+    if (sel.length === 1) return `Válido ${labels[sel[0]]}`;
+    const last = labels[sel[sel.length - 1]];
+    const head = sel.slice(0, -1).map((d) => labels[d]).join(", ");
+    return `Válido ${head} e ${last}`;
+  }, [diasAceitos]);
+
   return (
     <AppLayout>
       <div className="flex flex-col gap-0">
