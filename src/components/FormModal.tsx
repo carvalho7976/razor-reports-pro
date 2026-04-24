@@ -42,7 +42,7 @@ export function TextField({
           disabled && "cursor-default opacity-100",
           error
             ? "border-destructive/50 focus:border-destructive focus:ring-4 focus:ring-destructive/10"
-            : "border-border focus:border-foreground focus:ring-4 focus:ring-muted",
+            : "border-info/50 focus:border-info focus:ring-4 focus:ring-info/20",
         )}
       />
       <FieldError message={error} />
