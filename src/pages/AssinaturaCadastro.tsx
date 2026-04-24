@@ -1035,18 +1035,6 @@ export default function AssinaturaCadastro() {
           </aside>
         </div>
 
-        {/* FOOTER */}
-        <div className="border-t border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={handleSalvar}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-            >
-              {editing ? "Salvar alterações" : "Criar plano"}
-            </button>
-          </div>
-        </div>
       </div>
     </AppLayout>
   );
