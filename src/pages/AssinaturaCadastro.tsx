@@ -601,20 +601,20 @@ export default function AssinaturaCadastro() {
     <AppLayout>
       <div className="flex flex-col gap-0">
         {/* HEADER */}
-        <div className="mx-6 mt-4">
-          <div className="flex items-start justify-between gap-4">
+        <div className="mx-4 mt-4 sm:mx-6">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="pt-1">
-              <h1 className="text-xl font-bold text-foreground">
+              <h1 className="text-lg font-bold text-foreground sm:text-xl">
                 {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
               </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
                 Configure os dados, serviços e produtos do plano.
               </p>
             </div>
             <button
               type="button"
               onClick={handleSalvar}
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background"
+              className="inline-flex h-10 w-full shrink-0 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background sm:w-auto"
             >
               {editing ? "Salvar alterações" : "Criar plano"}
             </button>
@@ -623,7 +623,7 @@ export default function AssinaturaCadastro() {
 
         {/* TAB BAR (anchor-style, profissionalPerfil pattern) */}
         <div className="mt-4 border-b border-border bg-background">
-          <div className="mx-6 flex gap-6 overflow-x-auto">
+          <div className="mx-4 flex gap-5 overflow-x-auto sm:mx-6 sm:gap-6">
             {sections.map((s) => (
               <button
                 key={s.id}
@@ -642,7 +642,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="mx-4 mt-5 grid grid-cols-1 gap-5 pb-12 sm:mx-6 lg:grid-cols-[minmax(0,1fr)_280px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
             {/* DADOS DO PLANO */}
