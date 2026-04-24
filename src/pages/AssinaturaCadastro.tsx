@@ -353,17 +353,21 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                               Usos/mês
                             </span>
-                            <select
+                            <Select
                               value={sel.usos}
-                              onChange={(e) => update(item.id, "usos", e.target.value)}
-                              className="h-9 w-[110px] rounded-md border border-blue-500/40 bg-background px-2 text-xs font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                              onValueChange={(v) => update(item.id, "usos", v)}
                             >
-                              {usosOptions.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                  {o.label}
-                                </option>
-                              ))}
-                            </select>
+                              <SelectTrigger className="h-9 w-[120px] rounded-md border-border bg-background px-2 text-xs font-semibold">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {usosOptions.map((o) => (
+                                  <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                    {o.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
 
@@ -373,17 +377,21 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                               Comissão
                             </span>
-                            <select
+                            <Select
                               value={sel.comissao}
-                              onChange={(e) => update(item.id, "comissao", e.target.value)}
-                              className="h-9 w-[130px] rounded-md border border-blue-500/40 bg-background px-2 text-xs font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                              onValueChange={(v) => update(item.id, "comissao", v)}
                             >
-                              {comissaoOptions.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                  {o.label}
-                                </option>
-                              ))}
-                            </select>
+                              <SelectTrigger className="h-9 w-[140px] rounded-md border-border bg-background px-2 text-xs font-semibold">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {comissaoOptions.map((o) => (
+                                  <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                    {o.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
 
