@@ -12,6 +12,7 @@ import {
   Search,
   Star,
   CheckCircle2,
+  ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -291,7 +292,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
       </div>
 
       {/* List */}
-      <div className="max-h-[260px] overflow-y-auto p-2">
+      <div className="max-h-[170px] overflow-y-auto p-2">
         {filtered.length === 0 ? (
           <p className="px-4 py-8 text-center text-sm text-muted-foreground">
             Nenhum item encontrado.
@@ -666,9 +667,17 @@ export default function AssinaturaCadastro() {
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
-                    <div>
-                       <p className="text-sm font-semibold text-foreground">Disponível para Venda</p>
-                      <p className="text-xs text-muted-foreground">​</p>
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag
+                        className={cn(
+                          "h-4 w-4",
+                          disponivelVenda ? "fill-emerald-500/20 text-emerald-500" : "text-muted-foreground",
+                        )}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Disponível para Venda</p>
+                        <p className="text-xs text-muted-foreground" />
+                      </div>
                     </div>
                     <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                   </div>
