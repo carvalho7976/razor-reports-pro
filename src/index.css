@@ -167,7 +167,7 @@ shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
     border-radius: 999px;
 
     /* cria espaçamento lateral (efeito "longe do conteúdo") */
-    border: 2px solid transparent;
+    border: 4px solid transparent;
     background-clip: content-box;
   }
 
