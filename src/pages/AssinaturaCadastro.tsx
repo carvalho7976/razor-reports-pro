@@ -978,7 +978,7 @@ export default function AssinaturaCadastro() {
           </div>
 
           {/* SIDEBAR DIREITA - PREVIEW DO PLANO */}
-          <aside className="lg:sticky lg:top-16 lg:self-start">
+          <aside className="lg:sticky lg:top-5 lg:self-start">
             <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm mx-0 px-0">
               {/* Header */}
               <div className="border-b border-border p-5">
