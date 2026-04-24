@@ -611,6 +611,13 @@ export default function AssinaturaCadastro() {
                 Configure os dados, serviços e produtos do plano.
               </p>
             </div>
+            <button
+              type="button"
+              onClick={handleSalvar}
+              className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background"
+            >
+              {editing ? "Salvar alterações" : "Criar plano"}
+            </button>
           </div>
         </div>
 
@@ -669,7 +676,7 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div>
                       <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
                       <p className="text-xs text-muted-foreground">
@@ -679,7 +686,7 @@ export default function AssinaturaCadastro() {
                     <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                   </div>
 
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <Star
                         className={cn(
@@ -899,19 +906,19 @@ export default function AssinaturaCadastro() {
                           <div className="relative">
                             <div
                               className={cn(
-                                "flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm",
+                                "flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm",
                                 p.cor,
                               )}
                             >
                               {p.iniciais}
                             </div>
                             {ativo && (
-                              <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background fill-blue-500 text-white" />
+                              <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-background fill-blue-500 text-white" />
                             )}
                           </div>
                           <span
                             className={cn(
-                              "max-w-[80px] truncate text-xs font-medium",
+                              "max-w-[72px] truncate text-[11px] font-medium",
                               ativo ? "text-foreground" : "text-muted-foreground",
                             )}
                           >
@@ -1003,7 +1010,7 @@ export default function AssinaturaCadastro() {
               </div>
 
               {/* Footer (preço + status) */}
-              <div className="border-t border-border bg-muted/20 px-5 py-4">
+              <div className="border-t border-border bg-card px-5 py-4">
                 <div className="flex items-end justify-between gap-2">
                   <div>
                     <span className="text-xl font-bold text-foreground">
@@ -1028,18 +1035,6 @@ export default function AssinaturaCadastro() {
           </aside>
         </div>
 
-        {/* FOOTER */}
-        <div className="border-t border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={handleSalvar}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background"
-            >
-              {editing ? "Salvar alterações" : "Criar plano"}
-            </button>
-          </div>
-        </div>
       </div>
     </AppLayout>
   );
