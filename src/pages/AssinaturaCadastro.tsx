@@ -646,6 +646,25 @@ export default function AssinaturaCadastro() {
       return novo;
     });
 
+  const [editingBeneficioIdx, setEditingBeneficioIdx] = useState<number | null>(null);
+  const [editingBeneficioValue, setEditingBeneficioValue] = useState("");
+
+  const startEditBeneficio = (idx: number) => {
+    setEditingBeneficioIdx(idx);
+    setEditingBeneficioValue(beneficios[idx]);
+  };
+  const commitEditBeneficio = () => {
+    if (editingBeneficioIdx === null) return;
+    const t = editingBeneficioValue.trim();
+    if (t) {
+      setBeneficios((prev) =>
+        prev.map((b, i) => (i === editingBeneficioIdx ? t : b)),
+      );
+    }
+    setEditingBeneficioIdx(null);
+    setEditingBeneficioValue("");
+  };
+
   const handleSalvar = () => {
     setShowErrors(true);
     if (errors.nome) {
