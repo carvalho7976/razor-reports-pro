@@ -667,7 +667,7 @@ export default function AssinaturaCadastro() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div>
-                       <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
+                       <p className="text-sm font-semibold text-foreground">Disponível para Venda</p>
                       <p className="text-xs text-muted-foreground">​</p>
                     </div>
                     <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
