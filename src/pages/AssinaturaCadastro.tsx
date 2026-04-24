@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   ShoppingBag,
   X,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -1056,7 +1057,10 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center justify-between gap-2"><span className="text-sm font-medium text-foreground">Profissionais do Plano </span></div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">Profissionais do Plano</span>
+                  </div>
                   <div className="flex flex-wrap gap-3">
                     {profissionaisDisponiveis.map((p) => {
                       const ativo = profissionaisAtendem.includes(p.id);
