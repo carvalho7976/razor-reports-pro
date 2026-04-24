@@ -284,7 +284,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
       </div>
 
       {/* List */}
-      <div className="max-h-[420px] overflow-y-auto p-2">
+      <div className="max-h-[260px] overflow-y-auto p-2">
         {filtered.length === 0 ? (
           <p className="px-4 py-8 text-center text-sm text-muted-foreground">
             Nenhum item encontrado.
@@ -297,8 +297,9 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
               return (
                 <li
                   key={item.id}
+                  onClick={() => toggle(item.id)}
                   className={cn(
-                    "rounded-lg border transition",
+                    "cursor-pointer rounded-lg border transition",
                     isSelected
                       ? "border-blue-500/40 bg-blue-500/5"
                       : "border-border bg-card hover:bg-muted/40",
@@ -308,6 +309,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggle(item.id)}
+                      onClick={(e) => e.stopPropagation()}
                       className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                     />
                     <span className="flex-1 truncate text-sm font-medium text-foreground">
@@ -315,7 +317,10 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                     </span>
 
                     {isSelected && (
-                      <div className="flex flex-wrap items-end gap-2.5">
+                      <div
+                        className="flex flex-wrap items-end gap-2.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {/* DESCONTO */}
                         <div className="flex flex-col gap-0.5">
                           <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
