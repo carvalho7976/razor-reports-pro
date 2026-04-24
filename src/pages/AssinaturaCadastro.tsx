@@ -608,7 +608,7 @@ export default function AssinaturaCadastro() {
               <h1 className="text-lg font-bold text-foreground sm:text-lg">
                 {editing ? "Editar Plano" : "Novo Plano"}
               </h1>
-              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">​</p>
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm"></p>
             </div>
             <button
               type="button"
