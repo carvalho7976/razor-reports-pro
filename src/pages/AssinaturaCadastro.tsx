@@ -1026,7 +1026,7 @@ export default function AssinaturaCadastro() {
                         : "bg-muted text-muted-foreground",
                     )}
                   >
-                    {disponivelVenda ? "Ativo" : "Inativo"}
+                    {disponivelVenda ? "Disponível" : "Indisponível"}
                   </span>
                 </div>
 
