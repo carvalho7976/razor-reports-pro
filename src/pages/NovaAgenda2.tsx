@@ -977,11 +977,12 @@ export default function NovaAgenda2() {
                 ]}
               />
             </FormRow>
-            <Dropdown
+            <MultiDropdown
               label="Serviços"
-              value={novoServico}
-              setValue={setNovoServico}
+              values={novoServicos}
+              setValues={setNovoServicos}
               options={servicosOpcoes.map((s) => ({ value: s, label: s }))}
+              searchable
             />
             <Dropdown
               label="Profissional preferido (opcional)"
