@@ -385,6 +385,8 @@ export default function NovaAgenda2() {
   const [filtroProfsSel, setFiltroProfsSel] = useState<string[]>([]);
   const [filtroDiasSel, setFiltroDiasSel] = useState<string>("1");
 
+  const [filaOpen, setFilaOpen] = useState(false);
+
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
 
@@ -444,6 +446,12 @@ export default function NovaAgenda2() {
       />
 
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
+        {(filtroOpen || filaOpen) && (
+          <div
+            className="fixed inset-0 z-40 bg-black/80 animate-in fade-in-0"
+            aria-hidden="true"
+          />
+        )}
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
@@ -629,7 +637,7 @@ export default function NovaAgenda2() {
               </PopoverContent>
             </Popover>
 
-            <Popover>
+            <Popover open={filaOpen} onOpenChange={setFilaOpen}>
               <PopoverTrigger asChild>
                 <button
                   type="button"
@@ -719,6 +727,14 @@ export default function NovaAgenda2() {
 
           <TooltipProvider delayDuration={0}>
             <div className="ml-auto flex items-center gap-4">
+              <div className="flex items-center gap-1.5 border-r border-border pr-4">
+                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  Agendamentos
+                </span>
+                <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
+                  {agendamentos.filter((a) => a.status !== "folga").length}
+                </Badge>
+              </div>
               {[
                 { emoji: "😌", label: "Agendado", valor: 8 },
                 { emoji: "😉", label: "Confirmado", valor: 5 },
