@@ -170,6 +170,166 @@ export function Dropdown({
   );
 }
 
+export function MultiDropdown({
+  label,
+  values,
+  setValues,
+  options,
+  searchable = true,
+  placeholder = "Selecione...",
+  error,
+}: {
+  label: string;
+  values: string[];
+  setValues: (values: string[]) => void;
+  options: DropdownOption[];
+  searchable?: boolean;
+  placeholder?: string;
+  error?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [openUpward, setOpenUpward] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  const selected = options.filter((o) => values.includes(o.value));
+
+  const filtered = useMemo(() => {
+    if (!searchable) return options;
+    return options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()));
+  }, [options, search, searchable]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!open || !buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const estimated = Math.min(320, (searchable ? 70 : 0) + filtered.length * 40 + 16);
+    setOpenUpward(spaceBelow < estimated && spaceAbove > spaceBelow);
+  }, [open, filtered.length, searchable]);
+
+  const toggle = (val: string) => {
+    if (values.includes(val)) {
+      setValues(values.filter((v) => v !== val));
+    } else {
+      setValues([...values, val]);
+    }
+  };
+
+  return (
+    <div className="relative grid gap-0.5" ref={wrapperRef}>
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={cn(
+          "flex min-h-10 w-full items-center justify-between gap-2 rounded-lg border bg-card px-2 py-1 text-sm text-foreground transition-all",
+          error ? "border-destructive/50 focus:ring-destructive/10" : "border-border focus:ring-muted",
+          "hover:border-muted-foreground focus:border-foreground",
+        )}
+      >
+        <div className="flex flex-1 flex-wrap items-center gap-1">
+          {selected.length === 0 ? (
+            <span className="px-1 text-muted-foreground">{placeholder}</span>
+          ) : (
+            selected.map((opt) => (
+              <span
+                key={opt.value}
+                className="inline-flex items-center gap-1 rounded-md bg-foreground px-2 py-0.5 text-xs font-medium text-background"
+              >
+                {opt.label}
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggle(opt.value);
+                  }}
+                  className="flex h-4 w-4 cursor-pointer items-center justify-center rounded-full hover:bg-background/20"
+                >
+                  ✕
+                </span>
+              </span>
+            ))
+          )}
+        </div>
+        <svg
+          className="h-4 w-4 shrink-0 text-muted-foreground"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <FieldError message={error} />
+      {open && (
+        <div
+          className={cn(
+            "absolute left-0 z-50 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl",
+            openUpward ? "bottom-full mb-2" : "top-full mt-2",
+          )}
+        >
+          {searchable && (
+            <div className="border-b border-border p-3">
+              <input
+                placeholder="Buscar..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
+              />
+            </div>
+          )}
+          <div className="max-h-60 overflow-auto">
+            {filtered.map((option) => {
+              const checked = values.includes(option.value);
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => toggle(option.value)}
+                  className={cn(
+                    "flex w-full items-center gap-3 px-4 py-2.5 text-sm transition",
+                    "hover:bg-muted",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-4 w-4 shrink-0 items-center justify-center rounded border",
+                      checked ? "border-foreground bg-foreground text-background" : "border-border bg-card",
+                    )}
+                  >
+                    {checked && (
+                      <svg className="h-3 w-3" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M5 10l3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="truncate text-left">{option.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FormModal({
   title,
   subtitle,
