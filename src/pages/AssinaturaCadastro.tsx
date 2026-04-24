@@ -24,6 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ServicoOpt {
   id: number;
@@ -214,6 +220,8 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   searchPlaceholder,
   comissaoEnabled = true,
   hideUsos = false,
+  showOnlySelected = false,
+  onToggleShowOnlySelected,
 }: {
   items: T[];
   selected: Map<number, ServicoIncluso>;
@@ -221,10 +229,15 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   searchPlaceholder: string;
   comissaoEnabled?: boolean;
   hideUsos?: boolean;
+  showOnlySelected?: boolean;
+  onToggleShowOnlySelected?: () => void;
 }) {
   const [busca, setBusca] = useState("");
 
-  const filtered = items.filter((i) => i.nome.toLowerCase().includes(busca.toLowerCase()));
+  const filtered = items.filter((i) => {
+    if (showOnlySelected && !selected.has(i.id)) return false;
+    return i.nome.toLowerCase().includes(busca.toLowerCase());
+  });
   const allSelected = filtered.length > 0 && filtered.every((i) => selected.has(i.id));
 
   const toggle = (id: number) => {
@@ -329,101 +342,126 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                         className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {/* DESCONTO */}
-                        <div className="flex h-9 items-center rounded-md border border-border bg-card" title="Desconto">
-                          <span className="pl-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                            Desc.
-                          </span>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={sel.desconto}
-                            onChange={(e) =>
-                              update(item.id, "desconto", e.target.value.replace(/\D/g, ""))
-                            }
-                            className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
-                          />
-                          <span className="pr-2 text-xs text-muted-foreground">%</span>
-                        </div>
+                        <TooltipProvider delayDuration={200}>
+                          {/* DESCONTO */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex h-9 items-center rounded-md border border-border bg-card">
+                                <span className="pl-2 text-[11px] font-medium text-muted-foreground">
+                                  desc.
+                                </span>
+                                <input
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={sel.desconto}
+                                  onChange={(e) =>
+                                    update(item.id, "desconto", e.target.value.replace(/\D/g, ""))
+                                  }
+                                  className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                                />
+                                <span className="pr-2 text-xs text-muted-foreground">%</span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                              Desconto
+                            </TooltipContent>
+                          </Tooltip>
 
-                        {/* USOS */}
-                        {!hideUsos && (
-                          <Select
-                            value={sel.usos}
-                            onValueChange={(v) => update(item.id, "usos", v)}
-                          >
-                            <SelectTrigger
-                              className="h-9 w-[150px] rounded-md border-border bg-card px-2 text-xs font-semibold"
-                              title="Usos/mês"
-                            >
-                              <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Usos
-                              </span>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {usosOptions.map((o) => (
-                                <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
-                                  {o.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-
-                        {/* COMISSÃO */}
-                        {comissaoEnabled && (
-                          <Select
-                            value={sel.comissao}
-                            onValueChange={(v) => update(item.id, "comissao", v)}
-                          >
-                            <SelectTrigger
-                              className="h-9 w-[170px] rounded-md border-border bg-card px-2 text-xs font-semibold"
-                              title="Comissão"
-                            >
-                              <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                Com.
-                              </span>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {comissaoOptions.map((o) => (
-                                <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
-                                  {o.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-
-                        {/* % COM. ou PONTOS  */}
-                        {comissaoEnabled &&
-                          (sel.comissao === "PORCENTAGEM" || sel.comissao === "PONTOS") && (
-                            <div
-                              className="flex h-9 items-center rounded-md border border-border bg-card"
-                              title={sel.comissao === "PONTOS" ? "Pontos" : "% com."}
-                            >
-                              <span className="pl-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                {sel.comissao === "PONTOS" ? "Pts" : "%"}
-                              </span>
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                value={sel.comissaoValor}
-                                onChange={(e) =>
-                                  update(
-                                    item.id,
-                                    "comissaoValor",
-                                    e.target.value.replace(/\D/g, ""),
-                                  )
-                                }
-                                className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
-                              />
-                              <span className="pr-2 text-xs text-muted-foreground">
-                                {sel.comissao === "PONTOS" ? "pts" : "%"}
-                              </span>
-                            </div>
+                          {/* USOS */}
+                          {!hideUsos && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div>
+                                  <Select
+                                    value={sel.usos}
+                                    onValueChange={(v) => update(item.id, "usos", v)}
+                                  >
+                                    <SelectTrigger className="h-9 w-[140px] rounded-md border-border bg-card px-2 text-xs font-semibold">
+                                      <span className="mr-1 text-[11px] font-medium text-muted-foreground">
+                                        usos
+                                      </span>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {usosOptions.map((o) => (
+                                        <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                          {o.label}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                                Usos por mês
+                              </TooltipContent>
+                            </Tooltip>
                           )}
+
+                          {/* COMISSÃO */}
+                          {comissaoEnabled && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div>
+                                  <Select
+                                    value={sel.comissao}
+                                    onValueChange={(v) => update(item.id, "comissao", v)}
+                                  >
+                                    <SelectTrigger className="h-9 w-[160px] rounded-md border-border bg-card px-2 text-xs font-semibold">
+                                      <span className="mr-1 text-[11px] font-medium text-muted-foreground">
+                                        com.
+                                      </span>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {comissaoOptions.map((o) => (
+                                        <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                          {o.label}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                                Comissão
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+
+                          {/* % COM. ou PONTOS  */}
+                          {comissaoEnabled &&
+                            (sel.comissao === "PORCENTAGEM" || sel.comissao === "PONTOS") && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex h-9 items-center rounded-md border border-border bg-card">
+                                    <span className="pl-2 text-[11px] font-medium text-muted-foreground">
+                                      {sel.comissao === "PONTOS" ? "pts" : "%"}
+                                    </span>
+                                    <input
+                                      type="text"
+                                      inputMode="numeric"
+                                      value={sel.comissaoValor}
+                                      onChange={(e) =>
+                                        update(
+                                          item.id,
+                                          "comissaoValor",
+                                          e.target.value.replace(/\D/g, ""),
+                                        )
+                                      }
+                                      className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
+                                    />
+                                    <span className="pr-2 text-xs text-muted-foreground">
+                                      {sel.comissao === "PONTOS" ? "pts" : "%"}
+                                    </span>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                                  {sel.comissao === "PONTOS" ? "Pontos" : "Percentual de comissão"}
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                        </TooltipProvider>
                       </div>
                     )}
                   </div>
@@ -564,6 +602,8 @@ export default function AssinaturaCadastro() {
 
   const servicosArr = useMemo(() => Array.from(servicosMap.values()), [servicosMap]);
   const produtosArr = useMemo(() => Array.from(produtosMap.values()), [produtosMap]);
+  const [showOnlySelectedServicos, setShowOnlySelectedServicos] = useState(false);
+  const [showOnlySelectedProdutos, setShowOnlySelectedProdutos] = useState(false);
 
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
@@ -703,23 +743,65 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* SERVIÇOS */}
-            <SectionBlock id="servicos" title="Serviços" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
+            <SectionBlock
+              id="servicos"
+              title="Serviços"
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => servicosArr.length > 0 && setShowOnlySelectedServicos((v) => !v)}
+                  disabled={servicosArr.length === 0}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition",
+                    showOnlySelectedServicos
+                      ? "bg-info/15 text-info ring-1 ring-info/40"
+                      : "bg-muted text-muted-foreground hover:bg-muted/70",
+                    servicosArr.length === 0 && "cursor-default opacity-60",
+                  )}
+                >
+                  {servicosArr.length} selecionado(s)
+                </button>
+              }
+            >
               <InlineSelectableList
                 items={servicosDisponiveis}
                 selected={servicosMap}
                 setSelected={setServicosMap}
                 searchPlaceholder="Buscar serviço..."
+                showOnlySelected={showOnlySelectedServicos}
+                onToggleShowOnlySelected={() => setShowOnlySelectedServicos((v) => !v)}
               />
             </SectionBlock>
 
             {/* PRODUTOS */}
-            <SectionBlock id="produtos" title="Produtos" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{produtosArr.length} selecionado(s)</span>}>
+            <SectionBlock
+              id="produtos"
+              title="Produtos"
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => produtosArr.length > 0 && setShowOnlySelectedProdutos((v) => !v)}
+                  disabled={produtosArr.length === 0}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition",
+                    showOnlySelectedProdutos
+                      ? "bg-info/15 text-info ring-1 ring-info/40"
+                      : "bg-muted text-muted-foreground hover:bg-muted/70",
+                    produtosArr.length === 0 && "cursor-default opacity-60",
+                  )}
+                >
+                  {produtosArr.length} selecionado(s)
+                </button>
+              }
+            >
               <InlineSelectableList
                 items={produtosDisponiveis}
                 selected={produtosMap}
                 setSelected={setProdutosMap}
                 searchPlaceholder="Buscar produto..."
                 hideUsos
+                showOnlySelected={showOnlySelectedProdutos}
+                onToggleShowOnlySelected={() => setShowOnlySelectedProdutos((v) => !v)}
               />
             </SectionBlock>
 
