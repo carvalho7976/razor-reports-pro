@@ -602,6 +602,8 @@ export default function AssinaturaCadastro() {
 
   const servicosArr = useMemo(() => Array.from(servicosMap.values()), [servicosMap]);
   const produtosArr = useMemo(() => Array.from(produtosMap.values()), [produtosMap]);
+  const [showOnlySelectedServicos, setShowOnlySelectedServicos] = useState(false);
+  const [showOnlySelectedProdutos, setShowOnlySelectedProdutos] = useState(false);
 
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
@@ -741,23 +743,65 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* SERVIÇOS */}
-            <SectionBlock id="servicos" title="Serviços" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
+            <SectionBlock
+              id="servicos"
+              title="Serviços"
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => servicosArr.length > 0 && setShowOnlySelectedServicos((v) => !v)}
+                  disabled={servicosArr.length === 0}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition",
+                    showOnlySelectedServicos
+                      ? "bg-info/15 text-info ring-1 ring-info/40"
+                      : "bg-muted text-muted-foreground hover:bg-muted/70",
+                    servicosArr.length === 0 && "cursor-default opacity-60",
+                  )}
+                >
+                  {servicosArr.length} selecionado(s)
+                </button>
+              }
+            >
               <InlineSelectableList
                 items={servicosDisponiveis}
                 selected={servicosMap}
                 setSelected={setServicosMap}
                 searchPlaceholder="Buscar serviço..."
+                showOnlySelected={showOnlySelectedServicos}
+                onToggleShowOnlySelected={() => setShowOnlySelectedServicos((v) => !v)}
               />
             </SectionBlock>
 
             {/* PRODUTOS */}
-            <SectionBlock id="produtos" title="Produtos" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{produtosArr.length} selecionado(s)</span>}>
+            <SectionBlock
+              id="produtos"
+              title="Produtos"
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => produtosArr.length > 0 && setShowOnlySelectedProdutos((v) => !v)}
+                  disabled={produtosArr.length === 0}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition",
+                    showOnlySelectedProdutos
+                      ? "bg-info/15 text-info ring-1 ring-info/40"
+                      : "bg-muted text-muted-foreground hover:bg-muted/70",
+                    produtosArr.length === 0 && "cursor-default opacity-60",
+                  )}
+                >
+                  {produtosArr.length} selecionado(s)
+                </button>
+              }
+            >
               <InlineSelectableList
                 items={produtosDisponiveis}
                 selected={produtosMap}
                 setSelected={setProdutosMap}
                 searchPlaceholder="Buscar produto..."
                 hideUsos
+                showOnlySelected={showOnlySelectedProdutos}
+                onToggleShowOnlySelected={() => setShowOnlySelectedProdutos((v) => !v)}
               />
             </SectionBlock>
 
