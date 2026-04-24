@@ -930,28 +930,30 @@ export default function AssinaturaCadastro() {
               </div>
 
               {/* Body */}
-              <div className="space-y-4 p-5">
+              <div className="space-y-3 p-4">
                 {/* Inclusos */}
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-sky-500">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-sky-500">
                     Incluso:
                   </p>
 
-                  <ul className="mt-3 flex flex-col gap-2">
+                  <ul className="mt-2 flex flex-col gap-1.5">
                     {servicosArr.length === 0 && produtosArr.length === 0 && beneficios.length === 0 && (
-                      <li className="text-sm italic text-muted-foreground">
+                      <li className="text-xs italic text-muted-foreground">
                         Configure os itens do plano.
                       </li>
                     )}
 
                     {/* Serviços */}
                     {servicosArr.map((s) => (
-                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-xs font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>
-                          {s.usos === "ILIMITADO" ? "Ilimitado" : s.usos} {nomeServico(s.id)}
+                          {s.usos === "ILIMITADO"
+                            ? `${nomeServico(s.id)} ilimitado`
+                            : `${s.usos}x ${nomeServico(s.id)}`}
                           {s.desconto !== "0" && s.desconto !== "100" && (
-                            <span className="ml-1 normal-case text-muted-foreground">
+                            <span className="ml-1 text-muted-foreground">
                               ({s.desconto}% desc)
                             </span>
                           )}
@@ -961,19 +963,25 @@ export default function AssinaturaCadastro() {
 
                     {/* Produtos */}
                     {produtosArr.length > 0 && (
-                      <li className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li className="flex items-start gap-2 text-xs font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>Descontos em produtos</span>
                       </li>
                     )}
 
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => (
-                      <li key={`b-${idx}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li key={`b-${idx}`} className="flex items-start gap-2 text-xs font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>{b}</span>
                       </li>
                     ))}
+
+                    {/* Dias válidos */}
+                    <li className="flex items-start gap-2 text-xs font-medium text-foreground">
+                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <span>{diasValidosLabel}</span>
+                    </li>
                   </ul>
                 </div>
 
