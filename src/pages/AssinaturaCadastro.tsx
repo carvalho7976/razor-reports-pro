@@ -278,7 +278,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
             placeholder={searchPlaceholder}
-            className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+            className="h-10 w-full rounded-lg border border-info/50 bg-card pl-9 pr-3 text-sm text-foreground outline-none transition-all focus:border-info/60 focus:ring-2 focus:ring-info/40"
           />
         </div>
         <button
@@ -763,7 +763,7 @@ export default function AssinaturaCadastro() {
                     }
                   }}
                   placeholder="Ex: Traga um amigo no aniversário"
-                  className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  className="h-10 flex-1 rounded-lg border border-border bg-card px-3 text-sm outline-none transition-all focus:border-info/60 focus:ring-2 focus:ring-info/40"
                 />
                 <button
                   type="button"
