@@ -936,7 +936,35 @@ export default function AssinaturaCadastro() {
                           <td className="px-3 py-2.5 text-center text-sm font-medium text-muted-foreground">
                             {idx + 1}
                           </td>
-                          <td className="px-3 py-2.5 text-sm text-foreground">{b}</td>
+                          <td className="px-3 py-2.5 text-sm text-foreground">
+                            {editingBeneficioIdx === idx ? (
+                              <input
+                                autoFocus
+                                value={editingBeneficioValue}
+                                onChange={(e) => setEditingBeneficioValue(e.target.value)}
+                                onBlur={commitEditBeneficio}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    commitEditBeneficio();
+                                  } else if (e.key === "Escape") {
+                                    setEditingBeneficioIdx(null);
+                                    setEditingBeneficioValue("");
+                                  }
+                                }}
+                                className="h-8 w-full rounded-md border border-info/50 bg-card px-2 text-sm outline-none focus:border-info/60 focus:ring-2 focus:ring-info/40"
+                              />
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => startEditBeneficio(idx)}
+                                className="-mx-1 w-full rounded-md px-1 py-0.5 text-left text-sm text-foreground transition hover:bg-muted/60"
+                                title="Clique para editar"
+                              >
+                                {b}
+                              </button>
+                            )}
+                          </td>
                           <td className="px-3 py-2.5">
                             <div className="flex items-center justify-center gap-1">
                               <button
