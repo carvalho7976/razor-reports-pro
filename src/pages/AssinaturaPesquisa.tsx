@@ -354,7 +354,7 @@ export default function ListaPlanos() {
       pinned: true,
       render: (v, row) => (
         <div className="flex items-center gap-2">
-          <span className="font-medium text-foreground">{v}</span>
+          <span className="font-bold text-foreground">{v}</span>
           {row.destaque && (
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-amber-100 text-amber-700 border-0">
               destaque
@@ -367,32 +367,7 @@ export default function ListaPlanos() {
       key: "preco",
       label: "Preço",
       align: "right",
-      render: (v) => <span className="font-medium tabular-nums">{R$(v)}</span>,
-    },
-    {
-      key: "cortesIncluidos",
-      label: "Cortes",
-      align: "center",
-      render: (v) => <span className="text-muted-foreground tabular-nums">{v > 0 ? `${v}x` : "—"}</span>,
-    },
-    {
-      key: "barbasIncluidas",
-      label: "Barbas",
-      align: "center",
-      render: (v) => <span className="text-muted-foreground tabular-nums">{v > 0 ? `${v}x` : "—"}</span>,
-    },
-    {
-      key: "desconto",
-      label: "Desconto",
-      align: "center",
-      render: (v) =>
-        v > 0 ? (
-          <Badge variant="secondary" className="text-[11px] font-medium bg-emerald-50 text-emerald-700 border-0">
-            {v}% off
-          </Badge>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        ),
+      render: (v) => <span className="tabular-nums">{R$(v)}</span>,
     },
     {
       key: "assinantes",
@@ -400,16 +375,10 @@ export default function ListaPlanos() {
       align: "center",
       render: (v) => (
         <div className="flex items-center justify-center gap-1">
-          <Users className="h-3 w-3 text-muted-foreground" />
-          <span className="font-medium tabular-nums">{v}</span>
+          <Star className="h-3 w-3 text-muted-foreground" />
+          <span className="tabular-nums">{v}</span>
         </div>
       ),
-    },
-    {
-      key: "vendas",
-      label: "Vendas",
-      align: "center",
-      render: (v) => <span className="tabular-nums text-muted-foreground">{v}</span>,
     },
     {
       key: "status",
@@ -419,7 +388,7 @@ export default function ListaPlanos() {
         <Switch
           checked={v === "ativo"}
           onCheckedChange={() => toggleStatus(row)}
-          className="data-[state=checked]:bg-emerald-500"
+          className="scale-90 data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300"
         />
       ),
     },
@@ -432,7 +401,13 @@ export default function ListaPlanos() {
       render: (_, row) => (
         <ActionsMenu
           items={[
+            { label: "Visualizar", icon: <Eye className="h-4 w-4" />, onClick: () => openView(row) },
             { label: "Editar", icon: <Pencil className="h-4 w-4" />, onClick: () => openEdit(row) },
+            {
+              label: "Assinantes",
+              icon: <Users className="h-4 w-4" />,
+              onClick: goAssinantes,
+            },
             {
               label: row.destaque ? "Remover destaque" : "Marcar destaque",
               icon: <Star className="h-4 w-4" />,
