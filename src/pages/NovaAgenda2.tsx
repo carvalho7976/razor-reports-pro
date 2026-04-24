@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
-import { DeleteModal } from "@/components/FormModal";
+import { DeleteModal, FormModal, Dropdown } from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
@@ -1061,61 +1061,50 @@ export default function NovaAgenda2() {
           }
         }}
       >
-        <DialogContent className="max-w-md p-0 gap-0">
-          <div className="border-b border-border px-5 py-4">
-            <h2 className="text-lg font-semibold text-foreground">Confirme o profissional</h2>
-            {chamarItem && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {chamarItem.nome} · {chamarItem.servico}
-              </p>
-            )}
-          </div>
-
-          <div className="grid gap-3 px-5 py-4">
-            <div className="grid gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Profissional</Label>
-              <Select value={chamarProf} onValueChange={setChamarProf}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {profissionais.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-5 py-3">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!chamarProf}
-              onClick={() => {
-                if (chamarItem) removerFila(chamarItem.id);
-                setChamarItem(null);
-                setChamarProf("");
-              }}
-              className="h-9 border-foreground bg-card text-foreground hover:bg-accent"
-            >
-              Atender e pagar
-            </Button>
-            <Button
-              size="sm"
-              disabled={!chamarProf}
-              onClick={() => {
-                if (chamarItem) removerFila(chamarItem.id);
-                setChamarItem(null);
-                setChamarProf("");
-              }}
-              className="h-9 gap-2 bg-foreground text-background hover:bg-foreground/90"
-            >
-              Atender
-            </Button>
-          </div>
+        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+          <FormModal
+            title="Confirme o profissional"
+            subtitle={chamarItem ? `${chamarItem.nome} · ${chamarItem.servico}` : undefined}
+            onClose={() => {
+              setChamarItem(null);
+              setChamarProf("");
+            }}
+            footer={
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={!chamarProf}
+                  onClick={() => {
+                    if (chamarItem) removerFila(chamarItem.id);
+                    setChamarItem(null);
+                    setChamarProf("");
+                  }}
+                  className="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-foreground bg-card px-6 text-sm font-semibold text-foreground transition-colors hover:bg-muted active:scale-[0.98] disabled:opacity-50"
+                >
+                  Atender e pagar
+                </button>
+                <button
+                  type="button"
+                  disabled={!chamarProf}
+                  onClick={() => {
+                    if (chamarItem) removerFila(chamarItem.id);
+                    setChamarItem(null);
+                    setChamarProf("");
+                  }}
+                  className="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 active:scale-[0.98] disabled:opacity-50"
+                >
+                  Atender
+                </button>
+              </div>
+            }
+          >
+            <Dropdown
+              label="Profissional"
+              value={chamarProf}
+              setValue={setChamarProf}
+              options={profissionais.map((p) => ({ value: p.id, label: p.nome }))}
+            />
+          </FormModal>
         </DialogContent>
       </Dialog>
     </AppLayout>
