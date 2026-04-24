@@ -379,6 +379,8 @@ export default function NovaAgenda2() {
   const [filtroDias, setFiltroDias] = useState<string>("1");
   const [addFilaOpen, setAddFilaOpen] = useState(false);
   const [filaDeleteItem, setFilaDeleteItem] = useState<FilaItem | null>(null);
+  const [chamarItem, setChamarItem] = useState<FilaItem | null>(null);
+  const [chamarProf, setChamarProf] = useState<string>("");
 
   const [filtroOpen, setFiltroOpen] = useState(false);
   const [filtroBusca, setFiltroBusca] = useState("");
@@ -701,6 +703,14 @@ export default function NovaAgenda2() {
 
                           <button
                             type="button"
+                            onClick={() => {
+                              setChamarItem(item);
+                              setChamarProf(
+                                item.prefere
+                                  ? profissionais.find((p) => p.nome === item.prefere)?.id ?? ""
+                                  : ""
+                              );
+                            }}
                             className="inline-flex h-7 items-center rounded-md border border-foreground bg-card px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
                           >
                             Chamar
