@@ -921,7 +921,7 @@ export default function AssinaturaCadastro() {
                     {/* Serviços */}
                     {servicosArr.map((s) => (
                       <li key={`s-${s.id}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>
                           {s.usos === "ILIMITADO" ? "Ilimitado" : s.usos} {nomeServico(s.id)}
                           {s.desconto !== "0" && s.desconto !== "100" && (
@@ -936,7 +936,7 @@ export default function AssinaturaCadastro() {
                     {/* Produtos */}
                     {produtosArr.length > 0 && (
                       <li className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>Descontos em produtos</span>
                       </li>
                     )}
@@ -944,34 +944,13 @@ export default function AssinaturaCadastro() {
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => (
                       <li key={`b-${idx}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>{b}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Produtos detalhe (collapse) */}
-                {produtosArr.length > 0 && (
-                  <div className="rounded-lg border border-border bg-muted/30 p-3">
-                    <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Produtos com desconto
-                    </p>
-                    <ul className="flex flex-col gap-1">
-                      {produtosArr.map((p) => (
-                        <li
-                          key={`pd-${p.id}`}
-                          className="flex items-center justify-between gap-2 text-xs text-foreground"
-                        >
-                          <span className="truncate">{nomeProduto(p.id)}</span>
-                          <span className="shrink-0 font-semibold text-emerald-600">
-                            -{p.desconto}%
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
 
               {/* Footer (preço + status) */}
