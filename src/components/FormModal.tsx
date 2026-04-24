@@ -587,6 +587,7 @@ export function DatePickerField({
   error?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
 
   const dateValue = useMemo(() => {
     if (!value) return undefined;
@@ -597,25 +598,53 @@ export function DatePickerField({
     }
   }, [value]);
 
+  useEffect(() => {
+    setText(dateValue ? format(dateValue, "dd/MM/yyyy") : "");
+  }, [dateValue]);
+
+  const handleTextChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 8);
+    let masked = digits;
+    if (digits.length > 4) masked = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    else if (digits.length > 2) masked = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    setText(masked);
+    if (digits.length === 8) {
+      const dd = digits.slice(0, 2);
+      const mm = digits.slice(2, 4);
+      const yyyy = digits.slice(4);
+      const d = new Date(`${yyyy}-${mm}-${dd}T12:00:00`);
+      if (!isNaN(d.getTime())) onChange(`${yyyy}-${mm}-${dd}`);
+    } else if (digits.length === 0) {
+      onChange("");
+    }
+  };
+
   return (
     <div className="grid gap-0.5">
       <label className="text-[13px] font-semibold text-foreground">{label}</label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className={cn(
-              "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm transition-all",
-              error
-                ? "border-destructive/50 focus:ring-destructive/10"
-                : "border-border focus:ring-muted",
-              value ? "text-foreground" : "text-muted-foreground",
-            )}
-          >
-            <span>{dateValue ? format(dateValue, "dd/MM/yyyy") : "Selecione a data"}</span>
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-          </button>
-        </PopoverTrigger>
+      <div
+        className={cn(
+          "flex h-10 w-full items-center gap-1 rounded-lg border bg-card pl-3 pr-1 text-sm transition-all",
+          error ? "border-destructive/50" : "border-border focus-within:border-foreground focus-within:ring-4 focus-within:ring-muted",
+        )}
+      >
+        <input
+          value={text}
+          onChange={(e) => handleTextChange(e.target.value)}
+          placeholder="dd/mm/aaaa"
+          inputMode="numeric"
+          className="h-full flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        />
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-label="Abrir calendário"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <CalendarIcon className="h-4 w-4" />
+            </button>
+          </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start" sideOffset={4} style={{ zIndex: 9999 }}>
           <CalendarComponent
             mode="single"
@@ -646,7 +675,8 @@ export function DatePickerField({
             </button>
           </div>
         </PopoverContent>
-      </Popover>
+        </Popover>
+      </div>
       <FieldError message={error} />
     </div>
   );
