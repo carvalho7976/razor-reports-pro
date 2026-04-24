@@ -152,8 +152,8 @@ function CurrencyInput({
 }) {
   const formatted = value || "0,00";
   return (
-    <div className="grid min-w-0 gap-1.5">
-      <label className="text-sm font-medium text-foreground">{label}</label>
+    <div className="grid min-w-0 gap-0.5">
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
       <div className="flex h-10 w-full min-w-0 items-center overflow-hidden rounded-lg border border-info/50 bg-card text-sm focus-within:border-info/60 focus-within:ring-2 focus-within:ring-info/40">
         <span className="shrink-0 pl-3 pr-1 text-muted-foreground">R$</span>
         <input
