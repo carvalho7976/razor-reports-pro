@@ -1135,36 +1135,75 @@ export default function AssinaturaCadastro() {
                       </li>
                     )}
 
-                    {/* Serviços */}
-                    {servicosArr.map((s) => (
-                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                    {/* Serviços 100% gratuitos (inclusos individualmente) */}
+                    {servicosInclusos.map((s) => (
+                      <li key={`s-${s.id}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span>
+                        <span className="flex-1">
                           {s.usos === "ILIMITADO"
                             ? `${nomeServico(s.id)} ilimitado`
                             : `${s.usos}x ${nomeServico(s.id)}`}
-                          {s.desconto !== "0" && s.desconto !== "100" && (
-                            <span className="ml-1 text-muted-foreground">
-                              ({s.desconto}% desc)
-                            </span>
-                          )}
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => removerServicoResumo(s.id)}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover do plano"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </li>
                     ))}
 
+                    {/* Serviços com desconto (% < 100) agrupados */}
+                    {servicosComDesconto.length > 0 && (
+                      <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                        <span className="flex-1">Descontos em serviços</span>
+                        <button
+                          type="button"
+                          onClick={removerTodosServicosComDesconto}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover descontos em serviços"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
+                      </li>
+                    )}
+
                     {/* Produtos */}
                     {produtosArr.length > 0 && (
-                      <li className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                      <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span>Descontos em produtos</span>
+                        <span className="flex-1">Descontos em produtos</span>
+                        <button
+                          type="button"
+                          onClick={removerTodosProdutos}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover descontos em produtos"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </li>
                     )}
 
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => (
-                      <li key={`b-${idx}`} className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                      <li key={`b-${idx}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span>{b}</span>
+                        <span className="flex-1">{b}</span>
+                        <button
+                          type="button"
+                          onClick={() => removerBeneficio(idx)}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Remover benefício"
+                          title="Remover"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </li>
                     ))}
 
