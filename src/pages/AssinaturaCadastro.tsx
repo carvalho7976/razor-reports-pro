@@ -677,6 +677,28 @@ export default function AssinaturaCadastro() {
   const [showOnlySelectedServicos, setShowOnlySelectedServicos] = useState(false);
   const [showOnlySelectedProdutos, setShowOnlySelectedProdutos] = useState(false);
 
+  // Serviços 100% gratuitos = inclusos individualmente. Outros = "Descontos em serviços".
+  const servicosInclusos = useMemo(
+    () => servicosArr.filter((s) => s.desconto === "100"),
+    [servicosArr],
+  );
+  const servicosComDesconto = useMemo(
+    () => servicosArr.filter((s) => s.desconto !== "100"),
+    [servicosArr],
+  );
+
+  const removerServicoResumo = (id: number) => {
+    const next = new Map(servicosMap);
+    next.delete(id);
+    setServicosMap(next);
+  };
+  const removerTodosProdutos = () => setProdutosMap(new Map());
+  const removerTodosServicosComDesconto = () => {
+    const next = new Map(servicosMap);
+    servicosComDesconto.forEach((s) => next.delete(s.id));
+    setServicosMap(next);
+  };
+
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
   const labelUsos = (v: string) =>
