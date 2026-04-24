@@ -312,20 +312,20 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                       : "border-border bg-card hover:bg-muted/40",
                   )}
                 >
-                  <div className="flex items-center gap-3 px-3 py-2.5">
+                  <div className="flex flex-wrap items-center gap-3 px-3 py-2.5 sm:flex-nowrap">
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggle(item.id)}
                       onClick={(e) => e.stopPropagation()}
                       className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                     />
-                    <span className="flex-1 truncate text-sm font-medium text-foreground">
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
                       {item.nome}
                     </span>
 
                     {isSelected && (
                       <div
-                        className="flex flex-wrap items-end gap-2.5"
+                        className="flex w-full flex-wrap items-end gap-2.5 sm:w-auto"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {/* DESCONTO */}
