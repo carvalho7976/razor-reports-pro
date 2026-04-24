@@ -134,7 +134,7 @@ interface ProdutoIncluso {
 
 const sections = [
   { id: "dados", label: "Dados" },
-  { id: "servicos", label: "Serviços" },
+  { id: "servicos", label: "Serviços (opcional)" },
   { id: "produtos", label: "Produtos (opcional)" },
   { id: "beneficios", label: "Benefícios Extras (opcional)" },
   { id: "disponibilidade", label: "Disponibilidade" },
@@ -175,7 +175,7 @@ function SectionBlock({
   description,
   children,
   rightSlot,
-  className = "",
+   className = "border-primary-foreground",
 }: {
   id?: string;
   title: string;
@@ -189,7 +189,7 @@ function SectionBlock({
       id={id}
       className={cn("scroll-mt-24 rounded-xl border border-border bg-card p-4", className)}
     >
-      <div className="mb-3 flex items-start justify-between gap-3">
+      <div className="mb-3 flex items-start justify-between gap-3 text-xs">
         <div>
           <h2 className="text-base font-semibold text-foreground">{title}</h2>
           {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
@@ -602,7 +602,7 @@ export default function AssinaturaCadastro() {
       <div className="flex flex-col gap-0">
         {/* HEADER */}
         <div className="mx-4 mt-4 sm:mx-6">
-          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="flex flex-col items-stretch gap-3 sm:items-start sm:justify-between sm:gap-4">
             <div className="pt-1">
               <h1 className="text-lg font-bold text-foreground sm:text-lg">
                 {editing ? "Editar Plano" : "Novo Plano"}
@@ -693,7 +693,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* SERVIÇOS */}
-            <SectionBlock id="servicos" title="Serviços" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
+            <SectionBlock id="servicos" title="Serviços (opcional)" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={servicosDisponiveis}
                 selected={servicosMap}
