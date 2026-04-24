@@ -72,7 +72,9 @@ export function Dropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [openUpward, setOpenUpward] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const selected = options.find((o) => o.value === value);
 
@@ -92,10 +94,20 @@ export function Dropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!open || !buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const estimated = Math.min(280, (searchable ? 70 : 0) + filtered.length * 44 + 16);
+    setOpenUpward(spaceBelow < estimated && spaceAbove > spaceBelow);
+  }, [open, filtered.length, searchable]);
+
   return (
     <div className="relative grid gap-0.5" ref={wrapperRef}>
       <label className="text-[13px] font-semibold text-foreground">{label}</label>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
@@ -117,7 +129,12 @@ export function Dropdown({
       </button>
       <FieldError message={error} />
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+        <div
+          className={cn(
+            "absolute left-0 z-50 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl",
+            openUpward ? "bottom-full mb-2" : "top-full mt-2",
+          )}
+        >
           {searchable && (
             <div className="border-b border-border p-3">
               <input
