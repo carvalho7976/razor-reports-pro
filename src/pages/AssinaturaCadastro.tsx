@@ -284,7 +284,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
       </div>
 
       {/* List */}
-      <div className="max-h-[420px] overflow-y-auto p-2">
+      <div className="max-h-[260px] overflow-y-auto p-2">
         {filtered.length === 0 ? (
           <p className="px-4 py-8 text-center text-sm text-muted-foreground">
             Nenhum item encontrado.
@@ -297,8 +297,9 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
               return (
                 <li
                   key={item.id}
+                  onClick={() => toggle(item.id)}
                   className={cn(
-                    "rounded-lg border transition",
+                    "cursor-pointer rounded-lg border transition",
                     isSelected
                       ? "border-blue-500/40 bg-blue-500/5"
                       : "border-border bg-card hover:bg-muted/40",
@@ -308,6 +309,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggle(item.id)}
+                      onClick={(e) => e.stopPropagation()}
                       className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                     />
                     <span className="flex-1 truncate text-sm font-medium text-foreground">
@@ -315,7 +317,10 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                     </span>
 
                     {isSelected && (
-                      <div className="flex flex-wrap items-end gap-2.5">
+                      <div
+                        className="flex flex-wrap items-end gap-2.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {/* DESCONTO */}
                         <div className="flex flex-col gap-0.5">
                           <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -589,7 +594,7 @@ export default function AssinaturaCadastro() {
         </div>
 
         {/* CONTENT */}
-        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="mx-6 mt-5 grid grid-cols-1 gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_280px]">
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
             {/* DADOS DO PLANO */}
@@ -815,7 +820,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition",
                             ativo
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                              ? "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                           )}
                         >
@@ -846,7 +851,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "group flex flex-col items-center gap-1.5 rounded-lg border p-2 transition",
                             ativo
-                              ? "border-emerald-500/40 bg-emerald-500/5"
+                              ? "border-blue-500/40 bg-blue-500/5"
                               : "border-border bg-card opacity-60 hover:opacity-100",
                           )}
                         >
@@ -860,7 +865,7 @@ export default function AssinaturaCadastro() {
                               {p.iniciais}
                             </div>
                             {ativo && (
-                              <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background fill-emerald-500 text-white" />
+                              <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background fill-blue-500 text-white" />
                             )}
                           </div>
                           <span
@@ -916,7 +921,7 @@ export default function AssinaturaCadastro() {
                     {/* Serviços */}
                     {servicosArr.map((s) => (
                       <li key={`s-${s.id}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>
                           {s.usos === "ILIMITADO" ? "Ilimitado" : s.usos} {nomeServico(s.id)}
                           {s.desconto !== "0" && s.desconto !== "100" && (
@@ -931,7 +936,7 @@ export default function AssinaturaCadastro() {
                     {/* Produtos */}
                     {produtosArr.length > 0 && (
                       <li className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>Descontos em produtos</span>
                       </li>
                     )}
@@ -939,34 +944,13 @@ export default function AssinaturaCadastro() {
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => (
                       <li key={`b-${idx}`} className="flex items-start gap-2 text-sm font-semibold uppercase text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-pink-500/20 text-pink-500" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>{b}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Produtos detalhe (collapse) */}
-                {produtosArr.length > 0 && (
-                  <div className="rounded-lg border border-border bg-muted/30 p-3">
-                    <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Produtos com desconto
-                    </p>
-                    <ul className="flex flex-col gap-1">
-                      {produtosArr.map((p) => (
-                        <li
-                          key={`pd-${p.id}`}
-                          className="flex items-center justify-between gap-2 text-xs text-foreground"
-                        >
-                          <span className="truncate">{nomeProduto(p.id)}</span>
-                          <span className="shrink-0 font-semibold text-emerald-600">
-                            -{p.desconto}%
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
 
               {/* Footer (preço + status) */}
@@ -990,12 +974,6 @@ export default function AssinaturaCadastro() {
                   </span>
                 </div>
 
-                <button
-                  type="button"
-                  className="mt-3 w-full rounded-lg bg-sky-500 py-2.5 text-sm font-bold uppercase tracking-wide text-white shadow-sm transition hover:bg-sky-600"
-                >
-                  Assinar
-                </button>
               </div>
             </div>
           </aside>
