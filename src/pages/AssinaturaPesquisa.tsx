@@ -251,6 +251,92 @@ type ModalState =
   | { type: "delete"; item: Plano }
   | null;
 
+function PlanoResumoCard({ plano, onClose }: { plano: Plano; onClose: () => void }) {
+  // Lista mock de itens inclusos baseada no plano
+  const inclusos: string[] = [];
+  if (plano.cortesIncluidos > 0)
+    inclusos.push(
+      plano.cortesIncluidos > 4
+        ? "Cortes ilimitados"
+        : `${plano.cortesIncluidos}x corte`,
+    );
+  if (plano.barbasIncluidas > 0)
+    inclusos.push(
+      plano.barbasIncluidas > 4
+        ? "Barbas ilimitadas"
+        : `${plano.barbasIncluidas}x barba`,
+    );
+  if (plano.desconto > 0) inclusos.push("Descontos em produtos");
+  inclusos.push("Válido todos os dias");
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2 border-b border-border p-4">
+        <h3 className="text-lg font-bold uppercase leading-tight text-foreground">
+          {plano.nome}
+        </h3>
+        <div className="flex items-center gap-1.5">
+          {plano.destaque && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-600">
+              <Star className="h-3 w-3 fill-amber-500" />
+              Destaque
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            aria-label="Fechar"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="space-y-3 p-4">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-sky-500">
+          Incluso:
+        </p>
+        <ul className="flex flex-col gap-1.5">
+          {inclusos.map((b, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2 text-[13px] font-medium text-foreground"
+            >
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-border bg-card px-4 py-3">
+        <div className="flex items-end justify-between gap-2">
+          <div>
+            <span className="text-lg font-bold text-foreground">
+              {R$(plano.preco)}
+            </span>
+            <span className="ml-1 text-xs text-muted-foreground">Mensal</span>
+          </div>
+          <span
+            className={cn(
+              "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+              plano.status === "ativo"
+                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
+            {plano.status === "ativo" ? "Ativo" : "Inativo"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ListaPlanos() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("todos");
