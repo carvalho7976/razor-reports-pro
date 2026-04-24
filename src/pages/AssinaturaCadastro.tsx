@@ -645,7 +645,7 @@ export default function AssinaturaCadastro() {
               description="Identificação e cobrança do plano de assinatura."
             >
               <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1.8fr)_minmax(140px,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)]">
                   <TextField
                     label="Nome do plano *"
                     value={nome}
@@ -861,7 +861,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition",
                             ativo
-                              ? "border-foreground bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                              ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                           )}
                         >
@@ -892,7 +892,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "group flex flex-col items-center gap-1.5 rounded-lg border p-2 transition",
                             ativo
-                              ? "border-foreground bg-blue-500/5"
+                              ? "border-blue-500 bg-blue-500/5"
                               : "border-border bg-card opacity-60 hover:opacity-100",
                           )}
                         >
