@@ -12,6 +12,7 @@ import {
   Search,
   Star,
   CheckCircle2,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -939,6 +940,7 @@ export default function AssinaturaCadastro() {
 </SectionBlock>
 
           {/* SIDEBAR DIREITA - PREVIEW DO PLANO */}
+          </div>
           <aside className="lg:sticky lg:top-16 lg:self-start">
             <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
               {/* Header */}
