@@ -655,7 +655,7 @@ export default function AssinaturaCadastro() {
                     placeholder="Ex: Estagiário"
                     error={showError("nome")}
                   />
-                  <CurrencyInput label="Valor" value={valor} onChange={setValor} />
+                  <CurrencyInput label="Preço" value={valor} onChange={setValor} />
                   <Dropdown
                     label="Recorrência"
                     value={recorrencia}
