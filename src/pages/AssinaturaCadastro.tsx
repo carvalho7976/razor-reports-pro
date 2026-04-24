@@ -649,7 +649,7 @@ export default function AssinaturaCadastro() {
         <div>
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-3">
             <div className="flex items-center gap-2.5">
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-none">
                 {editing ? "Editar Plano" : "Novo Plano"}
               </h1>
               <AulaButton onOpen={() => setAulaOpen(true)} />
@@ -658,7 +658,7 @@ export default function AssinaturaCadastro() {
             <button
               type="button"
               onClick={handleSalvar}
-              className="inline-flex h-10 w-full shrink-0 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background sm:w-auto"
+              className="inline-flex h-8 w-full shrink-0 items-center justify-center rounded-lg bg-foreground px-4 text-sm font-semibold text-background sm:w-auto"
             >
               {editing ? "Salvar alterações" : "Criar plano"}
             </button>
