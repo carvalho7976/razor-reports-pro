@@ -175,7 +175,7 @@ function SectionBlock({
   description,
   children,
   rightSlot,
-  className = "",
+   className = "border-primary-foreground",
 }: {
   id?: string;
   title: string;
@@ -189,7 +189,7 @@ function SectionBlock({
       id={id}
       className={cn("scroll-mt-24 rounded-xl border border-border bg-card p-4", className)}
     >
-      <div className="mb-3 flex items-start justify-between gap-3">
+      <div className="mb-3 flex items-start justify-between gap-3 text-xs">
         <div>
           <h2 className="text-base font-semibold text-foreground">{title}</h2>
           {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
@@ -693,7 +693,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* SERVIÇOS */}
-            <SectionBlock id="servicos" title="Serviços" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
+            <SectionBlock id="servicos" title="Serviços (opcional)" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={servicosDisponiveis}
                 selected={servicosMap}
