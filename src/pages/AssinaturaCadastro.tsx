@@ -297,9 +297,9 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="rounded-xl bg-card">
       {/* Search header */}
-      <div className="flex flex-col gap-2 border-b border-border p-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 pb-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -327,7 +327,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                         applyBulkDiscount();
                       }
                     }}
-                    placeholder="%"
+                    placeholder="0"
                     className="h-full w-9 bg-transparent text-right text-sm outline-none"
                   />
                   <span className="pr-1.5 text-xs text-muted-foreground">%</span>
