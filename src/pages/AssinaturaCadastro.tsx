@@ -133,10 +133,10 @@ interface ProdutoIncluso {
 }
 
 const sections = [
-  { id: "dados", label: "Dados do plano" },
+  { id: "dados", label: "Dados" },
   { id: "servicos", label: "Serviços" },
-  { id: "produtos", label: "Produtos" },
-  { id: "beneficios", label: "Benefícios" },
+  { id: "produtos", label: "Produtos (opcional)" },
+  { id: "beneficios", label: "Benefícios Extras (opcional)" },
   { id: "disponibilidade", label: "Disponibilidade" },
 ];
 
@@ -604,8 +604,8 @@ export default function AssinaturaCadastro() {
         <div className="mx-4 mt-4 sm:mx-6">
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="pt-1">
-              <h1 className="text-lg font-bold text-foreground sm:text-xl">
-                {editing ? "Editar plano de assinatura" : "Novo plano de assinatura"}
+              <h1 className="text-lg font-bold text-foreground sm:text-lg">
+                {editing ? "Editar Plano" : "Novo Plano"}
               </h1>
               <p className="mt-1 text-xs text-muted-foreground sm:text-sm">​</p>
             </div>
@@ -644,18 +644,14 @@ export default function AssinaturaCadastro() {
           {/* COLUNA PRINCIPAL */}
           <div className="flex flex-col gap-5">
             {/* DADOS DO PLANO */}
-            <SectionBlock
-              id="dados"
-              title="Dados do plano"
-              description="Identificação e cobrança do plano de assinatura."
-            >
+            <SectionBlock id="dados" title="Dados">
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1.8fr)_minmax(140px,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)]">
                   <TextField
-                    label="Nome do plano *"
+                    label="Nome do Plano *"
                     value={nome}
                     onChange={setNome}
-                    placeholder="Ex: Francez Plano Master"
+                    placeholder="Ex: Estagiário"
                     error={showError("nome")}
                   />
                   <CurrencyInput label="Valor" value={valor} onChange={setValor} />
@@ -665,21 +661,14 @@ export default function AssinaturaCadastro() {
                     setValue={setRecorrencia}
                     options={recorrenciaOptions}
                   />
-                  <Dropdown
-                    label="Forma de pagamento"
-                    value={formaPagamento}
-                    setValue={setFormaPagamento}
-                    options={formaPagamentoOptions}
-                  />
+                  <Dropdown label="Forma de Pagamento" value={formaPagamento} setValue={setFormaPagamento} options={formaPagamentoOptions} />
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div>
                       <p className="text-sm font-semibold text-foreground">Disponível na vitrine</p>
-                      <p className="text-xs text-muted-foreground">
-                        Quando ativo, fica disponível para venda.
-                      </p>
+                      <p className="text-xs text-muted-foreground">​</p>
                     </div>
                     <Switch checked={disponivelVenda} onCheckedChange={setDisponivelVenda} />
                   </div>
@@ -694,9 +683,7 @@ export default function AssinaturaCadastro() {
                       />
                       <div>
                         <p className="text-sm font-semibold text-foreground">Destaque</p>
-                        <p className="text-xs text-muted-foreground">
-                          Marca este plano como destaque na vitrine.
-                        </p>
+                        <p className="text-xs text-muted-foreground" />
                       </div>
                     </div>
                     <Switch checked={destaque} onCheckedChange={setDestaque} />
@@ -706,16 +693,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* SERVIÇOS */}
-            <SectionBlock
-              id="servicos"
-              title="Serviços inclusos"
-              description="Selecione os serviços e configure desconto, usos e comissão."
-              rightSlot={
-                <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                  {servicosArr.length} selecionado(s)
-                </span>
-              }
-            >
+            <SectionBlock id="servicos" title="Serviços" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{servicosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={servicosDisponiveis}
                 selected={servicosMap}
@@ -725,16 +703,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* PRODUTOS */}
-            <SectionBlock
-              id="produtos"
-              title="Desconto em produtos"
-              description="Selecione os produtos com desconto incluído no plano."
-              rightSlot={
-                <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                  {produtosArr.length} selecionado(s)
-                </span>
-              }
-            >
+            <SectionBlock id="produtos" title="Produtos (opcional)" rightSlot={<span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{produtosArr.length} selecionado(s)</span>}>
               <InlineSelectableList
                 items={produtosDisponiveis}
                 selected={produtosMap}
@@ -745,11 +714,7 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* BENEFÍCIOS */}
-            <SectionBlock
-              id="beneficios"
-              title="Benefícios"
-              description="Itens exibidos no plano. Use as setas para reorganizar."
-            >
+            <SectionBlock id="beneficios" title="Benefícios Extras (opcional)">
               <div className="flex gap-2">
                 <input
                   value={novoBeneficio}
@@ -844,16 +809,12 @@ export default function AssinaturaCadastro() {
             </SectionBlock>
 
             {/* DISPONIBILIDADE */}
-            <SectionBlock
-              id="disponibilidade"
-              title="Disponibilidade"
-              description="Dias e profissionais que aceitam o plano."
-            >
+            <SectionBlock id="disponibilidade" title="Disponibilidade">
               <div className="grid gap-6">
                 <div className="grid gap-3">
                   <div className="flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">Dias aceitos</span>
+                    <span className="text-sm font-medium text-foreground">Dias Válidos</span>
                   </div>
                   <div className="grid grid-cols-7 gap-2">
                     {diasSemana.map((d) => {
@@ -878,14 +839,7 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-foreground">
-                      Profissionais que atendem
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {profissionaisAtendem.length} de {profissionaisDisponiveis.length}
-                    </span>
-                  </div>
+                  <div className="flex items-center justify-between gap-2"><span className="text-sm font-medium text-foreground">Profissionais do plano</span><span className="text-xs text-muted-foreground">{profissionaisAtendem.length} de {profissionaisDisponiveis.length}</span></div>
                   <div className="flex flex-wrap gap-3">
                     {profissionaisDisponiveis.map((p) => {
                       const ativo = profissionaisAtendem.includes(p.id);
@@ -937,7 +891,7 @@ export default function AssinaturaCadastro() {
               {/* Header */}
               <div className="border-b border-border p-5">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-xl font-bold uppercase leading-tight text-foreground">
+                  <h3 className="text-lg font-bold uppercase leading-tight text-foreground">
                     {nome.trim() || "Nome do plano"}
                   </h3>
                   {destaque && (
@@ -1016,14 +970,7 @@ export default function AssinaturaCadastro() {
                     </span>
                     <span className="ml-1 text-sm text-muted-foreground">{recorrenciaLabel}</span>
                   </div>
-                  <span
-                    className={cn(
-                      "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-                      disponivelVenda
-                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                        : "bg-muted text-muted-foreground",
-                    )}
-                  >
+                  <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", disponivelVenda ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" : "bg-muted text-muted-foreground")}>
                     {disponivelVenda ? "Disponível" : "Indisponível"}
                   </span>
                 </div>
