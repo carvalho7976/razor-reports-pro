@@ -839,7 +839,7 @@ export default function AssinaturaCadastro() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center justify-between gap-2"><span className="text-sm font-medium text-foreground">Profissionais do plano</span><span className="text-xs text-muted-foreground">{profissionaisAtendem.length} de {profissionaisDisponiveis.length}</span></div>
+                  <div className="flex items-center justify-between gap-2"><span className="text-sm font-medium text-foreground">Profissionais do Plano </span></div>
                   <div className="flex flex-wrap gap-3">
                     {profissionaisDisponiveis.map((p) => {
                       const ativo = profissionaisAtendem.includes(p.id);
@@ -904,14 +904,14 @@ export default function AssinaturaCadastro() {
               </div>
 
               {/* Body */}
-              <div className="space-y-3 p-4">
+              <div className="space-y-3 p-4 px-[17px]">
                 {/* Inclusos */}
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-sky-500">
                     Incluso:
                   </p>
 
-                  <ul className="mt-2 flex flex-col gap-1.5">
+                  <ul className="mt-2 flex flex-col my-[7px] px-0 py-0 gap-[10px]">
                     {servicosArr.length === 0 && produtosArr.length === 0 && beneficios.length === 0 && (
                       <li className="text-[13px] italic text-muted-foreground">
                         Configure os itens do plano.
@@ -962,7 +962,7 @@ export default function AssinaturaCadastro() {
               </div>
 
               {/* Footer (preço + status) */}
-              <div className="border-t border-border bg-card px-5 py-4">
+              <div className="border-t border-border bg-card px-5 py-4 my-0">
                 <div className="flex items-end justify-between gap-2">
                   <div>
                     <span className="text-xl font-bold text-foreground">
