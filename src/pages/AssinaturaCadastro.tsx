@@ -16,6 +16,13 @@ import {
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ServicoOpt {
   id: number;
@@ -346,17 +353,21 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                               Usos/mês
                             </span>
-                            <select
+                            <Select
                               value={sel.usos}
-                              onChange={(e) => update(item.id, "usos", e.target.value)}
-                              className="h-9 w-[110px] rounded-md border border-blue-500/40 bg-background px-2 text-xs font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                              onValueChange={(v) => update(item.id, "usos", v)}
                             >
-                              {usosOptions.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                  {o.label}
-                                </option>
-                              ))}
-                            </select>
+                              <SelectTrigger className="h-9 w-[120px] rounded-md border-border bg-background px-2 text-xs font-semibold">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {usosOptions.map((o) => (
+                                  <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                    {o.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
 
@@ -366,17 +377,21 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                               Comissão
                             </span>
-                            <select
+                            <Select
                               value={sel.comissao}
-                              onChange={(e) => update(item.id, "comissao", e.target.value)}
-                              className="h-9 w-[130px] rounded-md border border-blue-500/40 bg-background px-2 text-xs font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                              onValueChange={(v) => update(item.id, "comissao", v)}
                             >
-                              {comissaoOptions.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                  {o.label}
-                                </option>
-                              ))}
-                            </select>
+                              <SelectTrigger className="h-9 w-[140px] rounded-md border-border bg-background px-2 text-xs font-semibold">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {comissaoOptions.map((o) => (
+                                  <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                    {o.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
 
@@ -630,7 +645,7 @@ export default function AssinaturaCadastro() {
               description="Identificação e cobrança do plano de assinatura."
             >
               <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)]">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1.8fr)_minmax(140px,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)]">
                   <TextField
                     label="Nome do plano *"
                     value={nome}
@@ -846,7 +861,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "inline-flex h-12 items-center justify-center rounded-lg border text-sm font-semibold transition",
                             ativo
-                              ? "border-foreground bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                              ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400"
                               : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                           )}
                         >
@@ -877,7 +892,7 @@ export default function AssinaturaCadastro() {
                           className={cn(
                             "group flex flex-col items-center gap-1.5 rounded-lg border p-2 transition",
                             ativo
-                              ? "border-foreground bg-blue-500/5"
+                              ? "border-blue-500 bg-blue-500/5"
                               : "border-border bg-card opacity-60 hover:opacity-100",
                           )}
                         >
@@ -939,15 +954,15 @@ export default function AssinaturaCadastro() {
 
                   <ul className="mt-2 flex flex-col gap-1.5">
                     {servicosArr.length === 0 && produtosArr.length === 0 && beneficios.length === 0 && (
-                      <li className="text-xs italic text-muted-foreground">
+                      <li className="text-[13px] italic text-muted-foreground">
                         Configure os itens do plano.
                       </li>
                     )}
 
                     {/* Serviços */}
                     {servicosArr.map((s) => (
-                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-xs font-medium text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li key={`s-${s.id}`} className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>
                           {s.usos === "ILIMITADO"
                             ? `${nomeServico(s.id)} ilimitado`
@@ -963,23 +978,23 @@ export default function AssinaturaCadastro() {
 
                     {/* Produtos */}
                     {produtosArr.length > 0 && (
-                      <li className="flex items-start gap-2 text-xs font-medium text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>Descontos em produtos</span>
                       </li>
                     )}
 
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => (
-                      <li key={`b-${idx}`} className="flex items-start gap-2 text-xs font-medium text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                      <li key={`b-${idx}`} className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                         <span>{b}</span>
                       </li>
                     ))}
 
                     {/* Dias válidos */}
-                    <li className="flex items-start gap-2 text-xs font-medium text-foreground">
-                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                    <li className="flex items-start gap-2 text-[13px] font-medium text-foreground">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                       <span>{diasValidosLabel}</span>
                     </li>
                   </ul>
