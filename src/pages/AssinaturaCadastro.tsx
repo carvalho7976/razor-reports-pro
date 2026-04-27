@@ -1267,6 +1267,23 @@ export default function AssinaturaCadastro() {
                       </li>
                     )}
 
+                    {/* Parcerias */}
+                    {parcerias && !hiddenResumo.has("desc-parceiros") && (
+                      <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                        <span className="flex-1">Desconto em Parceiros</span>
+                        <button
+                          type="button"
+                          onClick={() => ocultarResumo("desc-parceiros")}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Ocultar do resumo"
+                          title="Ocultar do resumo"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
+                      </li>
+                    )}
+
                     {/* Benefícios extras */}
                     {beneficios.map((b, idx) => !hiddenResumo.has(`b-${idx}`) && (
                       <li key={`b-${idx}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
