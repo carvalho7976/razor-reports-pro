@@ -866,6 +866,8 @@ export function DataTable<T extends Record<string, any>>({
   columns: initialColumns,
   title,
   titleIcon,
+  titleHref,
+  titleHrefCopy,
   actions,
   totalRow,
   emptyMessage = "Nenhum registro encontrado",
