@@ -2,9 +2,11 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, XCircle, DollarSign } from "lucide-react";
+import { CreditCard, XCircle, DollarSign, CheckCircle2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 interface Assinante {
   id: number;
@@ -16,6 +18,39 @@ interface Assinante {
   valor: number;
   status: string;
 }
+
+interface PlanoOption {
+  id: number;
+  nome: string;
+  recorrencia: string;
+  valor: number;
+  beneficios: string[];
+}
+
+const planosDisponiveis: PlanoOption[] = [
+  {
+    id: 1,
+    nome: "Plano Mensal",
+    recorrencia: "Mensal",
+    valor: 89.9,
+    beneficios: ["Venha quando quiser", "Cortes ilimitados", "Descontos em produtos", "Descontos em serviços"],
+  },
+  {
+    id: 2,
+    nome: "Plano Trimestral",
+    recorrencia: "Trimestral",
+    valor: 239.9,
+    beneficios: ["Venha quando quiser", "Cortes ilimitados", "Descontos em produtos", "Barba ilimitada"],
+  },
+  {
+    id: 3,
+    nome: "Plano Semestral",
+    recorrencia: "Semestral",
+    valor: 449.9,
+    beneficios: ["Venha quando quiser", "Cortes ilimitados", "Descontos em produtos", "Descontos em serviços", "Barba ilimitada"],
+  },
+];
+
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const initialData: Assinante[] = [
@@ -107,6 +142,43 @@ export default function Assinantes() {
   const [allData, setAllData] = useState(initialData);
   const { toast } = useToast();
   const [tab, setTab] = useState("total");
+  const [novoOpen, setNovoOpen] = useState(false);
+  const [planoSelecionado, setPlanoSelecionado] = useState<number>(planosDisponiveis[0].id);
+  const [formNome, setFormNome] = useState("");
+  const [formCpf, setFormCpf] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formTelefone, setFormTelefone] = useState("");
+
+  const planoAtual = planosDisponiveis.find((p) => p.id === planoSelecionado) ?? planosDisponiveis[0];
+
+  const resetForm = () => {
+    setFormNome("");
+    setFormCpf("");
+    setFormEmail("");
+    setFormTelefone("");
+    setPlanoSelecionado(planosDisponiveis[0].id);
+  };
+
+  const handleAssinar = () => {
+    if (!formNome.trim()) {
+      toast({ title: "Informe o nome do assinante", variant: "destructive" });
+      return;
+    }
+    const novo: Assinante = {
+      id: Math.max(0, ...allData.map((a) => a.id)) + 1,
+      nome: formNome.trim().toUpperCase(),
+      telefone: formTelefone || "",
+      plano: planoAtual.nome,
+      inicio: new Date().toLocaleDateString("pt-BR"),
+      vencimento: new Date().toLocaleDateString("pt-BR"),
+      valor: planoAtual.valor,
+      status: "Ativo",
+    };
+    setAllData((prev) => [novo, ...prev]);
+    toast({ title: "Assinatura criada com sucesso!" });
+    setNovoOpen(false);
+    resetForm();
+  };
 
   const bulkCancel = (indices: number[]) => {
     const ids = indices.map((i) => allData[i]?.id).filter(Boolean);
@@ -176,7 +248,139 @@ export default function Assinantes() {
         selectionActions={selectionActions}
         pageSize={15}
         tableId="assinantes"
+        novoMenuItems={[
+          {
+            label: "Nova Assinatura",
+            icon: <Plus className="h-4 w-4" />,
+            onClick: () => setNovoOpen(true),
+          },
+        ]}
       />
+
+      <Dialog open={novoOpen} onOpenChange={(o) => { setNovoOpen(o); if (!o) resetForm(); }}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden border-0 bg-transparent shadow-none">
+          <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden bg-[hsl(220_15%_12%)] text-white">
+            {/* LEFT — Plan selection + summary */}
+            <div className="p-6 sm:p-8 border-b md:border-b-0 md:border-r border-white/10">
+              <h2 className="text-2xl font-bold leading-tight">
+                Realizar<br />Assinatura
+              </h2>
+
+              <div className="mt-5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-white/60 mb-2">
+                  Escolha o plano
+                </p>
+                <div className="flex flex-col gap-2">
+                  {planosDisponiveis.map((p) => {
+                    const active = p.id === planoSelecionado;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPlanoSelecionado(p.id)}
+                        className={cn(
+                          "flex items-center justify-between rounded-lg border px-3 py-2 text-left transition-colors",
+                          active
+                            ? "border-sky-400 bg-sky-500/10"
+                            : "border-white/10 bg-white/5 hover:bg-white/10",
+                        )}
+                      >
+                        <span className="text-sm font-semibold uppercase">{p.nome}</span>
+                        <span className="text-xs text-white/70">R$ {p.valor.toFixed(2)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-xl font-bold uppercase">{planoAtual.nome}</h3>
+                <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-rose-500">
+                  Incluso:
+                </p>
+                <ul className="mt-2 flex flex-col gap-2">
+                  {planoAtual.beneficios.map((b, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm font-medium uppercase">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-rose-500" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-6">
+                  <span className="text-2xl font-bold">R$ {planoAtual.valor.toFixed(2)}</span>
+                  <span className="ml-2 text-sm text-white/70">{planoAtual.recorrencia}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT — Subscriber data */}
+            <div className="p-6 sm:p-8 bg-[hsl(220_15%_14%)]">
+              <h2 className="text-2xl font-bold">Seus dados</h2>
+
+              <div className="mt-5 flex flex-col gap-4">
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                    Seu nome
+                  </label>
+                  <input
+                    type="text"
+                    value={formNome}
+                    onChange={(e) => setFormNome(e.target.value)}
+                    placeholder="Insira seu nome"
+                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                    CPF
+                  </label>
+                  <input
+                    type="text"
+                    value={formCpf}
+                    onChange={(e) => setFormCpf(e.target.value)}
+                    placeholder="CPF"
+                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    placeholder="Insira seu email"
+                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                    Telefone
+                  </label>
+                  <input
+                    type="text"
+                    value={formTelefone}
+                    onChange={(e) => setFormTelefone(e.target.value)}
+                    placeholder="Telefone"
+                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAssinar}
+                  className="mt-2 h-12 w-full rounded-md bg-sky-400 text-white font-semibold text-base hover:bg-sky-500 transition-colors"
+                >
+                  Assinar
+                </button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <YouTubeModal
         open={aulaOpen}
         onClose={() => setAulaOpen(false)}

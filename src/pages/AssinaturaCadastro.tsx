@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   X,
   Users,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -601,6 +602,7 @@ export default function AssinaturaCadastro() {
   const [formaPagamento, setFormaPagamento] = useState("CARTAO_CREDITO");
   const [disponivelVenda, setDisponivelVenda] = useState(true);
   const [destaque, setDestaque] = useState(false);
+  const [parcerias, setParcerias] = useState(false);
 
   const [beneficios, setBeneficios] = useState<string[]>([
     "Venha quando precisar",
@@ -888,6 +890,22 @@ export default function AssinaturaCadastro() {
                       </div>
                     </div>
                     <Switch checked={destaque} onCheckedChange={setDestaque} />
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <Tag
+                        className={cn(
+                          "h-4 w-4",
+                          parcerias ? "fill-sky-500/20 text-sky-500" : "text-muted-foreground",
+                        )}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Parcerias</p>
+                        <p className="text-xs text-muted-foreground" />
+                      </div>
+                    </div>
+                    <Switch checked={parcerias} onCheckedChange={setParcerias} />
                   </div>
                 </div>
               </div>
@@ -1240,6 +1258,23 @@ export default function AssinaturaCadastro() {
                         <button
                           type="button"
                           onClick={() => ocultarResumo("desc-produtos")}
+                          className="opacity-0 transition group-hover:opacity-100"
+                          aria-label="Ocultar do resumo"
+                          title="Ocultar do resumo"
+                        >
+                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
+                      </li>
+                    )}
+
+                    {/* Parcerias */}
+                    {parcerias && !hiddenResumo.has("desc-parceiros") && (
+                      <li className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                        <span className="flex-1">Desconto em Parceiros</span>
+                        <button
+                          type="button"
+                          onClick={() => ocultarResumo("desc-parceiros")}
                           className="opacity-0 transition group-hover:opacity-100"
                           aria-label="Ocultar do resumo"
                           title="Ocultar do resumo"
