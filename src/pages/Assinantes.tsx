@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, XCircle, DollarSign, CheckCircle2, Plus } from "lucide-react";
+import { CreditCard, XCircle, DollarSign, CheckCircle2, Plus, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { FormModal, TextField, FormRow, SaveButton } from "@/components/FormModal";
 import { cn } from "@/lib/utils";
 
 interface Assinante {
@@ -27,29 +28,132 @@ interface PlanoOption {
   beneficios: string[];
 }
 
+// Planos cadastrados e ATIVOS (origem: AssinaturaPesquisa)
 const planosDisponiveis: PlanoOption[] = [
   {
     id: 1,
-    nome: "Plano Mensal",
+    nome: "TESTE",
     recorrencia: "Mensal",
-    valor: 89.9,
+    valor: 190.0,
     beneficios: ["Venha quando quiser", "Cortes ilimitados", "Descontos em produtos", "Descontos em serviços"],
   },
   {
     id: 2,
-    nome: "Plano Trimestral",
-    recorrencia: "Trimestral",
-    valor: 239.9,
-    beneficios: ["Venha quando quiser", "Cortes ilimitados", "Descontos em produtos", "Barba ilimitada"],
+    nome: "Francez Plan Master",
+    recorrencia: "Mensal",
+    valor: 250.0,
+    beneficios: ["5 cortes inclusos", "1 barba inclusa", "10% desconto em produtos"],
   },
   {
     id: 3,
-    nome: "Plano Semestral",
-    recorrencia: "Semestral",
-    valor: 449.9,
-    beneficios: ["Venha quando quiser", "Cortes ilimitados", "Descontos em produtos", "Descontos em serviços", "Barba ilimitada"],
+    nome: "LP Barbearia Plano VIP",
+    recorrencia: "Mensal",
+    valor: 189.0,
+    beneficios: ["4 cortes inclusos", "4 barbas inclusas", "15% desconto em produtos"],
+  },
+  {
+    id: 4,
+    nome: "ON Barber Plano Master",
+    recorrencia: "Mensal",
+    valor: 170.0,
+    beneficios: ["3 cortes inclusos", "Descontos em serviços"],
   },
 ];
+
+interface ProfissionalAvatar {
+  id: number;
+  nome: string;
+  iniciais: string;
+  cor: string;
+}
+
+// Profissionais cadastrados (origem: ListaProfissionais)
+const profissionaisVenda: ProfissionalAvatar[] = [
+  { id: 1, nome: "Cesar", iniciais: "CE", cor: "bg-blue-500" },
+  { id: 2, nome: "Claudia", iniciais: "CL", cor: "bg-pink-500" },
+  { id: 4, nome: "Henrique", iniciais: "HE", cor: "bg-indigo-500" },
+  { id: 5, nome: "Lara", iniciais: "LA", cor: "bg-rose-500" },
+  { id: 6, nome: "Marcia Silva", iniciais: "MS", cor: "bg-amber-500" },
+  { id: 7, nome: "Matheus", iniciais: "MM", cor: "bg-emerald-500" },
+  { id: 9, nome: "Vini", iniciais: "VV", cor: "bg-purple-500" },
+];
+
+function ProfissionalAvatarBadge({ p, size = "md" }: { p: ProfissionalAvatar; size?: "sm" | "md" }) {
+  const dim = size === "sm" ? "h-6 w-6 text-[10px]" : "h-7 w-7 text-[11px]";
+  return (
+    <span className={cn("inline-flex items-center justify-center rounded-full font-semibold text-white shrink-0", p.cor, dim)}>
+      {p.iniciais}
+    </span>
+  );
+}
+
+function ResponsavelDropdown({
+  value,
+  onChange,
+}: {
+  value: number | null;
+  onChange: (id: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = profissionaisVenda.find((p) => p.id === value);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="relative grid gap-0.5" ref={ref}>
+      <label className="text-[13px] font-semibold text-foreground">Responsável pela venda</label>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={cn(
+          "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm text-foreground transition-all",
+          "border-info/50 hover:border-info",
+          open && "border-info ring-4 ring-info/20",
+        )}
+      >
+        {selected ? (
+          <span className="flex items-center gap-2 truncate">
+            <ProfissionalAvatarBadge p={selected} size="sm" />
+            <span className="truncate">{selected.nome}</span>
+          </span>
+        ) : (
+          <span className="text-muted-foreground">Selecione...</span>
+        )}
+        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
+          <div className="max-h-60 overflow-auto">
+            {profissionaisVenda.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  onChange(p.id);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center gap-2.5 px-3 py-2.5 text-sm transition",
+                  p.id === value ? "bg-foreground text-background" : "hover:bg-muted",
+                )}
+              >
+                <ProfissionalAvatarBadge p={p} size="sm" />
+                <span className="truncate">{p.nome}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -148,6 +252,7 @@ export default function Assinantes() {
   const [formCpf, setFormCpf] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formTelefone, setFormTelefone] = useState("");
+  const [responsavelId, setResponsavelId] = useState<number | null>(null);
 
   const planoAtual = planosDisponiveis.find((p) => p.id === planoSelecionado) ?? planosDisponiveis[0];
 
@@ -156,12 +261,17 @@ export default function Assinantes() {
     setFormCpf("");
     setFormEmail("");
     setFormTelefone("");
+    setResponsavelId(null);
     setPlanoSelecionado(planosDisponiveis[0].id);
   };
 
   const handleAssinar = () => {
     if (!formNome.trim()) {
       toast({ title: "Informe o nome do assinante", variant: "destructive" });
+      return;
+    }
+    if (!responsavelId) {
+      toast({ title: "Selecione o responsável pela venda", variant: "destructive" });
       return;
     }
     const novo: Assinante = {
@@ -258,126 +368,73 @@ export default function Assinantes() {
       />
 
       <Dialog open={novoOpen} onOpenChange={(o) => { setNovoOpen(o); if (!o) resetForm(); }}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden border-0 bg-transparent shadow-none">
-          <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden bg-[hsl(220_15%_12%)] text-white">
-            {/* LEFT — Plan selection + summary */}
-            <div className="p-6 sm:p-8 border-b md:border-b-0 md:border-r border-white/10">
-              <h2 className="text-2xl font-bold leading-tight">
-                Realizar<br />Assinatura
-              </h2>
+        <DialogContent className="max-w-4xl p-0 overflow-visible border-0 bg-transparent shadow-none [&>button]:hidden">
+          <FormModal
+            title="Realizar Assinatura"
+            subtitle="Selecione o plano e preencha os dados do assinante."
+            onClose={() => { setNovoOpen(false); resetForm(); }}
+            size="lg"
+            footer={<SaveButton onClick={handleAssinar} />}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-5">
+              {/* LEFT — Plano */}
+              <div className="flex flex-col gap-3">
+                <div className="grid gap-0.5">
+                  <label className="text-[13px] font-semibold text-foreground">Escolha o plano</label>
+                  <div className="flex flex-col gap-1.5">
+                    {planosDisponiveis.map((p) => {
+                      const active = p.id === planoSelecionado;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => setPlanoSelecionado(p.id)}
+                          className={cn(
+                            "flex items-center justify-between rounded-lg border px-3 h-10 text-left transition-colors",
+                            active
+                              ? "border-info bg-info/10 ring-2 ring-info/20"
+                              : "border-info/40 bg-card hover:border-info",
+                          )}
+                        >
+                          <span className="text-sm font-semibold uppercase truncate">{p.nome}</span>
+                          <span className="text-xs font-medium text-muted-foreground">{R$(p.valor)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
-              <div className="mt-5">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-white/60 mb-2">
-                  Escolha o plano
-                </p>
-                <div className="flex flex-col gap-2">
-                  {planosDisponiveis.map((p) => {
-                    const active = p.id === planoSelecionado;
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setPlanoSelecionado(p.id)}
-                        className={cn(
-                          "flex items-center justify-between rounded-lg border px-3 py-2 text-left transition-colors",
-                          active
-                            ? "border-sky-400 bg-sky-500/10"
-                            : "border-white/10 bg-white/5 hover:bg-white/10",
-                        )}
-                      >
-                        <span className="text-sm font-semibold uppercase">{p.nome}</span>
-                        <span className="text-xs text-white/70">R$ {p.valor.toFixed(2)}</span>
-                      </button>
-                    );
-                  })}
+                {/* Resumo do plano selecionado */}
+                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                  <h3 className="text-sm font-bold uppercase text-foreground">{planoAtual.nome}</h3>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-info">Incluso:</p>
+                  <ul className="mt-1.5 flex flex-col gap-1">
+                    {planoAtual.beneficios.map((b, i) => (
+                      <li key={i} className="flex items-center gap-2 text-[13px] font-medium text-foreground">
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600 fill-emerald-500/20" />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-3 flex items-end gap-1.5">
+                    <span className="text-xl font-bold text-foreground">{R$(planoAtual.valor)}</span>
+                    <span className="text-xs text-muted-foreground pb-0.5">{planoAtual.recorrencia}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-6">
-                <h3 className="text-xl font-bold uppercase">{planoAtual.nome}</h3>
-                <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-rose-500">
-                  Incluso:
-                </p>
-                <ul className="mt-2 flex flex-col gap-2">
-                  {planoAtual.beneficios.map((b, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm font-medium uppercase">
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-rose-500" />
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-6">
-                  <span className="text-2xl font-bold">R$ {planoAtual.valor.toFixed(2)}</span>
-                  <span className="ml-2 text-sm text-white/70">{planoAtual.recorrencia}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT — Subscriber data */}
-            <div className="p-6 sm:p-8 bg-[hsl(220_15%_14%)]">
-              <h2 className="text-2xl font-bold">Seus dados</h2>
-
-              <div className="mt-5 flex flex-col gap-4">
-                <div>
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
-                    Seu nome
-                  </label>
-                  <input
-                    type="text"
-                    value={formNome}
-                    onChange={(e) => setFormNome(e.target.value)}
-                    placeholder="Insira seu nome"
-                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
-                    CPF
-                  </label>
-                  <input
-                    type="text"
-                    value={formCpf}
-                    onChange={(e) => setFormCpf(e.target.value)}
-                    placeholder="CPF"
-                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={formEmail}
-                    onChange={(e) => setFormEmail(e.target.value)}
-                    placeholder="Insira seu email"
-                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-white/70">
-                    Telefone
-                  </label>
-                  <input
-                    type="text"
-                    value={formTelefone}
-                    onChange={(e) => setFormTelefone(e.target.value)}
-                    placeholder="Telefone"
-                    className="mt-1 w-full h-11 rounded-md bg-transparent border border-white/20 px-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAssinar}
-                  className="mt-2 h-12 w-full rounded-md bg-sky-400 text-white font-semibold text-base hover:bg-sky-500 transition-colors"
-                >
-                  Assinar
-                </button>
+              {/* RIGHT — Dados */}
+              <div className="flex flex-col gap-3">
+                <TextField label="Nome" value={formNome} onChange={setFormNome} placeholder="Insira o nome" />
+                <FormRow cols={2}>
+                  <TextField label="CPF" value={formCpf} onChange={setFormCpf} placeholder="000.000.000-00" />
+                  <TextField label="Telefone" value={formTelefone} onChange={setFormTelefone} placeholder="(00) 00000-0000" />
+                </FormRow>
+                <TextField label="Email" value={formEmail} onChange={setFormEmail} placeholder="Insira o email" />
+                <ResponsavelDropdown value={responsavelId} onChange={setResponsavelId} />
               </div>
             </div>
-          </div>
+          </FormModal>
         </DialogContent>
       </Dialog>
 
