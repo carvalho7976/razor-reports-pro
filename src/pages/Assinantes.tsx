@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, XCircle, DollarSign, CheckCircle2, Plus, ChevronDown, ArrowLeft } from "lucide-react";
+import { CreditCard, XCircle, DollarSign, CheckCircle2, Plus, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -285,7 +285,6 @@ export default function Assinantes() {
   const { toast } = useToast();
   const [tab, setTab] = useState("total");
   const [novoOpen, setNovoOpen] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
   const [planoSelecionado, setPlanoSelecionado] = useState<number>(planosDisponiveis[0].id);
   const [formNome, setFormNome] = useState("");
   const [formCpf, setFormCpf] = useState("");
@@ -296,7 +295,6 @@ export default function Assinantes() {
   const planoAtual = planosDisponiveis.find((p) => p.id === planoSelecionado) ?? planosDisponiveis[0];
 
   const resetForm = () => {
-    setStep(1);
     setFormNome("");
     setFormCpf("");
     setFormEmail("");
@@ -408,32 +406,17 @@ export default function Assinantes() {
       />
 
       <Dialog open={novoOpen} onOpenChange={(o) => { setNovoOpen(o); if (!o) resetForm(); }}>
-        <DialogContent className="border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="max-w-3xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Nova Assinatura"
-            subtitle={step === 1 ? "Etapa 1 de 2 — Escolha o plano." : "Etapa 2 de 2 — Dados do assinante."}
+            subtitle="Escolha o plano e preencha os dados do assinante."
             onClose={() => { setNovoOpen(false); resetForm(); }}
-            size="md"
-            footer={
-              step === 1 ? (
-                <SaveButton onClick={() => setStep(2)} />
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-card px-5 text-sm font-semibold text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Voltar
-                  </button>
-                  <SaveButton onClick={handleAssinar} />
-                </div>
-              )
-            }
+            size="lg"
+            footer={<SaveButton onClick={handleAssinar} />}
           >
-            {step === 1 ? (
-              <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 min-h-[440px]">
+              {/* Coluna esquerda — escolha do plano */}
+              <div className="flex flex-col gap-3">
                 <Dropdown
                   label="Plano"
                   value={String(planoSelecionado)}
@@ -445,10 +428,10 @@ export default function Assinantes() {
                   searchable
                 />
                 <BeneficiosCard plano={planoAtual} />
-              </>
-            ) : (
-              <>
-                <PlanoResumoLinha plano={planoAtual} />
+              </div>
+
+              {/* Coluna direita — dados do assinante */}
+              <div className="flex flex-col gap-3">
                 <TextField label="Nome" value={formNome} onChange={setFormNome} placeholder="Insira o nome" />
                 <FormRow cols={2}>
                   <TextField label="CPF" value={formCpf} onChange={setFormCpf} placeholder="000.000.000-00" />
@@ -456,8 +439,8 @@ export default function Assinantes() {
                 </FormRow>
                 <TextField label="Email" value={formEmail} onChange={setFormEmail} placeholder="Insira o email" />
                 <ResponsavelDropdown value={responsavelId} onChange={setResponsavelId} />
-              </>
-            )}
+              </div>
+            </div>
           </FormModal>
         </DialogContent>
       </Dialog>
