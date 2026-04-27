@@ -110,21 +110,6 @@ function BeneficiosCard({ plano }: { plano: PlanoOption }) {
   );
 }
 
-function PlanoResumoLinha({ plano }: { plano: PlanoOption }) {
-  return (
-    <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 px-4 py-3">
-      <div className="flex items-center gap-2 min-w-0">
-        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 fill-emerald-500/20" />
-        <span className="text-sm font-bold uppercase text-foreground truncate">{plano.nome}</span>
-      </div>
-      <span className="text-sm font-bold text-foreground shrink-0">
-        {plano.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-        <span className="ml-1 text-xs font-normal text-muted-foreground">{plano.recorrencia}</span>
-      </span>
-    </div>
-  );
-}
-
 function ResponsavelDropdown({
   value,
   onChange,
