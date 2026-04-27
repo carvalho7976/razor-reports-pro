@@ -481,7 +481,7 @@ export default function ListaPlanos() {
           <span className="font-bold text-foreground">{v}</span>
           {row.destaque && (
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-amber-100 text-amber-700 border-0">
-              destaque
+              DESTAQUE
             </Badge>
           )}
         </div>
