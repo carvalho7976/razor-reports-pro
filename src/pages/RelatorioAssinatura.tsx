@@ -303,14 +303,7 @@ export default function RelatorioAssinatura() {
             subtitle="Defina o total do bolo e a % destinada à equipe"
             onClose={() => setNovoOpen(false)}
             footer={
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setNovoOpen(false)}
-                  className="h-9 rounded-lg border border-border bg-card px-4 text-sm font-medium text-foreground hover:bg-muted"
-                >
-                  Cancelar
-                </button>
+              <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={onGerar}
@@ -321,28 +314,26 @@ export default function RelatorioAssinatura() {
               </div>
             }
           >
-            <FormRow cols={3}>
-              <Dropdown
-                label="Período"
-                value={novoPeriodo}
-                setValue={setNovoPeriodo}
-                options={periodosOptions}
-              />
-              <TextField
-                label="Total Bolo (R$)"
-                value={novoBolo ? `R$ ${formatCurrency(parseCurrency(novoBolo))}` : ""}
-                onChange={(v) => setNovoBolo(v)}
-                placeholder="R$ 0,00"
-                error={errors.bolo}
-              />
-              <TextField
-                label="% da Equipe"
-                value={novoPerc ? `${formatCurrency(parsePercent(novoPerc))}%` : ""}
-                onChange={(v) => setNovoPerc(v)}
-                placeholder="0,00%"
-                error={errors.perc}
-              />
-            </FormRow>
+            <Dropdown
+              label="Período"
+              value={novoPeriodo}
+              setValue={setNovoPeriodo}
+              options={periodosOptions}
+            />
+            <TextField
+              label="Total Bolo (R$)"
+              value={novoBolo ? `R$ ${formatCurrency(parseCurrency(novoBolo))}` : ""}
+              onChange={(v) => setNovoBolo(v)}
+              placeholder="R$ 0,00"
+              error={errors.bolo}
+            />
+            <TextField
+              label="% da Equipe"
+              value={novoPerc ? `${formatCurrency(parsePercent(novoPerc))}%` : ""}
+              onChange={(v) => setNovoPerc(v)}
+              placeholder="0,00%"
+              error={errors.perc}
+            />
           </FormModal>
         </div>
       )}
