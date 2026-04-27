@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   X,
   Users,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -601,6 +602,7 @@ export default function AssinaturaCadastro() {
   const [formaPagamento, setFormaPagamento] = useState("CARTAO_CREDITO");
   const [disponivelVenda, setDisponivelVenda] = useState(true);
   const [destaque, setDestaque] = useState(false);
+  const [parcerias, setParcerias] = useState(false);
 
   const [beneficios, setBeneficios] = useState<string[]>([
     "Venha quando precisar",
@@ -888,6 +890,22 @@ export default function AssinaturaCadastro() {
                       </div>
                     </div>
                     <Switch checked={destaque} onCheckedChange={setDestaque} />
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <Tag
+                        className={cn(
+                          "h-4 w-4",
+                          parcerias ? "fill-sky-500/20 text-sky-500" : "text-muted-foreground",
+                        )}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Parcerias</p>
+                        <p className="text-xs text-muted-foreground" />
+                      </div>
+                    </div>
+                    <Switch checked={parcerias} onCheckedChange={setParcerias} />
                   </div>
                 </div>
               </div>
