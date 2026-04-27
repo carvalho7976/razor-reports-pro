@@ -119,6 +119,8 @@ interface DataTableProps<T extends Record<string, any>> {
   columns: Column<T>[];
   title: string;
   titleIcon?: ReactNode;
+  titleHref?: string;
+  titleHrefCopy?: boolean;
   actions?: ReactNode;
   totalRow?: Record<string, ReactNode>;
   emptyMessage?: string;
