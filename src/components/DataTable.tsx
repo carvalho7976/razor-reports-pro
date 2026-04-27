@@ -1242,7 +1242,25 @@ export function DataTable<T extends Record<string, any>>({
     <div className="space-y-3 sm:space-y-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">{title}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+            {titleHref ? (
+              <a
+                href={titleHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  if (titleHrefCopy && typeof navigator !== "undefined" && navigator.clipboard) {
+                    navigator.clipboard.writeText(titleHref).catch(() => {});
+                  }
+                }}
+                className="text-foreground no-underline hover:no-underline"
+              >
+                {title}
+              </a>
+            ) : (
+              title
+            )}
+          </h1>
           {titleIcon}
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
