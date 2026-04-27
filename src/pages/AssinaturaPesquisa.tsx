@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   X,
   Copy,
+  ExternalLink,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -636,8 +637,9 @@ function PlanoExternalLink() {
       type="button"
       onClick={handleClick}
       title="Abrir página externa de planos (link copiado)"
-      className="inline-flex items-center justify-center text-base leading-none text-muted-foreground transition-colors hover:text-foreground"
+      className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted"
     >
+      <ExternalLink className="h-3.5 w-3.5" />
       <span aria-hidden>↗</span>
     </button>
   );
