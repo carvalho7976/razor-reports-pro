@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   X,
   Copy,
-  ExternalLink,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -397,11 +396,26 @@ export default function ListaPlanos() {
     toast({ title: `${cods.length} plano(s) desativado(s)` });
   };
 
+  const bulkActivate = (indices: number[]) => {
+    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    setAllData((prev) =>
+      prev.map((d) => (cods.includes(d.cod) ? { ...d, status: "ativo" as StatusPlano } : d)),
+    );
+    toast({ title: `${cods.length} plano(s) ativado(s)` });
+  };
+
   const selectionActions: SelectionAction[] = [
+    {
+      label: "Ativar",
+      icon: <ToggleRight className="h-4 w-4" />,
+      onClick: bulkActivate,
+      description: "Ativa os planos selecionados",
+    },
     {
       label: "Desativar",
       icon: <ToggleLeft className="h-4 w-4" />,
       onClick: bulkDeactivate,
+      variant: "destructive",
       description: "Desativa os planos selecionados",
     },
     {
@@ -544,10 +558,12 @@ export default function ListaPlanos() {
     <AppLayout>
       <DataTable
         title="Planos de Assinatura"
+        titleHref={EXTERNAL_PLANS_URL}
+        titleHrefCopy
         titleIcon={
-          <div className="flex items-center gap-2">
-            <AulaButton onOpen={() => setAulaOpen(true)} />
+          <div className="flex items-center gap-1.5">
             <PlanoExternalLink />
+            <AulaButton onOpen={() => setAulaOpen(true)} />
           </div>
         }
         data={filteredData}
@@ -620,10 +636,9 @@ function PlanoExternalLink() {
       type="button"
       onClick={handleClick}
       title="Abrir página externa de planos (link copiado)"
-      className="inline-flex items-center gap-1 rounded-full border border-border bg-card py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted px-[4px]"
+      className="inline-flex items-center justify-center text-base leading-none text-muted-foreground transition-colors hover:text-foreground"
     >
-      <ExternalLink className="h-3.5 w-3.5" />
-      <span aria-hidden>{"\n"}</span>
+      <span aria-hidden>↗</span>
     </button>
   );
 }
