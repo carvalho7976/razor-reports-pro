@@ -303,15 +303,13 @@ export default function RelatorioAssinatura() {
             subtitle="Defina o total do bolo e a % destinada à equipe"
             onClose={() => setNovoOpen(false)}
             footer={
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={onGerar}
-                  className="h-9 rounded-lg bg-[hsl(var(--novo-btn))] px-4 text-sm font-medium text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.85)]"
-                >
-                  Gerar
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={onGerar}
+                className="h-12 w-full rounded-xl bg-[hsl(var(--novo-btn))] text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
+              >
+                Gerar
+              </button>
             }
           >
             <Dropdown
