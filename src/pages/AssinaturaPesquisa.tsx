@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   X,
   Copy,
-  ExternalLink,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
