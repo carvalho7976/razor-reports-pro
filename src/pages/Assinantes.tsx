@@ -98,7 +98,7 @@ function BeneficiosCard({ plano }: { plano: PlanoOption }) {
         </span>
       </div>
       <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-info">Incluso:</p>
-      <ul className="mt-2 grid gap-y-2 gap-x-4 sm:grid-cols-2">
+      <ul className="mt-2 flex flex-col gap-2">
         {plano.beneficios.map((b, i) => (
           <li key={i} className="flex items-start gap-2 text-[13px] leading-snug font-medium text-foreground">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 fill-emerald-500/20" />
