@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { CreditCard, XCircle, DollarSign, CheckCircle2, Plus, ChevronDown } from "lucide-react";
+import { CreditCard, XCircle, DollarSign, CheckCircle2, Plus, ChevronDown, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -247,6 +247,7 @@ export default function Assinantes() {
   const { toast } = useToast();
   const [tab, setTab] = useState("total");
   const [novoOpen, setNovoOpen] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
   const [planoSelecionado, setPlanoSelecionado] = useState<number>(planosDisponiveis[0].id);
   const [formNome, setFormNome] = useState("");
   const [formCpf, setFormCpf] = useState("");
@@ -257,6 +258,7 @@ export default function Assinantes() {
   const planoAtual = planosDisponiveis.find((p) => p.id === planoSelecionado) ?? planosDisponiveis[0];
 
   const resetForm = () => {
+    setStep(1);
     setFormNome("");
     setFormCpf("");
     setFormEmail("");
@@ -371,68 +373,109 @@ export default function Assinantes() {
         <DialogContent className="max-w-4xl p-0 overflow-visible border-0 bg-transparent shadow-none [&>button]:hidden">
           <FormModal
             title="Realizar Assinatura"
-            subtitle="Selecione o plano e preencha os dados do assinante."
+            subtitle={step === 1 ? "Etapa 1 de 2 — Escolha o plano" : "Etapa 2 de 2 — Dados do assinante"}
             onClose={() => { setNovoOpen(false); resetForm(); }}
             size="lg"
-            footer={<SaveButton onClick={handleAssinar} />}
+            footer={
+              step === 1 ? (
+                <div className="flex">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 active:scale-[0.98]"
+                  >
+                    Continuar
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-card px-5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Voltar
+                  </button>
+                  <SaveButton onClick={handleAssinar} />
+                </div>
+              )
+            }
           >
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-5">
-              {/* LEFT — Plano */}
-              <div className="flex flex-col gap-3">
-                <div className="grid gap-0.5">
-                  <label className="text-[13px] font-semibold text-foreground">Escolha o plano</label>
-                  <div className="flex flex-col gap-1.5">
-                    {planosDisponiveis.map((p) => {
-                      const active = p.id === planoSelecionado;
-                      return (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => setPlanoSelecionado(p.id)}
-                          className={cn(
-                            "flex items-center justify-between rounded-lg border px-3 h-10 text-left transition-colors",
-                            active
-                              ? "border-info bg-info/10 ring-2 ring-info/20"
-                              : "border-info/40 bg-card hover:border-info",
-                          )}
-                        >
-                          <span className="text-sm font-semibold uppercase truncate">{p.nome}</span>
-                          <span className="text-xs font-medium text-muted-foreground">{R$(p.valor)}</span>
-                        </button>
-                      );
-                    })}
+            {/* Container com altura fixa para evitar pulos entre etapas */}
+            <div className="min-h-[420px]">
+              {step === 1 ? (
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-5">
+                  {/* Lista de planos */}
+                  <div className="grid gap-0.5">
+                    <label className="text-[13px] font-semibold text-foreground">Planos disponíveis</label>
+                    <div className="flex flex-col gap-1.5">
+                      {planosDisponiveis.map((p) => {
+                        const active = p.id === planoSelecionado;
+                        return (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => setPlanoSelecionado(p.id)}
+                            className={cn(
+                              "flex items-center justify-between rounded-lg border px-3 h-11 text-left transition-colors",
+                              active
+                                ? "border-info bg-info/10 ring-2 ring-info/20"
+                                : "border-info/40 bg-card hover:border-info",
+                            )}
+                          >
+                            <span className="text-sm font-semibold uppercase truncate">{p.nome}</span>
+                            <span className="text-xs font-medium text-muted-foreground">{R$(p.valor)}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Destaques do plano selecionado */}
+                  <div className="grid gap-0.5">
+                    <label className="text-[13px] font-semibold text-foreground">Destaques do plano</label>
+                    <div className="rounded-lg border border-border bg-muted/30 p-4 h-full">
+                      <h3 className="text-base font-bold uppercase text-foreground">{planoAtual.nome}</h3>
+                      <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-info">Incluso:</p>
+                      <ul className="mt-1.5 flex flex-col gap-1.5">
+                        {planoAtual.beneficios.map((b, i) => (
+                          <li key={i} className="flex items-center gap-2 text-[13px] font-medium text-foreground">
+                            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 fill-emerald-500/20" />
+                            {b}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-4 flex items-end gap-1.5 border-t border-border pt-3">
+                        <span className="text-2xl font-bold text-foreground">{R$(planoAtual.valor)}</span>
+                        <span className="text-sm text-muted-foreground pb-1">{planoAtual.recorrencia}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Resumo do plano selecionado */}
-                <div className="rounded-lg border border-border bg-muted/30 p-3">
-                  <h3 className="text-sm font-bold uppercase text-foreground">{planoAtual.nome}</h3>
-                  <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-info">Incluso:</p>
-                  <ul className="mt-1.5 flex flex-col gap-1">
-                    {planoAtual.beneficios.map((b, i) => (
-                      <li key={i} className="flex items-center gap-2 text-[13px] font-medium text-foreground">
-                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600 fill-emerald-500/20" />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-3 flex items-end gap-1.5">
-                    <span className="text-xl font-bold text-foreground">{R$(planoAtual.valor)}</span>
-                    <span className="text-xs text-muted-foreground pb-0.5">{planoAtual.recorrencia}</span>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {/* Resumo compacto do plano escolhido */}
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 fill-emerald-500/20" />
+                      <span className="text-sm font-semibold uppercase text-foreground">{planoAtual.nome}</span>
+                    </div>
+                    <span className="text-sm font-bold text-foreground">
+                      {R$(planoAtual.valor)}
+                      <span className="ml-1 text-xs font-normal text-muted-foreground">{planoAtual.recorrencia}</span>
+                    </span>
                   </div>
-                </div>
-              </div>
 
-              {/* RIGHT — Dados */}
-              <div className="flex flex-col gap-3">
-                <TextField label="Nome" value={formNome} onChange={setFormNome} placeholder="Insira o nome" />
-                <FormRow cols={2}>
-                  <TextField label="CPF" value={formCpf} onChange={setFormCpf} placeholder="000.000.000-00" />
-                  <TextField label="Telefone" value={formTelefone} onChange={setFormTelefone} placeholder="(00) 00000-0000" />
-                </FormRow>
-                <TextField label="Email" value={formEmail} onChange={setFormEmail} placeholder="Insira o email" />
-                <ResponsavelDropdown value={responsavelId} onChange={setResponsavelId} />
-              </div>
+                  <TextField label="Nome" value={formNome} onChange={setFormNome} placeholder="Insira o nome" />
+                  <FormRow cols={2}>
+                    <TextField label="CPF" value={formCpf} onChange={setFormCpf} placeholder="000.000.000-00" />
+                    <TextField label="Telefone" value={formTelefone} onChange={setFormTelefone} placeholder="(00) 00000-0000" />
+                  </FormRow>
+                  <TextField label="Email" value={formEmail} onChange={setFormEmail} placeholder="Insira o email" />
+                  <ResponsavelDropdown value={responsavelId} onChange={setResponsavelId} />
+                </div>
+              )}
             </div>
           </FormModal>
         </DialogContent>
