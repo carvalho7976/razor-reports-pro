@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   X,
   Copy,
+  ExternalLink,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +22,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DeleteModal } from "@/components/FormModal";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { cn } from "@/lib/utils";
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -343,6 +345,7 @@ export default function ListaPlanos() {
   const [activeTab, setActiveTab] = useState("todos");
   const [allData, setAllData] = useState<Plano[]>(data);
   const [modal, setModal] = useState<ModalState>(null);
+  const [aulaOpen, setAulaOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
@@ -386,7 +389,21 @@ export default function ListaPlanos() {
     toast({ title: `${cods.length} plano(s) removido(s)`, variant: "destructive" });
   };
 
+  const bulkDeactivate = (indices: number[]) => {
+    const cods = indices.map((i) => filteredData[i]?.cod).filter(Boolean);
+    setAllData((prev) =>
+      prev.map((d) => (cods.includes(d.cod) ? { ...d, status: "inativo" as StatusPlano } : d)),
+    );
+    toast({ title: `${cods.length} plano(s) desativado(s)` });
+  };
+
   const selectionActions: SelectionAction[] = [
+    {
+      label: "Desativar",
+      icon: <ToggleLeft className="h-4 w-4" />,
+      onClick: bulkDeactivate,
+      description: "Desativa os planos selecionados",
+    },
     {
       label: "Remover",
       icon: <Trash2 className="h-4 w-4" />,
@@ -527,6 +544,12 @@ export default function ListaPlanos() {
     <AppLayout>
       <DataTable
         title="Planos de Assinatura"
+        titleIcon={
+          <div className="flex items-center gap-2">
+            <AulaButton onOpen={() => setAulaOpen(true)} />
+            <PlanoExternalLink />
+          </div>
+        }
         data={filteredData}
         columns={columns}
         summaryCards={summaryCards}
@@ -569,6 +592,38 @@ export default function ListaPlanos() {
           />
         </DialogContent>
       </Dialog>
+
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Planos de Assinatura"
+      />
     </AppLayout>
+  );
+}
+
+const EXTERNAL_PLANS_URL =
+  "https://admin.frizzar.com.br/assinatura/assinaturas.xhtml?empresa=frizzar";
+
+function PlanoExternalLink() {
+  const { toast } = useToast();
+  const handleClick = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(EXTERNAL_PLANS_URL).catch(() => {});
+    }
+    toast({ title: "Link copiado", description: "Abrindo página externa de planos…" });
+    window.open(EXTERNAL_PLANS_URL, "_blank", "noopener,noreferrer");
+  };
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      title="Abrir página externa de planos (link copiado)"
+      className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+    >
+      <ExternalLink className="h-3.5 w-3.5" />
+      <span aria-hidden>↗</span>
+    </button>
   );
 }

@@ -1522,7 +1522,7 @@ export function DataTable<T extends Record<string, any>>({
                           <Info className="h-3.5 w-3.5" />
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-[200px] text-xs">
+                      <TooltipContent side="top" className="max-w-[200px] text-xs">
                         {action.description}
                       </TooltipContent>
                     </Tooltip>
