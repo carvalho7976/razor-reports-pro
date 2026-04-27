@@ -87,7 +87,7 @@ function ProfissionalAvatarBadge({ p, size = "md" }: { p: ProfissionalAvatar; si
   );
 }
 
-function BeneficiosCard({ plano }: { plano: PlanoOption }) {
+function BeneficiosCard({ plano, columns = 2 }: { plano: PlanoOption; columns?: 1 | 2 }) {
   return (
     <div className="rounded-lg border border-border bg-muted/30 p-4">
       <div className="flex items-center justify-between gap-2">
@@ -98,7 +98,12 @@ function BeneficiosCard({ plano }: { plano: PlanoOption }) {
         </span>
       </div>
       <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-info">Incluso:</p>
-      <ul className="mt-2 grid gap-y-2 gap-x-4 sm:grid-cols-2">
+      <ul
+        className={cn(
+          "mt-2 grid gap-y-2 gap-x-4",
+          columns === 2 ? "sm:grid-cols-2" : "grid-cols-1",
+        )}
+      >
         {plano.beneficios.map((b, i) => (
           <li key={i} className="flex items-start gap-2 text-[13px] leading-snug font-medium text-foreground">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 fill-emerald-500/20" />
@@ -429,11 +434,11 @@ export default function Assinantes() {
                   }))}
                   searchable
                 />
-                <BeneficiosCard plano={planoAtual} />
+                <BeneficiosCard plano={planoAtual} columns={2} />
               </>
             ) : (
               <>
-                <BeneficiosCard plano={planoAtual} />
+                <BeneficiosCard plano={planoAtual} columns={1} />
                 <TextField label="Nome" value={formNome} onChange={setFormNome} placeholder="Insira o nome" />
                 <FormRow cols={2}>
                   <TextField label="CPF" value={formCpf} onChange={setFormCpf} placeholder="000.000.000-00" />
