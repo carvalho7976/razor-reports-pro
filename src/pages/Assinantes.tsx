@@ -87,6 +87,29 @@ function ProfissionalAvatarBadge({ p, size = "md" }: { p: ProfissionalAvatar; si
   );
 }
 
+function BeneficiosCard({ plano }: { plano: PlanoOption }) {
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-sm font-bold uppercase text-foreground truncate">{plano.nome}</h3>
+        <span className="text-sm font-bold text-foreground shrink-0">
+          {plano.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+          <span className="ml-1 text-xs font-normal text-muted-foreground">{plano.recorrencia}</span>
+        </span>
+      </div>
+      <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-info">Incluso:</p>
+      <ul className="mt-1.5 grid gap-1 sm:grid-cols-2">
+        {plano.beneficios.map((b, i) => (
+          <li key={i} className="flex items-center gap-2 text-[13px] font-medium text-foreground">
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600 fill-emerald-500/20" />
+            {b}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function ResponsavelDropdown({
   value,
   onChange,
