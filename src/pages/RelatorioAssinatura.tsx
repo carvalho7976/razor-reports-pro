@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { FormModal, FormRow, TextField, Dropdown } from "@/components/FormModal";
-import { User, CheckCircle2, Trash2, Cake, Percent, Info } from "lucide-react";
+import { User, CheckCircle2, Trash2, Cake, Percent, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { cn } from "@/lib/utils";
