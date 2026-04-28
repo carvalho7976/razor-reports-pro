@@ -332,10 +332,10 @@ export default function RelatorioAssinatura() {
     },
     { key: "qtdServicosTempo", label: "Serviços de Tempo/Ponto", align: "right" },
     { key: "tempoTrabalhado", label: "Tempo Trabalhado", align: "right", render: (v) => `${v} min` },
+    { key: "pontosAcumulados", label: "Pontos Acumulados", align: "right" },
     { key: "qtdServicosPorcentagem", label: "Serviços de %", align: "right" },
     { key: "qtdProdutos", label: "Produtos Vendidos", align: "right" },
     { key: "clientesAtendidos", label: "Clientes Atendidos", align: "right" },
-    { key: "pontosAcumulados", label: "Pontos Acumulados", align: "right" },
     {
       key: "valor",
       label: "Valor",
