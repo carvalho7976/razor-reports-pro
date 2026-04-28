@@ -1352,22 +1352,23 @@ export default function AssinaturaCadastro() {
                       </li>
                     ))}
 
-                    {/* Adicionar benefício inline */}
-                    <li className="flex items-start gap-2 text-[13px] font-medium">
-                      <button
-                        type="button"
-                        onClick={startResumoNovoBeneficio}
-                        className="flex items-center gap-2 text-muted-foreground transition hover:text-primary"
-                      >
-                        <Plus className="h-4 w-4 shrink-0" />
-                        <span>Adicionar benefício</span>
-                      </button>
-                    </li>
-
                     {/* Dias válidos */}
                     <li className="flex items-start gap-2 text-[13px] font-medium text-foreground">
                       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
                       <span>{diasValidosLabel}</span>
+                    </li>
+
+                    {/* Adicionar benefício inline (apenas ícone) */}
+                    <li className="flex items-start">
+                      <button
+                        type="button"
+                        onClick={startResumoNovoBeneficio}
+                        className="text-muted-foreground transition hover:text-primary"
+                        aria-label="Adicionar benefício"
+                        title="Adicionar benefício"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
                     </li>
                   </ul>
                 </div>
