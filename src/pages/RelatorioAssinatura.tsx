@@ -400,19 +400,59 @@ export default function RelatorioAssinatura() {
 
   return (
     <AppLayout>
-      <DataTable
-        title="Comissões assinaturas"
-        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
-        data={linhas}
-        columns={columns}
-        totalRow={{ profissional: "Total:", valor: R$(totalValor) }}
-        summaryCards={summaryCards}
-        showDateFilter={true}
-        dateFilterSlot={<MonthPicker />}
-        slotBetweenCardsAndTabs={<ActionBar />}
-        pageSize={15}
-        tableId="relatorio_assinatura"
-        novoMenuItems={[
+      {isDetalhado ? (
+        <DataTable
+          title="Comissões assinaturas"
+          titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
+          data={linhasDetalhadas}
+          columns={columnsDetalhado}
+          totalRow={{ data: "Total:", valor: R$(totalValorDet) }}
+          summaryCards={summaryCards}
+          showDateFilter={true}
+          dateFilterSlot={<MonthPicker />}
+          slotBetweenCardsAndTabs={<ActionBar />}
+          tabs={[
+            { label: "Resumo", value: "resumo" },
+            { label: "Detalhado", value: "detalhado" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          pageSize={15}
+          tableId="relatorio_assinatura_det"
+          emptyMessage="Nenhum registro encontrado."
+          novoMenuItems={[
+            {
+              label: "Novo",
+              onClick: () => {
+                setNovoPeriodo(periodo);
+                setNovoBolo("");
+                setNovoPerc("");
+                setErrors({});
+                setNovoOpen(true);
+              },
+            },
+          ]}
+        />
+      ) : (
+        <DataTable
+          title="Comissões assinaturas"
+          titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
+          data={linhas}
+          columns={columns}
+          totalRow={{ profissional: "Total:", valor: R$(totalValor) }}
+          summaryCards={summaryCards}
+          showDateFilter={true}
+          dateFilterSlot={<MonthPicker />}
+          slotBetweenCardsAndTabs={<ActionBar />}
+          tabs={[
+            { label: "Resumo", value: "resumo" },
+            { label: "Detalhado", value: "detalhado" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          pageSize={15}
+          tableId="relatorio_assinatura"
+          novoMenuItems={[
           {
             label: "Novo",
             onClick: () => {
@@ -423,8 +463,9 @@ export default function RelatorioAssinatura() {
               setNovoOpen(true);
             },
           },
-        ]}
-      />
+          ]}
+        />
+      )}
 
       {novoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -508,16 +549,14 @@ export default function RelatorioAssinatura() {
             onClose={() => setPagarOpen(false)}
             size="sm"
             footer={
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={confirmarPagamento}
-                  className="h-10 inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--novo-btn))] px-4 text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  Pagar
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={confirmarPagamento}
+                className="h-12 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[hsl(var(--novo-btn))] px-4 text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                Pagar
+              </button>
             }
           >
             <div className="grid gap-1">
