@@ -38,6 +38,7 @@ import AssinaturaCadastro from "./pages/AssinaturaCadastro";
 import NovaAgenda2 from "./pages/NovaAgenda2";
 import AssinaturaPesquisa from "./pages/AssinaturaPesquisa";
 import RelatorioAssinatura from "./pages/RelatorioAssinatura";
+import Concorrentes from "./pages/Concorrentes";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
           <Route path="/assinaturaPesquisa" element={<AssinaturaPesquisa />} />
           <Route path="/relatorioAssinatura.xhtml" element={<RelatorioAssinatura />} />
           <Route path="/relatorioAssinatura" element={<RelatorioAssinatura />} />
+          <Route path="/concorrentes" element={<Concorrentes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
