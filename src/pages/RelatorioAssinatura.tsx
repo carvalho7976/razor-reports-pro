@@ -209,7 +209,7 @@ export default function RelatorioAssinatura() {
       {
         label: "Total Bolo",
         value: dadosPeriodo ? R$(dadosPeriodo.totalBolo) : R$(0),
-        icon: <Cake className="h-4 w-4" />,
+        icon: <CakeSlice className="h-4 w-4" />,
         color: "blue",
       },
       {
