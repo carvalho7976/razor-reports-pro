@@ -138,6 +138,7 @@ interface DataTableProps<T extends Record<string, any>> {
   tableId?: string;
   dateField?: string;
   slotBetweenCardsAndTabs?: ReactNode;
+  dateFilterSlot?: ReactNode;
 }
 
 export function NovoButton({ items }: { items: NovoMenuItem[] }) {
@@ -885,6 +886,7 @@ export function DataTable<T extends Record<string, any>>({
   tableId,
   dateField,
   slotBetweenCardsAndTabs,
+  dateFilterSlot,
 }: DataTableProps<T>) {
   const storageKey = tableId || title.replace(/\s+/g, "_").toLowerCase();
 
@@ -1281,15 +1283,17 @@ export function DataTable<T extends Record<string, any>>({
           {showDateFilter && (
             <>
               <div className="h-5 w-px bg-border hidden sm:block" />
-              <DateRangePicker
-                datePreset={datePreset}
-                onSelect={(p) => {
-                  setDatePreset(p);
-                  setPage(0);
-                }}
-                dateRange={dateRange}
-                onRangeChange={setDateRange}
-              />
+              {dateFilterSlot || (
+                <DateRangePicker
+                  datePreset={datePreset}
+                  onSelect={(p) => {
+                    setDatePreset(p);
+                    setPage(0);
+                  }}
+                  dateRange={dateRange}
+                  onRangeChange={setDateRange}
+                />
+              )}
             </>
           )}
 

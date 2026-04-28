@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { FormModal, FormRow, TextField, Dropdown } from "@/components/FormModal";
-import { User, CheckCircle2, Trash2, Cake, Percent, Users, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { User, CheckCircle2, Trash2, Cake, Percent, Users, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { cn } from "@/lib/utils";
@@ -369,8 +369,8 @@ export default function RelatorioAssinatura() {
         columns={columns}
         totalRow={{ profissional: "Total:", valor: R$(totalValor) }}
         summaryCards={summaryCards}
-        showDateFilter={false}
-        actions={<MonthPicker />}
+        showDateFilter={true}
+        dateFilterSlot={<MonthPicker />}
         slotBetweenCardsAndTabs={<ActionBar />}
         pageSize={15}
         tableId="relatorio_assinatura"
@@ -470,22 +470,14 @@ export default function RelatorioAssinatura() {
             onClose={() => setPagarOpen(false)}
             size="sm"
             footer={
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={confirmarPagamento}
-                  className="h-10 inline-flex items-center gap-2 rounded-lg bg-success px-4 text-sm font-semibold text-white hover:bg-success/90 transition-colors"
+                  className="h-10 inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--novo-btn))] px-4 text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
                 >
                   <CheckCircle2 className="h-4 w-4" />
                   Pagar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPagarOpen(false)}
-                  className="h-10 inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--novo-btn))] px-4 text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                  Cancelar
                 </button>
               </div>
             }
