@@ -2,10 +2,11 @@ import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SummaryCard } from "@/components/DataTable";
 import { FormModal, FormRow, TextField, Dropdown } from "@/components/FormModal";
-import { User, CheckCircle2, Trash2, Cake, Percent, Users } from "lucide-react";
+import { User, CheckCircle2, Trash2, Cake, Percent, Users, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const R$ = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -25,6 +26,7 @@ interface PeriodoData {
   totalBolo: number;
   percEquipe: number;
   pago: boolean;
+  formato: "tempo" | "pontos";
   linhas: LinhaProfissional[];
 }
 
@@ -54,6 +56,7 @@ const periodosIniciais: Record<string, PeriodoData> = {
     totalBolo: 5998,
     percEquipe: 50,
     pago: true,
+    formato: "tempo",
     linhas: baseProfissionais.map((p, idx) => ({
       ...p,
       valor: Math.round(((p.tempoTrabalhado + p.qtdProdutos * 30 + p.clientesAtendidos * 10) / 600) * 5998 * 0.5 * 100) / 100,
@@ -87,7 +90,26 @@ export default function RelatorioAssinatura() {
   const [novoPeriodo, setNovoPeriodo] = useState<string>(periodo);
   const [novoBolo, setNovoBolo] = useState<string>("");
   const [novoPerc, setNovoPerc] = useState<string>("");
+  const [novoFormato, setNovoFormato] = useState<"tempo" | "pontos">("tempo");
   const [errors, setErrors] = useState<{ bolo?: string; perc?: string }>({});
+
+  // Modal "Pagamento de Comissão"
+  const [pagarOpen, setPagarOpen] = useState(false);
+  const [origemPagamento, setOrigemPagamento] = useState<string>("");
+  const [origemErro, setOrigemErro] = useState<string | undefined>();
+
+  // Month picker year navigation
+  const [pickerYear, setPickerYear] = useState<number>(() => {
+    const m = periodo.match(/\/(\d{4})$/);
+    return m ? parseInt(m[1], 10) : new Date().getFullYear();
+  });
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const monthNames = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  const monthLabel = (key: string) => {
+    const [m, y] = key.split("/");
+    return `${m.charAt(0).toUpperCase()}${m.slice(1)}/${y}`;
+  };
 
   const dadosPeriodo: PeriodoData | undefined = periodos[periodo];
   const gerado = !!dadosPeriodo;
@@ -146,7 +168,7 @@ export default function RelatorioAssinatura() {
 
     setPeriodos((prev) => ({
       ...prev,
-      [novoPeriodo]: { totalBolo: bolo, percEquipe: perc, pago: false, linhas: novasLinhas },
+      [novoPeriodo]: { totalBolo: bolo, percEquipe: perc, pago: false, formato: novoFormato, linhas: novasLinhas },
     }));
     setPeriodo(novoPeriodo);
     setNovoOpen(false);
@@ -155,14 +177,24 @@ export default function RelatorioAssinatura() {
     toast({ title: "Bolo gerado", description: `Período ${novoPeriodo} gerado com sucesso.` });
   };
 
-  const onPagarLinha = (id: number) => {
+  const abrirPagar = () => {
+    setOrigemPagamento("");
+    setOrigemErro(undefined);
+    setPagarOpen(true);
+  };
+
+  const confirmarPagamento = () => {
+    if (!origemPagamento) {
+      setOrigemErro("Selecione a origem do pagamento");
+      return;
+    }
     setPeriodos((prev) => {
       const atual = prev[periodo];
       if (!atual) return prev;
-      // marca o período inteiro como pago (regra: pagamento por período)
       return { ...prev, [periodo]: { ...atual, pago: true } };
     });
-    toast({ title: "Pagamento registrado", description: `Profissional pago no período ${periodo}.` });
+    setPagarOpen(false);
+    toast({ title: "Pagamento registrado", description: `Comissões pagas via ${origemPagamento}.` });
   };
 
   const onExcluirLinha = (id: number) => {
@@ -233,6 +265,68 @@ export default function RelatorioAssinatura() {
 
   const totalValor = linhas.reduce((s, r) => s + r.valor, 0);
 
+  const totalComissoes = totalValor;
+
+  const origemOptions = [
+    { value: "Caixa", label: "Caixa" },
+    { value: "Capital de Giro", label: "Capital de Giro" },
+  ];
+
+  // Custom month-only picker (substitui o filtro "Período" padrão da toolbar nesta tela)
+  const MonthPicker = () => (
+    <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+      <PopoverTrigger asChild>
+        <button className={cn("toolbar-btn gap-1.5 text-xs", "toolbar-btn-active")}>
+          <Calendar className="h-3.5 w-3.5" />
+          <span>{monthLabel(periodo)}</span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-3" align="start" sideOffset={8}>
+        <div className="flex items-center justify-between mb-2">
+          <button
+            type="button"
+            onClick={() => setPickerYear((y) => y - 1)}
+            className="p-1 rounded-md hover:bg-muted text-foreground"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className="text-sm font-semibold text-foreground">{pickerYear}</span>
+          <button
+            type="button"
+            onClick={() => setPickerYear((y) => y + 1)}
+            className="p-1 rounded-md hover:bg-muted text-foreground"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5 w-[220px]">
+          {monthNames.map((m) => {
+            const key = `${m}/${pickerYear}`;
+            const isActive = key === periodo;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  setPeriodo(key);
+                  setPickerOpen(false);
+                }}
+                className={cn(
+                  "px-2 py-1.5 text-xs rounded-md transition-colors",
+                  isActive
+                    ? "bg-foreground text-background font-medium"
+                    : "text-foreground hover:bg-muted",
+                )}
+              >
+                {m.charAt(0).toUpperCase() + m.slice(1)}
+              </button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+
   // Bolacha de ação sempre visível quando o bolo foi gerado para o período.
   const ActionBar = () => {
     if (!gerado) return null;
@@ -275,7 +369,8 @@ export default function RelatorioAssinatura() {
         columns={columns}
         totalRow={{ profissional: "Total:", valor: R$(totalValor) }}
         summaryCards={summaryCards}
-        showDateFilter={true}
+        showDateFilter={false}
+        actions={<MonthPicker />}
         slotBetweenCardsAndTabs={<ActionBar />}
         pageSize={15}
         tableId="relatorio_assinatura"
