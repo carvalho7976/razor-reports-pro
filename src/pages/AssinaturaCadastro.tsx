@@ -757,6 +757,28 @@ export default function AssinaturaCadastro() {
       return next;
     });
 
+  // Edição inline de benefício direto no Resumo
+  const [resumoEditIdx, setResumoEditIdx] = useState<number | null>(null);
+  const [resumoEditValue, setResumoEditValue] = useState("");
+  const startResumoNovoBeneficio = () => {
+    setBeneficios((prev) => {
+      const next = [...prev, ""];
+      setResumoEditIdx(next.length - 1);
+      setResumoEditValue("");
+      return next;
+    });
+  };
+  const commitResumoBeneficio = () => {
+    if (resumoEditIdx === null) return;
+    const t = resumoEditValue.trim();
+    setBeneficios((prev) => {
+      if (!t) return prev.filter((_, i) => i !== resumoEditIdx);
+      return prev.map((b, i) => (i === resumoEditIdx ? t : b));
+    });
+    setResumoEditIdx(null);
+    setResumoEditValue("");
+  };
+
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
   const labelUsos = (v: string) =>
@@ -1288,18 +1310,61 @@ export default function AssinaturaCadastro() {
                     {beneficios.map((b, idx) => !hiddenResumo.has(`b-${idx}`) && (
                       <li key={`b-${idx}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span className="flex-1">{b}</span>
-                        <button
-                          type="button"
-                          onClick={() => ocultarResumo(`b-${idx}`)}
-                          className="opacity-0 transition group-hover:opacity-100"
-                          aria-label="Ocultar do resumo"
-                          title="Ocultar do resumo"
-                        >
-                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                        </button>
+                        {resumoEditIdx === idx ? (
+                          <input
+                            autoFocus
+                            value={resumoEditValue}
+                            onChange={(e) => setResumoEditValue(e.target.value)}
+                            onBlur={commitResumoBeneficio}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                commitResumoBeneficio();
+                              } else if (e.key === "Escape") {
+                                setResumoEditIdx(null);
+                                setResumoEditValue("");
+                                if (!beneficios[idx]) removerBeneficio(idx);
+                              }
+                            }}
+                            placeholder="Digite o benefício..."
+                            className="flex-1 border-b border-border bg-transparent text-[13px] outline-none focus:border-primary"
+                          />
+                        ) : (
+                          <>
+                            <span
+                              className="flex-1 cursor-text"
+                              onClick={() => {
+                                setResumoEditIdx(idx);
+                                setResumoEditValue(b);
+                              }}
+                            >
+                              {b}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => ocultarResumo(`b-${idx}`)}
+                              className="opacity-0 transition group-hover:opacity-100"
+                              aria-label="Ocultar do resumo"
+                              title="Ocultar do resumo"
+                            >
+                              <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                            </button>
+                          </>
+                        )}
                       </li>
                     ))}
+
+                    {/* Adicionar benefício inline */}
+                    <li className="flex items-start gap-2 text-[13px] font-medium">
+                      <button
+                        type="button"
+                        onClick={startResumoNovoBeneficio}
+                        className="flex items-center gap-2 text-muted-foreground transition hover:text-primary"
+                      >
+                        <Plus className="h-4 w-4 shrink-0" />
+                        <span>Adicionar benefício</span>
+                      </button>
+                    </li>
 
                     {/* Dias válidos */}
                     <li className="flex items-start gap-2 text-[13px] font-medium text-foreground">
