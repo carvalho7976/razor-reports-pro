@@ -349,7 +349,7 @@ export default function RelatorioAssinatura() {
         ) : (
           <button
             type="button"
-            onClick={() => onPagarLinha(0)}
+            onClick={abrirPagar}
             className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg text-success hover:bg-success/10 transition-colors"
           >
             <CheckCircle2 className="h-4 w-4" />
@@ -394,6 +394,7 @@ export default function RelatorioAssinatura() {
             title="Gerar bolo de assinaturas"
             subtitle="Defina o total do bolo e a % destinada à equipe"
             onClose={() => setNovoOpen(false)}
+            size="sm"
             footer={
               <button
                 type="button"
@@ -423,6 +424,86 @@ export default function RelatorioAssinatura() {
               onChange={(v) => setNovoPerc(v)}
               placeholder="0,00%"
               error={errors.perc}
+            />
+            <div className="grid gap-1.5">
+              <label className="text-[13px] font-semibold text-foreground">
+                Qual o formato de comissão?
+              </label>
+              <div className="flex gap-2">
+                {([
+                  { value: "tempo", label: "Tempo" },
+                  { value: "pontos", label: "Pontos" },
+                ] as const).map((opt) => {
+                  const active = novoFormato === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setNovoFormato(opt.value)}
+                      className={cn(
+                        "flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-lg border text-sm font-medium transition-colors",
+                        active
+                          ? "border-info bg-info/10 text-foreground"
+                          : "border-border bg-card text-foreground hover:bg-muted",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "h-3.5 w-3.5 rounded-full border-[2px]",
+                          active ? "border-info bg-info" : "border-muted-foreground/40 bg-card",
+                        )}
+                      />
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </FormModal>
+        </div>
+      )}
+
+      {pagarOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <FormModal
+            title="Pagamento de Comissão"
+            onClose={() => setPagarOpen(false)}
+            size="sm"
+            footer={
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={confirmarPagamento}
+                  className="h-10 inline-flex items-center gap-2 rounded-lg bg-success px-4 text-sm font-semibold text-white hover:bg-success/90 transition-colors"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  Pagar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPagarOpen(false)}
+                  className="h-10 inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--novo-btn))] px-4 text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                  Cancelar
+                </button>
+              </div>
+            }
+          >
+            <div className="grid gap-1">
+              <span className="text-sm font-semibold text-foreground">Total em comissões:</span>
+              <span className="text-base text-foreground">{R$(totalComissoes)}</span>
+            </div>
+            <Dropdown
+              label="Retirar valor de"
+              value={origemPagamento}
+              setValue={(v) => {
+                setOrigemPagamento(v);
+                setOrigemErro(undefined);
+              }}
+              options={origemOptions}
+              placeholder="selecione"
+              error={origemErro}
             />
           </FormModal>
         </div>
