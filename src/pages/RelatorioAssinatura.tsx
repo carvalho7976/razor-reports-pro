@@ -229,34 +229,42 @@ export default function RelatorioAssinatura() {
         <span className="font-medium text-foreground">{R$(v)}</span>
       ),
     },
-    {
-      key: "id",
-      label: "Ações",
-      align: "center",
-      render: (_v, row) => {
-        if (!gerado) {
-          return <span className="text-xs text-muted-foreground">—</span>;
-        }
-        return dadosPeriodo?.pago ? (
-          <ActionPill
-            variant="destructive"
-            icon={<Trash2 className="h-3.5 w-3.5" />}
-            label="Excluir"
-            onClick={() => onExcluirLinha(row.id)}
-          />
-        ) : (
-          <ActionPill
-            variant="success"
-            icon={<CheckCircle2 className="h-3.5 w-3.5" />}
-            label="Pagar"
-            onClick={() => onPagarLinha(row.id)}
-          />
-        );
-      },
-    },
   ];
 
   const totalValor = linhas.reduce((s, r) => s + r.valor, 0);
+
+  // Bolacha de ação sempre visível quando o bolo foi gerado para o período.
+  const ActionBar = () => {
+    if (!gerado) return null;
+    const isPago = !!dadosPeriodo?.pago;
+    return (
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-info/5 border border-info/20">
+        <span className="text-xs sm:text-sm font-medium text-foreground">
+          Bolo gerado · {periodo}
+        </span>
+        <div className="h-4 w-px bg-border" />
+        {isPago ? (
+          <button
+            type="button"
+            onClick={() => onExcluirLinha(0)}
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Excluir pagamento</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onPagarLinha(0)}
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg text-success hover:bg-success/10 transition-colors"
+          >
+            <CheckCircle2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Pagar</span>
+          </button>
+        )}
+      </div>
+    );
+  };
 
   return (
     <AppLayout>
@@ -267,19 +275,8 @@ export default function RelatorioAssinatura() {
         columns={columns}
         totalRow={{ profissional: "Total:", valor: R$(totalValor) }}
         summaryCards={summaryCards}
-        slotBetweenCardsAndTabs={
-          <div className="flex items-end gap-3">
-            <div className="grid gap-0.5 min-w-[160px]">
-              <label className="text-[13px] font-semibold text-foreground">Período</label>
-              <Dropdown
-                label=""
-                value={periodo}
-                setValue={setPeriodo}
-                options={periodosOptions}
-              />
-            </div>
-          </div>
-        }
+        showDateFilter={true}
+        slotBetweenCardsAndTabs={<ActionBar />}
         pageSize={15}
         tableId="relatorio_assinatura"
         novoMenuItems={[
