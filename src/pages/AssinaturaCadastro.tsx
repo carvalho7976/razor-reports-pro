@@ -606,8 +606,6 @@ export default function AssinaturaCadastro() {
 
   const [beneficios, setBeneficios] = useState<string[]>([
     "Venha quando precisar",
-    "Descontos em serviços",
-    "Desconto em produtos",
   ]);
   const [novoBeneficio, setNovoBeneficio] = useState("");
 
