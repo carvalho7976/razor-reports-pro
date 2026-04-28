@@ -4,6 +4,7 @@ import { DataTable, Column, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { User, Package, Layers, DollarSign, Tag, Scissors } from "lucide-react";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
+import { Switch } from "@/components/ui/switch";
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface Pacote {
@@ -184,6 +185,22 @@ export default function RelatorioPacotes() {
     { key: "valor", label: "Preço", align: "right", render: (v) => R$(v) },
     { key: "desconto", label: "Desconto", align: "right", render: (v) => R$(v) },
     { key: "dataVenda", label: "Data Venda" },
+    {
+      key: "restam" as any,
+      label: "Status",
+      align: "center",
+      render: (_v: any, row: Pacote) => {
+        const ativo = row.restam > 0;
+        return (
+          <div className="flex items-center justify-center gap-2">
+            <Switch checked={ativo} onCheckedChange={() => {}} />
+            <span className={`text-xs font-medium ${ativo ? "text-foreground" : "text-muted-foreground"}`}>
+              {ativo ? "Em uso" : "Finalizado"}
+            </span>
+          </div>
+        );
+      },
+    },
   ];
 
   return (
