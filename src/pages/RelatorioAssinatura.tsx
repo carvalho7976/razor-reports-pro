@@ -19,6 +19,7 @@ interface LinhaProfissional {
   qtdServicosPorcentagem: number;
   qtdProdutos: number;
   clientesAtendidos: number;
+  pontosAcumulados: number;
   valor: number; // valor a pagar (gerado a partir do bolo)
 }
 
@@ -31,15 +32,15 @@ interface PeriodoData {
 }
 
 const baseProfissionais: Omit<LinhaProfissional, "valor">[] = [
-  { id: 1, profissional: "Cesar", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 2, profissional: "Claudia", qtdServicosTempo: 2, tempoTrabalhado: 90, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1 },
-  { id: 3, profissional: "Fila de espera", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 4, profissional: "Henrique", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 5, profissional: "Lara", qtdServicosTempo: 1, tempoTrabalhado: 45, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1 },
-  { id: 6, profissional: "Marcia Silva", qtdServicosTempo: 3, tempoTrabalhado: 120, qtdServicosPorcentagem: 1, qtdProdutos: 0, clientesAtendidos: 2 },
-  { id: 7, profissional: "Matheus", qtdServicosTempo: 4, tempoTrabalhado: 180, qtdServicosPorcentagem: 0, qtdProdutos: 1, clientesAtendidos: 3 },
-  { id: 8, profissional: "Ramon", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 9, profissional: "Vini", qtdServicosTempo: 1, tempoTrabalhado: 30, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1 },
+  { id: 1, profissional: "Cesar", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 2, profissional: "Claudia", qtdServicosTempo: 2, tempoTrabalhado: 90, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 110 },
+  { id: 3, profissional: "Fila de espera", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 4, profissional: "Henrique", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 5, profissional: "Lara", qtdServicosTempo: 1, tempoTrabalhado: 45, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 55 },
+  { id: 6, profissional: "Marcia Silva", qtdServicosTempo: 3, tempoTrabalhado: 120, qtdServicosPorcentagem: 1, qtdProdutos: 0, clientesAtendidos: 2, pontosAcumulados: 160 },
+  { id: 7, profissional: "Matheus", qtdServicosTempo: 4, tempoTrabalhado: 180, qtdServicosPorcentagem: 0, qtdProdutos: 1, clientesAtendidos: 3, pontosAcumulados: 240 },
+  { id: 8, profissional: "Ramon", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 9, profissional: "Vini", qtdServicosTempo: 1, tempoTrabalhado: 30, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 40 },
 ];
 
 const periodosOptions = [
@@ -104,6 +105,7 @@ export default function RelatorioAssinatura() {
     return m ? parseInt(m[1], 10) : new Date().getFullYear();
   });
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("resumo");
 
   const monthNames = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
   const monthLabel = (key: string) => {
@@ -253,6 +255,7 @@ export default function RelatorioAssinatura() {
     { key: "qtdServicosPorcentagem", label: "Qtd serviços por porcentagem", align: "right" },
     { key: "qtdProdutos", label: "Qtd produtos", align: "right" },
     { key: "clientesAtendidos", label: "Clientes atendidos", align: "right" },
+    { key: "pontosAcumulados", label: "Pontos acumulados", align: "right" },
     {
       key: "valor",
       label: "Valor",
@@ -262,6 +265,41 @@ export default function RelatorioAssinatura() {
       ),
     },
   ];
+
+  // Linhas detalhadas (mock) — uma linha por serviço/comissão
+  interface LinhaDetalhada {
+    id: number;
+    data: string;
+    funcionario: string;
+    cliente: string;
+    tipoComissao: string;
+    item: string;
+    quantidade: number;
+    valor: number;
+  }
+  const linhasDetalhadas: LinhaDetalhada[] = useMemo(() => {
+    if (!gerado) return [];
+    return [
+      { id: 1, data: "05/05/2025", funcionario: "Claudia", cliente: "Ana Souza", tipoComissao: "Tempo", item: "Corte feminino", quantidade: 1, valor: 80 },
+      { id: 2, data: "08/05/2025", funcionario: "Lara", cliente: "Júlia Lima", tipoComissao: "Tempo", item: "Escova", quantidade: 1, valor: 60 },
+      { id: 3, data: "12/05/2025", funcionario: "Marcia Silva", cliente: "Paula Reis", tipoComissao: "Porcentagem", item: "Coloração", quantidade: 1, valor: 220 },
+      { id: 4, data: "15/05/2025", funcionario: "Matheus", cliente: "Carlos Dias", tipoComissao: "Tempo", item: "Barba", quantidade: 2, valor: 70 },
+      { id: 5, data: "22/05/2025", funcionario: "Vini", cliente: "Pedro Alves", tipoComissao: "Tempo", item: "Corte masculino", quantidade: 1, valor: 50 },
+    ];
+  }, [gerado, periodo]);
+
+  const columnsDetalhado: Column<LinhaDetalhada>[] = [
+    { key: "data", label: "Data", pinned: true },
+    { key: "funcionario", label: "Funcionário" },
+    { key: "cliente", label: "Cliente", render: (v) => <a href="/listaClientes" className="hover:underline font-medium">{v}</a> },
+    { key: "tipoComissao", label: "Tipo Comissão" },
+    { key: "item", label: "Ítem" },
+    { key: "quantidade", label: "Quantidade", align: "right" },
+    { key: "valor", label: "Valor", align: "right", render: (v: number) => <span className="font-medium text-foreground">{R$(v)}</span> },
+  ];
+
+  const isDetalhado = activeTab === "detalhado";
+  const totalValorDet = linhasDetalhadas.reduce((s, r) => s + r.valor, 0);
 
   const totalValor = linhas.reduce((s, r) => s + r.valor, 0);
 
@@ -276,7 +314,7 @@ export default function RelatorioAssinatura() {
   const MonthPicker = () => (
     <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
       <PopoverTrigger asChild>
-        <button className={cn("toolbar-btn gap-1.5 text-xs", "toolbar-btn-active")}>
+        <button className="toolbar-btn gap-1.5 text-xs">
           <Calendar className="h-3.5 w-3.5" />
           <span>{monthLabel(periodo)}</span>
         </button>
@@ -362,19 +400,59 @@ export default function RelatorioAssinatura() {
 
   return (
     <AppLayout>
-      <DataTable
-        title="Comissões assinaturas"
-        titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
-        data={linhas}
-        columns={columns}
-        totalRow={{ profissional: "Total:", valor: R$(totalValor) }}
-        summaryCards={summaryCards}
-        showDateFilter={true}
-        dateFilterSlot={<MonthPicker />}
-        slotBetweenCardsAndTabs={<ActionBar />}
-        pageSize={15}
-        tableId="relatorio_assinatura"
-        novoMenuItems={[
+      {isDetalhado ? (
+        <DataTable
+          title="Comissões assinaturas"
+          titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
+          data={linhasDetalhadas}
+          columns={columnsDetalhado}
+          totalRow={{ data: "Total:", valor: R$(totalValorDet) }}
+          summaryCards={summaryCards}
+          showDateFilter={true}
+          dateFilterSlot={<MonthPicker />}
+          slotBetweenCardsAndTabs={<ActionBar />}
+          tabs={[
+            { label: "Resumo", value: "resumo" },
+            { label: "Detalhado", value: "detalhado" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          pageSize={15}
+          tableId="relatorio_assinatura_det"
+          emptyMessage="Nenhum registro encontrado."
+          novoMenuItems={[
+            {
+              label: "Novo",
+              onClick: () => {
+                setNovoPeriodo(periodo);
+                setNovoBolo("");
+                setNovoPerc("");
+                setErrors({});
+                setNovoOpen(true);
+              },
+            },
+          ]}
+        />
+      ) : (
+        <DataTable
+          title="Comissões assinaturas"
+          titleIcon={<AulaButton onOpen={() => setAulaOpen(true)} />}
+          data={linhas}
+          columns={columns}
+          totalRow={{ profissional: "Total:", valor: R$(totalValor) }}
+          summaryCards={summaryCards}
+          showDateFilter={true}
+          dateFilterSlot={<MonthPicker />}
+          slotBetweenCardsAndTabs={<ActionBar />}
+          tabs={[
+            { label: "Resumo", value: "resumo" },
+            { label: "Detalhado", value: "detalhado" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          pageSize={15}
+          tableId="relatorio_assinatura"
+          novoMenuItems={[
           {
             label: "Novo",
             onClick: () => {
@@ -385,8 +463,9 @@ export default function RelatorioAssinatura() {
               setNovoOpen(true);
             },
           },
-        ]}
-      />
+          ]}
+        />
+      )}
 
       {novoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -470,16 +549,14 @@ export default function RelatorioAssinatura() {
             onClose={() => setPagarOpen(false)}
             size="sm"
             footer={
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={confirmarPagamento}
-                  className="h-10 inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--novo-btn))] px-4 text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  Pagar
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={confirmarPagamento}
+                className="h-12 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[hsl(var(--novo-btn))] px-4 text-sm font-semibold text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.9)] transition-colors"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                Pagar
+              </button>
             }
           >
             <div className="grid gap-1">
