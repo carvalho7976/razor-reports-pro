@@ -21,19 +21,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ServicoOpt {
   id: number;
@@ -151,15 +140,7 @@ const sections = [
   { id: "disponibilidade", label: "Disponibilidade" },
 ];
 
-function CurrencyInput({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function CurrencyInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   const formatted = value || "0,00";
   return (
     <div className="grid min-w-0 gap-0.5">
@@ -196,10 +177,7 @@ function SectionBlock({
   className?: string;
 }) {
   return (
-    <section
-      id={id}
-      className={cn("scroll-mt-24 rounded-xl border border-border bg-card p-4 px-[16px]", className)}
-    >
+    <section id={id} className={cn("scroll-mt-24 rounded-xl border border-border bg-card p-4 px-[16px]", className)}>
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-foreground">{title}</h2>
@@ -322,9 +300,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                     type="text"
                     inputMode="numeric"
                     value={bulkDiscount}
-                    onChange={(e) =>
-                      setBulkDiscount(e.target.value.replace(/\D/g, "").slice(0, 3))
-                    }
+                    onChange={(e) => setBulkDiscount(e.target.value.replace(/\D/g, "").slice(0, 3))}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
@@ -363,9 +339,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
       {/* List */}
       <div className="max-h-[225px] overflow-y-auto px-0 py-0">
         {filtered.length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-            Nenhum item encontrado.
-          </p>
+          <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum item encontrado.</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {filtered.map((item) => {
@@ -377,9 +351,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                   onClick={() => toggle(item.id)}
                   className={cn(
                     "cursor-pointer rounded-lg border transition",
-                    isSelected
-                      ? "border-blue-500/40 bg-blue-500/5"
-                      : "border-border bg-card hover:bg-muted/40",
+                    isSelected ? "border-blue-500/40 bg-blue-500/5" : "border-border bg-card hover:bg-muted/40",
                   )}
                 >
                   <div className="flex flex-wrap items-center gap-3 px-3 py-2.5 sm:flex-nowrap">
@@ -389,9 +361,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                       onClick={(e) => e.stopPropagation()}
                       className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                     />
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
-                      {item.nome}
-                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{item.nome}</span>
 
                     {isSelected && (
                       <div
@@ -403,16 +373,12 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className="flex h-9 items-center rounded-md border border-border bg-card">
-                                <span className="pl-2 text-[11px] font-medium text-muted-foreground">
-                                  desc.
-                                </span>
+                                <span className="pl-2 text-[11px] font-medium text-muted-foreground">desc.</span>
                                 <input
                                   type="text"
                                   inputMode="numeric"
                                   value={sel.desconto}
-                                  onChange={(e) =>
-                                    update(item.id, "desconto", e.target.value.replace(/\D/g, ""))
-                                  }
+                                  onChange={(e) => update(item.id, "desconto", e.target.value.replace(/\D/g, ""))}
                                   className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
                                 />
                                 <span className="pr-2 text-xs text-muted-foreground">%</span>
@@ -428,19 +394,13 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div className="flex h-9 items-center rounded-md border border-border bg-card">
-                                  <span className="pl-2 text-[11px] font-medium text-muted-foreground">
-                                    limite
-                                  </span>
+                                  <span className="pl-2 text-[11px] font-medium text-muted-foreground">limite</span>
                                   <input
                                     type="text"
                                     inputMode="numeric"
                                     value={sel.usos === "ILIMITADO" ? "" : sel.usos}
                                     onChange={(e) =>
-                                      update(
-                                        item.id,
-                                        "usos",
-                                        e.target.value.replace(/\D/g, "") || "ILIMITADO",
-                                      )
+                                      update(item.id, "usos", e.target.value.replace(/\D/g, "") || "ILIMITADO")
                                     }
                                     placeholder="∞"
                                     className="h-full w-12 bg-transparent px-1 text-right text-sm outline-none placeholder:text-muted-foreground/60"
@@ -452,34 +412,31 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                                 Limite de unidades por mês (vazio = ilimitado)
                               </TooltipContent>
                             </Tooltip>
-                          ) : !hideUsos && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div>
-                                  <Select
-                                    value={sel.usos}
-                                    onValueChange={(v) => update(item.id, "usos", v)}
-                                  >
-                                    <SelectTrigger className="h-9 w-[140px] rounded-md border-border bg-card px-2 text-xs font-semibold">
-                                      <span className="mr-1 text-[11px] font-medium text-muted-foreground">
-                                        usos
-                                      </span>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {usosOptions.map((o) => (
-                                        <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
-                                          {o.label}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
-                                Usos por mês
-                              </TooltipContent>
-                            </Tooltip>
+                          ) : (
+                            !hideUsos && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div>
+                                    <Select value={sel.usos} onValueChange={(v) => update(item.id, "usos", v)}>
+                                      <SelectTrigger className="h-9 w-[140px] rounded-md border-border bg-card px-2 text-xs font-semibold">
+                                        <span className="mr-1 text-[11px] font-medium text-muted-foreground">usos</span>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {usosOptions.map((o) => (
+                                          <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                            {o.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                                  Usos por mês
+                                </TooltipContent>
+                              </Tooltip>
+                            )
                           )}
 
                           {/* COMISSÃO */}
@@ -487,19 +444,13 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div className="flex h-9 items-center rounded-md border border-border bg-card">
-                                  <span className="pl-2 text-[11px] font-medium text-muted-foreground">
-                                    com.
-                                  </span>
+                                  <span className="pl-2 text-[11px] font-medium text-muted-foreground">com.</span>
                                   <input
                                     type="text"
                                     inputMode="numeric"
                                     value={sel.comissaoValor}
                                     onChange={(e) =>
-                                      update(
-                                        item.id,
-                                        "comissaoValor",
-                                        e.target.value.replace(/\D/g, ""),
-                                      )
+                                      update(item.id, "comissaoValor", e.target.value.replace(/\D/g, ""))
                                     }
                                     className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
                                   />
@@ -510,38 +461,36 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                                 Percentual de comissão
                               </TooltipContent>
                             </Tooltip>
-                          ) : comissaoEnabled && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div>
-                                  <Select
-                                    value={sel.comissao}
-                                    onValueChange={(v) => update(item.id, "comissao", v)}
-                                  >
-                                    <SelectTrigger className="h-9 w-[160px] rounded-md border-border bg-card px-2 text-xs font-semibold">
-                                      <span className="mr-1 text-[11px] font-medium text-muted-foreground">
-                                        com.
-                                      </span>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {comissaoOptions.map((o) => (
-                                        <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
-                                          {o.label}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
-                                Comissão
-                              </TooltipContent>
-                            </Tooltip>
+                          ) : (
+                            comissaoEnabled && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div>
+                                    <Select value={sel.comissao} onValueChange={(v) => update(item.id, "comissao", v)}>
+                                      <SelectTrigger className="h-9 w-[160px] rounded-md border-border bg-card px-2 text-xs font-semibold">
+                                        <span className="mr-1 text-[11px] font-medium text-muted-foreground">com.</span>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {comissaoOptions.map((o) => (
+                                          <SelectItem key={o.value} value={o.value} className="text-xs font-semibold">
+                                            {o.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                                  Comissão
+                                </TooltipContent>
+                              </Tooltip>
+                            )
                           )}
 
                           {/* % COM. ou PONTOS  */}
-                          {!productMode && comissaoEnabled &&
+                          {!productMode &&
+                            comissaoEnabled &&
                             (sel.comissao === "PORCENTAGEM" || sel.comissao === "PONTOS") && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -554,11 +503,7 @@ function InlineSelectableList<T extends { id: number; nome: string }>({
                                       inputMode="numeric"
                                       value={sel.comissaoValor}
                                       onChange={(e) =>
-                                        update(
-                                          item.id,
-                                          "comissaoValor",
-                                          e.target.value.replace(/\D/g, ""),
-                                        )
+                                        update(item.id, "comissaoValor", e.target.value.replace(/\D/g, ""))
                                       }
                                       className="h-full w-10 bg-transparent px-1 text-right text-sm outline-none"
                                     />
@@ -604,19 +549,14 @@ export default function AssinaturaCadastro() {
   const [destaque, setDestaque] = useState(false);
   const [parcerias, setParcerias] = useState(false);
 
-  const [beneficios, setBeneficios] = useState<string[]>([
-    "Venha quando precisar",
-  ]);
+  const [beneficios, setBeneficios] = useState<string[]>(["Venha quando precisar"]);
   const [novoBeneficio, setNovoBeneficio] = useState("");
 
   // Serviços
   const [servicosMap, setServicosMap] = useState<Map<number, ServicoIncluso>>(
     () =>
       new Map<number, ServicoIncluso>([
-        [
-          1,
-          { id: 1, desconto: "10", usos: "ILIMITADO", comissao: "PORCENTAGEM", comissaoValor: "0" },
-        ],
+        [1, { id: 1, desconto: "10", usos: "ILIMITADO", comissao: "PORCENTAGEM", comissaoValor: "0" }],
         [2, { id: 2, desconto: "100", usos: "ILIMITADO", comissao: "TEMPO", comissaoValor: "0" }],
       ]),
   );
@@ -630,13 +570,7 @@ export default function AssinaturaCadastro() {
   );
 
   // Disponibilidade
-  const [diasAceitos, setDiasAceitos] = useState<string[]>([
-    "seg",
-    "ter",
-    "qua",
-    "qui",
-    "sex",
-  ]);
+  const [diasAceitos, setDiasAceitos] = useState<string[]>(["seg", "ter", "qua", "qui", "sex"]);
   const [profissionaisAtendem, setProfissionaisAtendem] = useState<number[]>([1, 2, 3, 4]);
 
   // Aba ativa (anchor scroll)
@@ -675,14 +609,10 @@ export default function AssinaturaCadastro() {
   }, []);
 
   const toggleDia = (key: string) =>
-    setDiasAceitos((prev) =>
-      prev.includes(key) ? prev.filter((d) => d !== key) : [...prev, key],
-    );
+    setDiasAceitos((prev) => (prev.includes(key) ? prev.filter((d) => d !== key) : [...prev, key]));
 
   const toggleProfissional = (id: number) =>
-    setProfissionaisAtendem((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
-    );
+    setProfissionaisAtendem((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
 
   const adicionarBeneficio = () => {
     const t = novoBeneficio.trim();
@@ -690,8 +620,7 @@ export default function AssinaturaCadastro() {
     setBeneficios((prev) => [...prev, t]);
     setNovoBeneficio("");
   };
-  const removerBeneficio = (idx: number) =>
-    setBeneficios((prev) => prev.filter((_, i) => i !== idx));
+  const removerBeneficio = (idx: number) => setBeneficios((prev) => prev.filter((_, i) => i !== idx));
 
   const moverBeneficio = (idx: number, dir: -1 | 1) =>
     setBeneficios((prev) => {
@@ -713,9 +642,7 @@ export default function AssinaturaCadastro() {
     if (editingBeneficioIdx === null) return;
     const t = editingBeneficioValue.trim();
     if (t) {
-      setBeneficios((prev) =>
-        prev.map((b, i) => (i === editingBeneficioIdx ? t : b)),
-      );
+      setBeneficios((prev) => prev.map((b, i) => (i === editingBeneficioIdx ? t : b)));
     }
     setEditingBeneficioIdx(null);
     setEditingBeneficioValue("");
@@ -737,14 +664,8 @@ export default function AssinaturaCadastro() {
   const [showOnlySelectedProdutos, setShowOnlySelectedProdutos] = useState(false);
 
   // Serviços 100% gratuitos = inclusos individualmente. Outros = "Descontos em serviços".
-  const servicosInclusos = useMemo(
-    () => servicosArr.filter((s) => s.desconto === "100"),
-    [servicosArr],
-  );
-  const servicosComDesconto = useMemo(
-    () => servicosArr.filter((s) => s.desconto !== "100"),
-    [servicosArr],
-  );
+  const servicosInclusos = useMemo(() => servicosArr.filter((s) => s.desconto === "100"), [servicosArr]);
+  const servicosComDesconto = useMemo(() => servicosArr.filter((s) => s.desconto !== "100"), [servicosArr]);
 
   // O X no card resumo apenas oculta a linha do preview, sem alterar a configuração do plano.
   const [hiddenResumo, setHiddenResumo] = useState<Set<string>>(new Set());
@@ -779,11 +700,9 @@ export default function AssinaturaCadastro() {
 
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
-  const labelUsos = (v: string) =>
-    v === "ILIMITADO" ? "Ilimitado" : `${v}x / mês`;
+  const labelUsos = (v: string) => (v === "ILIMITADO" ? "Ilimitado" : `${v}x / mês`);
 
-  const recorrenciaLabel =
-    recorrenciaOptions.find((r) => r.value === recorrencia)?.label || "";
+  const recorrenciaLabel = recorrenciaOptions.find((r) => r.value === recorrencia)?.label || "";
 
   const diasValidosLabel = useMemo(() => {
     const order = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"];
@@ -807,7 +726,10 @@ export default function AssinaturaCadastro() {
     }
     if (sel.length === 1) return `Válido ${labels[sel[0]]}`;
     const last = labels[sel[sel.length - 1]];
-    const head = sel.slice(0, -1).map((d) => labels[d]).join(", ");
+    const head = sel
+      .slice(0, -1)
+      .map((d) => labels[d])
+      .join(", ");
     return `Válido ${head} e ${last}`;
   }, [diasAceitos]);
 
@@ -861,9 +783,9 @@ export default function AssinaturaCadastro() {
             {/* DADOS DO PLANO */}
             <SectionBlock id="dados" title="Dados">
               <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1.8fr)_minmax(140px,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)]">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1.8fr)_minmax(140px,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)] [&>*]:min-w-0">
                   <TextField
-                     label="Nome do Plano"
+                    label="Nome do Plano"
                     value={nome}
                     onChange={setNome}
                     placeholder="Ex: Estagiário"
@@ -876,7 +798,12 @@ export default function AssinaturaCadastro() {
                     setValue={setRecorrencia}
                     options={recorrenciaOptions}
                   />
-                  <Dropdown label="Forma de Pagamento" value={formaPagamento} setValue={setFormaPagamento} options={formaPagamentoOptions} />
+                  <Dropdown
+                    label="Forma de Pagamento"
+                    value={formaPagamento}
+                    setValue={setFormaPagamento}
+                    options={formaPagamentoOptions}
+                  />
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -899,10 +826,7 @@ export default function AssinaturaCadastro() {
                   <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <Star
-                        className={cn(
-                          "h-4 w-4",
-                          destaque ? "fill-amber-500 text-amber-500" : "text-muted-foreground",
-                        )}
+                        className={cn("h-4 w-4", destaque ? "fill-amber-500 text-amber-500" : "text-muted-foreground")}
                       />
                       <div>
                         <p className="text-sm font-semibold text-foreground">Destaque</p>
@@ -915,10 +839,7 @@ export default function AssinaturaCadastro() {
                   <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <Tag
-                        className={cn(
-                          "h-4 w-4",
-                          parcerias ? "fill-sky-500/20 text-sky-500" : "text-muted-foreground",
-                        )}
+                        className={cn("h-4 w-4", parcerias ? "fill-sky-500/20 text-sky-500" : "text-muted-foreground")}
                       />
                       <div>
                         <p className="text-sm font-semibold text-foreground">Parcerias</p>
@@ -1221,37 +1142,38 @@ export default function AssinaturaCadastro() {
               <div className="space-y-3 p-4 px-[17px]">
                 {/* Inclusos */}
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-sky-500">
-                    Incluso:
-                  </p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-sky-500">Incluso:</p>
 
                   <ul className="mt-2 flex flex-col my-[7px] px-0 py-0 gap-[10px]">
                     {servicosArr.length === 0 && produtosArr.length === 0 && beneficios.length === 0 && (
-                      <li className="text-[13px] italic text-muted-foreground">
-                        Configure os itens do plano.
-                      </li>
+                      <li className="text-[13px] italic text-muted-foreground">Configure os itens do plano.</li>
                     )}
 
                     {/* Serviços 100% gratuitos (inclusos individualmente) */}
-                    {servicosInclusos.filter((s) => !hiddenResumo.has(`s-${s.id}`)).map((s) => (
-                      <li key={`s-${s.id}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        <span className="flex-1">
-                          {s.usos === "ILIMITADO"
-                            ? `${nomeServico(s.id)} ilimitado`
-                            : `${s.usos}x ${nomeServico(s.id)}`}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => ocultarResumo(`s-${s.id}`)}
-                          className="opacity-0 transition group-hover:opacity-100"
-                          aria-label="Ocultar do resumo"
-                          title="Ocultar do resumo"
+                    {servicosInclusos
+                      .filter((s) => !hiddenResumo.has(`s-${s.id}`))
+                      .map((s) => (
+                        <li
+                          key={`s-${s.id}`}
+                          className="group flex items-start gap-2 text-[13px] font-medium text-foreground"
                         >
-                          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                        </button>
-                      </li>
-                    ))}
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                          <span className="flex-1">
+                            {s.usos === "ILIMITADO"
+                              ? `${nomeServico(s.id)} ilimitado`
+                              : `${s.usos}x ${nomeServico(s.id)}`}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => ocultarResumo(`s-${s.id}`)}
+                            className="opacity-0 transition group-hover:opacity-100"
+                            aria-label="Ocultar do resumo"
+                            title="Ocultar do resumo"
+                          >
+                            <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                          </button>
+                        </li>
+                      ))}
 
                     {/* Serviços com desconto (% < 100) agrupados */}
                     {servicosComDesconto.length > 0 && !hiddenResumo.has("desc-servicos") && (
@@ -1305,52 +1227,58 @@ export default function AssinaturaCadastro() {
                     )}
 
                     {/* Benefícios extras */}
-                    {beneficios.map((b, idx) => !hiddenResumo.has(`b-${idx}`) && (
-                      <li key={`b-${idx}`} className="group flex items-start gap-2 text-[13px] font-medium text-foreground">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
-                        {resumoEditIdx === idx ? (
-                          <input
-                            autoFocus
-                            value={resumoEditValue}
-                            onChange={(e) => setResumoEditValue(e.target.value)}
-                            onBlur={commitResumoBeneficio}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                commitResumoBeneficio();
-                              } else if (e.key === "Escape") {
-                                setResumoEditIdx(null);
-                                setResumoEditValue("");
-                                if (!beneficios[idx]) removerBeneficio(idx);
-                              }
-                            }}
-                            placeholder="Digite o benefício..."
-                            className="flex-1 border-b border-border bg-transparent text-[13px] outline-none focus:border-primary"
-                          />
-                        ) : (
-                          <>
-                            <span
-                              className="flex-1 cursor-text"
-                              onClick={() => {
-                                setResumoEditIdx(idx);
-                                setResumoEditValue(b);
-                              }}
-                            >
-                              {b}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => ocultarResumo(`b-${idx}`)}
-                              className="opacity-0 transition group-hover:opacity-100"
-                              aria-label="Ocultar do resumo"
-                              title="Ocultar do resumo"
-                            >
-                              <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                            </button>
-                          </>
-                        )}
-                      </li>
-                    ))}
+                    {beneficios.map(
+                      (b, idx) =>
+                        !hiddenResumo.has(`b-${idx}`) && (
+                          <li
+                            key={`b-${idx}`}
+                            className="group flex items-start gap-2 text-[13px] font-medium text-foreground"
+                          >
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 fill-emerald-500/20 text-emerald-600" />
+                            {resumoEditIdx === idx ? (
+                              <input
+                                autoFocus
+                                value={resumoEditValue}
+                                onChange={(e) => setResumoEditValue(e.target.value)}
+                                onBlur={commitResumoBeneficio}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    commitResumoBeneficio();
+                                  } else if (e.key === "Escape") {
+                                    setResumoEditIdx(null);
+                                    setResumoEditValue("");
+                                    if (!beneficios[idx]) removerBeneficio(idx);
+                                  }
+                                }}
+                                placeholder="Digite o benefício..."
+                                className="flex-1 border-b border-border bg-transparent text-[13px] outline-none focus:border-primary"
+                              />
+                            ) : (
+                              <>
+                                <span
+                                  className="flex-1 cursor-text"
+                                  onClick={() => {
+                                    setResumoEditIdx(idx);
+                                    setResumoEditValue(b);
+                                  }}
+                                >
+                                  {b}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => ocultarResumo(`b-${idx}`)}
+                                  className="opacity-0 transition group-hover:opacity-100"
+                                  aria-label="Ocultar do resumo"
+                                  title="Ocultar do resumo"
+                                >
+                                  <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                                </button>
+                              </>
+                            )}
+                          </li>
+                        ),
+                    )}
 
                     {/* Dias válidos */}
                     <li className="flex items-start gap-2 text-[13px] font-medium text-foreground">
@@ -1372,28 +1300,30 @@ export default function AssinaturaCadastro() {
                     </li>
                   </ul>
                 </div>
-
               </div>
 
               {/* Footer (preço + status) */}
               <div className="border-t border-border bg-card px-5 py-4 my-0">
                 <div className="flex items-end justify-between gap-2">
                   <div>
-                    <span className="text-xl font-bold text-foreground">
-                      R$ {valor || "0,00"}
-                    </span>
+                    <span className="text-xl font-bold text-foreground">R$ {valor || "0,00"}</span>
                     <span className="ml-1 text-sm text-muted-foreground">{recorrenciaLabel}</span>
                   </div>
-                  <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", disponivelVenda ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" : "bg-muted text-muted-foreground")}>
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                      disponivelVenda
+                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
                     {disponivelVenda ? "Disponível" : "Indisponível"}
                   </span>
                 </div>
-
               </div>
             </div>
           </aside>
         </div>
-
       </div>
       <YouTubeModal
         open={aulaOpen}
