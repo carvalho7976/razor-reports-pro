@@ -118,7 +118,9 @@ function ResponsavelDropdown({
   onChange: (id: number) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const selected = profissionaisVenda.find((p) => p.id === value);
 
   useEffect(() => {
@@ -129,38 +131,48 @@ function ResponsavelDropdown({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const filtered = profissionaisVenda.filter((p) =>
+    p.nome.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div className="relative grid gap-0.5" ref={ref}>
       <label className="text-[13px] font-semibold text-foreground">Responsável pela venda</label>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
+      <div
+        onClick={() => { setOpen(true); inputRef.current?.focus(); }}
         className={cn(
-          "flex h-10 w-full items-center justify-between rounded-lg border bg-card px-3 text-sm text-foreground transition-all",
+          "flex h-10 w-full cursor-text items-center justify-between gap-2 rounded-lg border bg-card px-3 text-sm text-foreground transition-all",
           "border-info/50 hover:border-info",
           open && "border-info ring-4 ring-info/20",
         )}
       >
-        {selected ? (
-          <span className="flex items-center gap-2 truncate">
-            <ProfissionalAvatarBadge p={selected} size="sm" />
-            <span className="truncate">{selected.nome}</span>
-          </span>
-        ) : (
-          <span className="text-muted-foreground">Selecione...</span>
+        {selected && !open && (
+          <ProfissionalAvatarBadge p={selected} size="sm" />
         )}
-        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
-      </button>
+        <input
+          ref={inputRef}
+          value={open ? search : (selected?.nome ?? "")}
+          onChange={(e) => { setSearch(e.target.value); setOpen(true); }}
+          onFocus={() => { setSearch(""); setOpen(true); }}
+          placeholder={selected ? "" : "Selecione..."}
+          className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        />
+        <ChevronDown className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")} />
+      </div>
       {open && (
         <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
           <div className="max-h-60 overflow-auto">
-            {profissionaisVenda.map((p) => (
+            {filtered.length === 0 && (
+              <div className="px-4 py-3 text-sm text-muted-foreground">Nenhum resultado.</div>
+            )}
+            {filtered.map((p) => (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => {
                   onChange(p.id);
                   setOpen(false);
+                  setSearch("");
                 }}
                 className={cn(
                   "flex w-full items-center gap-2.5 px-3 py-2.5 text-sm transition",
