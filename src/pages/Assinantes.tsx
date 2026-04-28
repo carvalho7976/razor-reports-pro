@@ -391,15 +391,15 @@ export default function Assinantes() {
       />
 
       <Dialog open={novoOpen} onOpenChange={(o) => { setNovoOpen(o); if (!o) resetForm(); }}>
-        <DialogContent className="max-w-3xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="max-w-2xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Nova Assinatura"
             subtitle="Escolha o plano e preencha os dados do assinante."
             onClose={() => { setNovoOpen(false); resetForm(); }}
-            size="lg"
+            size="md"
             footer={<SaveButton onClick={handleAssinar} />}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 min-h-[440px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[380px]">
               {/* Coluna esquerda — escolha do plano */}
               <div className="flex flex-col gap-3">
                 <Dropdown
