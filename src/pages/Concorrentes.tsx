@@ -1,188 +1,89 @@
-<section class="frzcmp-section">
-  <style>
-    .frzcmp-section{
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      background:#fff;
-      padding:80px 40px;
-      color:#222;
-    }
+export default function ComparativoPrecos() {
+  const rows = [
+    ["1", "R$57", "R$72", "~R$85", "R$99"],
+    ["2", "R$71", "R$89", "~R$130", "R$163"],
+    ["3 a 6", "R$91", "R$114", "~R$210", "R$286"],
+    ["7 a 12", "R$137", "R$172", "~R$310", "R$397"],
+    ["13 a 20", "R$177", "R$221", "~R$420", "R$397+"],
+  ];
 
-    .frzcmp-wrap{
-      max-width:1200px;
-      margin:0;
-    }
+  return (
+    <section className="w-full bg-white px-6 py-20">
+      <div className="max-w-6xl">
+        <h2 className="mb-2 text-left text-4xl font-semibold tracking-[-0.04em] text-zinc-900">
+          Compare antes de decidir
+        </h2>
 
-    .frzcmp-title{
-      font-size:36px;
-      font-weight:600;
-      margin-bottom:6px;
-      color:#111;
-    }
+        <p className="mb-8 text-left text-base text-zinc-500">Veja quanto você paga conforme sua equipe cresce.</p>
 
-    .frzcmp-sub{
-      font-size:15px;
-      color:#6b7280;
-      margin-bottom:30px;
-    }
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-[0_14px_45px_rgba(0,0,0,0.06)]">
+          <div className="min-w-[900px]">
+            <div className="grid grid-cols-[140px_repeat(4,1fr)] border-b border-zinc-200">
+              <div className="flex h-24 items-center justify-start bg-zinc-50 px-5 text-sm font-medium text-zinc-500">
+                Agendas
+              </div>
 
-    .frzcmp-card{
-      background:#fff;
-      border-radius:18px;
-      overflow:hidden;
-      border:1px solid #eee;
-      box-shadow:0 12px 40px rgba(0,0,0,.05);
-    }
+              <div className="flex h-24 flex-col items-center justify-center gap-2 bg-white px-5 text-center">
+                <div className="text-base font-semibold text-zinc-900">Frizzar+</div>
+                <span className="rounded-full bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-500">20% OFF</span>
+              </div>
 
-    .frzcmp-grid{
-      display:grid;
-      grid-template-columns:140px repeat(4,1fr);
-    }
+              <div className="flex h-24 items-center justify-center bg-white px-5">
+                <img
+                  src="https://a.frizzar.com.br/wp-content/uploads/2025/04/LNSPB-e1655256051516.png"
+                  alt="Frizzar"
+                  className="max-h-7 w-auto object-contain"
+                />
+              </div>
 
-    .frzcmp-cell{
-      padding:18px;
-      border-bottom:1px solid #eee;
-      border-right:1px solid #eee;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      font-size:15px;
-      background:#fff;
-    }
+              <div className="flex h-24 items-center justify-center bg-white px-5">
+                <img
+                  src="https://djnn6j6gf59xn.cloudfront.net/content/img/novo_portal/logo-topo-rebranding.png"
+                  alt="Trinks"
+                  className="max-h-8 w-auto object-contain"
+                />
+              </div>
 
-    .frzcmp-cell:nth-child(5n){
-      border-right:none;
-    }
+              <div className="flex h-24 items-center justify-center bg-white px-5">
+                <img
+                  src="https://cdn.prod.website-files.com/6151e81f5d43e8748b3808c6/6151fb367006fe41eaa186e7_Logo%20Avec.svg"
+                  alt="Avec"
+                  className="max-h-7 w-auto object-contain"
+                />
+              </div>
+            </div>
 
-    .frzcmp-head{
-      min-height:90px;
-      background:#fff;
-    }
+            {rows.map(([agendas, frizzarPlus, frizzar, trinks, avec]) => (
+              <div
+                key={agendas}
+                className="grid grid-cols-[140px_repeat(4,1fr)] border-b border-zinc-100 last:border-b-0"
+              >
+                <div className="flex min-h-16 items-center justify-start bg-zinc-50 px-5 text-sm font-medium text-zinc-600">
+                  {agendas}
+                </div>
 
-    .frzcmp-label{
-      background:#fafafa;
-      justify-content:flex-start;
-      text-align:left;
-      color:#666;
-      font-weight:500;
-    }
+                <div className="flex min-h-16 items-center justify-center bg-white px-5 text-base font-semibold text-red-500">
+                  {frizzarPlus}
+                </div>
 
-    .frzcmp-logo{
-      max-height:26px;
-    }
+                <div className="flex min-h-16 items-center justify-center bg-red-50/50 px-5 text-sm font-medium text-zinc-400 line-through">
+                  {frizzar}
+                </div>
 
-    .frzcmp-logo-trinks{
-      max-height:32px;
-    }
+                <div className="flex min-h-16 items-center justify-center bg-white px-5 text-base font-medium text-zinc-700">
+                  {trinks}
+                </div>
 
-    .frzcmp-badge{
-      margin-top:6px;
-      font-size:10px;
-      background:#fee2e2;
-      color:#ef4444;
-      padding:3px 7px;
-      border-radius:999px;
-    }
-
-    .frzcmp-old{
-      text-decoration:line-through;
-      color:#9ca3af;
-      font-size:13px;
-      display:block;
-    }
-
-    .frzcmp-new{
-      font-size:16px;
-      font-weight:600;
-      color:#ef4444;
-    }
-
-    .frzcmp-plus{
-      background:#f9fafb;
-    }
-
-    .frzcmp-frizzar{
-      background:#fff7f7;
-    }
-
-    .frzcmp-muted{
-      color:#9ca3af;
-      font-size:13px;
-    }
-
-    @media(max-width:900px){
-      .frzcmp-grid{min-width:900px;}
-      .frzcmp-card{overflow-x:auto;}
-      .frzcmp-section{padding:60px 20px;}
-    }
-  </style>
-
-  <div class="frzcmp-wrap">
-    <h2 class="frzcmp-title">Compare antes de decidir</h2>
-    <p class="frzcmp-sub">Veja quanto você paga conforme sua equipe cresce.</p>
-
-    <div class="frzcmp-card">
-      <div class="frzcmp-grid">
-
-        <!-- HEADER -->
-        <div class="frzcmp-cell frzcmp-head frzcmp-label">Agendas</div>
-
-        <!-- FRIZZAR+ (ESQUERDA) -->
-        <div class="frzcmp-cell frzcmp-head frzcmp-plus">
-          <div>
-            Frizzar+
-            <div class="frzcmp-badge">20% OFF</div>
+                <div className="flex min-h-16 items-center justify-center bg-white px-5 text-base font-medium text-zinc-700">
+                  {avec}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <!-- FRIZZAR -->
-        <div class="frzcmp-cell frzcmp-head">
-          <img class="frzcmp-logo" src="https://a.frizzar.com.br/wp-content/uploads/2025/04/LNSPB-e1655256051516.png">
-        </div>
-
-        <!-- TRINKS -->
-        <div class="frzcmp-cell frzcmp-head">
-          <img class="frzcmp-logo frzcmp-logo-trinks" src="https://djnn6j6gf59xn.cloudfront.net/content/img/novo_portal/logo-topo-rebranding.png">
-        </div>
-
-        <!-- AVEC -->
-        <div class="frzcmp-cell frzcmp-head">
-          <img class="frzcmp-logo" src="https://cdn.prod.website-files.com/6151e81f5d43e8748b3808c6/6151fb367006fe41eaa186e7_Logo%20Avec.svg">
-        </div>
-
-        <!-- LINHAS -->
-
-        <div class="frzcmp-cell frzcmp-label">1</div>
-        <div class="frzcmp-cell frzcmp-plus"><span class="frzcmp-new">R$57</span></div>
-        <div class="frzcmp-cell frzcmp-frizzar"><span class="frzcmp-old">R$72</span></div>
-        <div class="frzcmp-cell">~R$85</div>
-        <div class="frzcmp-cell">R$99</div>
-
-        <div class="frzcmp-cell frzcmp-label">2</div>
-        <div class="frzcmp-cell frzcmp-plus"><span class="frzcmp-new">R$71</span></div>
-        <div class="frzcmp-cell frzcmp-frizzar"><span class="frzcmp-old">R$89</span></div>
-        <div class="frzcmp-cell">~R$130</div>
-        <div class="frzcmp-cell">R$163</div>
-
-        <div class="frzcmp-cell frzcmp-label">3 a 6</div>
-        <div class="frzcmp-cell frzcmp-plus"><span class="frzcmp-new">R$91</span></div>
-        <div class="frzcmp-cell frzcmp-frizzar"><span class="frzcmp-old">R$114</span></div>
-        <div class="frzcmp-cell">~R$210</div>
-        <div class="frzcmp-cell">R$286</div>
-
-        <div class="frzcmp-cell frzcmp-label">7 a 12</div>
-        <div class="frzcmp-cell frzcmp-plus"><span class="frzcmp-new">R$137</span></div>
-        <div class="frzcmp-cell frzcmp-frizzar"><span class="frzcmp-old">R$172</span></div>
-        <div class="frzcmp-cell">~R$310</div>
-        <div class="frzcmp-cell">R$397</div>
-
-        <div class="frzcmp-cell frzcmp-label">13 a 20</div>
-        <div class="frzcmp-cell frzcmp-plus"><span class="frzcmp-new">R$177</span></div>
-        <div class="frzcmp-cell frzcmp-frizzar"><span class="frzcmp-old">R$221</span></div>
-        <div class="frzcmp-cell">~R$420</div>
-        <div class="frzcmp-cell">R$397+</div>
-
+        <p className="mt-4 text-left text-sm text-zinc-400">Valores aproximados para comparação comercial.</p>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
+  );
+}
