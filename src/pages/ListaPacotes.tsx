@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { FormModal, TextField, FormRow, DeleteModal, SaveButton, Dropdown } from "@/components/FormModal";
+import { Switch } from "@/components/ui/switch";
 
 interface Pacote {
   id: number;
@@ -101,7 +102,15 @@ export default function ListaPacotes() {
     toast({ title: `${ids.length} pacote(s) removido(s)`, variant: "destructive" });
   };
 
+  const bulkSetStatus = (indices: number[], status: "Ativo" | "Desativado") => {
+    const ids = indices.map(i => allData[i]?.id).filter(Boolean);
+    setAllData(prev => prev.map(d => ids.includes(d.id) ? { ...d, status } : d));
+    toast({ title: `${ids.length} pacote(s) ${status === "Ativo" ? "ativado(s)" : "desativado(s)"}` });
+  };
+
   const selectionActions: SelectionAction[] = [
+    { label: "Ativar", icon: <Power className="h-4 w-4" />, onClick: (i) => bulkSetStatus(i, "Ativo"), description: "Ativa os pacotes selecionados" },
+    { label: "Desativar", icon: <Power className="h-4 w-4" />, onClick: (i) => bulkSetStatus(i, "Desativado"), description: "Desativa os pacotes selecionados" },
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os pacotes selecionados" },
   ];
 
@@ -112,7 +121,13 @@ export default function ListaPacotes() {
     { key: "validade", label: "Validade" },
     {
       key: "status", label: "Status",
-      render: v => <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>{v}</span>,
+      align: "center",
+      render: (v, row) => (
+        <div className="flex items-center justify-center gap-2">
+          <Switch checked={v === "Ativo"} onCheckedChange={() => toggleStatus(row)} />
+          <span className={`text-xs font-medium ${v === "Ativo" ? "text-foreground" : "text-muted-foreground"}`}>{v}</span>
+        </div>
+      ),
     },
     {
       key: "acoes" as any, label: "Ações", sortable: false, filterable: false, align: "center",
