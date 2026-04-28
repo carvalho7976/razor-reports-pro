@@ -60,7 +60,7 @@ export function Dropdown({
   value,
   setValue,
   options,
-  searchable = false,
+  searchable = true,
   error,
   openDirection = "auto",
   placeholder = "Selecione...",
