@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import { ChevronLeft, ChevronRight, Clock, Eye, Filter, Save, Smile, Star, Users, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Clock, Eye, Filter, Save, Smile, Star, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import { NovoButton } from "@/components/DataTable";
-import { DeleteModal, FormModal, Dropdown, MultiDropdown, TextField, DatePickerField, FormRow, SaveButton } from "@/components/FormModal";
+import {
+  DeleteModal,
+  FormModal,
+  Dropdown,
+  MultiDropdown,
+  TextField,
+  DatePickerField,
+  FormRow,
+  SaveButton,
+} from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
@@ -388,6 +397,7 @@ export default function NovaAgenda2() {
   const [filtroDiasSel, setFiltroDiasSel] = useState<string>("1");
 
   const [filaOpen, setFilaOpen] = useState(false);
+  const [metricasOpen, setMetricasOpen] = useState(false);
 
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
@@ -449,10 +459,7 @@ export default function NovaAgenda2() {
 
       <div className="mx-auto flex max-w-[1600px] flex-col gap-2">
         {(filtroOpen || filaOpen) && (
-          <div
-            className="fixed inset-0 z-40 bg-black/80 animate-in fade-in-0"
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-40 bg-black/80 animate-in fade-in-0" aria-hidden="true" />
         )}
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
           <div className="flex items-center gap-2">
@@ -543,9 +550,9 @@ export default function NovaAgenda2() {
                       </button>
                     </PopoverTrigger>
                   </TooltipTrigger>
-                   <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
-                     Filtros
-                   </TooltipContent>
+                  <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
+                    Filtros
+                  </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
 
@@ -706,9 +713,7 @@ export default function NovaAgenda2() {
                             onClick={() => {
                               setChamarItem(item);
                               setChamarProf(
-                                item.prefere
-                                  ? profissionais.find((p) => p.nome === item.prefere)?.id ?? ""
-                                  : ""
+                                item.prefere ? (profissionais.find((p) => p.nome === item.prefere)?.id ?? "") : "",
                               );
                             }}
                             className="inline-flex h-7 items-center rounded-md border border-foreground bg-card px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-[hsl(var(--novo-btn))] hover:text-[hsl(var(--novo-btn-foreground))] hover:border-[hsl(var(--novo-btn))]"
@@ -736,36 +741,56 @@ export default function NovaAgenda2() {
           </div>
 
           <TooltipProvider delayDuration={0}>
-            <div className="ml-auto flex items-center gap-4">
-              <div className="flex items-center gap-1.5 border-r border-border pr-4">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                  Agendamentos
-                </span>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMetricasOpen((prev) => !prev)}
+                className="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-expanded={metricasOpen}
+                aria-label={metricasOpen ? "Recolher métricas de agendamentos" : "Abrir métricas de agendamentos"}
+              >
+                <span className="text-[11px] font-medium uppercase tracking-wide">Agendamentos</span>
+
                 <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
                   {agendamentos.filter((a) => a.status !== "folga").length}
                 </Badge>
+
+                <ChevronDown
+                  className={cn("h-3.5 w-3.5 transition-transform duration-200", metricasOpen && "rotate-180")}
+                />
+              </button>
+
+              <div
+                className={cn(
+                  "flex items-center gap-4 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out",
+                  metricasOpen
+                    ? "max-w-[560px] translate-x-0 opacity-100"
+                    : "pointer-events-none max-w-0 translate-x-2 opacity-0",
+                )}
+              >
+                {[
+                  { emoji: "😌", label: "Agendado", valor: 8 },
+                  { emoji: "😉", label: "Confirmado", valor: 5 },
+                  { emoji: "🤗", label: "Chegou", valor: 2 },
+                  { emoji: "💆🏻‍♂️", label: "Em atendimento", valor: 1 },
+                  { emoji: "😍", label: "Finalizado", valor: 7 },
+                  { emoji: "😱", label: "Faltou", valor: 1 },
+                  { emoji: "😢", label: "Desmarcou", valor: 2 },
+                ].map((k) => (
+                  <Tooltip key={k.label}>
+                    <TooltipTrigger asChild>
+                      <div className="flex shrink-0 cursor-default items-center gap-1.5">
+                        <span className="text-base leading-none">{k.emoji}</span>
+                        <span className="text-[13px] font-semibold leading-none text-foreground">{k.valor}</span>
+                      </div>
+                    </TooltipTrigger>
+
+                    <TooltipContent className="border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-sm">
+                      {k.label}
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
               </div>
-              {[
-                { emoji: "😌", label: "Agendado", valor: 8 },
-                { emoji: "😉", label: "Confirmado", valor: 5 },
-                { emoji: "🤗", label: "Chegou", valor: 2 },
-                { emoji: "💆🏻‍♂️", label: "Em atendimento", valor: 1 },
-                { emoji: "😍", label: "Finalizado", valor: 7 },
-                { emoji: "😱", label: "Faltou", valor: 1 },
-                { emoji: "😢", label: "Desmarcou", valor: 2 },
-              ].map((k) => (
-                <Tooltip key={k.label}>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 cursor-default">
-                      <span className="text-base leading-none">{k.emoji}</span>
-                      <span className="text-[13px] font-semibold text-foreground leading-none">{k.valor}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-popover text-popover-foreground border border-border shadow-sm text-xs px-2 py-1">
-                    {k.label}
-                  </TooltipContent>
-                </Tooltip>
-              ))}
             </div>
           </TooltipProvider>
         </div>
@@ -941,31 +966,12 @@ export default function NovaAgenda2() {
             footer={<SaveButton onClick={handleSalvarFila} />}
           >
             <FormRow>
-              <TextField
-                label="Nome"
-                value={novoCliente}
-                onChange={setNovoCliente}
-                placeholder="Buscar cliente..."
-              />
-              <TextField
-                label="Email"
-                value={novoEmail}
-                onChange={setNovoEmail}
-                type="text"
-              />
+              <TextField label="Nome" value={novoCliente} onChange={setNovoCliente} placeholder="Buscar cliente..." />
+              <TextField label="Email" value={novoEmail} onChange={setNovoEmail} type="text" />
             </FormRow>
             <div className="grid gap-3" style={{ gridTemplateColumns: "1.4fr 1fr 1fr" }}>
-              <TextField
-                label="Celular"
-                value={novoCelular}
-                onChange={setNovoCelular}
-                placeholder="(00) 00000-0000"
-              />
-              <DatePickerField
-                label="Aniversário"
-                value={novoAniversario}
-                onChange={setNovoAniversario}
-              />
+              <TextField label="Celular" value={novoCelular} onChange={setNovoCelular} placeholder="(00) 00000-0000" />
+              <DatePickerField label="Aniversário" value={novoAniversario} onChange={setNovoAniversario} />
               <Dropdown
                 label="Gênero"
                 value={novoSexo}
