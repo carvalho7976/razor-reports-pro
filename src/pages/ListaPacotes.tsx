@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
-import { Trash2, Eye, Power, Pencil } from "lucide-react";
+import { Trash2, Eye, Pencil, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -109,8 +109,8 @@ export default function ListaPacotes() {
   };
 
   const selectionActions: SelectionAction[] = [
-    { label: "Ativar", icon: <Power className="h-4 w-4" />, onClick: (i) => bulkSetStatus(i, "Ativo"), description: "Ativa os pacotes selecionados" },
-    { label: "Desativar", icon: <Power className="h-4 w-4" />, onClick: (i) => bulkSetStatus(i, "Desativado"), description: "Desativa os pacotes selecionados" },
+    { label: "Ativar", icon: <ToggleRight className="h-4 w-4" />, onClick: (i) => bulkSetStatus(i, "Ativo"), description: "Ativa os pacotes selecionados" },
+    { label: "Desativar", icon: <ToggleLeft className="h-4 w-4" />, onClick: (i) => bulkSetStatus(i, "Desativado"), variant: "destructive", description: "Desativa os pacotes selecionados" },
     { label: "Remover", icon: <Trash2 className="h-4 w-4" />, onClick: bulkRemove, variant: "destructive", description: "Remove os pacotes selecionados" },
   ];
 
@@ -135,7 +135,6 @@ export default function ListaPacotes() {
         <ActionsMenu items={[
           { label: "Visualizar", icon: <Eye className="h-4 w-4" />, onClick: () => openView(row) },
           { label: "Editar", icon: <Pencil className="h-4 w-4" />, onClick: () => openEdit(row) },
-          { label: row.status === "Ativo" ? "Desativar" : "Ativar", icon: <Power className="h-4 w-4" />, onClick: () => toggleStatus(row) },
           { label: "Excluir", icon: <Trash2 className="h-4 w-4" />, variant: "destructive", onClick: () => openDelete(row) },
         ]} />
       ),
