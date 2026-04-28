@@ -757,6 +757,28 @@ export default function AssinaturaCadastro() {
       return next;
     });
 
+  // Edição inline de benefício direto no Resumo
+  const [resumoEditIdx, setResumoEditIdx] = useState<number | null>(null);
+  const [resumoEditValue, setResumoEditValue] = useState("");
+  const startResumoNovoBeneficio = () => {
+    setBeneficios((prev) => {
+      const next = [...prev, ""];
+      setResumoEditIdx(next.length - 1);
+      setResumoEditValue("");
+      return next;
+    });
+  };
+  const commitResumoBeneficio = () => {
+    if (resumoEditIdx === null) return;
+    const t = resumoEditValue.trim();
+    setBeneficios((prev) => {
+      if (!t) return prev.filter((_, i) => i !== resumoEditIdx);
+      return prev.map((b, i) => (i === resumoEditIdx ? t : b));
+    });
+    setResumoEditIdx(null);
+    setResumoEditValue("");
+  };
+
   const nomeServico = (id: number) => servicosDisponiveis.find((s) => s.id === id)?.nome || "";
   const nomeProduto = (id: number) => produtosDisponiveis.find((p) => p.id === id)?.nome || "";
   const labelUsos = (v: string) =>
