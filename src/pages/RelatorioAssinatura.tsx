@@ -8,8 +8,7 @@ import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const R$ = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface LinhaProfissional {
   id: number;
@@ -32,15 +31,96 @@ interface PeriodoData {
 }
 
 const baseProfissionais: Omit<LinhaProfissional, "valor">[] = [
-  { id: 1, profissional: "Cesar", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
-  { id: 2, profissional: "Claudia", qtdServicosTempo: 2, tempoTrabalhado: 90, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 110 },
-  { id: 3, profissional: "Fila de espera", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
-  { id: 4, profissional: "Henrique", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
-  { id: 5, profissional: "Lara", qtdServicosTempo: 1, tempoTrabalhado: 45, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 55 },
-  { id: 6, profissional: "Marcia Silva", qtdServicosTempo: 3, tempoTrabalhado: 120, qtdServicosPorcentagem: 1, qtdProdutos: 0, clientesAtendidos: 2, pontosAcumulados: 160 },
-  { id: 7, profissional: "Matheus", qtdServicosTempo: 4, tempoTrabalhado: 180, qtdServicosPorcentagem: 0, qtdProdutos: 1, clientesAtendidos: 3, pontosAcumulados: 240 },
-  { id: 8, profissional: "Ramon", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
-  { id: 9, profissional: "Vini", qtdServicosTempo: 1, tempoTrabalhado: 30, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 40 },
+  {
+    id: 1,
+    profissional: "Cesar",
+    qtdServicosTempo: 0,
+    tempoTrabalhado: 0,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 0,
+    clientesAtendidos: 0,
+    pontosAcumulados: 0,
+  },
+  {
+    id: 2,
+    profissional: "Claudia",
+    qtdServicosTempo: 2,
+    tempoTrabalhado: 90,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 0,
+    clientesAtendidos: 1,
+    pontosAcumulados: 110,
+  },
+  {
+    id: 3,
+    profissional: "Fila de espera",
+    qtdServicosTempo: 0,
+    tempoTrabalhado: 0,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 0,
+    clientesAtendidos: 0,
+    pontosAcumulados: 0,
+  },
+  {
+    id: 4,
+    profissional: "Henrique",
+    qtdServicosTempo: 0,
+    tempoTrabalhado: 0,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 0,
+    clientesAtendidos: 0,
+    pontosAcumulados: 0,
+  },
+  {
+    id: 5,
+    profissional: "Lara",
+    qtdServicosTempo: 1,
+    tempoTrabalhado: 45,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 0,
+    clientesAtendidos: 1,
+    pontosAcumulados: 55,
+  },
+  {
+    id: 6,
+    profissional: "Marcia Silva",
+    qtdServicosTempo: 3,
+    tempoTrabalhado: 120,
+    qtdServicosPorcentagem: 1,
+    qtdProdutos: 0,
+    clientesAtendidos: 2,
+    pontosAcumulados: 160,
+  },
+  {
+    id: 7,
+    profissional: "Matheus",
+    qtdServicosTempo: 4,
+    tempoTrabalhado: 180,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 1,
+    clientesAtendidos: 3,
+    pontosAcumulados: 240,
+  },
+  {
+    id: 8,
+    profissional: "Ramon",
+    qtdServicosTempo: 0,
+    tempoTrabalhado: 0,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 0,
+    clientesAtendidos: 0,
+    pontosAcumulados: 0,
+  },
+  {
+    id: 9,
+    profissional: "Vini",
+    qtdServicosTempo: 1,
+    tempoTrabalhado: 30,
+    qtdServicosPorcentagem: 0,
+    qtdProdutos: 0,
+    clientesAtendidos: 1,
+    pontosAcumulados: 40,
+  },
 ];
 
 const periodosOptions = [
@@ -60,7 +140,9 @@ const periodosIniciais: Record<string, PeriodoData> = {
     formato: "tempo",
     linhas: baseProfissionais.map((p, idx) => ({
       ...p,
-      valor: Math.round(((p.tempoTrabalhado + p.qtdProdutos * 30 + p.clientesAtendidos * 10) / 600) * 5998 * 0.5 * 100) / 100,
+      valor:
+        Math.round(((p.tempoTrabalhado + p.qtdProdutos * 30 + p.clientesAtendidos * 10) / 600) * 5998 * 0.5 * 100) /
+        100,
     })),
   },
 };
@@ -138,9 +220,7 @@ export default function RelatorioAssinatura() {
       },
       {
         label: "Valor Distribuído",
-        value: dadosPeriodo
-          ? R$(dadosPeriodo.totalBolo * (dadosPeriodo.percEquipe / 100))
-          : R$(0),
+        value: dadosPeriodo ? R$(dadosPeriodo.totalBolo * (dadosPeriodo.percEquipe / 100)) : R$(0),
         icon: <Users className="h-4 w-4" />,
         color: dadosPeriodo?.pago ? "green" : "blue",
       },
@@ -250,19 +330,17 @@ export default function RelatorioAssinatura() {
         </div>
       ),
     },
-    { key: "qtdServicosTempo", label: "Qtd serviços por tempo", align: "right" },
-    { key: "tempoTrabalhado", label: "Tempo trabalhado", align: "right", render: (v) => `${v} min` },
-    { key: "qtdServicosPorcentagem", label: "Qtd serviços por porcentagem", align: "right" },
-    { key: "qtdProdutos", label: "Qtd produtos", align: "right" },
-    { key: "clientesAtendidos", label: "Clientes atendidos", align: "right" },
-    { key: "pontosAcumulados", label: "Pontos acumulados", align: "right" },
+    { key: "qtdServicosTempo", label: "Serviços de Tempo/Ponto", align: "right" },
+    { key: "tempoTrabalhado", label: "Tempo Trabalhado", align: "right", render: (v) => `${v} min` },
+    { key: "qtdServicosPorcentagem", label: "Serviços de %", align: "right" },
+    { key: "qtdProdutos", label: "Produtos Vendidos", align: "right" },
+    { key: "clientesAtendidos", label: "Clientes Atendidos", align: "right" },
+    { key: "pontosAcumulados", label: "Pontos Acumulados", align: "right" },
     {
       key: "valor",
       label: "Valor",
       align: "right",
-      render: (v: number) => (
-        <span className="font-medium text-foreground">{R$(v)}</span>
-      ),
+      render: (v: number) => <span className="font-medium text-foreground">{R$(v)}</span>,
     },
   ];
 
@@ -280,11 +358,56 @@ export default function RelatorioAssinatura() {
   const linhasDetalhadas: LinhaDetalhada[] = useMemo(() => {
     if (!gerado) return [];
     return [
-      { id: 1, data: "05/05/2025", funcionario: "Claudia", cliente: "Ana Souza", tipoComissao: "Tempo", item: "Corte feminino", quantidade: 1, valor: 80 },
-      { id: 2, data: "08/05/2025", funcionario: "Lara", cliente: "Júlia Lima", tipoComissao: "Tempo", item: "Escova", quantidade: 1, valor: 60 },
-      { id: 3, data: "12/05/2025", funcionario: "Marcia Silva", cliente: "Paula Reis", tipoComissao: "Porcentagem", item: "Coloração", quantidade: 1, valor: 220 },
-      { id: 4, data: "15/05/2025", funcionario: "Matheus", cliente: "Carlos Dias", tipoComissao: "Tempo", item: "Barba", quantidade: 2, valor: 70 },
-      { id: 5, data: "22/05/2025", funcionario: "Vini", cliente: "Pedro Alves", tipoComissao: "Tempo", item: "Corte masculino", quantidade: 1, valor: 50 },
+      {
+        id: 1,
+        data: "05/05/2025",
+        funcionario: "Claudia",
+        cliente: "Ana Souza",
+        tipoComissao: "Tempo",
+        item: "Corte feminino",
+        quantidade: 1,
+        valor: 80,
+      },
+      {
+        id: 2,
+        data: "08/05/2025",
+        funcionario: "Lara",
+        cliente: "Júlia Lima",
+        tipoComissao: "Tempo",
+        item: "Escova",
+        quantidade: 1,
+        valor: 60,
+      },
+      {
+        id: 3,
+        data: "12/05/2025",
+        funcionario: "Marcia Silva",
+        cliente: "Paula Reis",
+        tipoComissao: "Porcentagem",
+        item: "Coloração",
+        quantidade: 1,
+        valor: 220,
+      },
+      {
+        id: 4,
+        data: "15/05/2025",
+        funcionario: "Matheus",
+        cliente: "Carlos Dias",
+        tipoComissao: "Tempo",
+        item: "Barba",
+        quantidade: 2,
+        valor: 70,
+      },
+      {
+        id: 5,
+        data: "22/05/2025",
+        funcionario: "Vini",
+        cliente: "Pedro Alves",
+        tipoComissao: "Tempo",
+        item: "Corte masculino",
+        quantidade: 1,
+        valor: 50,
+      },
     ];
   }, [gerado, periodo]);
 
@@ -304,11 +427,24 @@ export default function RelatorioAssinatura() {
         </div>
       ),
     },
-    { key: "cliente", label: "Cliente", render: (v) => <a href="/listaClientes" className="hover:underline font-medium">{v}</a> },
+    {
+      key: "cliente",
+      label: "Cliente",
+      render: (v) => (
+        <a href="/listaClientes" className="hover:underline font-medium">
+          {v}
+        </a>
+      ),
+    },
     { key: "tipoComissao", label: "Tipo Comissão" },
     { key: "item", label: "Ítem" },
     { key: "quantidade", label: "Quantidade", align: "right" },
-    { key: "valor", label: "Valor", align: "right", render: (v: number) => <span className="font-medium text-foreground">{R$(v)}</span> },
+    {
+      key: "valor",
+      label: "Valor",
+      align: "right",
+      render: (v: number) => <span className="font-medium text-foreground">{R$(v)}</span>,
+    },
   ];
 
   const isDetalhado = activeTab === "detalhado";
@@ -364,9 +500,7 @@ export default function RelatorioAssinatura() {
                 }}
                 className={cn(
                   "px-2 py-1.5 text-xs rounded-md transition-colors",
-                  isActive
-                    ? "bg-foreground text-background font-medium"
-                    : "text-foreground hover:bg-muted",
+                  isActive ? "bg-foreground text-background font-medium" : "text-foreground hover:bg-muted",
                 )}
               >
                 {m.charAt(0).toUpperCase() + m.slice(1)}
@@ -384,9 +518,7 @@ export default function RelatorioAssinatura() {
     const isPago = !!dadosPeriodo?.pago;
     return (
       <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-info/5 border border-info/20">
-        <span className="text-xs sm:text-sm font-medium text-foreground">
-          Bolo gerado · {periodo}
-        </span>
+        <span className="text-xs sm:text-sm font-medium text-foreground">Bolo gerado · {periodo}</span>
         <div className="h-4 w-px bg-border" />
         {isPago ? (
           <button
@@ -466,16 +598,16 @@ export default function RelatorioAssinatura() {
           pageSize={15}
           tableId="relatorio_assinatura"
           novoMenuItems={[
-          {
-            label: "Novo",
-            onClick: () => {
-              setNovoPeriodo(periodo);
-              setNovoBolo("");
-              setNovoPerc("");
-              setErrors({});
-              setNovoOpen(true);
+            {
+              label: "Novo",
+              onClick: () => {
+                setNovoPeriodo(periodo);
+                setNovoBolo("");
+                setNovoPerc("");
+                setErrors({});
+                setNovoOpen(true);
+              },
             },
-          },
           ]}
         />
       )}
@@ -497,12 +629,7 @@ export default function RelatorioAssinatura() {
               </button>
             }
           >
-            <Dropdown
-              label="Período"
-              value={novoPeriodo}
-              setValue={setNovoPeriodo}
-              options={periodosOptions}
-            />
+            <Dropdown label="Período" value={novoPeriodo} setValue={setNovoPeriodo} options={periodosOptions} />
             <TextField
               label="Total Bolo (R$)"
               value={novoBolo ? `R$ ${formatCurrency(parseCurrency(novoBolo))}` : ""}
@@ -518,14 +645,14 @@ export default function RelatorioAssinatura() {
               error={errors.perc}
             />
             <div className="grid gap-1.5">
-              <label className="text-[13px] font-semibold text-foreground">
-                Qual o formato de comissão?
-              </label>
+              <label className="text-[13px] font-semibold text-foreground">Qual o formato de comissão?</label>
               <div className="flex gap-2">
-                {([
-                  { value: "tempo", label: "Tempo" },
-                  { value: "pontos", label: "Pontos" },
-                ] as const).map((opt) => {
+                {(
+                  [
+                    { value: "tempo", label: "Tempo" },
+                    { value: "pontos", label: "Pontos" },
+                  ] as const
+                ).map((opt) => {
                   const active = novoFormato === opt.value;
                   return (
                     <button
