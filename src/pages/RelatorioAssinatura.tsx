@@ -105,6 +105,7 @@ export default function RelatorioAssinatura() {
     return m ? parseInt(m[1], 10) : new Date().getFullYear();
   });
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("resumo");
 
   const monthNames = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
   const monthLabel = (key: string) => {
@@ -254,6 +255,7 @@ export default function RelatorioAssinatura() {
     { key: "qtdServicosPorcentagem", label: "Qtd serviços por porcentagem", align: "right" },
     { key: "qtdProdutos", label: "Qtd produtos", align: "right" },
     { key: "clientesAtendidos", label: "Clientes atendidos", align: "right" },
+    { key: "pontosAcumulados", label: "Pontos acumulados", align: "right" },
     {
       key: "valor",
       label: "Valor",
@@ -263,6 +265,41 @@ export default function RelatorioAssinatura() {
       ),
     },
   ];
+
+  // Linhas detalhadas (mock) — uma linha por serviço/comissão
+  interface LinhaDetalhada {
+    id: number;
+    data: string;
+    funcionario: string;
+    cliente: string;
+    tipoComissao: string;
+    item: string;
+    quantidade: number;
+    valor: number;
+  }
+  const linhasDetalhadas: LinhaDetalhada[] = useMemo(() => {
+    if (!gerado) return [];
+    return [
+      { id: 1, data: "05/05/2025", funcionario: "Claudia", cliente: "Ana Souza", tipoComissao: "Tempo", item: "Corte feminino", quantidade: 1, valor: 80 },
+      { id: 2, data: "08/05/2025", funcionario: "Lara", cliente: "Júlia Lima", tipoComissao: "Tempo", item: "Escova", quantidade: 1, valor: 60 },
+      { id: 3, data: "12/05/2025", funcionario: "Marcia Silva", cliente: "Paula Reis", tipoComissao: "Porcentagem", item: "Coloração", quantidade: 1, valor: 220 },
+      { id: 4, data: "15/05/2025", funcionario: "Matheus", cliente: "Carlos Dias", tipoComissao: "Tempo", item: "Barba", quantidade: 2, valor: 70 },
+      { id: 5, data: "22/05/2025", funcionario: "Vini", cliente: "Pedro Alves", tipoComissao: "Tempo", item: "Corte masculino", quantidade: 1, valor: 50 },
+    ];
+  }, [gerado, periodo]);
+
+  const columnsDetalhado: Column<LinhaDetalhada>[] = [
+    { key: "data", label: "Data", pinned: true },
+    { key: "funcionario", label: "Funcionário" },
+    { key: "cliente", label: "Cliente", render: (v) => <a href="/listaClientes" className="hover:underline font-medium">{v}</a> },
+    { key: "tipoComissao", label: "Tipo Comissão" },
+    { key: "item", label: "Ítem" },
+    { key: "quantidade", label: "Quantidade", align: "right" },
+    { key: "valor", label: "Valor", align: "right", render: (v: number) => <span className="font-medium text-foreground">{R$(v)}</span> },
+  ];
+
+  const isDetalhado = activeTab === "detalhado";
+  const totalValorDet = linhasDetalhadas.reduce((s, r) => s + r.valor, 0);
 
   const totalValor = linhas.reduce((s, r) => s + r.valor, 0);
 
@@ -277,7 +314,7 @@ export default function RelatorioAssinatura() {
   const MonthPicker = () => (
     <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
       <PopoverTrigger asChild>
-        <button className={cn("toolbar-btn gap-1.5 text-xs", "toolbar-btn-active")}>
+        <button className="toolbar-btn gap-1.5 text-xs">
           <Calendar className="h-3.5 w-3.5" />
           <span>{monthLabel(periodo)}</span>
         </button>
