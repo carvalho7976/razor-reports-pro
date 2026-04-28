@@ -15,10 +15,10 @@ interface LinhaProfissional {
   profissional: string;
   qtdServicosTempo: number;
   tempoTrabalhado: number; // minutos
+  pontosAcumulados: number;
   qtdServicosPorcentagem: number;
   qtdProdutos: number;
   clientesAtendidos: number;
-  pontosAcumulados: number;
   valor: number; // valor a pagar (gerado a partir do bolo)
 }
 
