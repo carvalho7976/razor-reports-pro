@@ -290,7 +290,20 @@ export default function RelatorioAssinatura() {
 
   const columnsDetalhado: Column<LinhaDetalhada>[] = [
     { key: "data", label: "Data", pinned: true },
-    { key: "funcionario", label: "Funcionário" },
+    {
+      key: "funcionario",
+      label: "Profissional",
+      render: (v) => (
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <a href="/funcionarioPesquisa" className="hover:underline font-medium">
+            {v}
+          </a>
+        </div>
+      ),
+    },
     { key: "cliente", label: "Cliente", render: (v) => <a href="/listaClientes" className="hover:underline font-medium">{v}</a> },
     { key: "tipoComissao", label: "Tipo Comissão" },
     { key: "item", label: "Ítem" },
