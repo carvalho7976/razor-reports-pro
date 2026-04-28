@@ -19,6 +19,7 @@ interface LinhaProfissional {
   qtdServicosPorcentagem: number;
   qtdProdutos: number;
   clientesAtendidos: number;
+  pontosAcumulados: number;
   valor: number; // valor a pagar (gerado a partir do bolo)
 }
 
@@ -31,15 +32,15 @@ interface PeriodoData {
 }
 
 const baseProfissionais: Omit<LinhaProfissional, "valor">[] = [
-  { id: 1, profissional: "Cesar", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 2, profissional: "Claudia", qtdServicosTempo: 2, tempoTrabalhado: 90, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1 },
-  { id: 3, profissional: "Fila de espera", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 4, profissional: "Henrique", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 5, profissional: "Lara", qtdServicosTempo: 1, tempoTrabalhado: 45, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1 },
-  { id: 6, profissional: "Marcia Silva", qtdServicosTempo: 3, tempoTrabalhado: 120, qtdServicosPorcentagem: 1, qtdProdutos: 0, clientesAtendidos: 2 },
-  { id: 7, profissional: "Matheus", qtdServicosTempo: 4, tempoTrabalhado: 180, qtdServicosPorcentagem: 0, qtdProdutos: 1, clientesAtendidos: 3 },
-  { id: 8, profissional: "Ramon", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0 },
-  { id: 9, profissional: "Vini", qtdServicosTempo: 1, tempoTrabalhado: 30, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1 },
+  { id: 1, profissional: "Cesar", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 2, profissional: "Claudia", qtdServicosTempo: 2, tempoTrabalhado: 90, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 110 },
+  { id: 3, profissional: "Fila de espera", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 4, profissional: "Henrique", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 5, profissional: "Lara", qtdServicosTempo: 1, tempoTrabalhado: 45, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 55 },
+  { id: 6, profissional: "Marcia Silva", qtdServicosTempo: 3, tempoTrabalhado: 120, qtdServicosPorcentagem: 1, qtdProdutos: 0, clientesAtendidos: 2, pontosAcumulados: 160 },
+  { id: 7, profissional: "Matheus", qtdServicosTempo: 4, tempoTrabalhado: 180, qtdServicosPorcentagem: 0, qtdProdutos: 1, clientesAtendidos: 3, pontosAcumulados: 240 },
+  { id: 8, profissional: "Ramon", qtdServicosTempo: 0, tempoTrabalhado: 0, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 0, pontosAcumulados: 0 },
+  { id: 9, profissional: "Vini", qtdServicosTempo: 1, tempoTrabalhado: 30, qtdServicosPorcentagem: 0, qtdProdutos: 0, clientesAtendidos: 1, pontosAcumulados: 40 },
 ];
 
 const periodosOptions = [
