@@ -189,7 +189,7 @@ const initialData: Assinante[] = [
     inicio: "01/01/2026",
     vencimento: "01/04/2026",
     valor: 89.9,
-    status: "Ativo",
+    status: "Em dia",
   },
   {
     id: 2,
@@ -219,7 +219,7 @@ const initialData: Assinante[] = [
     inicio: "01/11/2025",
     vencimento: "01/05/2026",
     valor: 449.9,
-    status: "Ativo",
+    status: "Em dia",
   },
   {
     id: 5,
@@ -239,20 +239,20 @@ const initialData: Assinante[] = [
     inicio: "05/03/2026",
     vencimento: "05/04/2026",
     valor: 89.9,
-    status: "Ativo",
+    status: "Em dia",
   },
 ];
 
 const tabFilter = (row: Assinante, tab: string) => {
   if (tab === "total") return true;
-  if (tab === "ativo") return row.status === "Ativo";
+  if (tab === "ativo") return row.status === "Em dia";
   return row.status === "Atrasado";
 };
 
 const buildCards = (filtered: Assinante[]): SummaryCard[] => [
   {
     label: "Total em Dia",
-    value: R$(filtered.filter((d) => d.status === "Ativo").reduce((s, r) => s + r.valor, 0)),
+    value: R$(filtered.filter((d) => d.status === "Em dia").reduce((s, r) => s + r.valor, 0)),
     icon: <DollarSign className="h-4 w-4" />,
     color: "green",
   },
@@ -305,7 +305,7 @@ export default function Assinantes() {
       inicio: new Date().toLocaleDateString("pt-BR"),
       vencimento: new Date().toLocaleDateString("pt-BR"),
       valor: planoAtual.valor,
-      status: "Ativo",
+      status: "Em dia",
     };
     setAllData((prev) => [novo, ...prev]);
     toast({ title: "Assinatura criada com sucesso!" });
@@ -351,7 +351,7 @@ export default function Assinantes() {
       key: "status",
       label: "Status",
       render: (v) => (
-        <span className="font-medium" style={{ color: v === "Ativo" ? "#00c5b4" : "#ff2f2f" }}>
+        <span className="font-medium" style={{ color: v === "Em dia" ? "#00c5b4" : "#ff2f2f" }}>
           {v}
         </span>
       ),
@@ -360,7 +360,7 @@ export default function Assinantes() {
 
   const tabs: TabDef[] = [
     { label: "Total", value: "total", color: "neutral" },
-    { label: "Ativos", value: "ativo", color: "success" },
+    { label: "Em dia", value: "ativo", color: "success" },
     { label: "Atrasados", value: "atrasado", color: "destructive" },
   ];
 
