@@ -597,7 +597,7 @@ export default function Assinantes() {
             onClick: () => setNovoOpen(true),
           },
           {
-            label: "Adicionar pela Celcoin",
+            label: "Cliente Celcoin",
             icon: <UserPlus className="h-4 w-4" />,
             onClick: () => setCelcoinOpen(true),
           },
@@ -751,9 +751,15 @@ export default function Assinantes() {
                               className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                             />
                           </TableHead>
-                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">Cliente</TableHead>
-                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">Documento</TableHead>
-                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">Plano</TableHead>
+                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">
+                            Cliente
+                          </TableHead>
+                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">
+                            Documento
+                          </TableHead>
+                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">
+                            Plano
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
