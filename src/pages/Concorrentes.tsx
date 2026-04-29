@@ -9,10 +9,10 @@ export default function ComparativoPrecos() {
 
   const features = [
     ["Chatbot", "Incluso", "R$49", "Custo à parte", "Custo à parte"],
-    ["Suporte", "Incluso", "R$49", "Custo à parte", "Custo à parte"],
-    ["Clube de fidelidade", "Incluso", "R$49", "Custo à parte", "Custo à parte"],
-    ["Seu próprio site", "Incluso", "R$49", "Custo à parte", "Custo à parte"],
-    ["Exclusividade de cliente", "Incluso", "R$49", "Não tem", "Não tem"],
+    ["Suporte", "Incluso", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Clube de fidelidade", "Incluso", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Seu próprio site", "Incluso", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Exclusividade de cliente", "Incluso", "Incluso", "Não tem", "Não tem"],
   ];
 
   return (
