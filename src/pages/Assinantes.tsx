@@ -110,7 +110,7 @@ const clientesCelcoinMock: ClienteCelcoin[] = [
     documento: "123.456.789-00",
     email: "caio@email.com",
     plano: "Plano Mensal",
-    status: "Já importado",
+    status: "Disponível",
   },
   {
     id: 4,
@@ -118,7 +118,7 @@ const clientesCelcoinMock: ClienteCelcoin[] = [
     documento: "123.456.789-00",
     email: "caio@email.com",
     plano: "Plano Mensal",
-    status: "Já importado",
+    status: "Disponível",
   },
   {
     id: 5,
@@ -126,7 +126,7 @@ const clientesCelcoinMock: ClienteCelcoin[] = [
     documento: "123.456.789-00",
     email: "caio@email.com",
     plano: "Plano Mensal",
-    status: "Já importado",
+    status: "Disponível",
   },
 ];
 
