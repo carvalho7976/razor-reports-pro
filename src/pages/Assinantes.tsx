@@ -652,8 +652,8 @@ export default function Assinantes() {
               </button>
             }
           >
-            <div className="flex flex-col gap-4">
-              <div className="rounded-xl border border-border bg-muted/20 p-4">
+            <div className="flex flex-col gap-2">
+              <div className="px-0 pb-1">
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <div className="relative flex-1">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -700,6 +700,7 @@ export default function Assinantes() {
                     </p>
                   </div>
                 ) : (
+                  <div className="max-h-[264px] overflow-y-auto">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/40 hover:bg-muted/40">
@@ -747,6 +748,7 @@ export default function Assinantes() {
                       })}
                     </TableBody>
                   </Table>
+                  </div>
                 )}
               </div>
             </div>
