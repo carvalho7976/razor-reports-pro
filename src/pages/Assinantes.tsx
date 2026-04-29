@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { FormModal, TextField, FormRow, SaveButton, Dropdown } from "@/components/FormModal";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 interface Assinante {
@@ -625,7 +627,7 @@ export default function Assinantes() {
           if (!o) resetCelcoin();
         }}
       >
-        <DialogContent className="max-w-2xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="max-w-[740px] border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Adicionar pela Celcoin"
             subtitle="Busque, sincronize e importe clientes da Celcoin para assinantes."
@@ -633,7 +635,7 @@ export default function Assinantes() {
               setCelcoinOpen(false);
               resetCelcoin();
             }}
-            size="md"
+            size="lg"
             footer={
               <button
                 type="button"
@@ -687,18 +689,6 @@ export default function Assinantes() {
               </div>
 
               <div className="overflow-hidden rounded-xl border border-border bg-card">
-                <div className="grid grid-cols-[44px_1.4fr_1fr_1fr] items-center border-b border-border bg-muted/40 px-4 py-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  <input
-                    type="checkbox"
-                    checked={todosSelecionados}
-                    onChange={toggleTodosClientesCelcoin}
-                    className="h-4 w-4 rounded border-border"
-                  />
-                  <span>Cliente</span>
-                  <span>Documento</span>
-                  <span>Plano</span>
-                </div>
-
                 {clientesCelcoinVisiveis.length === 0 ? (
                   <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
                     <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-muted">
@@ -710,38 +700,53 @@ export default function Assinantes() {
                     </p>
                   </div>
                 ) : (
-                  clientesCelcoinVisiveis.map((cliente) => {
-                    const checked = clientesSelecionados.includes(cliente.id);
-
-                    return (
-                      <button
-                        key={cliente.id}
-                        type="button"
-                        onClick={() => toggleClienteCelcoin(cliente.id)}
-                        className={cn(
-                          "grid w-full grid-cols-[44px_1.4fr_1fr_1fr] items-center border-b border-border px-4 py-3 text-left text-sm transition last:border-b-0 hover:bg-muted/40",
-                          checked && "bg-info/5",
-                        )}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleClienteCelcoin(cliente.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 rounded border-border"
-                        />
-
-                        <div className="min-w-0">
-                          <p className="truncate font-semibold text-foreground">{cliente.nome}</p>
-                          {cliente.email && <p className="truncate text-xs text-muted-foreground">{cliente.email}</p>}
-                        </div>
-
-                        <span className="text-muted-foreground">{cliente.documento}</span>
-
-                        <span className="font-medium text-foreground">{cliente.plano}</span>
-                      </button>
-                    );
-                  })
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/40 hover:bg-muted/40">
+                        <TableHead className="w-[44px] h-10">
+                          <Checkbox
+                            checked={todosSelecionados}
+                            onCheckedChange={toggleTodosClientesCelcoin}
+                            className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
+                          />
+                        </TableHead>
+                        <TableHead className="h-10 text-xs font-bold uppercase tracking-wide">Cliente</TableHead>
+                        <TableHead className="h-10 text-xs font-bold uppercase tracking-wide">Documento</TableHead>
+                        <TableHead className="h-10 text-xs font-bold uppercase tracking-wide">Plano</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {clientesCelcoinVisiveis.map((cliente) => {
+                        const checked = clientesSelecionados.includes(cliente.id);
+                        return (
+                          <TableRow
+                            key={cliente.id}
+                            onClick={() => toggleClienteCelcoin(cliente.id)}
+                            className={cn("cursor-pointer", checked && "bg-blue-500/5 hover:bg-blue-500/10")}
+                          >
+                            <TableCell className="py-2">
+                              <Checkbox
+                                checked={checked}
+                                onCheckedChange={() => toggleClienteCelcoin(cliente.id)}
+                                onClick={(e) => e.stopPropagation()}
+                                className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
+                              />
+                            </TableCell>
+                            <TableCell className="py-2">
+                              <div className="min-w-0">
+                                <p className="truncate font-semibold text-foreground">{cliente.nome}</p>
+                                {cliente.email && (
+                                  <p className="truncate text-xs text-muted-foreground">{cliente.email}</p>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-2 text-muted-foreground">{cliente.documento}</TableCell>
+                            <TableCell className="py-2 font-medium text-foreground">{cliente.plano}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             </div>
