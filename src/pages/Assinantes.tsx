@@ -128,6 +128,30 @@ const clientesCelcoinMock: ClienteCelcoin[] = [
     plano: "Plano Mensal",
     status: "Disponível",
   },
+  {
+    id: 6,
+    nome: "Lucas Pereira Rocha",
+    documento: "456.789.123-44",
+    email: "lucas.rocha@email.com",
+    plano: "Barba Club",
+    status: "Disponível",
+  },
+  {
+    id: 7,
+    nome: "Mariana Silva Costa",
+    documento: "789.123.456-77",
+    email: "mariana.costa@email.com",
+    plano: "Plano Semestral",
+    status: "Disponível",
+  },
+  {
+    id: 8,
+    nome: "Rafael Souza Oliveira",
+    documento: "321.654.987-22",
+    email: "rafael.oliveira@email.com",
+    plano: "Plano Mensal",
+    status: "Disponível",
+  },
 ];
 
 function ProfissionalAvatarBadge({ p, size = "md" }: { p: ProfissionalAvatar; size?: "sm" | "md" }) {
