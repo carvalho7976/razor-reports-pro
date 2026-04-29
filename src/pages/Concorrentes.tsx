@@ -7,6 +7,14 @@ export default function ComparativoPrecos() {
     ["13 a 20", "12x R$135", "12x R$270", "R$1.620/ano", "~R$420", "R$397+"],
   ];
 
+  const features = [
+    ["Chatbot", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Suporte", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Clube de fidelidade", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Seu próprio site", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Exclusividade de cliente", "Incluso", "Não tem", "Não tem"],
+  ];
+
   return (
     <section className="w-full bg-white px-6 py-20">
       <div className="max-w-7xl">
@@ -16,86 +24,82 @@ export default function ComparativoPrecos() {
 
         <p className="mb-8 text-left text-base text-zinc-500">Veja quanto você paga conforme sua equipe cresce.</p>
 
+        {/* TABELA DE PREÇO */}
         <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-[0_14px_45px_rgba(0,0,0,0.06)]">
           <div className="min-w-[1100px]">
             <div className="grid grid-cols-[130px_repeat(5,1fr)] border-b border-zinc-200">
-              <div className="flex h-24 items-center justify-start bg-zinc-50 px-5 text-sm font-medium text-zinc-500">
-                Agendas
+              <div className="flex h-24 items-center bg-zinc-50 px-5 text-sm text-zinc-500">Agendas</div>
+
+              <div className="flex h-24 flex-col items-center justify-center gap-2">
+                <div className="font-semibold">Frizzar Especial</div>
+                <span className="rounded-full bg-red-50 px-2 py-1 text-[10px] text-red-500">oferta ativa</span>
               </div>
 
-              <div className="flex h-24 flex-col items-center justify-center gap-2 bg-white px-5 text-center">
-                <div className="text-base font-semibold text-zinc-900">Frizzar Especial</div>
-                <span className="rounded-full bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-500">
-                  oferta ativa
-                </span>
-              </div>
-
-              <div className="flex h-24 items-center justify-center bg-white px-5">
+              <div className="flex h-24 items-center justify-center">
                 <img
                   src="https://a.frizzar.com.br/wp-content/uploads/2025/04/LNSPB-e1655256051516.png"
-                  alt="Frizzar"
-                  className="max-h-7 object-contain"
+                  className="max-h-7"
                 />
               </div>
 
-              <div className="flex h-24 flex-col items-center justify-center bg-white px-5 text-center text-sm font-medium text-zinc-500">
-                Economia
-                <span className="mt-1 text-[11px] text-zinc-400">no ano</span>
-              </div>
+              <div className="flex h-24 items-center justify-center text-sm text-zinc-400">Economia / ano</div>
 
-              <div className="flex h-24 items-center justify-center bg-white px-5">
+              <div className="flex h-24 items-center justify-center">
                 <img
                   src="https://djnn6j6gf59xn.cloudfront.net/content/img/novo_portal/logo-topo-rebranding.png"
-                  alt="Trinks"
-                  className="max-h-8 object-contain"
+                  className="max-h-8"
                 />
               </div>
 
-              <div className="flex h-24 items-center justify-center bg-white px-5">
+              <div className="flex h-24 items-center justify-center">
                 <img
                   src="https://cdn.prod.website-files.com/6151e81f5d43e8748b3808c6/6151fb367006fe41eaa186e7_Logo%20Avec.svg"
-                  alt="Avec"
-                  className="max-h-7 object-contain"
+                  className="max-h-7"
                 />
               </div>
             </div>
 
             {rows.map(([agendas, especial, frizzar, economia, trinks, avec]) => (
-              <div
-                key={agendas}
-                className="grid grid-cols-[130px_repeat(5,1fr)] border-b border-zinc-100 last:border-b-0"
-              >
-                <div className="flex min-h-16 items-center justify-start bg-zinc-50 px-5 text-sm font-medium text-zinc-600">
-                  {agendas}
-                </div>
-
-                <div className="flex min-h-16 items-center justify-center bg-white px-5 text-base font-semibold text-red-500">
-                  {especial}
-                </div>
-
-                <div className="flex min-h-16 items-center justify-center bg-red-50/40 px-5 text-sm font-medium text-zinc-400 line-through">
-                  {frizzar}
-                </div>
-
-                <div className="flex min-h-16 items-center justify-center bg-emerald-50 px-5 text-sm font-semibold text-emerald-700">
-                  {economia}
-                </div>
-
-                <div className="flex min-h-16 items-center justify-center bg-white px-5 text-base font-medium text-zinc-700">
-                  {trinks}
-                </div>
-
-                <div className="flex min-h-16 items-center justify-center bg-white px-5 text-base font-medium text-zinc-700">
-                  {avec}
-                </div>
+              <div key={agendas} className="grid grid-cols-[130px_repeat(5,1fr)] border-b border-zinc-100">
+                <div className="flex items-center bg-zinc-50 px-5 text-sm text-zinc-600">{agendas}</div>
+                <div className="flex items-center justify-center text-red-500 font-semibold">{especial}</div>
+                <div className="flex items-center justify-center text-zinc-400 line-through">{frizzar}</div>
+                <div className="flex items-center justify-center text-emerald-600 font-semibold">{economia}</div>
+                <div className="flex items-center justify-center text-zinc-700">{trinks}</div>
+                <div className="flex items-center justify-center text-zinc-700">{avec}</div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="mt-4 text-left text-sm text-zinc-400">
-          Economia calculada comparando o valor anual da Frizzar com a condição Frizzar Especial.
-        </p>
+        {/* DIVISÃO */}
+        <div className="my-16 h-px w-full bg-zinc-200" />
+
+        {/* TABELA DE FUNCIONALIDADES */}
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_14px_45px_rgba(0,0,0,0.04)]">
+          <div className="grid grid-cols-[1.5fr_repeat(3,1fr)] border-b border-zinc-200">
+            <div className="px-6 py-4 text-sm text-zinc-500">Funcionalidades</div>
+            <div className="px-6 py-4 text-center font-semibold">Frizzar</div>
+            <div className="px-6 py-4 text-center text-zinc-500">Trinks</div>
+            <div className="px-6 py-4 text-center text-zinc-500">Avec</div>
+          </div>
+
+          {features.map(([name, frizzar, trinks, avec]) => (
+            <div key={name} className="grid grid-cols-[1.5fr_repeat(3,1fr)] border-b border-zinc-100">
+              <div className="px-6 py-4 text-sm text-zinc-600">{name}</div>
+
+              <div className="px-6 py-4 text-center text-emerald-600 font-semibold">{frizzar}</div>
+
+              <div className="px-6 py-4 text-center text-zinc-500">
+                {trinks === "Não tem" ? <span className="text-red-500 font-semibold">Não tem</span> : trinks}
+              </div>
+
+              <div className="px-6 py-4 text-center text-zinc-500">
+                {avec === "Não tem" ? <span className="text-red-500 font-semibold">Não tem</span> : avec}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
