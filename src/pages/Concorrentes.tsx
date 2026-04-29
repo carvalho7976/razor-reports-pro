@@ -1,18 +1,18 @@
 export default function ComparativoPrecos() {
   const priceRows = [
-    ["1", "12x R$59", "R$1.116/ano", "12x R$152", "~R$85", "R$99"],
-    ["2", "12x R$69", "R$828/ano", "12x R$138", "~R$130", "R$163"],
-    ["3 a 6", "12x R$79", "R$1.008/ano", "12x R$163", "~R$210", "R$286"],
-    ["7 a 12", "12x R$110", "R$1.332/ano", "12x R$221", "~R$310", "R$397"],
-    ["13 a 20", "12x R$135", "R$1.620/ano", "12x R$270", "~R$420", "R$397+"],
+    ["1", "12x R$59", "R$1.116/ano", "12x R$152", "~R$185", "~R$199"],
+    ["2", "12x R$69", "R$828/ano", "12x R$138", "~R$230", "~R$263"],
+    ["3 a 6", "12x R$79", "R$1.008/ano", "12x R$163", "~R$270", "~R$386"],
+    ["7 a 12", "12x R$110", "R$1.332/ano", "12x R$221", "~R$310", "~R$397"],
+    ["13 a 20", "12x R$135", "R$1.620/ano", "12x R$270", "~R$420", "~R$497+"],
   ];
 
   const features = [
-    ["Chatbot", "Incluso", "Custo à parte", "Custo à parte"],
-    ["Suporte", "Incluso", "Custo à parte", "Custo à parte"],
-    ["Clube de fidelidade", "Incluso", "Custo à parte", "Custo à parte"],
-    ["Seu próprio site", "Incluso", "Custo à parte", "Custo à parte"],
-    ["Exclusividade de cliente", "Incluso", "Não tem", "Não tem"],
+    ["Chatbot", "Incluso", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Suporte", "Incluso", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Clube de fidelidade", "Incluso", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Seu próprio site", "Incluso", "Incluso", "Custo à parte", "Custo à parte"],
+    ["Exclusividade de cliente", "Incluso", "Incluso", "Não tem", "Não tem"],
   ];
 
   return (
@@ -23,7 +23,6 @@ export default function ComparativoPrecos() {
         <p className="mb-10 text-base text-zinc-500">Veja quanto você paga conforme sua equipe cresce.</p>
 
         <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-[0_18px_60px_rgba(0,0,0,0.06)]">
-          {/* HEADER */}
           <div className="grid grid-cols-[150px_repeat(4,1fr)] border-b border-zinc-200 bg-white">
             <div className="px-6 py-6 text-sm text-zinc-500">Agendas</div>
 
@@ -56,14 +55,13 @@ export default function ComparativoPrecos() {
             </div>
           </div>
 
-          {/* PREÇOS */}
           {priceRows.map(([agendas, especial, economia, frizzar, trinks, avec]) => (
             <div key={agendas} className="grid grid-cols-[150px_repeat(4,1fr)] border-b border-zinc-100">
-              <div className="flex items-center px-6 py-6 text-sm text-zinc-600 bg-zinc-50">{agendas}</div>
+              <div className="flex items-center bg-zinc-50 px-6 py-6 text-sm text-zinc-600">{agendas}</div>
 
               <div className="flex flex-col items-center justify-center px-6 py-6">
                 <div className="text-xl font-semibold text-red-500">{especial}</div>
-                <div className="mt-1 text-sm text-emerald-600 font-medium">economiza {economia}</div>
+                <div className="mt-1 text-sm font-medium text-emerald-600">economiza {economia}</div>
               </div>
 
               <div className="flex items-center justify-center px-6 py-6 text-base text-zinc-400 line-through">
@@ -76,30 +74,27 @@ export default function ComparativoPrecos() {
             </div>
           ))}
 
-          {/* DIVISOR */}
-          <div className="bg-zinc-50 px-6 py-4 text-sm font-medium text-zinc-500 border-y border-zinc-200">
+          <div className="border-y border-zinc-200 bg-zinc-50 px-6 py-4 text-sm font-medium text-zinc-500">
             Funcionalidades incluídas
           </div>
 
-          {/* FEATURES */}
-          {features.map(([name, frizzar, trinks, avec]) => (
-            <div key={name} className="grid grid-cols-[150px_repeat(4,1fr)] border-b border-zinc-100">
-              <div className="flex items-center px-6 py-6 text-sm text-zinc-700 bg-zinc-50">{name}</div>
+          {features.map(([name, frizzarEspecial, frizzar, trinks, avec]) => (
+            <div key={name} className="grid grid-cols-[150px_repeat(4,1fr)] border-b border-zinc-100 last:border-b-0">
+              <div className="flex items-center bg-zinc-50 px-6 py-6 text-sm text-zinc-700">{name}</div>
+
+              <div className="flex items-center justify-center px-6 py-6 text-sm font-semibold text-emerald-600">
+                {frizzarEspecial}
+              </div>
 
               <div className="flex items-center justify-center px-6 py-6 text-sm font-semibold text-emerald-600">
                 {frizzar}
               </div>
 
-              <div className="flex items-center justify-center px-6 py-6 text-sm text-red-500 font-medium">
-                {trinks === "Não tem" ? "Não tem" : trinks}
+              <div className="flex items-center justify-center px-6 py-6 text-sm font-medium text-red-500">
+                {trinks}
               </div>
 
-              <div className="flex items-center justify-center px-6 py-6 text-sm text-red-500 font-medium">
-                {avec === "Não tem" ? "Não tem" : avec}
-              </div>
-
-              {/* célula vazia pra alinhar grid */}
-              <div className="hidden"></div>
+              <div className="flex items-center justify-center px-6 py-6 text-sm font-medium text-red-500">{avec}</div>
             </div>
           ))}
         </div>
