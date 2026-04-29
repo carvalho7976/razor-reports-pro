@@ -2,17 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, SummaryCard, TabDef } from "@/components/DataTable";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import {
-  CreditCard,
-  XCircle,
-  DollarSign,
-  CheckCircle2,
-  Plus,
-  ChevronDown,
-  Search,
-  RefreshCw,
-  UserPlus,
-} from "lucide-react";
+import { XCircle, DollarSign, CheckCircle2, Plus, ChevronDown, Search, RefreshCw, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -357,6 +347,21 @@ export default function Assinantes() {
 
   const planoAtual = planosDisponiveis.find((p) => p.id === planoSelecionado) ?? planosDisponiveis[0];
 
+  const clientesCelcoinVisiveis = clientesCelcoin.filter((cliente) => cliente.status !== "Já importado");
+
+  const todosSelecionados =
+    clientesCelcoinVisiveis.length > 0 &&
+    clientesCelcoinVisiveis.every((cliente) => clientesSelecionados.includes(cliente.id));
+
+  const toggleTodosClientesCelcoin = () => {
+    if (todosSelecionados) {
+      setClientesSelecionados([]);
+      return;
+    }
+
+    setClientesSelecionados(clientesCelcoinVisiveis.map((cliente) => cliente.id));
+  };
+
   const resetForm = () => {
     setFormNome("");
     setFormCpf("");
@@ -470,7 +475,8 @@ export default function Assinantes() {
   };
 
   const handleAdicionarSelecionadosCelcoin = () => {
-    const selecionados = clientesCelcoin.filter((cliente) => clientesSelecionados.includes(cliente.id));
+    const selecionados = clientesCelcoinVisiveis.filter((cliente) => clientesSelecionados.includes(cliente.id));
+
     adicionarClientesCelcoin(selecionados);
   };
 
@@ -619,58 +625,34 @@ export default function Assinantes() {
           if (!o) resetCelcoin();
         }}
       >
-        <DialogContent className="max-w-4xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
+        <DialogContent className="max-w-2xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden">
           <FormModal
             title="Adicionar pela Celcoin"
-            subtitle="Busque um cliente por CPF ou e-mail, sincronize a lista e importe para assinantes."
+            subtitle="Busque, sincronize e importe clientes da Celcoin para assinantes."
             onClose={() => {
               setCelcoinOpen(false);
               resetCelcoin();
             }}
-            size="lg"
+            size="md"
             footer={
-              <div className="flex w-full items-center justify-between gap-3">
-                <button
-                  type="button"
-                  onClick={handleSincronizarCelcoin}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Sincronizar lista
-                </button>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCelcoinOpen(false);
-                      resetCelcoin();
-                    }}
-                    className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
-                  >
-                    Cancelar
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleAdicionarSelecionadosCelcoin}
-                    disabled={clientesSelecionados.length === 0}
-                    className={cn(
-                      "inline-flex h-10 items-center justify-center rounded-lg px-4 text-sm font-semibold transition",
-                      clientesSelecionados.length > 0
-                        ? "bg-foreground text-background hover:opacity-90"
-                        : "cursor-not-allowed bg-muted text-muted-foreground",
-                    )}
-                  >
-                    Adicionar selecionados
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={handleAdicionarSelecionadosCelcoin}
+                disabled={clientesSelecionados.length === 0}
+                className={cn(
+                  "inline-flex h-11 w-full items-center justify-center rounded-lg px-4 text-sm font-semibold transition",
+                  clientesSelecionados.length > 0
+                    ? "bg-foreground text-background hover:opacity-90"
+                    : "cursor-not-allowed bg-muted text-muted-foreground",
+                )}
+              >
+                Adicionar selecionados
+              </button>
             }
           >
             <div className="flex flex-col gap-4">
               <div className="rounded-xl border border-border bg-muted/20 p-4">
-                <div className="flex flex-col gap-3 md:flex-row">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <div className="relative flex-1">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <input
@@ -692,54 +674,62 @@ export default function Assinantes() {
                     <Search className="h-4 w-4" />
                     Buscar
                   </button>
-                </div>
 
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Use a busca para localizar um cliente específico ou sincronize a lista para atualizar os clientes
-                  vindos da Celcoin.
-                </p>
+                  <button
+                    type="button"
+                    onClick={handleSincronizarCelcoin}
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Sincronizar
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-hidden rounded-xl border border-border bg-card">
-                <div className="grid grid-cols-[44px_1.4fr_1fr_1fr_120px] items-center border-b border-border bg-muted/40 px-4 py-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  <span></span>
+                <div className="grid grid-cols-[44px_1.4fr_1fr_1fr] items-center border-b border-border bg-muted/40 px-4 py-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={todosSelecionados}
+                    onChange={toggleTodosClientesCelcoin}
+                    className="h-4 w-4 rounded border-border"
+                  />
                   <span>Cliente</span>
                   <span>Documento</span>
                   <span>Plano</span>
-                  <span className="text-right">Ação</span>
                 </div>
 
-                {clientesCelcoin.length === 0 ? (
+                {clientesCelcoinVisiveis.length === 0 ? (
                   <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
                     <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-muted">
                       <Search className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-semibold text-foreground">Nenhum cliente encontrado</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Tente buscar outro CPF ou e-mail.</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Tente buscar outro CPF ou e-mail, ou sincronize a lista.
+                    </p>
                   </div>
                 ) : (
-                  clientesCelcoin.map((cliente) => {
-                    const disabled = cliente.status === "Já importado";
+                  clientesCelcoinVisiveis.map((cliente) => {
                     const checked = clientesSelecionados.includes(cliente.id);
 
                     return (
-                      <div
+                      <button
                         key={cliente.id}
+                        type="button"
+                        onClick={() => toggleClienteCelcoin(cliente.id)}
                         className={cn(
-                          "grid grid-cols-[44px_1.4fr_1fr_1fr_120px] items-center border-b border-border px-4 py-3 text-sm last:border-b-0",
+                          "grid w-full grid-cols-[44px_1.4fr_1fr_1fr] items-center border-b border-border px-4 py-3 text-left text-sm transition last:border-b-0 hover:bg-muted/40",
                           checked && "bg-info/5",
-                          disabled && "opacity-60",
                         )}
                       >
-                        <div>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            disabled={disabled}
-                            onChange={() => toggleClienteCelcoin(cliente.id)}
-                            className="h-4 w-4 rounded border-border"
-                          />
-                        </div>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleClienteCelcoin(cliente.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-4 w-4 rounded border-border"
+                        />
 
                         <div className="min-w-0">
                           <p className="truncate font-semibold text-foreground">{cliente.nome}</p>
@@ -749,23 +739,7 @@ export default function Assinantes() {
                         <span className="text-muted-foreground">{cliente.documento}</span>
 
                         <span className="font-medium text-foreground">{cliente.plano}</span>
-
-                        <div className="flex justify-end">
-                          {disabled ? (
-                            <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-                              Importado
-                            </span>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => adicionarClientesCelcoin([cliente])}
-                              className="inline-flex items-center justify-center rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground transition hover:bg-muted"
-                            >
-                              Adicionar
-                            </button>
-                          )}
-                        </div>
-                      </div>
+                      </button>
                     );
                   })
                 )}
