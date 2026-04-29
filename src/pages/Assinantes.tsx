@@ -742,18 +742,18 @@ export default function Assinantes() {
                 ) : (
                   <div className="max-h-[264px] overflow-y-auto">
                     <Table>
-                      <TableHeader>
+                      <TableHeader className="sticky top-0 z-10 bg-muted/40 [&_tr]:border-b">
                         <TableRow className="bg-muted/40 hover:bg-muted/40">
-                          <TableHead className="w-[44px] h-10">
+                          <TableHead className="w-[44px] h-10 bg-muted/40">
                             <Checkbox
                               checked={todosSelecionados}
                               onCheckedChange={toggleTodosClientesCelcoin}
                               className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                             />
                           </TableHead>
-                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide">Cliente</TableHead>
-                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide">Documento</TableHead>
-                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide">Plano</TableHead>
+                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">Cliente</TableHead>
+                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">Documento</TableHead>
+                          <TableHead className="h-10 text-xs font-bold uppercase tracking-wide bg-muted/40">Plano</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
