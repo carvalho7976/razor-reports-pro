@@ -1077,6 +1077,8 @@ export default function NovaAgenda2() {
           </FormModal>
         </DialogContent>
       </Dialog>
+
+      <ComandaSheet open={comandaOpen} onOpenChange={setComandaOpen} agendamento={comandaSel} />
     </AppLayout>
   );
 }
