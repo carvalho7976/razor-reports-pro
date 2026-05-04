@@ -29,6 +29,7 @@ import {
   SaveButton,
 } from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { ComandaSheet, type ComandaAgendamento } from "@/components/ComandaSheet";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
 type FilaItem = {
