@@ -138,7 +138,7 @@ const agendamentos: Agendamento[] = [
 ];
 
 const HORA_INICIO = 8;
-const HORA_FIM = 20;
+const HORA_FIM = 24;
 const SLOT_MIN = 30;
 const PX_POR_MIN = 1.6;
 
