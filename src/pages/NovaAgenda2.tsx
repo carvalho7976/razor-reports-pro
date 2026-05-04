@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -387,6 +387,18 @@ export default function NovaAgenda2() {
   const [data, setData] = useState<Date>(new Date(2026, 3, 22));
   const [filtroProf, setFiltroProf] = useState<string>("todos");
   const [filtroDias, setFiltroDias] = useState<string>("1");
+  const [nowMin, setNowMin] = useState<number>(() => {
+    const d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  });
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      setNowMin(d.getHours() * 60 + d.getMinutes());
+    };
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, []);
   const [addFilaOpen, setAddFilaOpen] = useState(false);
   const [filaDeleteItem, setFilaDeleteItem] = useState<FilaItem | null>(null);
   const [chamarItem, setChamarItem] = useState<FilaItem | null>(null);
@@ -847,6 +859,17 @@ export default function NovaAgenda2() {
                   <span className="-mt-1.5">{h}</span>
                 </div>
               ))}
+              {nowMin >= HORA_INICIO * 60 && nowMin <= HORA_FIM * 60 && (
+                <div
+                  className="pointer-events-none absolute left-0 right-0 z-10 flex items-center justify-end pr-1"
+                  style={{ top: `${(nowMin - HORA_INICIO * 60) * PX_POR_MIN}px` }}
+                >
+                  <span className="-translate-y-1/2 rounded-sm bg-red-600 px-1 py-px text-[10px] font-semibold text-white shadow-sm">
+                    {String(Math.floor(nowMin / 60)).padStart(2, "0")}:
+                    {String(nowMin % 60).padStart(2, "0")}
+                  </span>
+                </div>
+              )}
             </div>
 
             {profissionaisVisiveis.map((p) => (
@@ -862,6 +885,17 @@ export default function NovaAgenda2() {
                     style={{ top: `${i * SLOT_MIN * PX_POR_MIN}px`, height: `${SLOT_MIN * PX_POR_MIN}px` }}
                   />
                 ))}
+
+                {nowMin >= HORA_INICIO * 60 && nowMin <= HORA_FIM * 60 && (
+                  <div
+                    className="pointer-events-none absolute left-0 right-0 z-20"
+                    style={{ top: `${(nowMin - HORA_INICIO * 60) * PX_POR_MIN}px` }}
+                  >
+                    <div className="relative h-px bg-red-600">
+                      <span className="absolute -left-1 -top-1 h-2 w-2 rounded-full bg-red-600" />
+                    </div>
+                  </div>
+                )}
 
                 {agendamentos
                   .filter((a) => a.profissional === p.id)
