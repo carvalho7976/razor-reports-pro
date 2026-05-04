@@ -387,6 +387,18 @@ export default function NovaAgenda2() {
   const [data, setData] = useState<Date>(new Date(2026, 3, 22));
   const [filtroProf, setFiltroProf] = useState<string>("todos");
   const [filtroDias, setFiltroDias] = useState<string>("1");
+  const [nowMin, setNowMin] = useState<number>(() => {
+    const d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  });
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      setNowMin(d.getHours() * 60 + d.getMinutes());
+    };
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, []);
   const [addFilaOpen, setAddFilaOpen] = useState(false);
   const [filaDeleteItem, setFilaDeleteItem] = useState<FilaItem | null>(null);
   const [chamarItem, setChamarItem] = useState<FilaItem | null>(null);
