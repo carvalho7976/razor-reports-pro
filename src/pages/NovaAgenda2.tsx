@@ -403,6 +403,9 @@ export default function NovaAgenda2() {
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
 
+  const [comandaOpen, setComandaOpen] = useState(false);
+  const [comandaSel, setComandaSel] = useState<ComandaAgendamento | null>(null);
+
   const [novoCliente, setNovoCliente] = useState("");
   const [novoEmail, setNovoEmail] = useState("");
   const [novoCelular, setNovoCelular] = useState("");
