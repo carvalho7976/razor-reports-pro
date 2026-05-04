@@ -29,6 +29,7 @@ import {
   SaveButton,
 } from "@/components/FormModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { ComandaSheet, type ComandaAgendamento } from "@/components/ComandaSheet";
 
 // ── tipos ──────────────────────────────────────────────────────────────────
 type FilaItem = {
@@ -401,6 +402,9 @@ export default function NovaAgenda2() {
 
   const [storyProf, setStoryProf] = useState<Profissional | null>(null);
   const [storyTema, setStoryTema] = useState<"claro" | "escuro">("escuro");
+
+  const [comandaOpen, setComandaOpen] = useState(false);
+  const [comandaSel, setComandaSel] = useState<ComandaAgendamento | null>(null);
 
   const [novoCliente, setNovoCliente] = useState("");
   const [novoEmail, setNovoEmail] = useState("");
@@ -869,6 +873,20 @@ export default function NovaAgenda2() {
                     return (
                       <div
                         key={a.id}
+                        onClick={() => {
+                          if (isFolga || !a.cliente) return;
+                          const profNome = profissionais.find((pp) => pp.id === a.profissional)?.nome ?? "";
+                          setComandaSel({
+                            id: a.id,
+                            cliente: a.cliente,
+                            servico: a.servico,
+                            profissional: profNome,
+                            inicio: formatHora(a.inicio),
+                            fim: formatHora(a.inicio + a.duracao),
+                            data: format(data, "dd/MM/yyyy"),
+                          });
+                          setComandaOpen(true);
+                        }}
                         className={cn(
                           "absolute left-0 right-0 cursor-pointer overflow-hidden border-l-[3px] px-2 py-1 text-[11px] transition-all hover:z-10 hover:shadow-md",
                           isFolga && "border-l-foreground bg-foreground text-background",
@@ -1059,6 +1077,8 @@ export default function NovaAgenda2() {
           </FormModal>
         </DialogContent>
       </Dialog>
+
+      <ComandaSheet open={comandaOpen} onOpenChange={setComandaOpen} agendamento={comandaSel} />
     </AppLayout>
   );
 }
