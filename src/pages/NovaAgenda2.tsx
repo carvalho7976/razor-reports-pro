@@ -689,9 +689,15 @@ export default function NovaAgenda2() {
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-[13px] font-medium text-foreground leading-tight">
-                              {item.nome}
-                            </p>
+                            <div className="flex items-center gap-1.5 leading-tight">
+                              <p className="truncate text-[13px] font-medium text-foreground">
+                                {item.nome}
+                              </p>
+                              <span className="inline-flex shrink-0 items-center gap-0.5 text-[11px] text-muted-foreground">
+                                <Clock className="h-2.5 w-2.5" />
+                                {item.esperaMin > 0 ? `${item.esperaMin}min` : "Agora"}
+                              </span>
+                            </div>
                             <p className="truncate text-[11px] text-muted-foreground leading-tight mt-0.5">
                               {item.servico}
                               {item.prefere && (
@@ -700,11 +706,6 @@ export default function NovaAgenda2() {
                                   <span className="text-foreground">{item.prefere}</span>
                                 </>
                               )}
-                              <span className="mx-1">·</span>
-                              <span className="inline-flex items-center gap-0.5">
-                                <Clock className="h-2.5 w-2.5" />
-                                {item.esperaMin > 0 ? `${item.esperaMin}min` : "Agora"}
-                              </span>
                             </p>
                           </div>
 
