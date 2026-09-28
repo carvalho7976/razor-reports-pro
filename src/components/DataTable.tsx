@@ -902,8 +902,11 @@ export function DataTable<T extends Record<string, any>>({
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
   const [draftFilters, setDraftFilters] = useState<Record<string, string[]>>({});
+  const [rangeFilters, setRangeFilters] = useState<Record<string, { min?: string; max?: string }>>({});
+  const [draftRanges, setDraftRanges] = useState<Record<string, { min?: string; max?: string }>>({});
   const filterOptions = useMemo(() => {
-    return initialColumns
+    const dateRe = /^\d{2}\/\d{2}\/\d{4}$/;
+    const out = initialColumns
       .filter((c) => c.filterable !== false && c.key !== "acoes")
       .map((col) => {
         const set = new Set<string>();
@@ -911,10 +914,20 @@ export function DataTable<T extends Record<string, any>>({
           const v = row[col.key];
           if (v !== null && v !== undefined && v !== "" && typeof v !== "object") set.add(String(v));
         }
-        return { col, values: Array.from(set).sort((x, y) => x.localeCompare(y, "pt-BR")) };
+        const values = Array.from(set).sort((x, y) => x.localeCompare(y, "pt-BR"));
+        let kind: "date" | "number" | "options" | null = null;
+        if (values.length > 1 && values.every((v) => dateRe.test(v))) kind = "date";
+        else if (values.length > 1 && values.every((v) => /^-?[\d.,]+$/.test(v) && !/^0\d/.test(v)) && values.length > 6) kind = values.length > data.length * 0.8 ? null : "number";
+        else if (values.length > 1 && values.length <= 8) kind = "options";
+        return { col, values, kind };
       })
-      .filter((o) => o.values.length > 1 && o.values.length <= 40 && o.values.length <= Math.max(3, data.length * 0.6));
+      .filter((o) => o.kind !== null) as { col: Column<T>; values: string[]; kind: "date" | "number" | "options" }[];
+    const order = { options: 0, date: 1, number: 2 };
+    return out.sort((a, b) => order[a.kind] - order[b.kind]);
   }, [initialColumns, data]);
+  const activeFilterTotal =
+    Object.values(columnFilters).flat().length +
+    Object.values(rangeFilters).filter((r) => r.min || r.max).length;
 
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(() => {
     try {
@@ -1132,6 +1145,26 @@ export function DataTable<T extends Record<string, any>>({
       );
     }
 
+    const rangeEntries = Object.entries(rangeFilters).filter(([, r]) => r.min || r.max);
+    if (rangeEntries.length > 0) {
+      result = result.filter((row) =>
+        rangeEntries.every(([key, r]) => {
+          const raw = String(row[key] ?? "");
+          const d = parseDateBR(raw);
+          if (d && /\//.test(raw)) {
+            if (r.min && d < new Date(r.min + "T00:00:00")) return false;
+            if (r.max && d > new Date(r.max + "T23:59:59")) return false;
+            return true;
+          }
+          const n = parseFloat(raw.replace(/\./g, "").replace(",", "."));
+          if (isNaN(n)) return false;
+          if (r.min && n < parseFloat(r.min)) return false;
+          if (r.max && n > parseFloat(r.max)) return false;
+          return true;
+        }),
+      );
+    }
+
     if (dateRange?.from && dateRange?.to && autoDateField) {
       result = result.filter((row) => {
         const dateStr = String(row[autoDateField] ?? "");
@@ -1145,7 +1178,7 @@ export function DataTable<T extends Record<string, any>>({
     }
 
     return result;
-  }, [data, search, columnFilters, columns, dateRange, autoDateField]);
+  }, [data, search, columnFilters, rangeFilters, columns, dateRange, autoDateField]);
 
   const dynamicTabCounts = useMemo(() => {
     if (!tabFilterFn || !tabs) return null;
@@ -1315,26 +1348,32 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
-          <Sheet open={showFilters} onOpenChange={(o) => { setShowFilters(o); if (o) setDraftFilters(columnFilters); }}>
+          <Sheet open={showFilters} onOpenChange={(o) => { setShowFilters(o); if (o) { setDraftFilters(columnFilters); setDraftRanges(rangeFilters); } }}>
             <SheetTrigger asChild>
-              <button className={cn("toolbar-btn", (showFilters || Object.keys(columnFilters).length > 0) && "toolbar-btn-active")} title="Filtros">
+              <button className={cn("toolbar-btn", (showFilters || activeFilterTotal > 0) && "toolbar-btn-active")} title="Filtros">
                 <ListFilter className="h-4 w-4" />
                 <span className="hidden sm:inline">Filtros</span>
-                {Object.values(columnFilters).flat().length > 0 && (
-                  <span className="ml-1 rounded-full bg-primary text-primary-foreground text-[10px] px-1.5 leading-4">
-                    {Object.values(columnFilters).flat().length}
+                {activeFilterTotal > 0 && (
+                  <span className="ml-1 rounded-full bg-foreground text-background text-[10px] px-1.5 leading-4">
+                    {activeFilterTotal}
                   </span>
                 )}
                 <ChevronDown className="h-3.5 w-3.5" />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-[440px] p-0 flex flex-col gap-0">
-              <SheetHeader className="px-5 py-4 border-b border-border">
+            <SheetContent side="right" className="w-full sm:max-w-[400px] p-0 flex flex-col gap-0">
+              <SheetHeader className="px-6 py-5 border-b border-border">
                 <SheetTitle className="text-base">Filtros</SheetTitle>
               </SheetHeader>
               <div className="flex-1 overflow-y-auto divide-y divide-border">
-                {filterOptions.map(({ col, values }) => {
+                {filterOptions.length === 0 && (
+                  <p className="px-6 py-8 text-sm text-muted-foreground">Nenhum filtro disponível para esta lista.</p>
+                )}
+                {filterOptions.map(({ col, values, kind }) => {
                   const selected = draftFilters[col.key] || [];
+                  const range = draftRanges[col.key] || {};
+                  const setRange = (k: "min" | "max", v: string) =>
+                    setDraftRanges((prev) => ({ ...prev, [col.key]: { ...prev[col.key], [k]: v } }));
                   const toggle = (v: string) =>
                     setDraftFilters((prev) => {
                       const cur = prev[col.key] || [];
@@ -1345,52 +1384,59 @@ export function DataTable<T extends Record<string, any>>({
                       return next;
                     });
                   return (
-                    <details key={col.key} open className="group px-5 py-4">
-                      <summary className="flex items-center justify-between cursor-pointer list-none text-sm font-semibold text-foreground">
-                        {col.label}
-                        <ChevronDown className="h-4 w-4 text-info transition-transform group-open:rotate-180" />
-                      </summary>
-                      <div className="mt-3">
-                      {values.length <= 10 ? (
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-                        {values.map((v) => (
-                          <label key={v} className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-                            <Checkbox checked={selected.includes(v)} onCheckedChange={() => toggle(v)} />
-                            <span className="truncate">{v}</span>
-                          </label>
-                        ))}
+                    <section key={col.key} className="px-6 py-5">
+                      <p className="text-[13px] font-semibold text-foreground mb-3">{col.label}</p>
+                      {kind === "options" && (
+                        <div className="flex flex-wrap gap-2">
+                          {values.map((v) => {
+                            const on = selected.includes(v);
+                            return (
+                              <button
+                                key={v}
+                                type="button"
+                                onClick={() => toggle(v)}
+                                className={cn(
+                                  "h-8 px-3.5 rounded-full border text-sm capitalize transition-colors",
+                                  on
+                                    ? "border-foreground bg-foreground text-background"
+                                    : "border-border bg-card text-foreground hover:border-foreground/40",
+                                )}
+                              >
+                                {v}
+                              </button>
+                            );
+                          })}
                         </div>
-                      ) : (
-                        <Select
-                          value={selected[0] ?? "__all"}
-                          onValueChange={(v) =>
-                            setDraftFilters((prev) => {
-                              const next = { ...prev };
-                              if (v === "__all") delete next[col.key];
-                              else next[col.key] = [v];
-                              return next;
-                            })
-                          }
-                        >
-                          <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="__all">Todos</SelectItem>
-                            {values.map((v) => (
-                              <SelectItem key={v} value={v}>{v}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
                       )}
-                      </div>
-                    </details>
+                      {kind !== "options" && (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type={kind === "date" ? "date" : "number"}
+                            placeholder="Mínimo"
+                            value={range.min || ""}
+                            onChange={(e) => setRange("min", e.target.value)}
+                            className="toolbar-input h-10 px-3 text-sm flex-1 min-w-0"
+                          />
+                          <span className="text-xs text-muted-foreground">até</span>
+                          <input
+                            type={kind === "date" ? "date" : "number"}
+                            placeholder="Máximo"
+                            value={range.max || ""}
+                            onChange={(e) => setRange("max", e.target.value)}
+                            className="toolbar-input h-10 px-3 text-sm flex-1 min-w-0"
+                          />
+                        </div>
+                      )}
+                    </section>
                   );
                 })}
               </div>
-              <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
-                <Button variant="outline" onClick={() => setDraftFilters({})}>Limpar</Button>
+              <div className="flex items-center justify-end gap-2 border-t border-border px-6 py-4">
+                <Button variant="ghost" className="mr-auto" onClick={() => { setDraftFilters({}); setDraftRanges({}); }}>Limpar tudo</Button>
                 <Button
                   onClick={() => {
                     setColumnFilters(() => draftFilters);
+                    setRangeFilters(draftRanges);
                     setPage(0);
                     setShowFilters(false);
                   }}
