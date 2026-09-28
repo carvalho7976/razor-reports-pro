@@ -1396,7 +1396,7 @@ export function DataTable<T extends Record<string, any>>({
                       {kind === "options" ? (
                         <div className="grid grid-cols-2 gap-x-1 gap-y-0.5">
                           {values.map((v) => (
-                            <label key={v} className="flex items-center gap-1.5 px-1 py-1 rounded-md text-xs text-foreground capitalize cursor-pointer hover:bg-muted min-w-0">
+                            <label key={v} title={v} className="flex items-center gap-1.5 px-1 py-1 rounded-md text-xs text-foreground capitalize cursor-pointer hover:bg-muted min-w-0">
                               <Checkbox checked={selected.includes(v)} onCheckedChange={() => toggle(v)} className="h-3.5 w-3.5 shrink-0" />
                               <span className="truncate">{v}</span>
                             </label>
