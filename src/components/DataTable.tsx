@@ -338,51 +338,6 @@ function DateRangePicker({
   );
 }
 
-function FilterDateSelect({ value, onChange }: { value?: string; onChange: (v?: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const parsed = value ? parse(value, "yyyy-MM-dd", new Date()) : undefined;
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          className={cn(
-            "toolbar-input h-8 px-2 text-xs w-full min-w-0 flex items-center justify-between gap-1",
-            !parsed && "text-muted-foreground",
-          )}
-        >
-          <span className="truncate">{parsed ? format(parsed, "dd/MM/yy") : "Todos"}</span>
-          <ChevronDown className="h-3 w-3 shrink-0 opacity-60" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
-        <CalendarComponent
-          mode="single"
-          selected={parsed}
-          defaultMonth={parsed}
-          onSelect={(d) => {
-            onChange(d ? format(d, "yyyy-MM-dd") : undefined);
-            if (d) setOpen(false);
-          }}
-          locale={ptBR}
-          className="pointer-events-auto"
-        />
-        {parsed && (
-          <div className="border-t border-border px-3 py-2 flex justify-end">
-            <button
-              onClick={() => {
-                onChange(undefined);
-                setOpen(false);
-              }}
-              className="text-xs text-destructive hover:underline font-medium"
-            >
-              Limpar
-            </button>
-          </div>
-        )}
-      </PopoverContent>
-    </Popover>
-  );
-}
 
 
 function SearchWithFilter<T>({
@@ -1441,18 +1396,34 @@ export function DataTable<T extends Record<string, any>>({
                     <div key={col.key} className="min-w-0">
                       <p className="text-[11px] font-medium text-muted-foreground mb-1 truncate">{col.label}</p>
                       {kind === "options" ? (
-                        <div className="grid grid-cols-2 gap-x-1 gap-y-0.5">
-                          {values.map((v) => (
-                            <label key={v} title={v} className="flex items-center gap-1.5 px-1 py-1 rounded-md text-xs text-foreground capitalize cursor-pointer hover:bg-muted min-w-0">
-                              <Checkbox checked={selected.includes(v)} onCheckedChange={() => toggle(v)} className="h-3.5 w-3.5 shrink-0" />
-                              <span className="truncate">{v}</span>
-                            </label>
-                          ))}
-                        </div>
+                        <Select
+                          value={selected[0] ?? "ALL"}
+                          onValueChange={(v) => {
+                            setColumnFilters((prev) => {
+                              const next = { ...prev };
+                              if (v === "ALL") delete next[col.key];
+                              else next[col.key] = [v];
+                              return next;
+                            });
+                            setPage(0);
+                          }}
+                        >
+                          <SelectTrigger className="h-8 text-xs w-full min-w-0 capitalize">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[240px]">
+                            <SelectItem value="ALL" className="text-xs">Todos</SelectItem>
+                            {values.map((v) => (
+                              <SelectItem key={v} value={v} className="text-xs capitalize">{v}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       ) : kind === "date" ? (
-                        <FilterDateSelect
-                          value={range.min}
-                          onChange={(v) => setRangeFilters((prev) => ({ ...prev, [col.key]: { min: v, max: v } }))}
+                        <input
+                          type="date"
+                          value={range.min || ""}
+                          onChange={(e) => setRangeFilters((prev) => ({ ...prev, [col.key]: { min: e.target.value, max: e.target.value } }))}
+                          className="toolbar-input h-8 px-2 text-xs w-full min-w-0"
                         />
                       ) : (
                         <div className="flex items-center gap-1.5">
