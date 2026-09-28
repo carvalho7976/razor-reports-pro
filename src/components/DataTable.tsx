@@ -1450,11 +1450,9 @@ export function DataTable<T extends Record<string, any>>({
                           ))}
                         </div>
                       ) : kind === "date" ? (
-                        <input
-                          type="date"
-                          value={range.min || ""}
-                          onChange={(e) => setRangeFilters((prev) => ({ ...prev, [col.key]: { min: e.target.value, max: e.target.value || undefined } }))}
-                          className="toolbar-input h-8 px-2 text-xs w-full min-w-0"
+                        <FilterDateSelect
+                          value={range.min}
+                          onChange={(v) => setRangeFilters((prev) => ({ ...prev, [col.key]: { min: v, max: v } }))}
                         />
                       ) : (
                         <div className="flex items-center gap-1.5">
