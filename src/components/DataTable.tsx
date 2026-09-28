@@ -338,6 +338,53 @@ function DateRangePicker({
   );
 }
 
+function FilterDateSelect({ value, onChange }: { value?: string; onChange: (v?: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const parsed = value ? parse(value, "yyyy-MM-dd", new Date()) : undefined;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className={cn(
+            "toolbar-input h-8 px-2 text-xs w-full min-w-0 flex items-center justify-between gap-1",
+            !parsed && "text-muted-foreground",
+          )}
+        >
+          <span className="truncate">{parsed ? format(parsed, "dd/MM/yy") : "Todos"}</span>
+          <ChevronDown className="h-3 w-3 shrink-0 opacity-60" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
+        <CalendarComponent
+          mode="single"
+          selected={parsed}
+          defaultMonth={parsed}
+          onSelect={(d) => {
+            onChange(d ? format(d, "yyyy-MM-dd") : undefined);
+            if (d) setOpen(false);
+          }}
+          locale={ptBR}
+          className="pointer-events-auto"
+        />
+        {parsed && (
+          <div className="border-t border-border px-3 py-2 flex justify-end">
+            <button
+              onClick={() => {
+                onChange(undefined);
+                setOpen(false);
+              }}
+              className="text-xs text-destructive hover:underline font-medium"
+            >
+              Limpar
+            </button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+
 function SearchWithFilter<T>({
   columns,
   data,
@@ -1403,11 +1450,9 @@ export function DataTable<T extends Record<string, any>>({
                           ))}
                         </div>
                       ) : kind === "date" ? (
-                        <input
-                          type="date"
-                          value={range.min || ""}
-                          onChange={(e) => setRangeFilters((prev) => ({ ...prev, [col.key]: { min: e.target.value, max: e.target.value || undefined } }))}
-                          className="toolbar-input h-8 px-2 text-xs w-full min-w-0"
+                        <FilterDateSelect
+                          value={range.min}
+                          onChange={(v) => setRangeFilters((prev) => ({ ...prev, [col.key]: { min: v, max: v } }))}
                         />
                       ) : (
                         <div className="flex items-center gap-1.5">
