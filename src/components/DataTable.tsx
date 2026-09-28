@@ -1,7 +1,6 @@
 import { useState, useMemo, ReactNode, useCallback, useRef, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Search,
@@ -901,6 +900,20 @@ export function DataTable<T extends Record<string, any>>({
   const [internalPageSize, setInternalPageSize] = useState(pageSize);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [draftFilters, setDraftFilters] = useState<Record<string, string[]>>({});
+  const filterOptions = useMemo(() => {
+    return initialColumns
+      .filter((c) => c.filterable !== false && c.key !== "acoes")
+      .map((col) => {
+        const set = new Set<string>();
+        for (const row of data) {
+          const v = row[col.key];
+          if (v !== null && v !== undefined && v !== "" && typeof v !== "object") set.add(String(v));
+        }
+        return { col, values: Array.from(set).sort((x, y) => x.localeCompare(y, "pt-BR")) };
+      })
+      .filter((o) => o.values.length > 1 && o.values.length <= 40);
+  }, [initialColumns, data]);
 
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(() => {
     try {
@@ -1301,52 +1314,83 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
-          <button
-            onClick={() => setShowFilters((v) => !v)}
-            className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}
-            title="Filtro"
-          >
-            <ListFilter className="h-4 w-4" />
-            <span className="hidden sm:inline">Filtro</span>
-          </button>
-
-
-          <Dialog open={showFilters} onOpenChange={setShowFilters}>
-            <DialogContent className="max-w-[640px]">
-              <DialogHeader>
-                <DialogTitle>Filtros</DialogTitle>
-              </DialogHeader>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto py-1">
-                {columns
-                  .filter((c) => c.filterable !== false && c.key !== "acoes")
-                  .map((col) => (
-                    <div key={col.key} className="flex flex-col gap-1.5">
-                      <label className="text-xs font-medium text-muted-foreground">{col.label}</label>
-                      <input
-                        type="text"
-                        placeholder="Filtrar..."
-                        value={(columnFilters[col.key] || [])[0] || ""}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setColumnFilters((prev) => {
-                            const next = { ...prev };
-                            if (v) next[col.key] = [v];
-                            else delete next[col.key];
-                            return next;
-                          });
-                          setPage(0);
-                        }}
-                        className="toolbar-input h-10 px-3 text-sm w-full"
-                      />
+          <Popover open={showFilters} onOpenChange={(o) => { setShowFilters(o); if (o) setDraftFilters(columnFilters); }}>
+            <PopoverTrigger asChild>
+              <button className={cn("toolbar-btn", (showFilters || Object.keys(columnFilters).length > 0) && "toolbar-btn-active")} title="Filtros">
+                <ListFilter className="h-4 w-4" />
+                <span className="hidden sm:inline">Filtros</span>
+                {Object.values(columnFilters).flat().length > 0 && (
+                  <span className="ml-1 rounded-full bg-primary text-primary-foreground text-[10px] px-1.5 leading-4">
+                    {Object.values(columnFilters).flat().length}
+                  </span>
+                )}
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto max-w-[min(900px,95vw)] p-0">
+              <div className="flex flex-wrap gap-x-10 gap-y-5 p-5 max-h-[60vh] overflow-y-auto">
+                {filterOptions.map(({ col, values }) => {
+                  const selected = draftFilters[col.key] || [];
+                  const toggle = (v: string) =>
+                    setDraftFilters((prev) => {
+                      const cur = prev[col.key] || [];
+                      const nextVals = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
+                      const next = { ...prev };
+                      if (nextVals.length) next[col.key] = nextVals;
+                      else delete next[col.key];
+                      return next;
+                    });
+                  return (
+                    <div key={col.key} className="flex flex-col gap-2.5 min-w-[160px]">
+                      <p className="text-sm font-semibold text-foreground">{col.label}</p>
+                      {values.length <= 6 ? (
+                        values.map((v) => (
+                          <label key={v} className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                            <Checkbox checked={selected.includes(v)} onCheckedChange={() => toggle(v)} />
+                            <span className="truncate max-w-[200px]">{v}</span>
+                          </label>
+                        ))
+                      ) : (
+                        <Select
+                          value={selected[0] ?? "__all"}
+                          onValueChange={(v) =>
+                            setDraftFilters((prev) => {
+                              const next = { ...prev };
+                              if (v === "__all") delete next[col.key];
+                              else next[col.key] = [v];
+                              return next;
+                            })
+                          }
+                        >
+                          <SelectTrigger className="h-10 w-[220px]"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="__all">Todos</SelectItem>
+                            {values.map((v) => (
+                              <SelectItem key={v} value={v}>{v}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
-                  ))}
+                  );
+                })}
               </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => { setColumnFilters(() => ({})); setPage(0); }}>Limpar</Button>
-                <Button onClick={() => setShowFilters(false)}>Aplicar</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
+                <Button variant="outline" onClick={() => setDraftFilters({})}>Limpar</Button>
+                <Button
+                  onClick={() => {
+                    setColumnFilters(() => draftFilters);
+                    setPage(0);
+                    setShowFilters(false);
+                  }}
+                >
+                  Aplicar
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+
 
           <ColumnManager
             initialColumns={initialColumns}
