@@ -12,6 +12,7 @@ import {
   EyeOff,
   Calendar,
   Download,
+  ListFilter,
   ArrowUpDown,
   MoreHorizontal,
   FileSpreadsheet,
@@ -897,6 +898,7 @@ export function DataTable<T extends Record<string, any>>({
   const [page, setPage] = useState(0);
   const [internalPageSize, setInternalPageSize] = useState(pageSize);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const [showFilters, setShowFilters] = useState(false);
 
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(() => {
     try {
@@ -1297,6 +1299,15 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className={cn("toolbar-btn", showFilters && "toolbar-btn-active")}
+            title="Filtro"
+          >
+            <ListFilter className="h-4 w-4" />
+            <span className="hidden sm:inline">Filtro</span>
+          </button>
+
           <ColumnManager
             initialColumns={initialColumns}
             hiddenColumns={hiddenColumns}
@@ -1620,6 +1631,42 @@ export function DataTable<T extends Record<string, any>>({
                   );
                 })}
               </tr>
+
+              {showFilters && (
+                <tr className="bg-table-header/70 sticky top-[45px] z-10">
+                  {selectable && <th className="px-3 py-2 border-b border-table-border" />}
+                  {columns.map((col) => (
+                    <th
+                      key={col.key}
+                      className={cn(
+                        "px-2 py-2 border-b border-table-border",
+                        pinnedColumns.has(col.key) && "sticky left-0 z-10 bg-table-header",
+                        col.align === "right" && "text-right",
+                        col.align === "center" && "text-center",
+                      )}
+                    >
+                      {col.filterable !== false ? (
+                        <input
+                          type="text"
+                          placeholder="Filtrar..."
+                          value={(columnFilters[col.key] || [])[0] || ""}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setColumnFilters((prev) => {
+                              const next = { ...prev };
+                              if (v) next[col.key] = [v];
+                              else delete next[col.key];
+                              return next;
+                            });
+                            setPage(0);
+                          }}
+                          className="toolbar-input px-2.5 py-1.5 text-xs w-full"
+                        />
+                      ) : null}
+                    </th>
+                  ))}
+                </tr>
+              )}
             </thead>
 
             <tbody>
