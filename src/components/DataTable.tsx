@@ -2,6 +2,7 @@ import { useState, useMemo, ReactNode, useCallback, useRef, useEffect } from "re
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   Search,
   SlidersHorizontal,
@@ -912,7 +913,7 @@ export function DataTable<T extends Record<string, any>>({
         }
         return { col, values: Array.from(set).sort((x, y) => x.localeCompare(y, "pt-BR")) };
       })
-      .filter((o) => o.values.length > 1 && o.values.length <= 40);
+      .filter((o) => o.values.length > 1 && o.values.length <= 40 && o.values.length <= Math.max(3, data.length * 0.6));
   }, [initialColumns, data]);
 
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(() => {
@@ -1314,8 +1315,8 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
-          <Popover open={showFilters} onOpenChange={(o) => { setShowFilters(o); if (o) setDraftFilters(columnFilters); }}>
-            <PopoverTrigger asChild>
+          <Sheet open={showFilters} onOpenChange={(o) => { setShowFilters(o); if (o) setDraftFilters(columnFilters); }}>
+            <SheetTrigger asChild>
               <button className={cn("toolbar-btn", (showFilters || Object.keys(columnFilters).length > 0) && "toolbar-btn-active")} title="Filtros">
                 <ListFilter className="h-4 w-4" />
                 <span className="hidden sm:inline">Filtros</span>
@@ -1326,9 +1327,12 @@ export function DataTable<T extends Record<string, any>>({
                 )}
                 <ChevronDown className="h-3.5 w-3.5" />
               </button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto max-w-[min(900px,95vw)] p-0">
-              <div className="flex flex-wrap gap-x-10 gap-y-5 p-5 max-h-[60vh] overflow-y-auto">
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:max-w-[440px] p-0 flex flex-col gap-0">
+              <SheetHeader className="px-5 py-4 border-b border-border">
+                <SheetTitle className="text-base">Filtros</SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto divide-y divide-border">
                 {filterOptions.map(({ col, values }) => {
                   const selected = draftFilters[col.key] || [];
                   const toggle = (v: string) =>
@@ -1341,15 +1345,21 @@ export function DataTable<T extends Record<string, any>>({
                       return next;
                     });
                   return (
-                    <div key={col.key} className="flex flex-col gap-2.5 min-w-[160px]">
-                      <p className="text-sm font-semibold text-foreground">{col.label}</p>
-                      {values.length <= 6 ? (
-                        values.map((v) => (
+                    <details key={col.key} open className="group px-5 py-4">
+                      <summary className="flex items-center justify-between cursor-pointer list-none text-sm font-semibold text-foreground">
+                        {col.label}
+                        <ChevronDown className="h-4 w-4 text-info transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="mt-3">
+                      {values.length <= 10 ? (
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                        {values.map((v) => (
                           <label key={v} className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
                             <Checkbox checked={selected.includes(v)} onCheckedChange={() => toggle(v)} />
-                            <span className="truncate max-w-[200px]">{v}</span>
+                            <span className="truncate">{v}</span>
                           </label>
-                        ))
+                        ))}
+                        </div>
                       ) : (
                         <Select
                           value={selected[0] ?? "__all"}
@@ -1362,7 +1372,7 @@ export function DataTable<T extends Record<string, any>>({
                             })
                           }
                         >
-                          <SelectTrigger className="h-10 w-[220px]"><SelectValue /></SelectTrigger>
+                          <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="__all">Todos</SelectItem>
                             {values.map((v) => (
@@ -1371,7 +1381,8 @@ export function DataTable<T extends Record<string, any>>({
                           </SelectContent>
                         </Select>
                       )}
-                    </div>
+                      </div>
+                    </details>
                   );
                 })}
               </div>
@@ -1387,8 +1398,8 @@ export function DataTable<T extends Record<string, any>>({
                   Aplicar
                 </Button>
               </div>
-            </PopoverContent>
-          </Popover>
+            </SheetContent>
+          </Sheet>
 
 
 
