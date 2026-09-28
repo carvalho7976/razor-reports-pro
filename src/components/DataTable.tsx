@@ -2,7 +2,6 @@ import { useState, useMemo, ReactNode, useCallback, useRef, useEffect } from "re
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   Search,
   SlidersHorizontal,
@@ -901,9 +900,7 @@ export function DataTable<T extends Record<string, any>>({
   const [internalPageSize, setInternalPageSize] = useState(pageSize);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
-  const [draftFilters, setDraftFilters] = useState<Record<string, string[]>>({});
   const [rangeFilters, setRangeFilters] = useState<Record<string, { min?: string; max?: string }>>({});
-  const [draftRanges, setDraftRanges] = useState<Record<string, { min?: string; max?: string }>>({});
   const filterOptions = useMemo(() => {
     const dateRe = /^\d{2}\/\d{2}\/\d{4}$/;
     const out = initialColumns
@@ -1348,8 +1345,8 @@ export function DataTable<T extends Record<string, any>>({
             </>
           )}
 
-          <Sheet open={showFilters} onOpenChange={(o) => { setShowFilters(o); if (o) { setDraftFilters(columnFilters); setDraftRanges(rangeFilters); } }}>
-            <SheetTrigger asChild>
+          <Popover open={showFilters} onOpenChange={setShowFilters}>
+            <PopoverTrigger asChild>
               <button className={cn("toolbar-btn", (showFilters || activeFilterTotal > 0) && "toolbar-btn-active")} title="Filtros">
                 <ListFilter className="h-4 w-4" />
                 <span className="hidden sm:inline">Filtros</span>
@@ -1360,22 +1357,31 @@ export function DataTable<T extends Record<string, any>>({
                 )}
                 <ChevronDown className="h-3.5 w-3.5" />
               </button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-[400px] p-0 flex flex-col gap-0">
-              <SheetHeader className="px-6 py-5 border-b border-border">
-                <SheetTitle className="text-base">Filtros</SheetTitle>
-              </SheetHeader>
-              <div className="flex-1 overflow-y-auto divide-y divide-border">
+            </PopoverTrigger>
+            <PopoverContent align="start" sideOffset={8} className="w-[260px] p-3">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filtros</p>
+                <button
+                  onClick={() => { setColumnFilters(() => ({})); setRangeFilters({}); setPage(0); }}
+                  className="text-destructive"
+                  title="Limpar filtros"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="max-h-[360px] overflow-y-auto space-y-3">
                 {filterOptions.length === 0 && (
-                  <p className="px-6 py-8 text-sm text-muted-foreground">Nenhum filtro disponível para esta lista.</p>
+                  <p className="text-xs text-muted-foreground py-2">Nenhum filtro disponível.</p>
                 )}
                 {filterOptions.map(({ col, values, kind }) => {
-                  const selected = draftFilters[col.key] || [];
-                  const range = draftRanges[col.key] || {};
-                  const setRange = (k: "min" | "max", v: string) =>
-                    setDraftRanges((prev) => ({ ...prev, [col.key]: { ...prev[col.key], [k]: v } }));
-                  const toggle = (v: string) =>
-                    setDraftFilters((prev) => {
+                  const selected = columnFilters[col.key] || [];
+                  const range = rangeFilters[col.key] || {};
+                  const setRange = (k: "min" | "max", v: string) => {
+                    setRangeFilters((prev) => ({ ...prev, [col.key]: { ...prev[col.key], [k]: v } }));
+                    setPage(0);
+                  };
+                  const toggle = (v: string) => {
+                    setColumnFilters((prev) => {
                       const cur = prev[col.key] || [];
                       const nextVals = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
                       const next = { ...prev };
@@ -1383,69 +1389,45 @@ export function DataTable<T extends Record<string, any>>({
                       else delete next[col.key];
                       return next;
                     });
+                    setPage(0);
+                  };
                   return (
-                    <section key={col.key} className="px-6 py-5">
-                      <p className="text-[13px] font-semibold text-foreground mb-3">{col.label}</p>
-                      {kind === "options" && (
-                        <div className="flex flex-wrap gap-2">
-                          {values.map((v) => {
-                            const on = selected.includes(v);
-                            return (
-                              <button
-                                key={v}
-                                type="button"
-                                onClick={() => toggle(v)}
-                                className={cn(
-                                  "h-8 px-3.5 rounded-full border text-sm capitalize transition-colors",
-                                  on
-                                    ? "border-foreground bg-foreground text-background"
-                                    : "border-border bg-card text-foreground hover:border-foreground/40",
-                                )}
-                              >
-                                {v}
-                              </button>
-                            );
-                          })}
+                    <div key={col.key}>
+                      <p className="text-[11px] font-medium text-muted-foreground mb-1">{col.label}</p>
+                      {kind === "options" ? (
+                        <div className="space-y-0.5">
+                          {values.map((v) => (
+                            <label key={v} className="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-foreground capitalize cursor-pointer hover:bg-muted">
+                              <Checkbox checked={selected.includes(v)} onCheckedChange={() => toggle(v)} className="h-3.5 w-3.5" />
+                              {v}
+                            </label>
+                          ))}
                         </div>
-                      )}
-                      {kind !== "options" && (
-                        <div className="flex items-center gap-2">
+                      ) : (
+                        <div className="flex items-center gap-1.5">
                           <input
                             type={kind === "date" ? "date" : "number"}
-                            placeholder="Mínimo"
+                            placeholder="De"
                             value={range.min || ""}
                             onChange={(e) => setRange("min", e.target.value)}
-                            className="toolbar-input h-10 px-3 text-sm flex-1 min-w-0"
+                            className="toolbar-input h-8 px-2 text-xs flex-1 min-w-0"
                           />
-                          <span className="text-xs text-muted-foreground">até</span>
+                          <span className="text-[11px] text-muted-foreground">até</span>
                           <input
                             type={kind === "date" ? "date" : "number"}
-                            placeholder="Máximo"
+                            placeholder="Até"
                             value={range.max || ""}
                             onChange={(e) => setRange("max", e.target.value)}
-                            className="toolbar-input h-10 px-3 text-sm flex-1 min-w-0"
+                            className="toolbar-input h-8 px-2 text-xs flex-1 min-w-0"
                           />
                         </div>
                       )}
-                    </section>
+                    </div>
                   );
                 })}
               </div>
-              <div className="flex items-center justify-end gap-2 border-t border-border px-6 py-4">
-                <Button variant="ghost" className="mr-auto" onClick={() => { setDraftFilters({}); setDraftRanges({}); }}>Limpar tudo</Button>
-                <Button
-                  onClick={() => {
-                    setColumnFilters(() => draftFilters);
-                    setRangeFilters(draftRanges);
-                    setPage(0);
-                    setShowFilters(false);
-                  }}
-                >
-                  Aplicar
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+            </PopoverContent>
+          </Popover>
 
 
 
