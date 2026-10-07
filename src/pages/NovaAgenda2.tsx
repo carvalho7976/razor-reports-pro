@@ -779,9 +779,9 @@ export default function NovaAgenda2() {
 
               <div
                 className={cn(
-                  "flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-lg bg-sidebar p-1 shadow-sm transition-all duration-300 ease-in-out",
+                  "flex items-center gap-4 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out",
                   metricasOpen
-                    ? "max-w-[600px] translate-x-0 opacity-100"
+                    ? "max-w-[560px] translate-x-0 opacity-100"
                     : "pointer-events-none max-w-0 -translate-x-2 opacity-0",
                 )}
               >
@@ -789,28 +789,24 @@ export default function NovaAgenda2() {
                   { emoji: "😌", label: "Agendado", valor: 8 },
                   { emoji: "😉", label: "Confirmado", valor: 5 },
                   { emoji: "🤗", label: "Chegou", valor: 2 },
-                  { emoji: "💆", label: "Em atendimento", valor: 1 },
+                  { emoji: "💆🏻‍♂️", label: "Em atendimento", valor: 1 },
                   { emoji: "😍", label: "Finalizado", valor: 7 },
                   { emoji: "😱", label: "Faltou", valor: 1 },
                   { emoji: "😢", label: "Desmarcou", valor: 2 },
                 ].map((k) => (
                   <Tooltip key={k.label}>
                     <TooltipTrigger asChild>
-                      <div className="flex h-8 shrink-0 cursor-default items-center gap-1.5 rounded-md px-2.5 transition-colors hover:bg-sidebar-accent">
+                      <div className="flex shrink-0 cursor-default items-center gap-1.5">
                         <span className="text-base leading-none">{k.emoji}</span>
-                        <span className="text-[13px] font-semibold leading-none text-sidebar-accent-foreground">
-                          {k.valor}
-                        </span>
+                        <span className="text-[13px] font-semibold leading-none text-foreground">{k.valor}</span>
                       </div>
                     </TooltipTrigger>
 
-                    <TooltipContent className="border border-sidebar-border bg-sidebar px-2 py-1 text-xs text-sidebar-foreground shadow-sm">
+                    <TooltipContent className="border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-sm">
                       {k.label}
                     </TooltipContent>
                   </Tooltip>
                 ))}
-
-                <div className="h-5 w-px shrink-0 bg-sidebar-border" />
               </div>
             </div>
           </TooltipProvider>
