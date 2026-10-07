@@ -758,36 +758,30 @@ export default function NovaAgenda2() {
           </div>
 
           <TooltipProvider delayDuration={0}>
-            <div className="ml-auto flex flex-row-reverse items-center gap-1 rounded-xl bg-sidebar p-1">
+            <div className="ml-auto flex flex-row-reverse items-center gap-2">
               <button
                 type="button"
                 onClick={() => setMetricasOpen((prev) => !prev)}
-                className={cn(
-                  "flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-[13px] font-medium text-sidebar-accent-foreground transition-colors",
-                  metricasOpen
-                    ? "bg-sidebar-accent"
-                    : "hover:bg-sidebar-accent",
-                )}
+                className="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 aria-expanded={metricasOpen}
                 aria-label={metricasOpen ? "Recolher métricas de agendamentos" : "Abrir métricas de agendamentos"}
               >
-                <Smile className="h-4 w-4 shrink-0" />
-                <span>Agendamentos</span>
+                <span className="text-[11px] font-medium uppercase tracking-wide">Agendamentos</span>
 
-                <span className="inline-flex h-5 min-w-[26px] items-center justify-center rounded-full border border-sidebar-border px-1.5 text-[11px] font-semibold text-sidebar-accent-foreground">
+                <Badge variant="secondary" className="h-5 rounded-full px-2 text-[11px] font-semibold">
                   {agendamentos.filter((a) => a.status !== "folga").length}
-                </span>
+                </Badge>
 
                 <ChevronDown
-                  className={cn("h-3.5 w-3.5 shrink-0 transition-transform duration-200", metricasOpen && "rotate-180")}
+                  className={cn("h-3.5 w-3.5 transition-transform duration-200", metricasOpen && "rotate-180")}
                 />
               </button>
 
               <div
                 className={cn(
-                  "flex items-center gap-1 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out",
+                  "flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-lg bg-sidebar p-1 shadow-sm transition-all duration-300 ease-in-out",
                   metricasOpen
-                    ? "max-w-[560px] translate-x-0 opacity-100"
+                    ? "max-w-[600px] translate-x-0 opacity-100"
                     : "pointer-events-none max-w-0 -translate-x-2 opacity-0",
                 )}
               >
@@ -795,15 +789,15 @@ export default function NovaAgenda2() {
                   { emoji: "😌", label: "Agendado", valor: 8 },
                   { emoji: "😉", label: "Confirmado", valor: 5 },
                   { emoji: "🤗", label: "Chegou", valor: 2 },
-                  { emoji: "💆🏻‍♂️", label: "Em atendimento", valor: 1 },
+                  { emoji: "💆", label: "Em atendimento", valor: 1 },
                   { emoji: "😍", label: "Finalizado", valor: 7 },
                   { emoji: "😱", label: "Faltou", valor: 1 },
                   { emoji: "😢", label: "Desmarcou", valor: 2 },
                 ].map((k) => (
                   <Tooltip key={k.label}>
                     <TooltipTrigger asChild>
-                      <div className="flex h-9 shrink-0 cursor-default items-center gap-1.5 rounded-lg px-2.5 hover:bg-sidebar-accent">
-                        <span className="text-[17px] leading-none">{k.emoji}</span>
+                      <div className="flex h-8 shrink-0 cursor-default items-center gap-1.5 rounded-md px-2.5 transition-colors hover:bg-sidebar-accent">
+                        <span className="text-base leading-none">{k.emoji}</span>
                         <span className="text-[13px] font-semibold leading-none text-sidebar-accent-foreground">
                           {k.valor}
                         </span>
