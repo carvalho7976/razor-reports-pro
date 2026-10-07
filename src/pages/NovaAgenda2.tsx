@@ -763,10 +763,10 @@ export default function NovaAgenda2() {
                 type="button"
                 onClick={() => setMetricasOpen((prev) => !prev)}
                 className={cn(
-                  "flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-[13px] font-medium transition-colors",
+                  "flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-[13px] font-medium text-sidebar-accent-foreground transition-colors",
                   metricasOpen
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    ? "bg-sidebar-accent"
+                    : "hover:bg-sidebar-accent",
                 )}
                 aria-expanded={metricasOpen}
                 aria-label={metricasOpen ? "Recolher métricas de agendamentos" : "Abrir métricas de agendamentos"}
@@ -774,7 +774,7 @@ export default function NovaAgenda2() {
                 <Smile className="h-4 w-4 shrink-0" />
                 <span>Agendamentos</span>
 
-                <span className="inline-flex h-5 min-w-[26px] items-center justify-center rounded-full border border-sidebar-border px-1.5 text-[11px] font-semibold text-sidebar-foreground">
+                <span className="inline-flex h-5 min-w-[26px] items-center justify-center rounded-full border border-sidebar-border px-1.5 text-[11px] font-semibold text-sidebar-accent-foreground">
                   {agendamentos.filter((a) => a.status !== "folga").length}
                 </span>
 
@@ -804,7 +804,7 @@ export default function NovaAgenda2() {
                     <TooltipTrigger asChild>
                       <div className="flex h-9 shrink-0 cursor-default items-center gap-1.5 rounded-lg px-2.5 hover:bg-sidebar-accent">
                         <span className="text-[17px] leading-none">{k.emoji}</span>
-                        <span className="text-[13px] font-semibold leading-none text-sidebar-foreground">
+                        <span className="text-[13px] font-semibold leading-none text-sidebar-accent-foreground">
                           {k.valor}
                         </span>
                       </div>
