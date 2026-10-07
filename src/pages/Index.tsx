@@ -54,6 +54,18 @@ const groups: ShortcutGroup[] = [
       { icon: PackageX, label: "Cancelamento de Assinaturas", path: "/relatorioExclusaoAssinante", color: "bg-destructive" },
     ],
   },
+  {
+    title: "Outras Páginas",
+    items: [
+      { icon: Calendar, label: "Agenda", path: "/novaAgenda2", color: "bg-info" },
+      { icon: Users, label: "Perfil do Profissional", path: "/profissionalPerfil", color: "bg-info" },
+      { icon: ShoppingCart, label: "Nova Compra", path: "/novaCompra", color: "bg-accent" },
+      { icon: FileText, label: "Cadastro de Assinatura", path: "/assinaturaCadastro", color: "bg-primary" },
+      { icon: List, label: "Pesquisa de Assinaturas", path: "/assinaturaPesquisa", color: "bg-primary" },
+      { icon: BarChart3, label: "Relatório de Assinatura", path: "/relatorioAssinatura", color: "bg-warning" },
+      { icon: Star, label: "Concorrentes", path: "/concorrentes", color: "bg-accent" },
+    ],
+  },
 ];
 
 const Index = () => (
