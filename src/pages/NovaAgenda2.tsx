@@ -758,7 +758,7 @@ export default function NovaAgenda2() {
           </div>
 
           <TooltipProvider delayDuration={0}>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex flex-row-reverse items-center gap-2">
               <button
                 type="button"
                 onClick={() => setMetricasOpen((prev) => !prev)}
