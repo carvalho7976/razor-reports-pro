@@ -1,4 +1,5 @@
-import { Bell, Heart, CreditCard, Grid3X3, Menu } from "lucide-react";
+import { useState } from "react";
+import { Bell, Heart, CreditCard, Grid3X3, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
@@ -6,6 +7,7 @@ import frizzarLogo from "@/assets/frizzar-logo.png";
 
 export function AppHeaderBar() {
   const { toggleSidebar, state, isMobile } = useSidebar();
+  const [bannerOpen, setBannerOpen] = useState(true);
   const collapsed = !isMobile && state === "collapsed";
 
   return (
@@ -29,6 +31,30 @@ export function AppHeaderBar() {
 
       </div>
 
+      {bannerOpen && (
+        <div className="hidden items-center gap-3 rounded-full bg-accent py-1.5 pl-1.5 pr-2 text-accent-foreground shadow-sm lg:flex">
+          <span className="rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
+            Novo
+          </span>
+          <p className="text-xs font-medium">
+            Fechamento de comandas em tela única, direto na agenda.
+          </p>
+          <button
+            type="button"
+            className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Conferir
+          </button>
+          <button
+            type="button"
+            onClick={() => setBannerOpen(false)}
+            className="rounded-full p-1 text-accent-foreground/70 transition-colors hover:bg-primary/10 hover:text-accent-foreground"
+            aria-label="Fechar banner"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center gap-2 sm:gap-3">
         <button className="btn-action hidden border border-border bg-transparent py-1.5 text-xs text-foreground hover:bg-black/5 sm:inline-flex">

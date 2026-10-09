@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import { ChevronDown, ChevronLeft, ChevronRight, Clock, Eye, Filter, Save, Smile, Star, Users, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, CirclePlay, Clock, Filter, Save, Smile, Star, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +141,15 @@ const HORA_INICIO = 8;
 const HORA_FIM = 24;
 const SLOT_MIN = 30;
 const PX_POR_MIN = 1.6;
+const JORNADA_MIN = 480;
+
+// Taxa de ocupação = tempo agendado com cliente / jornada de trabalho (8h)
+function taxaOcupacao(profId: string): number {
+  const totalMin = agendamentos
+    .filter((a) => a.profissional === profId && a.status !== "folga" && a.cliente !== "")
+    .reduce((s, a) => s + a.duracao, 0);
+  return Math.min(100, Math.round((totalMin / JORNADA_MIN) * 100));
+}
 
 function horariosLivres(profId: string, onlyFuture = false): string[] {
   const ocupados = agendamentos
@@ -838,13 +847,38 @@ export default function NovaAgenda2() {
                   <p className="truncate text-sm font-semibold text-foreground">{p.nome}</p>
                   <p className="truncate text-[11px] text-muted-foreground">{p.cargo}</p>
                 </div>
+                {(() => {
+                  const occ = taxaOcupacao(p.id);
+                  const C = 2 * Math.PI * 10;
+                  return (
+                    <div
+                      className="relative flex h-7 w-7 shrink-0 items-center justify-center"
+                      title={`Taxa de ocupação: ${occ}%`}
+                    >
+                      <svg viewBox="0 0 28 28" className="absolute inset-0 h-full w-full -rotate-90">
+                        <circle cx="14" cy="14" r="10" fill="none" strokeWidth="3" className="stroke-muted" />
+                        <circle
+                          cx="14"
+                          cy="14"
+                          r="10"
+                          fill="none"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeDasharray={`${(occ / 100) * C} ${C}`}
+                          className="stroke-primary"
+                        />
+                      </svg>
+                      <span className="text-[8px] font-bold leading-none text-foreground">{occ}%</span>
+                    </div>
+                  );
+                })()}
                 <button
                   type="button"
                   onClick={() => setStoryProf(p)}
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label={`Ver story de ${p.nome}`}
                 >
-                  <Eye className="h-4 w-4" />
+                  <CirclePlay className="h-4 w-4" />
                 </button>
               </div>
             ))}
