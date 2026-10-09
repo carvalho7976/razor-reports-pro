@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import { ChevronDown, ChevronLeft, ChevronRight, Clock, Eye, Filter, Save, Smile, Star, Users, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, CirclePlay, Clock, Filter, Save, Smile, Star, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +141,15 @@ const HORA_INICIO = 8;
 const HORA_FIM = 24;
 const SLOT_MIN = 30;
 const PX_POR_MIN = 1.6;
+const JORNADA_MIN = 480;
+
+// Taxa de ocupação = tempo agendado com cliente / jornada de trabalho (8h)
+function taxaOcupacao(profId: string): number {
+  const totalMin = agendamentos
+    .filter((a) => a.profissional === profId && a.status !== "folga" && a.cliente !== "")
+    .reduce((s, a) => s + a.duracao, 0);
+  return Math.min(100, Math.round((totalMin / JORNADA_MIN) * 100));
+}
 
 function horariosLivres(profId: string, onlyFuture = false): string[] {
   const ocupados = agendamentos
