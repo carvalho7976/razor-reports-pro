@@ -847,13 +847,38 @@ export default function NovaAgenda2() {
                   <p className="truncate text-sm font-semibold text-foreground">{p.nome}</p>
                   <p className="truncate text-[11px] text-muted-foreground">{p.cargo}</p>
                 </div>
+                {(() => {
+                  const occ = taxaOcupacao(p.id);
+                  const C = 2 * Math.PI * 10;
+                  return (
+                    <div
+                      className="relative flex h-7 w-7 shrink-0 items-center justify-center"
+                      title={`Taxa de ocupação: ${occ}%`}
+                    >
+                      <svg viewBox="0 0 28 28" className="absolute inset-0 h-full w-full -rotate-90">
+                        <circle cx="14" cy="14" r="10" fill="none" strokeWidth="3" className="stroke-muted" />
+                        <circle
+                          cx="14"
+                          cy="14"
+                          r="10"
+                          fill="none"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeDasharray={`${(occ / 100) * C} ${C}`}
+                          className="stroke-primary"
+                        />
+                      </svg>
+                      <span className="text-[8px] font-bold leading-none text-foreground">{occ}%</span>
+                    </div>
+                  );
+                })()}
                 <button
                   type="button"
                   onClick={() => setStoryProf(p)}
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label={`Ver story de ${p.nome}`}
                 >
-                  <Eye className="h-4 w-4" />
+                  <CirclePlay className="h-4 w-4" />
                 </button>
               </div>
             ))}
