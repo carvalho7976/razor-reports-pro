@@ -30,8 +30,13 @@ import {
   Crown,
   History,
   Link2,
+  Bell,
+  CalendarClock,
+  Minus,
   MoreVertical,
   Package,
+  Scissors,
+  UserRound,
   Plus,
   QrCode,
   RefreshCw,
@@ -64,9 +69,15 @@ type Item = {
   valor: number;
   tipo: "servico" | "produto" | "pack";
   assinatura?: boolean;
+  qtd?: number;
+  semEstoque?: boolean;
 };
 
-type CatalogoItem = { nome: string; valor: number; detalhe?: string; tipo: Item["tipo"] };
+type CatalogoItem = { nome: string; valor: number; detalhe?: string; tipo: Item["tipo"]; semEstoque?: boolean };
+
+type Layout = "atual" | "novo";
+
+const LAYOUT_KEY = "comanda-layout";
 
 type Pagamento = { id: number; forma: string; valor: number };
 
@@ -84,7 +95,7 @@ const catalogo: Record<"servicos" | "produtos" | "pacotes", CatalogoItem[]> = {
   produtos: [
     { nome: "Pomada Modeladora", valor: 49, tipo: "produto" },
     { nome: "Shampoo Anticaspa", valor: 38, tipo: "produto" },
-    { nome: "Óleo Reparador", valor: 65, tipo: "produto" },
+    { nome: "Óleo Reparador", valor: 65, tipo: "produto", semEstoque: true },
     { nome: "Água", valor: 5, tipo: "produto" },
   ],
   pacotes: [
@@ -145,8 +156,10 @@ const itensIniciais = (a: ComandaAgendamento | null): Item[] => [
     tipo: "servico",
     assinatura: true,
   },
-  { id: 2, descricao: "Água", detalhe: "Produto · 1 un", valor: 5, tipo: "produto" },
+  { id: 2, descricao: "Água", detalhe: "Produto", valor: 5, tipo: "produto", qtd: 1 },
 ];
+
+const valorItem = (i: Item) => i.valor * (i.qtd ?? 1);
 
 export function ComandaSheet({
   open,
@@ -168,6 +181,23 @@ export function ComandaSheet({
   const [pagamentos, setPagamentos] = useState<Pagamento[]>([]);
   const [novoPgForma, setNovoPgForma] = useState("");
   const [novoPgValor, setNovoPgValor] = useState("");
+  // Comparação temporária entre o layout atual e o novo; a escolha fica salva no navegador
+  const [layout, setLayoutState] = useState<Layout>(() => {
+    try {
+      return localStorage.getItem(LAYOUT_KEY) === "atual" ? "atual" : "novo";
+    } catch {
+      return "novo";
+    }
+  });
+  const setLayout = (l: Layout) => {
+    setLayoutState(l);
+    try {
+      localStorage.setItem(LAYOUT_KEY, l);
+    } catch {
+      /* sem storage, vale só nesta sessão */
+    }
+  };
+  const novo = layout === "novo";
 
   // Cada agendamento aberto começa uma comanda nova
   useEffect(() => {
@@ -182,7 +212,7 @@ export function ComandaSheet({
     setPagamentos([]);
   }, [agendamento?.id]);
 
-  const total = useMemo(() => itens.reduce((s, i) => s + i.valor, 0), [itens]);
+  const total = useMemo(() => itens.reduce((s, i) => s + valorItem(i), 0), [itens]);
   const pago = useMemo(() => pagamentos.reduce((s, p) => s + p.valor, 0), [pagamentos]);
   const resta = Math.max(0, total - pago);
 
@@ -211,20 +241,34 @@ export function ComandaSheet({
   const statusAtual = statusOpcoes.find((s) => s.value === status) ?? statusOpcoes[0];
 
   const adicionar = (c: CatalogoItem) => {
-    setItens((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        descricao: c.nome,
-        detalhe: c.tipo === "produto" ? "Produto · 1 un" : agendamento.profissional,
-        valor: c.valor,
-        tipo: c.tipo,
-      },
-    ]);
+    setItens((prev) => {
+      // Produto repetido soma na quantidade em vez de virar outra linha
+      const existente = c.tipo === "produto" && prev.find((i) => i.tipo === "produto" && i.descricao === c.nome);
+      if (existente) {
+        return prev.map((i) => (i.id === existente.id ? { ...i, qtd: (i.qtd ?? 1) + 1 } : i));
+      }
+      return [
+        ...prev,
+        {
+          id: Date.now(),
+          descricao: c.nome,
+          detalhe: c.tipo === "produto" ? "Produto" : agendamento.profissional,
+          valor: c.valor,
+          tipo: c.tipo,
+          qtd: c.tipo === "produto" ? 1 : undefined,
+          semEstoque: c.semEstoque,
+        },
+      ];
+    });
     toast.success(`${c.nome} adicionado`);
   };
 
   const removerItem = (id: number) => setItens((prev) => prev.filter((i) => i.id !== id));
+
+  const alterarQtd = (id: number, delta: number) =>
+    setItens((prev) => prev.map((i) => (i.id === id ? { ...i, qtd: Math.max(1, (i.qtd ?? 1) + delta) } : i)));
+
+  const pagoStatus = status === "finalizado";
 
   const addPagamento = () => {
     const v = parseFloat(novoPgValor.replace(",", "."));
@@ -283,7 +327,83 @@ export function ComandaSheet({
     </DropdownMenu>
   );
 
-  const listaItens = (compacto = false) => (
+  const listaItensNovo = (compacto = false) => (
+    <div className="divide-y divide-border">
+      {itens.length === 0 && <p className="py-2 text-xs text-muted-foreground">Nenhum item na comanda.</p>}
+      {itens.map((i) => {
+        const Icone = i.tipo === "produto" ? Package : Scissors;
+        return (
+          <div key={i.id} className={cn("flex gap-3", compacto ? "py-2.5" : "py-3")}>
+            <div
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-lg",
+                compacto ? "h-11 w-11" : "h-14 w-14",
+                i.semEstoque
+                  ? "bg-destructive/10 text-destructive ring-1 ring-destructive/30"
+                  : i.tipo === "produto"
+                    ? "bg-muted text-muted-foreground"
+                    : "bg-primary/10 text-primary",
+              )}
+            >
+              <Icone className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <p className={cn("truncate font-semibold", compacto ? "text-[13px]" : "text-sm")}>{i.descricao}</p>
+                <span className={cn("shrink-0 font-semibold tabular-nums", compacto ? "text-[13px]" : "text-sm")}>
+                  {R$(valorItem(i))}
+                </span>
+              </div>
+              <p className="truncate text-xs text-muted-foreground">
+                {i.detalhe}
+                {i.qtd && i.qtd > 1 ? ` · ${R$(i.valor)} cada` : ""}
+              </p>
+              <div className="mt-1.5 flex flex-wrap items-center gap-3">
+                {i.qtd !== undefined && (
+                  <div className="inline-flex h-7 items-center rounded-md border border-border">
+                    <button
+                      onClick={() => alterarQtd(i.id, -1)}
+                      disabled={i.qtd <= 1}
+                      className="flex h-full w-7 items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40"
+                      aria-label={`Diminuir ${i.descricao}`}
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </button>
+                    <span className="w-6 text-center text-xs font-medium tabular-nums">{i.qtd}</span>
+                    <button
+                      onClick={() => alterarQtd(i.id, 1)}
+                      className="flex h-full w-7 items-center justify-center text-muted-foreground hover:text-foreground"
+                      aria-label={`Aumentar ${i.descricao}`}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
+                {i.assinatura && (
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    Assinatura
+                  </span>
+                )}
+                <button
+                  onClick={() => removerItem(i.id)}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-destructive hover:underline"
+                >
+                  <Trash2 className="h-3.5 w-3.5" /> Remover
+                </button>
+              </div>
+              {i.semEstoque && (
+                <span className="mt-1.5 inline-block rounded bg-destructive px-1.5 py-0.5 text-[10px] font-semibold text-destructive-foreground">
+                  Sem estoque
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const listaItens = (compacto = false) => novo ? listaItensNovo(compacto) : (
     <div className={cn("space-y-4", compacto && "space-y-3")}>
       {itens.length === 0 && <p className="text-xs text-muted-foreground">Nenhum item na comanda.</p>}
       {itens.map((i) => (
@@ -304,10 +424,13 @@ export function ComandaSheet({
                   </span>
                 )}
               </p>
-              <p className="truncate text-xs text-muted-foreground">{i.detalhe}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {i.detalhe}
+                {i.qtd !== undefined && ` · ${i.qtd} un`}
+              </p>
             </div>
             <div className="flex items-center gap-1">
-              <span className={cn("tabular-nums", compacto ? "text-[13px]" : "text-sm")}>{R$(i.valor)}</span>
+              <span className={cn("tabular-nums", compacto ? "text-[13px]" : "text-sm")}>{R$(valorItem(i))}</span>
               <button
                 onClick={() => removerItem(i.id)}
                 className="text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100 focus-visible:opacity-100"
@@ -426,9 +549,29 @@ export function ComandaSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-[860px] md:flex-row md:overflow-hidden [&>button:last-child]:hidden"
+        className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-[860px] md:overflow-hidden [&>button:last-child]:hidden"
       >
         <SheetTitle className="sr-only">Comanda de {agendamento.cliente}</SheetTitle>
+
+        <div className="flex shrink-0 items-center justify-center gap-2 border-b border-dashed border-border bg-muted/60 px-4 py-1.5 text-[11px] text-muted-foreground">
+          Comparar layout
+          <div className="inline-flex rounded-md border border-border bg-card p-0.5">
+            {(["atual", "novo"] as const).map((l) => (
+              <button
+                key={l}
+                onClick={() => setLayout(l)}
+                className={cn(
+                  "rounded px-2.5 py-0.5 font-medium capitalize transition-colors",
+                  layout === l ? "bg-foreground text-background" : "hover:text-foreground",
+                )}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden">
 
         {etapa === "agendamento" && (
           <>
@@ -512,6 +655,96 @@ export function ComandaSheet({
 
             {/* Agendamento */}
             <section className="flex min-h-0 min-w-0 flex-1 flex-col">
+              {novo ? (
+                <div className="border-b border-border px-5 pb-4 pt-5">
+                  <div className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                          {iniciais}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[11px] text-muted-foreground">Cliente</p>
+                          <p className="truncate text-base font-semibold">{agendamento.cliente}</p>
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="hidden text-[11px] text-muted-foreground sm:inline">Alterar status</span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-muted">
+                              <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
+                              {statusAtual.label}
+                              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            {statusOpcoes.map((s) => (
+                              <DropdownMenuItem key={s.value} onClick={() => setStatus(s.value)}>
+                                <span className={cn("mr-2 h-2 w-2 rounded-full", s.cor)} />
+                                {s.label}
+                                {s.value === status && <Check className="ml-auto h-3.5 w-3.5" />}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <button
+                          onClick={() => onOpenChange(false)}
+                          className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                          aria-label="Fechar"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-1 gap-3 px-1 sm:grid-cols-3">
+                    {[
+                      { icon: Scissors, label: "Serviço", valor: agendamento.servico },
+                      {
+                        icon: CalendarClock,
+                        label: "Data e horário",
+                        valor: `${agendamento.data.slice(0, 5)} · ${agendamento.inicio}–${agendamento.fim}`,
+                      },
+                      { icon: UserRound, label: "Profissional", valor: agendamento.profissional },
+                    ].map(({ icon: Icone, label, valor }) => (
+                      <div key={label} className="flex min-w-0 items-start gap-2.5">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground">
+                          <Icone className="h-4 w-4" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className={rotulo}>{label}</p>
+                          <p className="truncate text-[13px] font-medium">{valor}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-border px-1 pt-3">
+                    <p className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">Pagamento</span>
+                      <span className="font-semibold">Comanda #{10000 + agendamento.id}</span>
+                      <span
+                        className={cn(
+                          "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                          pagoStatus ? "bg-success/10 text-success" : "bg-primary/10 text-primary",
+                        )}
+                      >
+                        {pagoStatus ? "Paga" : "Em aberto"}
+                      </span>
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 gap-1.5 text-xs"
+                      onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`)}
+                    >
+                      <Bell className="h-3.5 w-3.5 text-warning" /> Enviar lembrete
+                    </Button>
+                  </div>
+                </div>
+              ) : (
               <div className="bg-header px-6 py-5 text-header-foreground">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -549,6 +782,7 @@ export function ComandaSheet({
                   </div>
                 </div>
               </div>
+              )}
 
               <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
                 <p className={cn(rotulo, "mb-4")}>Itens da comanda</p>
@@ -630,6 +864,11 @@ export function ComandaSheet({
                         {R$(c.valor)}
                         {c.detalhe && ` · ${c.detalhe}`}
                       </span>
+                      {novo && c.semEstoque && (
+                        <span className="mt-1 inline-block rounded bg-destructive px-1.5 py-0.5 text-[10px] font-semibold text-destructive-foreground">
+                          Sem estoque
+                        </span>
+                      )}
                     </span>
                   </button>
                 ))}
@@ -755,6 +994,7 @@ export function ComandaSheet({
             </div>
           </section>
         )}
+        </div>
       </SheetContent>
     </Sheet>
   );
