@@ -447,7 +447,7 @@ export function ComandaSheet({
 
   // Coluna direita do carrinho e do pagamento
   const painelCarrinho = (botao: string, onBotao: () => void) => (
-    <aside className="flex min-h-0 w-full flex-col border-t border-border md:w-[290px] md:border-l md:border-t-0">
+    <aside className="flex min-h-0 w-full flex-col border-t border-border md:w-[360px] md:border-l md:border-t-0">
       <div className="m-4 rounded-xl border border-border p-3">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
@@ -549,7 +549,7 @@ export function ComandaSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-[860px] md:overflow-hidden [&>button:last-child]:hidden"
+        className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-[1000px] md:overflow-hidden [&>button:last-child]:hidden"
       >
         <SheetTitle className="sr-only">Comanda de {agendamento.cliente}</SheetTitle>
 
@@ -576,7 +576,7 @@ export function ComandaSheet({
         {etapa === "agendamento" && (
           <>
             {/* Cliente */}
-            <aside className="flex w-full shrink-0 flex-col border-b border-border md:w-[250px] md:border-b-0 md:border-r md:overflow-y-auto">
+            <aside className="flex w-full shrink-0 flex-col border-b border-border md:w-[270px] md:border-b-0 md:border-r md:overflow-y-auto">
               <div className="flex flex-col items-center px-5 pb-5 pt-7 text-center">
                 <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-semibold text-primary">
                   {iniciais}
@@ -792,16 +792,19 @@ export function ComandaSheet({
                 </Button>
               </div>
 
-              <div className="border-t border-border px-6 py-4">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <span className="text-sm font-semibold">Total</span>
-                  <span className="text-lg font-semibold tabular-nums">{R$(total)}</span>
-                </div>
-                <div className="flex gap-2">
-                  {menuMais()}
-                  <Button className="h-10 flex-1 font-semibold" onClick={() => setEtapa("pagamento")}>
-                    Fechar comanda
-                  </Button>
+              {/* Mesma largura e posição do rodapé do carrinho/pagamento: o botão principal não muda de lugar entre as etapas */}
+              <div className="flex justify-end border-t border-border">
+                <div className="w-full p-4 md:w-[360px] md:border-l md:border-transparent">
+                  <div className="mb-3 flex items-baseline justify-between">
+                    <span className="text-sm font-semibold">Total</span>
+                    <span className="text-lg font-semibold tabular-nums">{R$(total)}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    {menuMais()}
+                    <Button className="h-10 flex-1 font-semibold" onClick={() => setEtapa("pagamento")}>
+                      Fechar comanda
+                    </Button>
+                  </div>
                 </div>
               </div>
             </section>
