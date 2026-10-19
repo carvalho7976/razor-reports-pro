@@ -30,6 +30,8 @@ import {
   Crown,
   History,
   Link2,
+  Bell,
+  Minus,
   MoreVertical,
   Package,
   Plus,
@@ -65,9 +67,10 @@ type Item = {
   tipo: "servico" | "produto" | "pack";
   assinatura?: boolean;
   qtd?: number;
+  semEstoque?: boolean;
 };
 
-type CatalogoItem = { nome: string; valor: number; detalhe?: string; tipo: Item["tipo"] };
+type CatalogoItem = { nome: string; valor: number; detalhe?: string; tipo: Item["tipo"]; semEstoque?: boolean };
 
 
 type Pagamento = { id: number; forma: string; valor: number };
@@ -86,7 +89,7 @@ const catalogo: Record<"servicos" | "produtos" | "pacotes", CatalogoItem[]> = {
   produtos: [
     { nome: "Pomada Modeladora", valor: 49, tipo: "produto" },
     { nome: "Shampoo Anticaspa", valor: 38, tipo: "produto" },
-    { nome: "Óleo Reparador", valor: 65, tipo: "produto" },
+    { nome: "Óleo Reparador", valor: 65, tipo: "produto", semEstoque: true },
     { nome: "Água", valor: 5, tipo: "produto" },
   ],
   pacotes: [
@@ -150,7 +153,16 @@ const itensIniciais = (a: ComandaAgendamento | null): Item[] => [
   { id: 2, descricao: "Água", detalhe: "Produto", valor: 5, tipo: "produto", qtd: 1 },
 ];
 
+// Avisos no topo: no canto de baixo cobriam o botão principal da comanda
+const noTopo = { position: "top-center" as const };
+
 const valorItem = (i: Item) => i.valor * (i.qtd ?? 1);
+
+const SeloSemEstoque = () => (
+  <span className="inline-block rounded bg-destructive px-1.5 py-0.5 text-[10px] font-semibold text-destructive-foreground">
+    Sem estoque
+  </span>
+);
 
 export function ComandaSheet({
   open,
@@ -230,19 +242,23 @@ export function ComandaSheet({
           valor: c.valor,
           tipo: c.tipo,
           qtd: c.tipo === "produto" ? 1 : undefined,
+          semEstoque: c.semEstoque,
         },
       ];
     });
-    toast.success(`${c.nome} adicionado`);
+    toast.success(`${c.nome} adicionado`, noTopo);
   };
 
   const removerItem = (id: number) => setItens((prev) => prev.filter((i) => i.id !== id));
+
+  const alterarQtd = (id: number, delta: number) =>
+    setItens((prev) => prev.map((i) => (i.id === id ? { ...i, qtd: Math.max(1, (i.qtd ?? 1) + delta) } : i)));
 
 
   const addPagamento = () => {
     const v = parseFloat(novoPgValor.replace(",", "."));
     if (!novoPgForma || isNaN(v) || v <= 0) {
-      toast.error("Escolha a forma e informe o valor");
+      toast.error("Escolha a forma e informe o valor", noTopo);
       return;
     }
     setPagamentos((prev) => [...prev, { id: Date.now(), forma: novoPgForma, valor: v }]);
@@ -252,11 +268,11 @@ export function ComandaSheet({
 
   const cobrar = () => {
     if (!forma) {
-      toast.error("Escolha a forma de pagamento");
+      toast.error("Escolha a forma de pagamento", noTopo);
       return;
     }
     if (forma === "Dividir" && resta > 0) {
-      toast.error(`Ainda faltam ${R$(resta)}`);
+      toast.error(`Ainda faltam ${R$(resta)}`, noTopo);
       return;
     }
     setStatus("finalizado");
@@ -282,13 +298,13 @@ export function ComandaSheet({
         >
           <StickyNote className="mr-2 h-4 w-4" /> Adicionar observação
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast("Link copiado")}>
+        <DropdownMenuItem onClick={() => toast("Link copiado", noTopo)}>
           <Copy className="mr-2 h-4 w-4" /> Copiar link
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
-          onClick={() => toast("Agendamento excluído")}
+          onClick={() => toast("Agendamento excluído", noTopo)}
         >
           <Trash2 className="mr-2 h-4 w-4" /> Excluir agendamento
         </DropdownMenuItem>
@@ -319,8 +335,33 @@ export function ComandaSheet({
               </p>
               <p className="truncate text-xs text-muted-foreground">
                 {i.detalhe}
-                {i.qtd !== undefined && ` · ${i.qtd} un`}
+                {i.qtd !== undefined && i.qtd > 1 && ` · ${R$(i.valor)} cada`}
               </p>
+              {(i.qtd !== undefined || i.semEstoque) && (
+                <div className="mt-1.5 flex items-center gap-2">
+                  {i.qtd !== undefined && (
+                    <div className="inline-flex h-6 items-center rounded-md border border-border bg-card">
+                      <button
+                        onClick={() => alterarQtd(i.id, -1)}
+                        disabled={i.qtd <= 1}
+                        className="flex h-full w-6 items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40"
+                        aria-label={`Diminuir ${i.descricao}`}
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                      <span className="w-5 text-center text-xs font-medium tabular-nums">{i.qtd}</span>
+                      <button
+                        onClick={() => alterarQtd(i.id, 1)}
+                        className="flex h-full w-6 items-center justify-center text-muted-foreground hover:text-foreground"
+                        aria-label={`Aumentar ${i.descricao}`}
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                  {i.semEstoque && <SeloSemEstoque />}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-1">
               <span className={cn("tabular-nums", compacto ? "text-[13px]" : "text-[13.5px]")}>{R$(valorItem(i))}</span>
@@ -468,8 +509,8 @@ export function ComandaSheet({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="center" className="w-48">
-                      <DropdownMenuItem onClick={() => toast("Abrindo perfil")}>Ver perfil</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => toast("Abrindo histórico")}>Histórico de visitas</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => toast("Abrindo histórico", noTopo)}>Histórico de visitas</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setEtapa("carrinho")}>Cobrar avulso</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -566,6 +607,25 @@ export function ComandaSheet({
                     </button>
                   </div>
                 </div>
+                <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+                  <p className="flex items-center gap-2 text-xs">
+                    <span className="font-medium">Comanda #{10000 + agendamento.id}</span>
+                    <span
+                      className={cn(
+                        "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                        status === "finalizado" ? "bg-success/20 text-success" : "bg-primary/25 text-white",
+                      )}
+                    >
+                      {status === "finalizado" ? "Paga" : "Em aberto"}
+                    </span>
+                  </p>
+                  <button
+                    onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-white/20 px-2.5 py-1 text-xs font-medium hover:bg-white/10"
+                  >
+                    <Bell className="h-3.5 w-3.5 text-warning" /> Enviar lembrete
+                  </button>
+                </div>
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
@@ -649,6 +709,11 @@ export function ComandaSheet({
                         {R$(c.valor)}
                         {c.detalhe && ` · ${c.detalhe}`}
                       </span>
+                      {c.semEstoque && (
+                        <span className="mt-1 block">
+                          <SeloSemEstoque />
+                        </span>
+                      )}
                     </span>
                   </button>
                 ))}
@@ -761,7 +826,7 @@ export function ComandaSheet({
                 <Button
                   className="h-9 flex-1"
                   onClick={() => {
-                    toast.success("Retorno agendado");
+                    toast.success("Retorno agendado", noTopo);
                     onOpenChange(false);
                   }}
                 >
