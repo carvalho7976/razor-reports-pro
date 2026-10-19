@@ -793,18 +793,16 @@ export function ComandaSheet({
               </div>
 
               {/* Mesma largura e posição do rodapé do carrinho/pagamento: o botão principal não muda de lugar entre as etapas */}
-              <div className="flex justify-end border-t border-border">
-                <div className="w-full p-4 md:w-[360px] md:border-l md:border-transparent">
-                  <div className="mb-3 flex items-baseline justify-between">
-                    <span className="text-sm font-semibold">Total</span>
-                    <span className="text-lg font-semibold tabular-nums">{R$(total)}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    {menuMais()}
-                    <Button className="h-10 flex-1 font-semibold" onClick={() => setEtapa("pagamento")}>
-                      Fechar comanda
-                    </Button>
-                  </div>
+              <div className="flex flex-col gap-3 border-t border-border py-4 pl-6 pr-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="text-xl font-semibold tabular-nums">{R$(total)}</p>
+                </div>
+                <div className="flex gap-2 md:w-[327px]">
+                  {menuMais()}
+                  <Button className="h-10 flex-1 font-semibold" onClick={() => setEtapa("pagamento")}>
+                    Fechar comanda
+                  </Button>
                 </div>
               </div>
             </section>
