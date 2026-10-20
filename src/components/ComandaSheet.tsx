@@ -30,7 +30,6 @@ import {
   Crown,
   History,
   Link2,
-  Bell,
   Minus,
   MoreVertical,
   Package,
@@ -526,6 +525,9 @@ export function ComandaConteudo({
               <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
               <DropdownMenuItem onClick={() => toast("Abrindo ficha da cliente", noTopo)}>Ver ficha</DropdownMenuItem>
               <DropdownMenuItem onClick={() => toast("Abrindo histórico", noTopo)}>Histórico de visitas</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}>
+                Enviar lembrete
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setEtapa("carrinho")}>Cobrar avulso</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -634,97 +636,66 @@ export function ComandaConteudo({
 
         {etapa === "agendamento" && (
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            {/* Faixa clara: cliente à esquerda, comanda e ações à direita */}
-            <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-5 py-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  {iniciais}
-                </div>
-                <div className="min-w-0">
-                  <p className="truncate text-[15px] font-semibold leading-tight">{agendamento.cliente}</p>
-                  <p className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">
-                    <Crown className="h-3.5 w-3.5 shrink-0" /> Assinante · R$ 0,00 em créditos
-                    {agendamento.telefone && <span className="hidden lg:inline">· {agendamento.telefone}</span>}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-muted-foreground">
-                  #{numeroComanda} ·{" "}
-                  {variante === "caixa"
-                    ? `Aberta em ${agendamento.data.slice(0, 5)} · Balcão`
-                    : `${agendamento.data.slice(0, 5)} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
-                </span>
-                <span
-                  className={cn(
-                    "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                    status === "finalizado" ? "bg-success/10 text-success" : "bg-primary/10 text-primary",
-                  )}
-                >
-                  {status === "finalizado" ? "Paga" : "Em aberto"}
-                </span>
-                {variante === "agenda" && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-xs font-medium hover:bg-muted">
-                        <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
-                        {statusAtual.label}
-                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                      {statusOpcoes.map((s) => (
-                        <DropdownMenuItem key={s.value} onClick={() => setStatus(s.value)}>
-                          <span className={cn("mr-2 h-2 w-2 rounded-full", s.cor)} />
-                          {s.label}
-                          {s.value === status && <Check className="ml-auto h-3.5 w-3.5" />}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-                <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 gap-1 px-2.5 text-xs">
-                      Ações <ChevronDown className="h-3.5 w-3.5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-52">
-                    <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => toast("Abrindo ficha da cliente", noTopo)}>Ver ficha</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => toast("Abrindo histórico", noTopo)}>Histórico de visitas</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}>
-                      <Bell className="mr-2 h-4 w-4" /> Enviar lembrete
-                    </DropdownMenuItem>
-                    {variante === "caixa" && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive focus:text-destructive"
-                          onClick={() => toast("Comanda excluída", noTopo)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Excluir comanda
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {variante === "agenda" && (
-                  <button
-                    onClick={() => onFechar()}
-                    className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-                    aria-label="Fechar"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            </header>
 
             <div className="flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden">
               <section className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {variante === "caixa"
+                        ? `Aberta em ${agendamento.data} · Balcão`
+                        : `${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span
+                      className={cn(
+                        "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                        status === "finalizado" ? "bg-success/10 text-success" : "bg-primary/10 text-primary",
+                      )}
+                    >
+                      {status === "finalizado" ? "Paga" : "Em aberto"}
+                    </span>
+                    {variante === "agenda" && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-xs font-medium hover:bg-muted">
+                            <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
+                            {statusAtual.label}
+                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          {statusOpcoes.map((s) => (
+                            <DropdownMenuItem key={s.value} onClick={() => setStatus(s.value)}>
+                              <span className={cn("mr-2 h-2 w-2 rounded-full", s.cor)} />
+                              {s.label}
+                              {s.value === status && <Check className="ml-auto h-3.5 w-3.5" />}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                    {variante === "caixa" ? (
+                      <button
+                        onClick={() => toast("Comanda excluída", noTopo)}
+                        className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-destructive"
+                        aria-label="Excluir comanda"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => onFechar()}
+                        className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                        aria-label="Fechar"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <p className={cn(rotulo, "mb-4")}>Itens da comanda</p>
                   {listaItens()}
@@ -736,8 +707,9 @@ export function ComandaConteudo({
 
               {/* Dados da cliente + total: mesma largura e rodapé do carrinho, o botão principal não muda de lugar */}
               <aside className="flex w-full shrink-0 flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
-                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 text-xs">
-                  <p className={rotulo}>Sobre a cliente</p>
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                {cartaoCliente()}
+                <div className="space-y-4 px-4 pb-4 text-xs">
                   <dl className="grid grid-cols-4 divide-x divide-border">
                     {[
                       { label: "Moedas", valor: "0" },
@@ -797,6 +769,7 @@ export function ComandaConteudo({
                       </button>
                     )}
                   </div>
+                </div>
                 </div>
                 <div className="border-t border-border p-4">
                   <div className="mb-3 flex items-baseline justify-between">
