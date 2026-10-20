@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DateRangePicker, type DatePreset } from "@/components/DataTable";
 import type { DateRange } from "react-day-picker";
-import { endOfWeek, isWithinInterval, parse, startOfDay, endOfDay, startOfWeek } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { endOfDay, isWithinInterval, parse, startOfDay } from "date-fns";
 
 type ComandaAberta = ComandaAgendamento & { abertaEm: string };
 
@@ -35,12 +34,9 @@ export default function FrenteCaixa() {
   const [comandas, setComandas] = useState(comandasIniciais);
   const [selecionadaId, setSelecionadaId] = useState<number | null>(comandasIniciais[0].id);
   const [busca, setBusca] = useState("");
-  // Mesmo seletor de período das outras telas; começa na semana atual
-  const [datePreset, setDatePreset] = useState<DatePreset>("semana");
-  const [periodo, setPeriodo] = useState<DateRange | undefined>(() => ({
-    from: startOfWeek(new Date(), { locale: ptBR }),
-    to: endOfWeek(new Date(), { locale: ptBR }),
-  }));
+  // Mesmo seletor de período das outras telas: sem período, mostra todas as abertas
+  const [datePreset, setDatePreset] = useState<DatePreset>(null);
+  const [periodo, setPeriodo] = useState<DateRange | undefined>();
 
   const lista = useMemo(() => {
     const q = busca.trim().toLowerCase();
@@ -89,25 +85,22 @@ export default function FrenteCaixa() {
               <Plus className="h-3.5 w-3.5" /> Nova
             </Button>
           </div>
-          <div className="relative px-3 pt-3">
-            <Search className="absolute left-5 top-1/2 mt-1.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar cliente"
-              className="h-8 pl-8 text-xs"
-            />
-          </div>
-          <div className="flex items-center justify-between gap-2 px-3 pb-1 pt-2">
+          <div className="flex items-center gap-2 px-3 pb-2 pt-3">
+            <div className="relative min-w-0 flex-1">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Buscar cliente"
+                className="h-9 pl-8 text-xs"
+              />
+            </div>
             <DateRangePicker
               datePreset={datePreset}
               onSelect={setDatePreset}
               dateRange={periodo}
               onRangeChange={setPeriodo}
             />
-            <span className="text-[11px] text-muted-foreground">
-              {lista.length} {lista.length === 1 ? "comanda" : "comandas"}
-            </span>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
             {lista.map((c) => (
