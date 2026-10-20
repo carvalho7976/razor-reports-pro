@@ -5,6 +5,10 @@ import { ComandaConteudo, type ComandaAgendamento } from "@/components/ComandaSh
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { DateRangePicker, type DatePreset } from "@/components/DataTable";
+import type { DateRange } from "react-day-picker";
+import { endOfWeek, isWithinInterval, parse, startOfDay, endOfDay, startOfWeek } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 type ComandaAberta = ComandaAgendamento & { abertaEm: string };
 
@@ -31,11 +35,24 @@ export default function FrenteCaixa() {
   const [comandas, setComandas] = useState(comandasIniciais);
   const [selecionadaId, setSelecionadaId] = useState<number | null>(comandasIniciais[0].id);
   const [busca, setBusca] = useState("");
+  // Mesmo seletor de período das outras telas; começa na semana atual
+  const [datePreset, setDatePreset] = useState<DatePreset>("semana");
+  const [periodo, setPeriodo] = useState<DateRange | undefined>(() => ({
+    from: startOfWeek(new Date(), { locale: ptBR }),
+    to: endOfWeek(new Date(), { locale: ptBR }),
+  }));
 
   const lista = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    return q ? comandas.filter((c) => c.cliente.toLowerCase().includes(q)) : comandas;
-  }, [comandas, busca]);
+    return comandas.filter((c) => {
+      if (q && !c.cliente.toLowerCase().includes(q)) return false;
+      if (periodo?.from && periodo?.to) {
+        const dia = parse(c.data, "dd/MM/yyyy", new Date());
+        return isWithinInterval(dia, { start: startOfDay(periodo.from), end: endOfDay(periodo.to) });
+      }
+      return true;
+    });
+  }, [comandas, busca, periodo]);
 
   const selecionada = comandas.find((c) => c.id === selecionadaId) ?? null;
 
@@ -81,9 +98,17 @@ export default function FrenteCaixa() {
               className="h-8 pl-8 text-xs"
             />
           </div>
-          <p className="px-4 pb-1 pt-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            18/10 – 19/10 · {lista.length} {lista.length === 1 ? "comanda" : "comandas"}
-          </p>
+          <div className="flex items-center justify-between gap-2 px-3 pb-1 pt-2">
+            <DateRangePicker
+              datePreset={datePreset}
+              onSelect={setDatePreset}
+              dateRange={periodo}
+              onRangeChange={setPeriodo}
+            />
+            <span className="text-[11px] text-muted-foreground">
+              {lista.length} {lista.length === 1 ? "comanda" : "comandas"}
+            </span>
+          </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
             {lista.map((c) => (
               <button

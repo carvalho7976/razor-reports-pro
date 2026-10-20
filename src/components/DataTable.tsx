@@ -64,7 +64,7 @@ export interface Column<T> {
   cardWidth?: "compact" | "wide";
 }
 
-type DatePreset =
+export type DatePreset =
   | "hoje"
   | "ontem"
   | "semana"
@@ -200,7 +200,7 @@ export function NovoButton({ items }: { items: NovoMenuItem[] }) {
   );
 }
 
-function DateRangePicker({
+export function DateRangePicker({
   datePreset,
   onSelect,
   dateRange,
