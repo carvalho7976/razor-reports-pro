@@ -32,6 +32,8 @@ import {
   Link2,
   Bell,
   Minus,
+  FileText,
+  Wallet,
   MoreVertical,
   Package,
   Plus,
@@ -57,6 +59,8 @@ export type ComandaAgendamento = {
   fim: string;
   data: string;
   telefone?: string;
+  /** Valor do primeiro item, quando a comanda já vem com preço (frente de caixa) */
+  valor?: number;
 };
 
 type Item = {
@@ -141,17 +145,20 @@ const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currenc
 
 const rotulo = "text-[11px] font-medium uppercase tracking-wide text-muted-foreground";
 
-const itensIniciais = (a: ComandaAgendamento | null): Item[] => [
-  {
+const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa"): Item[] => {
+  const servico: Item = {
     id: 1,
     descricao: a?.servico ?? "Serviço",
     detalhe: [a?.inicio, a?.profissional].filter(Boolean).join(" · "),
-    valor: 0,
+    valor: a?.valor ?? 0,
     tipo: "servico",
-    assinatura: true,
-  },
-  { id: 2, descricao: "Água", detalhe: "Produto", valor: 5, tipo: "produto", qtd: 1 },
-];
+    assinatura: variante === "agenda",
+  };
+  // Comanda de balcão começa só com o que veio da lista; a da agenda traz o exemplo da água
+  return variante === "caixa"
+    ? [servico]
+    : [servico, { id: 2, descricao: "Água", detalhe: "Produto", valor: 5, tipo: "produto", qtd: 1 }];
+};
 
 // Avisos no topo: no canto de baixo cobriam o botão principal da comanda
 const noTopo = { position: "top-center" as const };
@@ -173,11 +180,38 @@ export function ComandaSheet({
   onOpenChange: (o: boolean) => void;
   agendamento: ComandaAgendamento | null;
 }) {
+  if (!agendamento) return null;
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-[920px] md:overflow-hidden [&>button:last-child]:hidden"
+      >
+        <SheetTitle className="sr-only">Comanda de {agendamento.cliente}</SheetTitle>
+        <ComandaConteudo agendamento={agendamento} onFechar={() => onOpenChange(false)} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+/**
+ * Miolo da comanda, usado na agenda (dentro do Sheet) e na frente de caixa.
+ * "agenda" mostra data, horário e status do agendamento; "caixa" é uma comanda de balcão.
+ */
+export function ComandaConteudo({
+  agendamento,
+  variante = "agenda",
+  onFechar,
+}: {
+  agendamento: ComandaAgendamento | null;
+  variante?: "agenda" | "caixa";
+  onFechar: () => void;
+}) {
   const [etapa, setEtapa] = useState<Etapa>("agendamento");
   const [status, setStatus] = useState("agendado");
   const [obs, setObs] = useState("");
   const [editandoObs, setEditandoObs] = useState(false);
-  const [itens, setItens] = useState<Item[]>(() => itensIniciais(agendamento));
+  const [itens, setItens] = useState<Item[]>(() => itensIniciais(agendamento, variante));
   const [aba, setAba] = useState<Aba>("rapida");
   const [busca, setBusca] = useState("");
   const [forma, setForma] = useState<string | null>(null);
@@ -191,7 +225,7 @@ export function ComandaSheet({
     setStatus("agendado");
     setObs("");
     setEditandoObs(false);
-    setItens(itensIniciais(agendamento));
+    setItens(itensIniciais(agendamento, variante));
     setAba("rapida");
     setBusca("");
     setForma(null);
@@ -223,6 +257,9 @@ export function ComandaSheet({
     .map((s) => s[0])
     .join("")
     .toUpperCase();
+
+  // Na agenda o número é derivado do agendamento; no caixa a comanda já tem número próprio
+  const numeroComanda = variante === "caixa" ? agendamento.id : 10000 + agendamento.id;
 
   const statusAtual = statusOpcoes.find((s) => s.value === status) ?? statusOpcoes[0];
 
@@ -480,13 +517,6 @@ export function ComandaSheet({
   );
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        className="flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-[920px] md:overflow-hidden [&>button:last-child]:hidden"
-      >
-        <SheetTitle className="sr-only">Comanda de {agendamento.cliente}</SheetTitle>
-
         <div className="flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden">
 
         {etapa === "agendamento" && (
@@ -519,6 +549,27 @@ export function ComandaSheet({
               </div>
 
               <div className="space-y-3 border-t border-border px-5 py-4 text-xs">
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { icon: Coins, label: "Moedas", valor: "0" },
+                    { icon: Package, label: "Packs", valor: "1" },
+                    { icon: Wallet, label: "Débitos", valor: R$(0) },
+                    { icon: CreditCard, label: "Créditos", valor: R$(0) },
+                  ].map(({ icon: Icone, label, valor }) => (
+                    <div key={label} className="rounded-md border border-border px-2 py-1.5">
+                      <p className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
+                        <Icone className="h-3 w-3" /> {label}
+                      </p>
+                      <p className="font-semibold tabular-nums">{valor}</p>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => toast("Abrindo ficha da cliente", noTopo)}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+                >
+                  <FileText className="h-3.5 w-3.5" /> Ver ficha
+                </button>
                 <div className="rounded-lg bg-muted px-3 py-2">
                   <p className="flex items-center gap-1.5 font-medium">
                     <Crown className="h-3.5 w-3.5" /> Assinante
@@ -572,6 +623,32 @@ export function ComandaSheet({
             {/* Agendamento */}
             <section className="flex min-h-0 min-w-0 flex-1 flex-col">
               <div className="bg-header px-5 py-4 text-header-foreground">
+                {variante === "caixa" ? (
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-lg font-semibold tracking-tight">Comanda #{numeroComanda}</p>
+                      <p className="mt-0.5 text-xs opacity-75">Aberta em {agendamento.data} · Balcão</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                          status === "finalizado" ? "bg-success/20 text-success" : "bg-primary/25 text-white",
+                        )}
+                      >
+                        {status === "finalizado" ? "Paga" : "Em aberto"}
+                      </span>
+                      <button
+                        onClick={() => toast("Comanda excluída", noTopo)}
+                        className="rounded-md p-1.5 opacity-75 hover:bg-white/10 hover:opacity-100"
+                        aria-label="Excluir comanda"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                <>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-lg font-semibold tracking-tight">{agendamento.data}</p>
@@ -599,7 +676,7 @@ export function ComandaSheet({
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <button
-                      onClick={() => onOpenChange(false)}
+                      onClick={() => onFechar()}
                       className="rounded-md p-1.5 opacity-75 hover:bg-white/10 hover:opacity-100"
                       aria-label="Fechar"
                     >
@@ -609,7 +686,7 @@ export function ComandaSheet({
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
                   <p className="flex items-center gap-2 text-xs">
-                    <span className="font-medium">Comanda #{10000 + agendamento.id}</span>
+                    <span className="font-medium">Comanda #{numeroComanda}</span>
                     <span
                       className={cn(
                         "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
@@ -626,6 +703,8 @@ export function ComandaSheet({
                     <Bell className="h-3.5 w-3.5 text-warning" /> Enviar lembrete
                   </button>
                 </div>
+                </>
+                )}
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
@@ -827,12 +906,12 @@ export function ComandaSheet({
                   className="h-9 flex-1"
                   onClick={() => {
                     toast.success("Retorno agendado", noTopo);
-                    onOpenChange(false);
+                    onFechar();
                   }}
                 >
                   Agendar retorno
                 </Button>
-                <Button variant="outline" className="h-9 flex-1" onClick={() => onOpenChange(false)}>
+                <Button variant="outline" className="h-9 flex-1" onClick={() => onFechar()}>
                   Agora não
                 </Button>
               </div>
@@ -840,7 +919,5 @@ export function ComandaSheet({
           </section>
         )}
         </div>
-      </SheetContent>
-    </Sheet>
   );
 }

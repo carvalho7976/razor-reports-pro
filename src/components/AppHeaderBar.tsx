@@ -62,10 +62,10 @@ export function AppHeaderBar() {
           <span className="hidden lg:inline">Indicar amigo</span>
         </button>
 
-        <button className="btn-action bg-primary py-1.5 text-xs text-primary-foreground">
+        <Link to="/frenteCaixa" className="btn-action bg-primary py-1.5 text-xs text-primary-foreground">
           <CreditCard className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Comandas</span>
-        </button>
+        </Link>
 
         <button className="btn-action hidden bg-accent py-1.5 text-xs text-accent-foreground sm:inline-flex">
           <Grid3X3 className="h-3.5 w-3.5" />

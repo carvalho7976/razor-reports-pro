@@ -18,6 +18,7 @@ import ExclusaoAgendamentos from "./pages/ExclusaoAgendamentos";
 import ListaClientes from "./pages/ListaClientes";
 import Assinantes from "./pages/Assinantes";
 import Comandas from "./pages/Comandas";
+import FrenteCaixa from "./pages/FrenteCaixa";
 import Avaliacoes from "./pages/Avaliacoes";
 import RelatorioAgendamentos from "./pages/RelatorioAgendamentos";
 import RelatorioPacotes from "./pages/RelatorioPacotes";
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/clientePesquisa" element={<ListaClientes />} />
           <Route path="/assinantePesquisa" element={<Assinantes />} />
           <Route path="/comandasAbertas" element={<Comandas />} />
+          <Route path="/frenteCaixa" element={<FrenteCaixa />} />
           <Route path="/avaliacoes" element={<Avaliacoes />} />
           <Route path="/relatorioAgendamentos" element={<RelatorioAgendamentos />} />
           <Route path="/relatorioCombos" element={<RelatorioPacotes />} />
