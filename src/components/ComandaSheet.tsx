@@ -78,26 +78,31 @@ type Item = {
   assistentes?: string[];
 };
 
-// Mesmas iniciais e cores do cabeçalho da agenda (ainda não há foto cadastrada)
+// Mesmas iniciais e cores do cabeçalho da agenda; fotos fictícias (randomuser.me) só para avaliar o visual
 const equipeSalao = [
-  { nome: "Cesar", iniciais: "CE", cor: "bg-amber-700 text-white" },
-  { nome: "Claudia", iniciais: "CL", cor: "bg-pink-500 text-white" },
-  { nome: "Marcia Silva", iniciais: "MS", cor: "bg-rose-400 text-white" },
-  { nome: "Matheus", iniciais: "MA", cor: "bg-stone-700 text-white" },
-  { nome: "Vini", iniciais: "VI", cor: "bg-indigo-500 text-white" },
+  { nome: "Cesar", iniciais: "CE", cor: "bg-amber-700 text-white", foto: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { nome: "Claudia", iniciais: "CL", cor: "bg-pink-500 text-white", foto: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { nome: "Marcia Silva", iniciais: "MS", cor: "bg-rose-400 text-white", foto: "https://randomuser.me/api/portraits/women/65.jpg" },
+  { nome: "Matheus", iniciais: "MA", cor: "bg-stone-700 text-white", foto: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { nome: "Vini", iniciais: "VI", cor: "bg-indigo-500 text-white", foto: "https://randomuser.me/api/portraits/men/12.jpg" },
 ];
 
 const FotoProf = ({ nome, tamanho = "h-5 w-5 text-[9px]" }: { nome?: string; tamanho?: string }) => {
   const p = equipeSalao.find((e) => e.nome === nome);
+  const [falhou, setFalhou] = useState(false);
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-semibold",
         tamanho,
         p?.cor ?? "bg-muted text-muted-foreground",
       )}
     >
-      {p?.iniciais ?? "?"}
+      {p?.foto && !falhou ? (
+        <img src={p.foto} alt={p.nome} className="h-full w-full object-cover" onError={() => setFalhou(true)} />
+      ) : (
+        p?.iniciais ?? "?"
+      )}
     </span>
   );
 };
