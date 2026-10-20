@@ -70,7 +70,13 @@ type Item = {
   assinatura?: boolean;
   qtd?: number;
   semEstoque?: boolean;
+  /** Só serviços e pacotes: quem atende e quem ajuda */
+  horario?: string;
+  profissional?: string;
+  assistentes?: string[];
 };
+
+const equipeSalao = ["Cesar", "Claudia", "Marcia Silva", "Matheus", "Vini"];
 
 type CatalogoItem = { nome: string; valor: number; detalhe?: string; tipo: Item["tipo"]; semEstoque?: boolean };
 
@@ -147,7 +153,10 @@ const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa
   const servico: Item = {
     id: 1,
     descricao: a?.servico ?? "Serviço",
-    detalhe: [a?.inicio, a?.profissional].filter(Boolean).join(" · "),
+    detalhe: "",
+    horario: a?.inicio || undefined,
+    profissional: a?.profissional || undefined,
+    assistentes: [],
     valor: a?.valor ?? 0,
     tipo: "servico",
     assinatura: variante === "agenda",
@@ -273,7 +282,9 @@ export function ComandaConteudo({
         {
           id: Date.now(),
           descricao: c.nome,
-          detalhe: c.tipo === "produto" ? "Produto" : agendamento.profissional,
+          detalhe: c.tipo === "produto" ? "Produto" : "",
+          profissional: c.tipo === "produto" ? undefined : agendamento.profissional || equipeSalao[0],
+          assistentes: c.tipo === "produto" ? undefined : [],
           valor: c.valor,
           tipo: c.tipo,
           qtd: c.tipo === "produto" ? 1 : undefined,
@@ -285,6 +296,9 @@ export function ComandaConteudo({
   };
 
   const removerItem = (id: number) => setItens((prev) => prev.filter((i) => i.id !== id));
+
+  const alterarItem = (id: number, mudar: (i: Item) => Item) =>
+    setItens((prev) => prev.map((i) => (i.id === id ? mudar(i) : i)));
 
   const alterarQtd = (id: number, delta: number) =>
     setItens((prev) => prev.map((i) => (i.id === id ? { ...i, qtd: Math.max(1, (i.qtd ?? 1) + delta) } : i)));
@@ -347,6 +361,71 @@ export function ComandaConteudo({
     </DropdownMenu>
   );
 
+  // Profissional e assistentes de um serviço, editáveis direto na linha do item
+  const equipe = (i: Item) => (
+    <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
+      {i.horario && <span>{i.horario} ·</span>}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="inline-flex items-center gap-0.5 rounded px-0.5 text-foreground hover:bg-muted">
+            {i.profissional ?? "Escolher profissional"}
+            <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-48">
+          {equipeSalao.map((nome) => (
+            <DropdownMenuItem
+              key={nome}
+              onClick={() =>
+                alterarItem(i.id, (it) => ({
+                  ...it,
+                  profissional: nome,
+                  assistentes: (it.assistentes ?? []).filter((a) => a !== nome),
+                }))
+              }
+            >
+              {nome}
+              {nome === i.profissional && <Check className="ml-auto h-3.5 w-3.5" />}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {(i.assistentes ?? []).map((nome) => (
+        <span key={nome} className="inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[11px] text-foreground">
+          {nome}
+          <button
+            onClick={() => alterarItem(i.id, (it) => ({ ...it, assistentes: (it.assistentes ?? []).filter((a) => a !== nome) }))}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label={`Tirar ${nome} de assistente`}
+          >
+            <X className="h-2.5 w-2.5" />
+          </button>
+        </span>
+      ))}
+      {equipeSalao.some((n) => n !== i.profissional && !(i.assistentes ?? []).includes(n)) && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="inline-flex items-center gap-0.5 rounded px-0.5 hover:bg-muted hover:text-foreground">
+              <Plus className="h-3 w-3" /> Assistente
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            {equipeSalao
+              .filter((n) => n !== i.profissional && !(i.assistentes ?? []).includes(n))
+              .map((nome) => (
+                <DropdownMenuItem
+                  key={nome}
+                  onClick={() => alterarItem(i.id, (it) => ({ ...it, assistentes: [...(it.assistentes ?? []), nome] }))}
+                >
+                  {nome}
+                </DropdownMenuItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </div>
+  );
+
   const listaItens = (compacto = false) => (
     <div className={cn("space-y-3", compacto && "space-y-2.5")}>
       {itens.length === 0 && <p className="text-xs text-muted-foreground">Nenhum item na comanda.</p>}
@@ -368,10 +447,14 @@ export function ComandaConteudo({
                   </span>
                 )}
               </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {i.detalhe}
-                {i.qtd !== undefined && i.qtd > 1 && ` · ${R$(i.valor)} cada`}
-              </p>
+              {i.tipo === "produto" ? (
+                <p className="truncate text-xs text-muted-foreground">
+                  {i.detalhe}
+                  {i.qtd !== undefined && i.qtd > 1 && ` · ${R$(i.valor)} cada`}
+                </p>
+              ) : (
+                equipe(i)
+              )}
               {(i.qtd !== undefined || i.semEstoque) && (
                 <div className="mt-1.5 flex items-center gap-2">
                   {i.qtd !== undefined && (
@@ -526,13 +609,23 @@ export function ComandaConteudo({
       key={value}
       onClick={() => setForma(value)}
       className={cn(
-        "flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-lg border bg-card p-3 text-[13px] font-medium transition-colors hover:bg-muted",
-        forma === value ? "border-2 border-primary bg-primary/[0.06] hover:bg-primary/[0.06]" : "border-border",
+        "flex items-center gap-2.5 rounded-lg border bg-card px-3 py-2.5 text-left text-[13px] transition-colors hover:bg-muted/60",
+        forma === value ? "border-foreground/70 bg-muted/60" : "border-border",
       )}
     >
-      <Icon className="h-5 w-5" />
-      {value}
-      {sub && <span className="text-[11px] font-normal text-muted-foreground">{sub}</span>}
+      <Icon className={cn("h-4 w-4 shrink-0", forma === value ? "text-foreground" : "text-muted-foreground")} />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-medium">{value}</span>
+        {sub && <span className="block truncate text-[11px] text-muted-foreground">{sub}</span>}
+      </span>
+      <span
+        className={cn(
+          "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
+          forma === value ? "border-foreground bg-foreground text-background" : "border-border",
+        )}
+      >
+        {forma === value && <Check className="h-2.5 w-2.5" />}
+      </span>
     </button>
   );
 
@@ -810,12 +903,12 @@ export function ComandaConteudo({
               <h2 className="mb-4 mt-1 text-lg font-semibold tracking-tight">Forma de pagamento</h2>
 
               <p className={cn(rotulo, "mb-2")}>Da cliente</p>
-              <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {formasDaCliente.map((f) => cardForma(f))}
               </div>
 
               <p className={cn(rotulo, "mb-2")}>Outras formas</p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {outrasFormas.map((f) => cardForma(f))}
               </div>
 
