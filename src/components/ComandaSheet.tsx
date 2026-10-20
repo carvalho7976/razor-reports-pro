@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import {
   DropdownMenu,
@@ -72,6 +73,8 @@ type Item = {
   /** Só serviços e pacotes: quem atende e quem ajuda */
   horario?: string;
   profissional?: string;
+  /** Preço de tabela, guardado quando o valor é alterado na comanda */
+  valorOriginal?: number;
   assistentes?: string[];
 };
 
@@ -207,7 +210,10 @@ const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa
   // Comanda de balcão começa só com o que veio da lista; a da agenda traz o exemplo da água
   return variante === "caixa"
     ? [servico]
-    : [servico, { id: 2, descricao: "Água", detalhe: "Produto", valor: 5, tipo: "produto", qtd: 1 }];
+    : [
+        servico,
+        { id: 2, descricao: "Água", detalhe: "Produto", valor: 5, tipo: "produto", qtd: 1, profissional: a?.profissional || undefined },
+      ];
 };
 
 // Avisos no topo: no canto de baixo cobriam o botão principal da comanda
@@ -327,7 +333,7 @@ export function ComandaConteudo({
           id: Date.now(),
           descricao: c.nome,
           detalhe: c.tipo === "produto" ? "Produto" : "",
-          profissional: c.tipo === "produto" ? undefined : agendamento.profissional || equipeSalao[0].nome,
+          profissional: agendamento.profissional || equipeSalao[0].nome,
           assistentes: c.tipo === "produto" ? undefined : [],
           valor: c.valor,
           tipo: c.tipo,
@@ -412,7 +418,7 @@ export function ComandaConteudo({
   // Profissional e assistentes de um serviço, editáveis direto na linha do item
   const equipe = (i: Item) => (
     <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-      {i.horario && <span className="mr-0.5">{i.horario}</span>}
+      {i.tipo !== "produto" && i.horario && <span className="mr-0.5">{i.horario}</span>}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="inline-flex h-6 items-center gap-1.5 rounded-[30px] border border-border bg-card pl-0.5 pr-2 text-foreground hover:bg-muted">
@@ -441,6 +447,28 @@ export function ComandaConteudo({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+      {i.tipo === "produto" && i.qtd !== undefined && (
+        <div className="inline-flex h-6 items-center rounded-[30px] border border-border bg-card">
+          <button
+            onClick={() => alterarQtd(i.id, -1)}
+            disabled={i.qtd <= 1}
+            className="flex h-full w-6 items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40"
+            aria-label={`Diminuir ${i.descricao}`}
+          >
+            <Minus className="h-3 w-3" />
+          </button>
+          <span className="w-5 text-center text-xs font-medium tabular-nums text-foreground">{i.qtd}</span>
+          <button
+            onClick={() => alterarQtd(i.id, 1)}
+            className="flex h-full w-6 items-center justify-center text-muted-foreground hover:text-foreground"
+            aria-label={`Aumentar ${i.descricao}`}
+          >
+            <Plus className="h-3 w-3" />
+          </button>
+        </div>
+      )}
+      {i.tipo === "produto" && i.qtd !== undefined && i.qtd > 1 && <span>{R$(i.valor)} cada</span>}
+      {i.semEstoque && <SeloSemEstoque />}
       {(i.assistentes ?? []).map((nome) => (
         <span key={nome} className="inline-flex h-6 items-center gap-1.5 rounded-[30px] bg-muted pl-0.5 pr-2 text-foreground">
           <FotoProf nome={nome} />
@@ -454,7 +482,7 @@ export function ComandaConteudo({
           </button>
         </span>
       ))}
-      {disponiveis(i).length > 0 && (
+      {i.tipo !== "produto" && disponiveis(i).length > 0 && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="inline-flex h-6 items-center gap-1 rounded-[30px] border border-dashed border-border px-2 hover:bg-muted hover:text-foreground">
@@ -479,35 +507,90 @@ export function ComandaConteudo({
   );
 
   // Preço editável: clica no valor, digita e confirma com Enter (Esc cancela)
-  const preco = (i: Item, compacto: boolean) =>
-    editandoPreco === i.id ? (
-      <Input
-        autoFocus
-        defaultValue={i.valor.toFixed(2).replace(".", ",")}
-        aria-label={`Preço de ${i.descricao}`}
-        className="h-7 w-24 text-right text-xs tabular-nums"
-        onKeyDown={(e) => {
-          if (e.key === "Escape") setEditandoPreco(null);
-          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-        }}
-        onBlur={(e) => {
-          const v = parseFloat(e.target.value.replace(/\./g, "").replace(",", "."));
-          if (!isNaN(v) && v >= 0) alterarItem(i.id, (it) => ({ ...it, valor: v }));
-          setEditandoPreco(null);
-        }}
-      />
-    ) : (
-      <button
-        onClick={() => setEditandoPreco(i.id)}
-        title="Editar preço"
-        className={cn(
-          "rounded px-1 tabular-nums underline-offset-2 hover:bg-muted hover:underline",
-          compacto ? "text-[13px]" : "text-[13.5px]",
-        )}
-      >
-        {R$(valorItem(i))}
-      </button>
+  // Preço: clique abre um painel com novo valor ou desconto rápido
+  const aplicarPreco = (i: Item, novo: number) => {
+    const original = i.valorOriginal ?? i.valor;
+    alterarItem(i.id, (it) => ({ ...it, valor: Math.max(0, Math.round(novo * 100) / 100), valorOriginal: original }));
+  };
+
+  const preco = (i: Item, compacto: boolean) => {
+    const original = i.valorOriginal ?? i.valor;
+    const alterado = i.valorOriginal !== undefined && i.valorOriginal !== i.valor;
+    return (
+      <Popover open={editandoPreco === i.id} onOpenChange={(o) => setEditandoPreco(o ? i.id : null)}>
+        <PopoverTrigger asChild>
+          <button
+            title="Alterar preço"
+            className={cn(
+              "flex flex-col items-end rounded px-1 font-semibold tabular-nums hover:bg-muted",
+              compacto ? "text-[13px]" : "text-sm",
+            )}
+          >
+            {R$(valorItem(i))}
+            {alterado && (
+              <span className="text-[10.5px] font-normal text-muted-foreground line-through">
+                {R$(original * (i.qtd ?? 1))}
+              </span>
+            )}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-60 p-3">
+          <p className="text-xs font-semibold">Preço de {i.descricao}</p>
+          <p className="mb-2 text-[11px] text-muted-foreground">Tabela: {R$(original)}{i.qtd && i.qtd > 1 ? " cada" : ""}</p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const campo = new FormData(e.currentTarget).get("valor")?.toString() ?? "";
+              const v = parseFloat(campo.replace(/\./g, "").replace(",", "."));
+              if (!isNaN(v) && v >= 0) aplicarPreco(i, v);
+              setEditandoPreco(null);
+            }}
+            className="flex gap-1.5"
+          >
+            <div className="relative flex-1">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">R$</span>
+              <Input
+                name="valor"
+                autoFocus
+                defaultValue={i.valor.toFixed(2).replace(".", ",")}
+                className="h-8 pl-8 text-xs tabular-nums"
+                aria-label="Novo preço"
+              />
+            </div>
+            <Button type="submit" size="sm" className="h-8 text-xs">
+              Aplicar
+            </Button>
+          </form>
+          <p className="mb-1.5 mt-3 text-[11px] text-muted-foreground">Desconto rápido</p>
+          <div className="grid grid-cols-4 gap-1">
+            {[5, 10, 15, 20].map((pct) => (
+              <button
+                key={pct}
+                onClick={() => {
+                  aplicarPreco(i, original * (1 - pct / 100));
+                  setEditandoPreco(null);
+                }}
+                className="rounded-md border border-border py-1 text-xs hover:bg-muted"
+              >
+                {pct}%
+              </button>
+            ))}
+          </div>
+          {alterado && (
+            <button
+              onClick={() => {
+                aplicarPreco(i, original);
+                setEditandoPreco(null);
+              }}
+              className="mt-2.5 text-xs text-info hover:underline"
+            >
+              Voltar ao preço de tabela
+            </button>
+          )}
+        </PopoverContent>
+      </Popover>
     );
+  };
 
   const listaItens = (compacto = false) => (
     <div className={cn("space-y-3", compacto && "space-y-2.5")}>
@@ -528,39 +611,7 @@ export function ComandaConteudo({
                   </span>
                 )}
               </p>
-              {i.tipo === "produto" ? (
-                <p className="truncate text-xs text-muted-foreground">
-                  {i.detalhe}
-                  {i.qtd !== undefined && i.qtd > 1 && ` · ${R$(i.valor)} cada`}
-                </p>
-              ) : (
-                equipe(i)
-              )}
-              {(i.qtd !== undefined || i.semEstoque) && (
-                <div className="mt-1.5 flex items-center gap-2">
-                  {i.qtd !== undefined && (
-                    <div className="inline-flex h-6 items-center rounded-md border border-border bg-card">
-                      <button
-                        onClick={() => alterarQtd(i.id, -1)}
-                        disabled={i.qtd <= 1}
-                        className="flex h-full w-6 items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40"
-                        aria-label={`Diminuir ${i.descricao}`}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </button>
-                      <span className="w-5 text-center text-xs font-medium tabular-nums">{i.qtd}</span>
-                      <button
-                        onClick={() => alterarQtd(i.id, 1)}
-                        className="flex h-full w-6 items-center justify-center text-muted-foreground hover:text-foreground"
-                        aria-label={`Aumentar ${i.descricao}`}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </button>
-                    </div>
-                  )}
-                  {i.semEstoque && <SeloSemEstoque />}
-                </div>
-              )}
+              {equipe(i)}
             </div>
             <div className="flex items-center gap-1">
               {preco(i, compacto)}
@@ -618,6 +669,27 @@ export function ComandaConteudo({
     </div>
   );
 
+  // Recompra: aparece em todas as etapas enquanto houver sugestão
+  const faixaSugestoes = (classe: string) =>
+    recompraSugestoes.length > 0 && (
+      <button
+        onClick={() => {
+          setBusca("");
+          setAba("sugestoes");
+          setEtapa("carrinho");
+        }}
+        className={cn(
+          "flex items-center justify-between rounded-lg bg-primary/[0.08] px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/[0.12]",
+          classe,
+        )}
+      >
+        <span className="flex items-center gap-1.5">
+          <Sparkles className="h-3.5 w-3.5" /> {recompraSugestoes.length} sugestões de recompra
+        </span>
+        <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    );
+
   // Coluna direita do carrinho e do pagamento
   const painelCarrinho = (botao: string, onBotao: () => void) => (
     <aside className="flex min-h-0 w-full flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
@@ -627,20 +699,7 @@ export function ComandaConteudo({
         {listaItens(true)}
       </div>
 
-      {etapa === "carrinho" && aba !== "sugestoes" && (
-        <button
-          onClick={() => {
-            setBusca("");
-            setAba("sugestoes");
-          }}
-          className="mx-4 mb-3 flex items-center justify-between rounded-lg bg-primary/[0.08] px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/[0.12]"
-        >
-          <span className="flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5" /> {recompraSugestoes.length} sugestões de recompra
-          </span>
-          <ChevronRight className="h-3.5 w-3.5" />
-        </button>
-      )}
+      {faixaSugestoes("mx-4 mb-3")}
 
       <div className="space-y-1 px-4 pb-3 text-xs text-muted-foreground">
         <div className="flex justify-between">
@@ -781,9 +840,9 @@ export function ComandaConteudo({
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <div className="mb-4 flex items-center justify-between gap-2">
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-foreground">Itens da comanda</p>
-                    <Button variant="outline" size="sm" className="h-7 gap-1.5 text-xs" onClick={() => setEtapa("carrinho")}>
-                      <Plus className="h-3.5 w-3.5" /> Adicionar item
-                    </Button>
+                    <button onClick={() => setEtapa("carrinho")} className="text-xs font-medium text-info hover:underline">
+                      + Adicionar item
+                    </button>
                   </div>
                   {listaItens()}
                 </div>
@@ -855,6 +914,7 @@ export function ComandaConteudo({
                   </div>
                 </div>
                 </div>
+                {faixaSugestoes("mx-4 mb-3")}
                 <div className="border-t border-border p-4">
                   <div className="mb-3 flex items-baseline justify-between">
                     <span className="text-sm font-semibold">Total</span>
@@ -894,19 +954,38 @@ export function ComandaConteudo({
                   className="h-9 pl-9 text-sm"
                 />
               </div>
-              <div className="mb-4 flex flex-wrap gap-1.5">
-                {abas.map((a) => (
-                  <button
-                    key={a.value}
-                    onClick={() => {
-                      setBusca("");
-                      setAba(a.value);
-                    }}
-                    className={cn("filter-chip", !(aba === a.value && !busca) && "border-border bg-card shadow-none hover:bg-muted")}
-                  >
-                    {a.label}
-                  </button>
-                ))}
+              <div className="mb-4 flex flex-wrap border-b border-border">
+                {abas.map((a) => {
+                  const ativa = aba === a.value && !busca;
+                  const qtd = a.value === "rapida" ? undefined : a.value === "sugestoes" ? recompraSugestoes.length : catalogo[a.value].length;
+                  return (
+                    <button
+                      key={a.value}
+                      onClick={() => {
+                        setBusca("");
+                        setAba(a.value);
+                      }}
+                      className={cn(
+                        "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-xs font-medium transition-colors",
+                        ativa
+                          ? "border-foreground text-foreground"
+                          : "border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground",
+                      )}
+                    >
+                      {a.label}
+                      {qtd !== undefined && (
+                        <span
+                          className={cn(
+                            "ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums",
+                            ativa ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
+                          )}
+                        >
+                          {qtd}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {listaCatalogo.map((c) => (
