@@ -75,7 +75,51 @@ type Item = {
   assistentes?: string[];
 };
 
-const equipeSalao = ["Cesar", "Claudia", "Marcia Silva", "Matheus", "Vini"];
+// Mesmas iniciais e cores do cabeçalho da agenda (ainda não há foto cadastrada)
+const equipeSalao = [
+  { nome: "Cesar", iniciais: "CE", cor: "bg-amber-700 text-white" },
+  { nome: "Claudia", iniciais: "CL", cor: "bg-pink-500 text-white" },
+  { nome: "Marcia Silva", iniciais: "MS", cor: "bg-rose-400 text-white" },
+  { nome: "Matheus", iniciais: "MA", cor: "bg-stone-700 text-white" },
+  { nome: "Vini", iniciais: "VI", cor: "bg-indigo-500 text-white" },
+];
+
+const FotoProf = ({ nome, tamanho = "h-5 w-5 text-[9px]" }: { nome?: string; tamanho?: string }) => {
+  const p = equipeSalao.find((e) => e.nome === nome);
+  return (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
+        tamanho,
+        p?.cor ?? "bg-muted text-muted-foreground",
+      )}
+    >
+      {p?.iniciais ?? "?"}
+    </span>
+  );
+};
+
+// Cores das categorias de serviço (as mesmas cadastradas em Categorias)
+const categorias: Record<string, string> = {
+  Cabelo: "#3b82f6",
+  Barba: "#78716c",
+  Química: "#a855f7",
+  Tratamento: "#00c5b4",
+  Unhas: "#ec4899",
+  Estética: "#f59e0b",
+};
+
+const categoriaDe = (servico: string) => {
+  const s = servico.toLowerCase();
+  if (/barba/.test(s)) return "Barba";
+  if (/colora|mecha|luzes|progressiva|relax/.test(s)) return "Química";
+  if (/hidrata|cauteriz|reconstr/.test(s)) return "Tratamento";
+  if (/manicure|pedicure|unha|esmalt|pé e mão/.test(s)) return "Unhas";
+  if (/sobrancelha|limpeza/.test(s)) return "Estética";
+  return "Cabelo";
+};
+
+const corCategoria = (servico: string) => categorias[categoriaDe(servico)];
 
 type CatalogoItem = { nome: string; valor: number; detalhe?: string; tipo: Item["tipo"]; semEstoque?: boolean };
 
@@ -224,6 +268,7 @@ export function ComandaConteudo({
   const [pagamentos, setPagamentos] = useState<Pagamento[]>([]);
   const [novoPgForma, setNovoPgForma] = useState("");
   const [novoPgValor, setNovoPgValor] = useState("");
+  const [editandoPreco, setEditandoPreco] = useState<number | null>(null);
 
   // Cada agendamento aberto começa uma comanda nova
   useEffect(() => {
@@ -282,7 +327,7 @@ export function ComandaConteudo({
           id: Date.now(),
           descricao: c.nome,
           detalhe: c.tipo === "produto" ? "Produto" : "",
-          profissional: c.tipo === "produto" ? undefined : agendamento.profissional || equipeSalao[0],
+          profissional: c.tipo === "produto" ? undefined : agendamento.profissional || equipeSalao[0].nome,
           assistentes: c.tipo === "produto" ? undefined : [],
           valor: c.valor,
           tipo: c.tipo,
@@ -361,69 +406,108 @@ export function ComandaConteudo({
   );
 
   // Profissional e assistentes de um serviço, editáveis direto na linha do item
+  const disponiveis = (i: Item) =>
+    equipeSalao.filter((e) => e.nome !== i.profissional && !(i.assistentes ?? []).includes(e.nome));
+
+  // Profissional e assistentes de um serviço, editáveis direto na linha do item
   const equipe = (i: Item) => (
-    <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
-      {i.horario && <span>{i.horario} ·</span>}
+    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+      {i.horario && <span className="mr-0.5">{i.horario}</span>}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="inline-flex items-center gap-0.5 rounded px-0.5 text-foreground hover:bg-muted">
-            {i.profissional ?? "Escolher profissional"}
+          <button className="inline-flex h-6 items-center gap-1.5 rounded-[30px] border border-border bg-card pl-0.5 pr-2 text-foreground hover:bg-muted">
+            <FotoProf nome={i.profissional} />
+            {i.profissional ?? "Profissional"}
             <ChevronDown className="h-3 w-3 text-muted-foreground" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48">
-          {equipeSalao.map((nome) => (
+        <DropdownMenuContent align="start" className="w-52">
+          {equipeSalao.map((e) => (
             <DropdownMenuItem
-              key={nome}
+              key={e.nome}
+              className="gap-2"
               onClick={() =>
                 alterarItem(i.id, (it) => ({
                   ...it,
-                  profissional: nome,
-                  assistentes: (it.assistentes ?? []).filter((a) => a !== nome),
+                  profissional: e.nome,
+                  assistentes: (it.assistentes ?? []).filter((n) => n !== e.nome),
                 }))
               }
             >
-              {nome}
-              {nome === i.profissional && <Check className="ml-auto h-3.5 w-3.5" />}
+              <FotoProf nome={e.nome} tamanho="h-6 w-6 text-[10px]" />
+              {e.nome}
+              {e.nome === i.profissional && <Check className="ml-auto h-3.5 w-3.5" />}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
       {(i.assistentes ?? []).map((nome) => (
-        <span key={nome} className="inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[11px] text-foreground">
+        <span key={nome} className="inline-flex h-6 items-center gap-1.5 rounded-[30px] bg-muted pl-0.5 pr-2 text-foreground">
+          <FotoProf nome={nome} />
           {nome}
           <button
-            onClick={() => alterarItem(i.id, (it) => ({ ...it, assistentes: (it.assistentes ?? []).filter((a) => a !== nome) }))}
+            onClick={() => alterarItem(i.id, (it) => ({ ...it, assistentes: (it.assistentes ?? []).filter((n) => n !== nome) }))}
             className="text-muted-foreground hover:text-foreground"
             aria-label={`Tirar ${nome} de assistente`}
           >
-            <X className="h-2.5 w-2.5" />
+            <X className="h-3 w-3" />
           </button>
         </span>
       ))}
-      {equipeSalao.some((n) => n !== i.profissional && !(i.assistentes ?? []).includes(n)) && (
+      {disponiveis(i).length > 0 && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="inline-flex items-center gap-0.5 rounded px-0.5 hover:bg-muted hover:text-foreground">
+            <button className="inline-flex h-6 items-center gap-1 rounded-[30px] border border-dashed border-border px-2 hover:bg-muted hover:text-foreground">
               <Plus className="h-3 w-3" /> Assistente
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            {equipeSalao
-              .filter((n) => n !== i.profissional && !(i.assistentes ?? []).includes(n))
-              .map((nome) => (
-                <DropdownMenuItem
-                  key={nome}
-                  onClick={() => alterarItem(i.id, (it) => ({ ...it, assistentes: [...(it.assistentes ?? []), nome] }))}
-                >
-                  {nome}
-                </DropdownMenuItem>
-              ))}
+          <DropdownMenuContent align="start" className="w-52">
+            {disponiveis(i).map((e) => (
+              <DropdownMenuItem
+                key={e.nome}
+                className="gap-2"
+                onClick={() => alterarItem(i.id, (it) => ({ ...it, assistentes: [...(it.assistentes ?? []), e.nome] }))}
+              >
+                <FotoProf nome={e.nome} tamanho="h-6 w-6 text-[10px]" />
+                {e.nome}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       )}
     </div>
   );
+
+  // Preço editável: clica no valor, digita e confirma com Enter (Esc cancela)
+  const preco = (i: Item, compacto: boolean) =>
+    editandoPreco === i.id ? (
+      <Input
+        autoFocus
+        defaultValue={i.valor.toFixed(2).replace(".", ",")}
+        aria-label={`Preço de ${i.descricao}`}
+        className="h-7 w-24 text-right text-xs tabular-nums"
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setEditandoPreco(null);
+          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+        }}
+        onBlur={(e) => {
+          const v = parseFloat(e.target.value.replace(/\./g, "").replace(",", "."));
+          if (!isNaN(v) && v >= 0) alterarItem(i.id, (it) => ({ ...it, valor: v }));
+          setEditandoPreco(null);
+        }}
+      />
+    ) : (
+      <button
+        onClick={() => setEditandoPreco(i.id)}
+        title="Editar preço"
+        className={cn(
+          "rounded px-1 tabular-nums underline-offset-2 hover:bg-muted hover:underline",
+          compacto ? "text-[13px]" : "text-[13.5px]",
+        )}
+      >
+        {R$(valorItem(i))}
+      </button>
+    );
 
   const listaItens = (compacto = false) => (
     <div className={cn("space-y-3", compacto && "space-y-2.5")}>
@@ -431,10 +515,8 @@ export function ComandaConteudo({
       {itens.map((i) => (
         <div
           key={i.id}
-          className={cn(
-            "group border-l-[3px] py-1 pl-3",
-            i.tipo === "produto" ? "border-border" : "border-primary",
-          )}
+          className={cn("group border-l-[3px] py-1 pl-3", i.tipo === "produto" && "border-border")}
+          style={i.tipo === "produto" ? undefined : { borderLeftColor: corCategoria(i.descricao) }}
         >
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
@@ -481,7 +563,7 @@ export function ComandaConteudo({
               )}
             </div>
             <div className="flex items-center gap-1">
-              <span className={cn("tabular-nums", compacto ? "text-[13px]" : "text-[13.5px]")}>{R$(valorItem(i))}</span>
+              {preco(i, compacto)}
               <button
                 onClick={() => removerItem(i.id)}
                 className="text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100 focus-visible:opacity-100"
@@ -697,11 +779,13 @@ export function ComandaConteudo({
                   </div>
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-                  <p className={cn(rotulo, "mb-4")}>Itens da comanda</p>
+                  <div className="mb-4 flex items-center justify-between gap-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-foreground">Itens da comanda</p>
+                    <Button variant="outline" size="sm" className="h-7 gap-1.5 text-xs" onClick={() => setEtapa("carrinho")}>
+                      <Plus className="h-3.5 w-3.5" /> Adicionar item
+                    </Button>
+                  </div>
                   {listaItens()}
-                  <Button variant="outline" size="sm" className="mt-5 h-8 gap-1.5 text-xs" onClick={() => setEtapa("carrinho")}>
-                    <Plus className="h-3.5 w-3.5" /> Adicionar item
-                  </Button>
                 </div>
               </section>
 
@@ -836,7 +920,7 @@ export function ComandaConteudo({
                         <Package className="h-4 w-4" />
                       </span>
                     ) : (
-                      <span className="w-[3px] shrink-0 bg-primary" />
+                      <span className="w-[3px] shrink-0" style={{ backgroundColor: corCategoria(c.nome) }} />
                     )}
                     <span className="min-w-0 px-3 py-2">
                       <span className="block truncate text-[13px] font-medium">{c.nome}</span>
