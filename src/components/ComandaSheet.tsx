@@ -540,109 +540,111 @@ export function ComandaConteudo({
         <div className="flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden">
 
         {etapa === "agendamento" && (
-          <>
-            {/* Agendamento */}
-            <section className="flex min-h-0 min-w-0 flex-1 flex-col">
-              <div className="bg-header px-5 py-4 text-header-foreground">
-                {variante === "caixa" ? (
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold tracking-tight">Comanda #{numeroComanda}</p>
-                      <p className="mt-0.5 text-xs opacity-75">Aberta em {agendamento.data} · Balcão</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                          status === "finalizado" ? "bg-success/20 text-success" : "bg-primary/25 text-white",
-                        )}
-                      >
-                        {status === "finalizado" ? "Paga" : "Em aberto"}
-                      </span>
-                      <button
-                        onClick={() => toast("Comanda excluída", noTopo)}
-                        className="rounded-md p-1.5 opacity-75 hover:bg-white/10 hover:opacity-100"
-                        aria-label="Excluir comanda"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                <>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-lg font-semibold tracking-tight">{agendamento.data}</p>
-                    <p className="mt-0.5 text-xs opacity-75">
-                      {agendamento.inicio} – {agendamento.fim} · {agendamento.profissional}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/[0.08] px-3 py-1.5 text-xs font-medium hover:bg-white/[0.14]">
-                          <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
-                          {statusAtual.label}
-                          <ChevronDown className="h-3.5 w-3.5" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-44">
-                        {statusOpcoes.map((s) => (
-                          <DropdownMenuItem key={s.value} onClick={() => setStatus(s.value)}>
-                            <span className={cn("mr-2 h-2 w-2 rounded-full", s.cor)} />
-                            {s.label}
-                            {s.value === status && <Check className="ml-auto h-3.5 w-3.5" />}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <button
-                      onClick={() => onFechar()}
-                      className="rounded-md p-1.5 opacity-75 hover:bg-white/10 hover:opacity-100"
-                      aria-label="Fechar"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            {/* Faixa clara: cliente à esquerda, comanda e ações à direita */}
+            <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-5 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                  {iniciais}
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
-                  <p className="flex items-center gap-2 text-xs">
-                    <span className="font-medium">Comanda #{numeroComanda}</span>
-                    <span
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                        status === "finalizado" ? "bg-success/20 text-success" : "bg-primary/25 text-white",
-                      )}
-                    >
-                      {status === "finalizado" ? "Paga" : "Em aberto"}
-                    </span>
+                <div className="min-w-0">
+                  <p className="truncate text-[15px] font-semibold leading-tight">{agendamento.cliente}</p>
+                  <p className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">
+                    <Crown className="h-3.5 w-3.5 shrink-0" /> Assinante · R$ 0,00 em créditos
+                    {agendamento.telefone && <span className="hidden lg:inline">· {agendamento.telefone}</span>}
                   </p>
-                  <button
-                    onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-white/20 px-2.5 py-1 text-xs font-medium hover:bg-white/10"
-                  >
-                    <Bell className="h-3.5 w-3.5 text-warning" /> Enviar lembrete
-                  </button>
                 </div>
-                </>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  #{numeroComanda} ·{" "}
+                  {variante === "caixa"
+                    ? `Aberta em ${agendamento.data.slice(0, 5)} · Balcão`
+                    : `${agendamento.data.slice(0, 5)} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
+                </span>
+                <span
+                  className={cn(
+                    "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                    status === "finalizado" ? "bg-success/10 text-success" : "bg-primary/10 text-primary",
+                  )}
+                >
+                  {status === "finalizado" ? "Paga" : "Em aberto"}
+                </span>
+                {variante === "agenda" && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-xs font-medium hover:bg-muted">
+                        <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
+                        {statusAtual.label}
+                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      {statusOpcoes.map((s) => (
+                        <DropdownMenuItem key={s.value} onClick={() => setStatus(s.value)}>
+                          <span className={cn("mr-2 h-2 w-2 rounded-full", s.cor)} />
+                          {s.label}
+                          {s.value === status && <Check className="ml-auto h-3.5 w-3.5" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 gap-1 px-2.5 text-xs">
+                      Ações <ChevronDown className="h-3.5 w-3.5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => toast("Abrindo ficha da cliente", noTopo)}>Ver ficha</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => toast("Abrindo histórico", noTopo)}>Histórico de visitas</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}>
+                      <Bell className="mr-2 h-4 w-4" /> Enviar lembrete
+                    </DropdownMenuItem>
+                    {variante === "caixa" && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => toast("Comanda excluída", noTopo)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Excluir comanda
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {variante === "agenda" && (
+                  <button
+                    onClick={() => onFechar()}
+                    className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    aria-label="Fechar"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 )}
               </div>
+            </header>
 
-              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-                <p className={cn(rotulo, "mb-4")}>Itens da comanda</p>
-                {listaItens()}
-                <Button variant="outline" size="sm" className="mt-5 h-8 gap-1.5 text-xs" onClick={() => setEtapa("carrinho")}>
-                  <Plus className="h-3.5 w-3.5" /> Adicionar item
-                </Button>
-              </div>
-            </section>
+            <div className="flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden">
+              <section className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+                  <p className={cn(rotulo, "mb-4")}>Itens da comanda</p>
+                  {listaItens()}
+                  <Button variant="outline" size="sm" className="mt-5 h-8 gap-1.5 text-xs" onClick={() => setEtapa("carrinho")}>
+                    <Plus className="h-3.5 w-3.5" /> Adicionar item
+                  </Button>
+                </div>
+              </section>
 
-            {/* Cliente + total: mesma coluna e rodapé do carrinho, o botão principal não muda de lugar */}
-            <aside className="flex w-full shrink-0 flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
-              <div className="min-h-0 flex-1 overflow-y-auto">
-                {cartaoCliente()}
-
-                <div className="space-y-3 px-4 pb-4 text-xs">
+              {/* Dados da cliente + total: mesma largura e rodapé do carrinho, o botão principal não muda de lugar */}
+              <aside className="flex w-full shrink-0 flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 text-xs">
+                  <p className={rotulo}>Sobre a cliente</p>
                   <dl className="grid grid-cols-4 divide-x divide-border">
                     {[
                       { label: "Moedas", valor: "0" },
@@ -650,69 +652,74 @@ export function ComandaConteudo({
                       { label: "Débitos", valor: R$(0) },
                       { label: "Créditos", valor: R$(0) },
                     ].map(({ label, valor }) => (
-                      <div key={label} className="px-2 first:pl-1">
+                      <div key={label} className="px-2 first:pl-0">
                         <dt className="text-[11px] text-muted-foreground">{label}</dt>
                         <dd className="text-[13px] font-medium tabular-nums">{valor}</dd>
                       </div>
                     ))}
                   </dl>
-                  <p className="flex items-start gap-2">
-                    <History className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                    <span>
-                      Última visita {ultimaVisita.data.slice(0, 5)} · {ultimaVisita.servico}
-                    </span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <RefreshCw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                    <span>Retorno ideal em 28 dias</span>
-                  </p>
-
-                  {editandoObs ? (
-                    <div className="space-y-2">
-                      <Textarea
-                        autoFocus
-                        value={obs}
-                        onChange={(e) => setObs(e.target.value)}
-                        placeholder="Ex: alérgica a dipirona, não cortar franja"
-                        className="min-h-[70px] resize-none text-xs"
-                      />
-                      <Button size="sm" variant="outline" className="h-7 w-full text-xs" onClick={() => setEditandoObs(false)}>
-                        Salvar observação
-                      </Button>
-                    </div>
-                  ) : obs ? (
-                    <button
-                      onClick={() => setEditandoObs(true)}
-                      className="w-full rounded-lg bg-warning/10 px-3 py-2 text-left"
-                    >
-                      <span className="flex items-start gap-2">
-                        <StickyNote className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {obs}
+                  <div className="space-y-2.5 border-t border-border pt-4">
+                    <p className="flex items-start gap-2">
+                      <Crown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span>Plano Especial · ativo</span>
+                    </p>
+                    <p className="flex items-start gap-2">
+                      <History className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span>
+                        Última visita {ultimaVisita.data.slice(0, 5)} · {ultimaVisita.servico}
                       </span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setEditandoObs(true)}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-                    >
-                      <StickyNote className="h-3.5 w-3.5" /> Adicionar observação
-                    </button>
-                  )}
+                    </p>
+                    <p className="flex items-start gap-2">
+                      <RefreshCw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span>Retorno ideal em 28 dias</span>
+                    </p>
+                    {editandoObs ? (
+                      <div className="space-y-2">
+                        <Textarea
+                          autoFocus
+                          value={obs}
+                          onChange={(e) => setObs(e.target.value)}
+                          placeholder="Ex: alérgica a dipirona, não cortar franja"
+                          className="min-h-[70px] resize-none text-xs"
+                        />
+                        <Button size="sm" variant="outline" className="h-7 w-full text-xs" onClick={() => setEditandoObs(false)}>
+                          Salvar observação
+                        </Button>
+                      </div>
+                    ) : obs ? (
+                      <button
+                        onClick={() => setEditandoObs(true)}
+                        className="w-full rounded-lg bg-warning/10 px-3 py-2 text-left"
+                      >
+                        <span className="flex items-start gap-2">
+                          <StickyNote className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {obs}
+                        </span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setEditandoObs(true)}
+                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+                      >
+                        <StickyNote className="h-3.5 w-3.5" /> Adicionar observação
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="border-t border-border p-4">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <span className="text-sm font-semibold">Total</span>
-                  <span className="text-base font-semibold tabular-nums">{R$(total)}</span>
+                <div className="border-t border-border p-4">
+                  <div className="mb-3 flex items-baseline justify-between">
+                    <span className="text-sm font-semibold">Total</span>
+                    <span className="text-base font-semibold tabular-nums">{R$(total)}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    {menuMais()}
+                    <Button className="h-9 flex-1 font-semibold" onClick={() => setEtapa("pagamento")}>
+                      Fechar comanda
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  {menuMais()}
-                  <Button className="h-9 flex-1 font-semibold" onClick={() => setEtapa("pagamento")}>
-                    Fechar comanda
-                  </Button>
-                </div>
-              </div>
-            </aside>
-          </>
+              </aside>
+            </div>
+          </div>
         )}
 
         {etapa === "carrinho" && (
