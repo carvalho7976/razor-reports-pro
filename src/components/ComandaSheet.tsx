@@ -32,8 +32,6 @@ import {
   Link2,
   Bell,
   Minus,
-  FileText,
-  Wallet,
   MoreVertical,
   Package,
   Plus,
@@ -416,25 +414,47 @@ export function ComandaConteudo({
     </div>
   );
 
+  // Card da cliente: o mesmo em todas as etapas (agendamento, carrinho e pagamento)
+  const subtituloCliente = agendamento.telefone ?? [agendamento.data, agendamento.inicio].filter(Boolean).join(" · ");
+  const cartaoCliente = () => (
+    <div className="m-4 rounded-xl border border-border p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
+          <p className="truncate text-xs text-muted-foreground">{subtituloCliente}</p>
+        </div>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+          {iniciais}
+        </div>
+      </div>
+      <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-xs text-muted-foreground">
+        <span className="flex min-w-0 items-center gap-1.5 truncate">
+          <Crown className="h-3.5 w-3.5 shrink-0" /> Assinante · R$ 0,00 em créditos
+        </span>
+        <div className="flex shrink-0 items-center gap-1">
+          <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-0.5 rounded px-1 font-medium text-foreground hover:bg-muted">
+                Ações <ChevronDown className="h-3 w-3" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast("Abrindo ficha da cliente", noTopo)}>Ver ficha</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast("Abrindo histórico", noTopo)}>Histórico de visitas</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setEtapa("carrinho")}>Cobrar avulso</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </div>
+  );
+
   // Coluna direita do carrinho e do pagamento
   const painelCarrinho = (botao: string, onBotao: () => void) => (
     <aside className="flex min-h-0 w-full flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
-      <div className="m-4 rounded-xl border border-border p-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              {agendamento.telefone ?? `${agendamento.data} · ${agendamento.inicio}`}
-            </p>
-          </div>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-            {iniciais}
-          </div>
-        </div>
-        <p className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-xs text-muted-foreground">
-          <Crown className="h-3.5 w-3.5" /> Assinante · R$ 0,00 em créditos
-        </p>
-      </div>
+      {cartaoCliente()}
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2">
         {listaItens(true)}
@@ -620,61 +640,22 @@ export function ComandaConteudo({
             {/* Cliente + total: mesma coluna e rodapé do carrinho, o botão principal não muda de lugar */}
             <aside className="flex w-full shrink-0 flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
               <div className="min-h-0 flex-1 overflow-y-auto">
-                <div className="flex items-center gap-3 px-5 py-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                    {iniciais}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
-                    {agendamento.telefone && (
-                      <p className="truncate text-xs text-muted-foreground">{agendamento.telefone}</p>
-                    )}
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} />
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8 gap-1 px-2.5 text-xs">
-                          Ações <ChevronDown className="h-3.5 w-3.5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast("Abrindo histórico", noTopo)}>Histórico de visitas</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setEtapa("carrinho")}>Cobrar avulso</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
+                {cartaoCliente()}
 
-                <div className="space-y-3 border-t border-border px-5 py-4 text-xs">
-                  <div className="grid grid-cols-4 gap-1.5">
+                <div className="space-y-3 px-4 pb-4 text-xs">
+                  <dl className="grid grid-cols-4 divide-x divide-border">
                     {[
-                      { icon: Coins, label: "Moedas", valor: "0" },
-                      { icon: Package, label: "Packs", valor: "1" },
-                      { icon: Wallet, label: "Débitos", valor: R$(0) },
-                      { icon: CreditCard, label: "Créditos", valor: R$(0) },
-                    ].map(({ icon: Icone, label, valor }) => (
-                      <div key={label} className="rounded-md border border-border px-2 py-1.5">
-                        <p className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
-                          <Icone className="h-3 w-3" /> {label}
-                        </p>
-                        <p className="font-semibold tabular-nums">{valor}</p>
+                      { label: "Moedas", valor: "0" },
+                      { label: "Packs", valor: "1" },
+                      { label: "Débitos", valor: R$(0) },
+                      { label: "Créditos", valor: R$(0) },
+                    ].map(({ label, valor }) => (
+                      <div key={label} className="px-2 first:pl-1">
+                        <dt className="text-[11px] text-muted-foreground">{label}</dt>
+                        <dd className="text-[13px] font-medium tabular-nums">{valor}</dd>
                       </div>
                     ))}
-                  </div>
-                  <button
-                    onClick={() => toast("Abrindo ficha da cliente", noTopo)}
-                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-                  >
-                    <FileText className="h-3.5 w-3.5" /> Ver ficha
-                  </button>
-                  <div className="rounded-lg bg-muted px-3 py-2">
-                    <p className="flex items-center gap-1.5 font-medium">
-                      <Crown className="h-3.5 w-3.5" /> Assinante
-                    </p>
-                    <p className="text-muted-foreground">Plano Especial · ativo</p>
-                  </div>
+                  </dl>
                   <p className="flex items-start gap-2">
                     <History className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                     <span>
