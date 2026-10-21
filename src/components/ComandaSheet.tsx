@@ -939,23 +939,17 @@ export function ComandaConteudo({
                     )}
                   </div>
                 </div>
-                {/* Picote delicado: furinhos redondos em linha e meia-lua nas bordas (só no caixa, onde há fundo de fora) */}
-                <div className="relative h-1 shrink-0">
+                {/* Picote: o mesmo semicírculo das bordas repetido ao longo da linha (furos na cor do fundo) */}
+                <div aria-hidden="true" className="relative -my-1.5 h-3 shrink-0 overflow-hidden">
                   <span
-                    aria-hidden="true"
-                    className="absolute inset-x-4 top-0 h-1"
+                    className="absolute -inset-x-1.5 inset-y-0"
                     style={{
-                      backgroundImage: "radial-gradient(circle, hsl(var(--muted-foreground) / 0.35) 1.25px, transparent 1.5px)",
-                      backgroundSize: "7px 4px",
-                      backgroundPosition: "center",
+                      backgroundImage:
+                        "radial-gradient(circle, hsl(var(--background)) 5px, hsl(var(--border)) 5px, hsl(var(--border)) 5.75px, transparent 6.25px)",
+                      backgroundSize: "22px 12px",
+                      backgroundRepeat: "round",
                     }}
                   />
-                  {variante === "caixa" && (
-                    <>
-                      <span className="absolute -left-1.5 -top-1 h-3 w-3 rounded-full bg-background" />
-                      <span className="absolute -right-1.5 -top-1 h-3 w-3 rounded-full bg-background" />
-                    </>
-                  )}
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <div className="mb-4 flex items-center justify-between gap-2">
