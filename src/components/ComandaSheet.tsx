@@ -1197,7 +1197,7 @@ export function ComandaConteudo({
                     {observacoes.length === 0 && !editandoObs && (
                       <p className="text-[13px] text-muted-foreground">Nenhuma observação registrada.</p>
                     )}
-                    <ul className="space-y-2.5">
+                    <ul className={cn("space-y-2.5", !obsAbertas && "hidden")}>
                       {observacoes.map((o) => (
                         <li key={o.id} className="flex items-start gap-2.5">
                           <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
