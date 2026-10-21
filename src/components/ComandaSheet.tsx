@@ -952,7 +952,7 @@ export function ComandaConteudo({
     <aside className={cn("flex min-h-0 w-full flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
       {cartaoCliente()}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {listaItens(true)}
       </div>
 
@@ -1119,7 +1119,7 @@ export function ComandaConteudo({
 
               {/* Dados da cliente + total: mesma largura e rodapé do carrinho, o botão principal não muda de lugar */}
               <aside className={cn("flex w-full shrink-0 flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
-                <div className="min-h-0 flex-1 overflow-y-auto">
+                <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {cartaoCliente()}
                 <div className="mt-4 space-y-4 border-t border-border px-4 pb-4 pt-4 text-[13px]">
                   <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
