@@ -142,11 +142,11 @@ export default function FrenteCaixa() {
           </div>
         </aside>
 
-        <section className="flex min-h-[560px] min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-card">
+        <section className="flex min-h-[560px] min-w-0 flex-1 flex-col">
           {selecionada ? (
             <ComandaConteudo agendamento={selecionada} variante="caixa" onFechar={fecharSelecionada} />
           ) : (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl bg-card p-8 text-center">
               <p className="text-sm font-semibold">Nenhuma comanda selecionada</p>
               <p className="max-w-xs text-[13px] text-muted-foreground">
                 Escolha uma comanda aberta na lista ou abra uma nova para vender no balcão.

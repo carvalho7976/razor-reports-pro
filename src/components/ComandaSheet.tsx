@@ -236,6 +236,9 @@ const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa
 const noTopo = { position: "top-center" as const };
 
 // Ação principal no padrão do sistema: botão escuro, o mesmo do "Novo" das tabelas
+// Frente de caixa: cada coluna da comanda vira um card separado
+const cartaoColuna = "overflow-hidden rounded-xl bg-card";
+
 const btnPrincipal = "bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.85)]";
 
 // Campos de dinheiro: ao clicar já seleciona tudo, para digitar por cima sem apagar
@@ -778,7 +781,7 @@ export function ComandaConteudo({
 
   // Coluna direita do carrinho e do pagamento
   const painelCarrinho = (botao: string, onBotao: () => void) => (
-    <aside className="flex min-h-0 w-full flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
+    <aside className={cn("flex min-h-0 w-full flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
       {cartaoCliente()}
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2">
@@ -873,13 +876,13 @@ export function ComandaConteudo({
   );
 
   return (
-        <div className="flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden">
+        <div className={cn("flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden", variante === "caixa" && "gap-4")}>
 
         {etapa === "agendamento" && (
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">
 
-            <div className="flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden">
-              <section className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div className={cn("flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden", variante === "caixa" && "gap-4")}>
+              <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
                 <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
@@ -942,7 +945,7 @@ export function ComandaConteudo({
               </section>
 
               {/* Dados da cliente + total: mesma largura e rodapé do carrinho, o botão principal não muda de lugar */}
-              <aside className="flex w-full shrink-0 flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
+              <aside className={cn("flex w-full shrink-0 flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
                 <div className="min-h-0 flex-1 overflow-y-auto">
                 {cartaoCliente()}
                 <div className="space-y-4 px-4 pb-4 text-[13px]">
@@ -1042,7 +1045,7 @@ export function ComandaConteudo({
 
         {etapa === "carrinho" && (
           <>
-            <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-5 py-4">
+            <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-5 py-4", variante === "caixa" && cartaoColuna)}>
               <div className="flex items-center justify-between">
                 {trilha("carrinho")}
                 <button
@@ -1134,7 +1137,7 @@ export function ComandaConteudo({
 
         {etapa === "pagamento" && (
           <>
-            <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-5 py-4">
+            <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-5 py-4", variante === "caixa" && cartaoColuna)}>
               <div className="flex items-center justify-between">
                 {trilha("pagamento")}
                 <button
@@ -1226,7 +1229,7 @@ export function ComandaConteudo({
         )}
 
         {etapa === "pago" && (
-          <section className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
+          <section className={cn("flex flex-1 flex-col items-center justify-center px-6 py-16 text-center", variante === "caixa" && cartaoColuna)}>
             {/* Anel verde carrega, preenche e o check aparece (estilo Mercado Pago) */}
             <svg viewBox="0 0 64 64" className="h-16 w-16 text-success" aria-hidden="true">
               <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="4" />
