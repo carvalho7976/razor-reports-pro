@@ -374,8 +374,9 @@ export function ComandaConteudo({
   const [observacoes, setObservacoes] = useState<Observacao[]>(observacoesExemplo);
   const [obs, setObs] = useState("");
   const [editandoObs, setEditandoObs] = useState(false);
-  const [pacotesAbertos, setPacotesAbertos] = useState(false);
-  const [obsAbertas, setObsAbertas] = useState(false);
+  // Recolhíveis: com um único item já nascem abertos; com vários, recolhidos
+  const [pacotesAbertos, setPacotesAbertos] = useState(pacotesCliente.length === 1);
+  const [obsAbertas, setObsAbertas] = useState(observacoes.length === 1);
   const [itens, setItens] = useState<Item[]>(() => itensIniciais(agendamento, variante));
   const [aba, setAba] = useState<Aba>("rapida");
   const [busca, setBusca] = useState("");
@@ -391,6 +392,11 @@ export function ComandaConteudo({
   const [imprimir, setImprimir] = useState(false);
   const [emitirNota, setEmitirNota] = useState(false);
   const [resumoPago, setResumoPago] = useState<string[]>([]);
+
+  // Ficou com uma só observação (apagou ou é a primeira): abre sozinha
+  useEffect(() => {
+    if (observacoes.length === 1) setObsAbertas(true);
+  }, [observacoes.length]);
 
   // Cada agendamento aberto começa uma comanda nova
   useEffect(() => {
