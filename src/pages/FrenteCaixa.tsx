@@ -5,6 +5,7 @@ import { ComandaConteudo, type ComandaAgendamento } from "@/components/ComandaSh
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { EscolherClienteDialog, type ClienteResumo } from "@/components/EscolherClienteDialog";
 import { DateRangePicker, type DatePreset } from "@/components/DataTable";
 import type { DateRange } from "react-day-picker";
 import { endOfDay, isWithinInterval, parse, startOfDay } from "date-fns";
@@ -61,20 +62,27 @@ export default function FrenteCaixa() {
 
   const selecionada = comandas.find((c) => c.id === selecionadaId) ?? null;
 
-  const novaComanda = () => {
+  // "+ Nova" abre a escolha da cliente; a comanda nasce vazia e já no catálogo
+  const [escolhendoCliente, setEscolhendoCliente] = useState(false);
+  const novaComanda = () => setEscolhendoCliente(true);
+
+  const abrirComanda = (cliente: ClienteResumo) => {
     const nova: ComandaAberta = {
       id: Math.max(...comandas.map((c) => c.id), 3961387) + 1,
-      cliente: "Cliente avulso",
-      servico: "Venda balcão",
+      cliente: cliente.nome,
+      telefone: cliente.telefone,
+      servico: "",
       profissional: "",
       inicio: "",
       fim: "",
       data: hoje(),
       abertaEm: hoje().slice(0, 5),
       valor: 0,
+      nova: true,
     };
     setComandas((prev) => [nova, ...prev]);
     setSelecionadaId(nova.id);
+    setEscolhendoCliente(false);
   };
 
   // Comanda paga sai da lista de abertas e a próxima fica selecionada
@@ -167,6 +175,7 @@ export default function FrenteCaixa() {
           )}
         </section>
       </div>
+      <EscolherClienteDialog open={escolhendoCliente} onOpenChange={setEscolhendoCliente} onEscolher={abrirComanda} />
     </AppLayout>
   );
 }

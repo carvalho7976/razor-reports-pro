@@ -62,6 +62,8 @@ export type ComandaAgendamento = {
   fim: string;
   data: string;
   telefone?: string;
+  /** Comanda recém-aberta no caixa: começa vazia e já no catálogo */
+  nova?: boolean;
   /** De onde veio a comanda (Balcão, Agenda...). Padrão: Balcão */
   origem?: string;
   /** Cartão já salvo no cadastro da cliente, oferecido primeiro no pagamento */
@@ -216,6 +218,7 @@ const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currenc
 const tituloSecao = "text-xs font-semibold uppercase tracking-wide text-foreground";
 
 const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa"): Item[] => {
+  if (a?.nova) return [];
   const servico: Item = {
     id: 1,
     descricao: a?.servico ?? "Serviço",
@@ -311,7 +314,7 @@ export function ComandaConteudo({
   variante?: "agenda" | "caixa";
   onFechar: () => void;
 }) {
-  const [etapa, setEtapa] = useState<Etapa>("agendamento");
+  const [etapa, setEtapa] = useState<Etapa>(agendamento?.nova ? "carrinho" : "agendamento");
   const [status, setStatus] = useState("agendado");
   const [obs, setObs] = useState("");
   const [editandoObs, setEditandoObs] = useState(false);
@@ -333,7 +336,7 @@ export function ComandaConteudo({
 
   // Cada agendamento aberto começa uma comanda nova
   useEffect(() => {
-    setEtapa("agendamento");
+    setEtapa(agendamento?.nova ? "carrinho" : "agendamento");
     setStatus("agendado");
     setObs("");
     setEditandoObs(false);
