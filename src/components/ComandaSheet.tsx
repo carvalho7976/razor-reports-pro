@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { BandeiraCartao } from "@/components/BandeiraCartao";
 import { cn } from "@/lib/utils";
 
 export type ComandaAgendamento = {
@@ -761,7 +762,18 @@ export function ComandaConteudo({
     </div>
   );
 
-  const cardForma = ({ value, icon: Icon, sub }: { value: string; icon: typeof Crown; sub?: string }) => (
+  const cardForma = ({
+    value,
+    icon: Icon,
+    sub,
+    marca,
+  }: {
+    value: string;
+    icon?: typeof Crown;
+    sub?: string;
+    /** Logo colorido no lugar do ícone (ex.: bandeira do cartão salvo) */
+    marca?: ReactNode;
+  }) => (
     <button
       key={value}
       onClick={() => setForma(value)}
@@ -770,7 +782,8 @@ export function ComandaConteudo({
         forma === value ? "border-foreground/70 bg-muted/60" : "border-border",
       )}
     >
-      <Icon className={cn("h-4 w-4 shrink-0", forma === value ? "text-foreground" : "text-muted-foreground")} />
+      {marca ??
+        (Icon && <Icon className={cn("h-4 w-4 shrink-0", forma === value ? "text-foreground" : "text-muted-foreground")} />)}
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{value}</span>
         {sub && <span className="block truncate text-xs text-muted-foreground">{sub}</span>}
@@ -940,7 +953,8 @@ export function ComandaConteudo({
                           setEtapa("pago");
                         }}
                       >
-                        <CreditCard className="h-4 w-4" /> Pagar •••• {agendamento.cartaoSalvo.final}
+                        Pagar •••• {agendamento.cartaoSalvo.final}
+                        <BandeiraCartao bandeira={agendamento.cartaoSalvo.bandeira} />
                       </Button>
                     )}
                     <Button className={cn("h-9 flex-1 font-semibold", btnPrincipal)} onClick={() => setEtapa("pagamento")}>
@@ -1064,7 +1078,7 @@ export function ComandaConteudo({
                 {agendamento.cartaoSalvo &&
                   cardForma({
                     value: `${agendamento.cartaoSalvo.bandeira} •••• ${agendamento.cartaoSalvo.final}`,
-                    icon: CreditCard,
+                    marca: <BandeiraCartao bandeira={agendamento.cartaoSalvo.bandeira} className="h-6 w-9" />,
                     sub: `Salvo · vence ${agendamento.cartaoSalvo.validade}`,
                   })}
                 {formasDaCliente.map((f) => cardForma(f))}
