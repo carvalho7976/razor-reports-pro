@@ -17,7 +17,7 @@ const hoje = () => new Date().toLocaleDateString("pt-BR");
 
 const comandasIniciais: ComandaAberta[] = [
   { id: 3961388, cliente: "Caio César", servico: "auxiliar", profissional: "Claudia", inicio: "", fim: "", data: "19/10/2026", abertaEm: "19/10", valor: 0 },
-  { id: 3961390, cliente: "João Silva", servico: "Corte Masculino", profissional: "Cesar", inicio: "", fim: "", data: "19/10/2026", abertaEm: "19/10", valor: 50, telefone: "(41) 99123-4567" },
+  { id: 3961390, cliente: "João Silva", servico: "Corte Masculino", profissional: "Cesar", inicio: "", fim: "", data: "19/10/2026", abertaEm: "19/10", valor: 50, telefone: "(41) 99123-4567", cartaoSalvo: { bandeira: "Mastercard", final: "9365", validade: "08/28" } },
   { id: 3961391, cliente: "Maria Santos", servico: "Escova", profissional: "Claudia", inicio: "", fim: "", data: "18/10/2026", abertaEm: "18/10", valor: 60, telefone: "(41) 98765-4321" },
 ];
 
@@ -78,10 +78,10 @@ export default function FrenteCaixa() {
   return (
     <AppLayout>
       <div className="flex h-full min-h-0 flex-col gap-4 lg:-ml-6 lg:flex-row">
-        <aside className="flex w-full shrink-0 flex-col rounded-xl border border-border bg-card lg:w-[300px]">
+        <aside className="flex w-full shrink-0 flex-col rounded-xl bg-card lg:w-[300px]">
           <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
             <h1 className="text-sm font-semibold">Comandas abertas</h1>
-            <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={novaComanda}>
+            <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-[13px]" onClick={novaComanda}>
               <Plus className="h-3.5 w-3.5" /> Nova
             </Button>
           </div>
@@ -92,7 +92,7 @@ export default function FrenteCaixa() {
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 placeholder="Buscar cliente"
-                className="h-9 pl-8 text-xs"
+                className="h-9 pl-8 text-[13px]"
               />
             </div>
             <DateRangePicker
@@ -114,33 +114,33 @@ export default function FrenteCaixa() {
                     : "border-transparent hover:bg-muted/60",
                 )}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-foreground">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
                   {iniciais(c.cliente)}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] font-medium">{c.cliente}</span>
-                  <span className="block truncate text-[11px] text-muted-foreground">
+                  <span className="block truncate text-sm font-medium">{c.cliente}</span>
+                  <span className="block truncate text-xs text-muted-foreground">
                     #{c.id} · {c.abertaEm}
                   </span>
                 </span>
-                <span className="text-xs tabular-nums text-muted-foreground">{R$(c.valor ?? 0)}</span>
+                <span className="text-[13px] tabular-nums text-muted-foreground">{R$(c.valor ?? 0)}</span>
               </button>
             ))}
             {lista.length === 0 && (
-              <p className="px-2 py-4 text-center text-xs text-muted-foreground">
+              <p className="px-2 py-4 text-center text-[13px] text-muted-foreground">
                 {busca ? `Nenhuma comanda para “${busca}”.` : "Nenhuma comanda aberta."}
               </p>
             )}
           </div>
         </aside>
 
-        <section className="flex min-h-[560px] min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card">
+        <section className="flex min-h-[560px] min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-card">
           {selecionada ? (
             <ComandaConteudo agendamento={selecionada} variante="caixa" onFechar={fecharSelecionada} />
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
               <p className="text-sm font-semibold">Nenhuma comanda selecionada</p>
-              <p className="max-w-xs text-xs text-muted-foreground">
+              <p className="max-w-xs text-[13px] text-muted-foreground">
                 Escolha uma comanda aberta na lista ou abra uma nova para vender no balcão.
               </p>
               <Button size="sm" className="gap-1 bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.85)]" onClick={novaComanda}>

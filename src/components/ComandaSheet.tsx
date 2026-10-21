@@ -57,6 +57,8 @@ export type ComandaAgendamento = {
   fim: string;
   data: string;
   telefone?: string;
+  /** Cartão já salvo no cadastro da cliente, oferecido primeiro no pagamento */
+  cartaoSalvo?: { bandeira: string; final: string; validade: string };
   /** Valor do primeiro item, quando a comanda já vem com preço (frente de caixa) */
   valor?: number;
 };
@@ -136,7 +138,7 @@ type Pagamento = { id: number; forma: string; valor: number };
 
 type Etapa = "agendamento" | "carrinho" | "pagamento" | "pago";
 
-const catalogo: Record<"servicos" | "produtos" | "pacotes", CatalogoItem[]> = {
+const catalogo: Record<"servicos" | "produtos" | "pacotes" | "assinaturas", CatalogoItem[]> = {
   servicos: [
     { nome: "Corte Feminino", valor: 80, detalhe: "45min", tipo: "servico" },
     { nome: "Corte Masculino", valor: 50, detalhe: "30min", tipo: "servico" },
@@ -153,7 +155,11 @@ const catalogo: Record<"servicos" | "produtos" | "pacotes", CatalogoItem[]> = {
   ],
   pacotes: [
     { nome: "Pacote Especial", valor: 150, detalhe: "5 sessões", tipo: "pack" },
-    { nome: "Assinatura Mensal", valor: 129, detalhe: "corte ilimitado", tipo: "pack" },
+  ],
+  assinaturas: [
+    { nome: "Clube do Corte", valor: 99, detalhe: "por mês · cortes ilimitados", tipo: "pack" },
+    { nome: "Corte + Barba", valor: 149, detalhe: "por mês · ilimitado", tipo: "pack" },
+    { nome: "Plano Especial", valor: 189, detalhe: "por mês · corte, escova e hidratação", tipo: "pack" },
   ],
 };
 
@@ -191,6 +197,7 @@ const abas = [
   { value: "servicos", label: "Serviços" },
   { value: "produtos", label: "Produtos" },
   { value: "pacotes", label: "Pacotes" },
+  { value: "assinaturas", label: "Assinaturas" },
   { value: "sugestoes", label: "Sugestões" },
 ] as const;
 
@@ -198,7 +205,7 @@ type Aba = (typeof abas)[number]["value"];
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const rotulo = "text-[11px] font-medium uppercase tracking-wide text-muted-foreground";
+const rotulo = "text-xs font-medium uppercase tracking-wide text-muted-foreground";
 
 const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa"): Item[] => {
   const servico: Item = {
@@ -304,7 +311,7 @@ export function ComandaConteudo({
   const listaCatalogo = useMemo<CatalogoItem[]>(() => {
     if (busca.trim()) {
       const q = busca.toLowerCase();
-      return [...catalogo.servicos, ...catalogo.produtos, ...catalogo.pacotes].filter((i) =>
+      return [...catalogo.servicos, ...catalogo.produtos, ...catalogo.pacotes, ...catalogo.assinaturas].filter((i) =>
         i.nome.toLowerCase().includes(q),
       );
     }
@@ -389,7 +396,7 @@ export function ComandaConteudo({
   const menuMais = (lado: "top" | "bottom" = "top") => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" aria-label="Mais ações">
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground" aria-label="Mais ações">
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -413,7 +420,7 @@ export function ComandaConteudo({
           className="text-destructive focus:text-destructive"
           onClick={() => toast("Agendamento excluído", noTopo)}
         >
-          <Trash2 className="mr-2 h-4 w-4" /> Excluir agendamento
+          <Trash2 className="mr-2 h-4 w-4" /> {variante === "caixa" ? "Excluir comanda" : "Excluir agendamento"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -425,7 +432,7 @@ export function ComandaConteudo({
 
   // Profissional e assistentes de um serviço, editáveis direto na linha do item
   const equipe = (i: Item) => (
-    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[13px] text-muted-foreground">
       {i.tipo !== "produto" && i.horario && <span className="mr-0.5">{i.horario}</span>}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -465,7 +472,7 @@ export function ComandaConteudo({
           >
             <Minus className="h-3 w-3" />
           </button>
-          <span className="w-5 text-center text-xs font-medium tabular-nums text-foreground">{i.qtd}</span>
+          <span className="w-5 text-center text-[13px] font-medium tabular-nums text-foreground">{i.qtd}</span>
           <button
             onClick={() => alterarQtd(i.id, 1)}
             className="flex h-full w-6 items-center justify-center text-muted-foreground hover:text-foreground"
@@ -531,20 +538,20 @@ export function ComandaConteudo({
             title="Alterar preço"
             className={cn(
               "flex flex-col items-end rounded px-1 font-semibold tabular-nums hover:bg-muted",
-              compacto ? "text-[13px]" : "text-sm",
+              compacto ? "text-sm" : "text-sm",
             )}
           >
             {R$(valorItem(i))}
             {alterado && (
-              <span className="text-[10.5px] font-normal text-muted-foreground line-through">
+              <span className="text-[11px] font-normal text-muted-foreground line-through">
                 {R$(original * (i.qtd ?? 1))}
               </span>
             )}
           </button>
         </PopoverTrigger>
         <PopoverContent align="end" className="w-60 p-3">
-          <p className="text-xs font-semibold">Preço de {i.descricao}</p>
-          <p className="mb-2 text-[11px] text-muted-foreground">Tabela: {R$(original)}{i.qtd && i.qtd > 1 ? " cada" : ""}</p>
+          <p className="text-[13px] font-semibold">Preço de {i.descricao}</p>
+          <p className="mb-2 text-xs text-muted-foreground">Tabela: {R$(original)}{i.qtd && i.qtd > 1 ? " cada" : ""}</p>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -556,20 +563,20 @@ export function ComandaConteudo({
             className="flex gap-1.5"
           >
             <div className="relative flex-1">
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">R$</span>
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">R$</span>
               <Input
                 name="valor"
                 autoFocus
                 defaultValue={i.valor.toFixed(2).replace(".", ",")}
-                className="h-8 pl-8 text-xs tabular-nums"
+                className="h-8 pl-8 text-[13px] tabular-nums"
                 aria-label="Novo preço"
               />
             </div>
-            <Button type="submit" size="sm" className={cn("h-8 text-xs", btnPrincipal)}>
+            <Button type="submit" size="sm" className={cn("h-8 text-[13px]", btnPrincipal)}>
               Aplicar
             </Button>
           </form>
-          <p className="mb-1.5 mt-3 text-[11px] text-muted-foreground">Desconto rápido</p>
+          <p className="mb-1.5 mt-3 text-xs text-muted-foreground">Desconto rápido</p>
           <div className="grid grid-cols-4 gap-1">
             {[5, 10, 15, 20].map((pct) => (
               <button
@@ -578,7 +585,7 @@ export function ComandaConteudo({
                   aplicarPreco(i, original * (1 - pct / 100));
                   setEditandoPreco(null);
                 }}
-                className="rounded-md border border-border py-1 text-xs hover:bg-muted"
+                className="rounded-md border border-border py-1 text-[13px] hover:bg-muted"
               >
                 {pct}%
               </button>
@@ -590,7 +597,7 @@ export function ComandaConteudo({
                 aplicarPreco(i, original);
                 setEditandoPreco(null);
               }}
-              className="mt-2.5 text-xs text-info hover:underline"
+              className="mt-2.5 text-[13px] text-info hover:underline"
             >
               Voltar ao preço de tabela
             </button>
@@ -602,7 +609,7 @@ export function ComandaConteudo({
 
   const listaItens = (compacto = false) => (
     <div className={cn("space-y-3", compacto && "space-y-2.5")}>
-      {itens.length === 0 && <p className="text-xs text-muted-foreground">Nenhum item na comanda.</p>}
+      {itens.length === 0 && <p className="text-[13px] text-muted-foreground">Nenhum item na comanda.</p>}
       {itens.map((i) => (
         <div
           key={i.id}
@@ -611,7 +618,7 @@ export function ComandaConteudo({
         >
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className={cn("truncate font-medium", compacto ? "text-[13px]" : "text-[13.5px]")}>
+              <p className={cn("truncate font-medium", compacto ? "text-sm" : "text-sm")}>
                 {i.descricao}
                 {i.assinatura && (
                   <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 align-middle text-[10px] font-medium text-muted-foreground">
@@ -644,13 +651,13 @@ export function ComandaConteudo({
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
-          <p className="truncate text-xs text-muted-foreground">{subtituloCliente}</p>
+          <p className="truncate text-[13px] text-muted-foreground">{subtituloCliente}</p>
         </div>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-[13px] font-semibold text-foreground">
           {iniciais}
         </div>
       </div>
-      <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-xs text-muted-foreground">
+      <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-[13px] text-muted-foreground">
         <span className="flex min-w-0 items-center gap-1.5 truncate">
           <Crown className="h-3.5 w-3.5 shrink-0" /> Assinante · R$ 0,00 em créditos
         </span>
@@ -687,7 +694,7 @@ export function ComandaConteudo({
           setEtapa("carrinho");
         }}
         className={cn(
-          "flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted",
+          "flex items-center justify-between rounded-lg bg-info/10 px-3 py-2 text-[13px] font-medium text-info transition-colors hover:bg-info/15",
           classe,
         )}
       >
@@ -709,7 +716,7 @@ export function ComandaConteudo({
 
       {faixaSugestoes("mx-4 mb-3")}
 
-      <div className="space-y-1 px-4 pb-3 text-xs text-muted-foreground">
+      <div className="space-y-1 px-4 pb-3 text-[13px] text-muted-foreground">
         <div className="flex justify-between">
           <span>Subtotal</span>
           <span className="tabular-nums">{R$(total)}</span>
@@ -725,10 +732,9 @@ export function ComandaConteudo({
       <div className="border-t border-border p-4">
         <div className="mb-3 flex items-baseline justify-between">
           <span className="text-sm font-semibold">A pagar</span>
-          <span className="text-base font-semibold tabular-nums">{R$(forma === "Dividir" ? resta : total)}</span>
+          <span className="text-lg font-semibold tabular-nums">{R$(forma === "Dividir" ? resta : total)}</span>
         </div>
         <div className="flex gap-2">
-          {menuMais()}
           <Button className={cn("h-9 flex-1 font-semibold", btnPrincipal)} onClick={onBotao}>
             {botao}
           </Button>
@@ -738,7 +744,7 @@ export function ComandaConteudo({
   );
 
   const trilha = (atual: "carrinho" | "pagamento") => (
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
       <button
         onClick={() => setEtapa("carrinho")}
         className={cn("hover:text-foreground", atual === "carrinho" && "font-medium text-foreground")}
@@ -760,14 +766,14 @@ export function ComandaConteudo({
       key={value}
       onClick={() => setForma(value)}
       className={cn(
-        "flex items-center gap-2.5 rounded-lg border bg-card px-3 py-2.5 text-left text-[13px] transition-colors hover:bg-muted/60",
+        "flex items-center gap-2.5 rounded-lg border bg-card px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted/60",
         forma === value ? "border-foreground/70 bg-muted/60" : "border-border",
       )}
     >
       <Icon className={cn("h-4 w-4 shrink-0", forma === value ? "text-foreground" : "text-muted-foreground")} />
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{value}</span>
-        {sub && <span className="block truncate text-[11px] text-muted-foreground">{sub}</span>}
+        {sub && <span className="block truncate text-xs text-muted-foreground">{sub}</span>}
       </span>
       <span
         className={cn(
@@ -791,7 +797,7 @@ export function ComandaConteudo({
                 <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="truncate text-[13px] text-muted-foreground">
                       {variante === "caixa"
                         ? `Aberta em ${agendamento.data} · Balcão`
                         : `${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
@@ -809,7 +815,7 @@ export function ComandaConteudo({
                     {variante === "agenda" && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-xs font-medium hover:bg-muted">
+                          <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-[13px] font-medium hover:bg-muted">
                             <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
                             {statusAtual.label}
                             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
@@ -826,15 +832,8 @@ export function ComandaConteudo({
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
-                    {variante === "caixa" ? (
-                      <button
-                        onClick={() => toast("Comanda excluída", noTopo)}
-                        className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-destructive"
-                        aria-label="Excluir comanda"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    ) : (
+                    {menuMais("bottom")}
+                    {variante === "agenda" && (
                       <button
                         onClick={() => onFechar()}
                         className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -847,8 +846,8 @@ export function ComandaConteudo({
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <div className="mb-4 flex items-center justify-between gap-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-foreground">Itens da comanda</p>
-                    <button onClick={() => setEtapa("carrinho")} className="text-xs font-medium text-info hover:underline">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Itens da comanda</p>
+                    <button onClick={() => setEtapa("carrinho")} className="text-[13px] font-medium text-info hover:underline">
                       + Adicionar item
                     </button>
                   </div>
@@ -860,7 +859,7 @@ export function ComandaConteudo({
               <aside className="flex w-full shrink-0 flex-col border-t border-border md:w-[320px] md:border-l md:border-t-0">
                 <div className="min-h-0 flex-1 overflow-y-auto">
                 {cartaoCliente()}
-                <div className="space-y-4 px-4 pb-4 text-xs">
+                <div className="space-y-4 px-4 pb-4 text-[13px]">
                   <dl className="grid grid-cols-4 divide-x divide-border">
                     {[
                       { label: "Moedas", valor: "0" },
@@ -869,8 +868,8 @@ export function ComandaConteudo({
                       { label: "Créditos", valor: R$(0) },
                     ].map(({ label, valor }) => (
                       <div key={label} className="px-2 first:pl-0">
-                        <dt className="text-[11px] text-muted-foreground">{label}</dt>
-                        <dd className="text-[13px] font-medium tabular-nums">{valor}</dd>
+                        <dt className="text-xs text-muted-foreground">{label}</dt>
+                        <dd className="text-sm font-medium tabular-nums">{valor}</dd>
                       </div>
                     ))}
                   </dl>
@@ -896,9 +895,9 @@ export function ComandaConteudo({
                           value={obs}
                           onChange={(e) => setObs(e.target.value)}
                           placeholder="Ex: alérgica a dipirona, não cortar franja"
-                          className="min-h-[70px] resize-none text-xs"
+                          className="min-h-[70px] resize-none text-[13px]"
                         />
-                        <Button size="sm" variant="outline" className="h-7 w-full text-xs" onClick={() => setEditandoObs(false)}>
+                        <Button size="sm" variant="outline" className="h-7 w-full text-[13px]" onClick={() => setEditandoObs(false)}>
                           Salvar observação
                         </Button>
                       </div>
@@ -926,10 +925,9 @@ export function ComandaConteudo({
                 <div className="border-t border-border p-4">
                   <div className="mb-3 flex items-baseline justify-between">
                     <span className="text-sm font-semibold">Total</span>
-                    <span className="text-base font-semibold tabular-nums">{R$(total)}</span>
+                    <span className="text-lg font-semibold tabular-nums">{R$(total)}</span>
                   </div>
                   <div className="flex gap-2">
-                    {menuMais()}
                     <Button className={cn("h-9 flex-1 font-semibold", btnPrincipal)} onClick={() => setEtapa("pagamento")}>
                       Fechar comanda
                     </Button>
@@ -947,7 +945,7 @@ export function ComandaConteudo({
                 {trilha("carrinho")}
                 <button
                   onClick={() => setEtapa("agendamento")}
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" /> Agendamento
                 </button>
@@ -974,7 +972,7 @@ export function ComandaConteudo({
                         setAba(a.value);
                       }}
                       className={cn(
-                        "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-xs font-medium transition-colors",
+                        "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-[13px] font-medium transition-colors",
                         ativa
                           ? "border-foreground text-foreground"
                           : "border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground",
@@ -1010,8 +1008,8 @@ export function ComandaConteudo({
                       <span className="w-[3px] shrink-0" style={{ backgroundColor: corCategoria(c.nome) }} />
                     )}
                     <span className="min-w-0 px-3 py-2">
-                      <span className="block truncate text-[13px] font-medium">{c.nome}</span>
-                      <span className="block truncate text-xs text-muted-foreground">
+                      <span className="block truncate text-sm font-medium">{c.nome}</span>
+                      <span className="block truncate text-[13px] text-muted-foreground">
                         {R$(c.valor)}
                         {c.detalhe && ` · ${c.detalhe}`}
                       </span>
@@ -1024,7 +1022,7 @@ export function ComandaConteudo({
                   </button>
                 ))}
                 {listaCatalogo.length === 0 && (
-                  <p className="text-xs text-muted-foreground">Nada encontrado para “{busca}”.</p>
+                  <p className="text-[13px] text-muted-foreground">Nada encontrado para “{busca}”.</p>
                 )}
               </div>
             </section>
@@ -1039,7 +1037,7 @@ export function ComandaConteudo({
                 {trilha("pagamento")}
                 <button
                   onClick={() => setEtapa("agendamento")}
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" /> Agendamento
                 </button>
@@ -1048,6 +1046,12 @@ export function ComandaConteudo({
 
               <p className={cn(rotulo, "mb-2")}>Da cliente</p>
               <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {agendamento.cartaoSalvo &&
+                  cardForma({
+                    value: `${agendamento.cartaoSalvo.bandeira} •••• ${agendamento.cartaoSalvo.final}`,
+                    icon: CreditCard,
+                    sub: `Salvo · vence ${agendamento.cartaoSalvo.validade}`,
+                  })}
                 {formasDaCliente.map((f) => cardForma(f))}
               </div>
 
@@ -1061,7 +1065,7 @@ export function ComandaConteudo({
                   <p className={cn(rotulo, "mb-2")}>Pagamentos</p>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
                     <Select value={novoPgForma} onValueChange={setNovoPgForma}>
-                      <SelectTrigger className="h-9 text-xs">
+                      <SelectTrigger className="h-9 text-[13px]">
                         <SelectValue placeholder="Forma" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1076,16 +1080,16 @@ export function ComandaConteudo({
                       value={novoPgValor}
                       onChange={(e) => setNovoPgValor(e.target.value)}
                       placeholder={resta ? resta.toFixed(2).replace(".", ",") : "Valor"}
-                      className="h-9 text-xs"
+                      className="h-9 text-[13px]"
                     />
-                    <Button size="sm" variant="outline" className="h-9 gap-1 text-xs" onClick={addPagamento}>
+                    <Button size="sm" variant="outline" className="h-9 gap-1 text-[13px]" onClick={addPagamento}>
                       <Plus className="h-3.5 w-3.5" /> Adicionar
                     </Button>
                   </div>
                   {pagamentos.length > 0 && (
                     <ul className="mt-2 space-y-1">
                       {pagamentos.map((p) => (
-                        <li key={p.id} className="flex items-center justify-between rounded-md bg-muted px-2.5 py-1.5 text-xs">
+                        <li key={p.id} className="flex items-center justify-between rounded-md bg-muted px-2.5 py-1.5 text-[13px]">
                           <span>{p.forma}</span>
                           <span className="flex items-center gap-2 tabular-nums">
                             {R$(p.valor)}
@@ -1101,7 +1105,7 @@ export function ComandaConteudo({
                       ))}
                     </ul>
                   )}
-                  <p className="mt-2 text-right text-xs text-muted-foreground">Resta {R$(resta)}</p>
+                  <p className="mt-2 text-right text-[13px] text-muted-foreground">Resta {R$(resta)}</p>
                 </div>
               )}
             </section>
@@ -1125,7 +1129,7 @@ export function ComandaConteudo({
               <p className="flex items-center gap-2 text-sm font-semibold">
                 <CalendarPlus className="h-4 w-4" /> Agendar retorno?
               </p>
-              <p className="mb-3 mt-1 text-xs text-muted-foreground">
+              <p className="mb-3 mt-1 text-[13px] text-muted-foreground">
                 Sugestão: em 28 dias com {agendamento.profissional}, mesmo horário.
               </p>
               <div className="flex gap-2">
