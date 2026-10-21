@@ -831,6 +831,65 @@ export function ComandaConteudo({
       </button>
     );
 
+  // Cabeçalho da comanda (número, origem, status e menu): o mesmo em todas as etapas
+  const cabecalhoComanda = () => (
+        <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <ReceiptText className="h-[18px] w-[18px]" />
+            </span>
+            <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
+            <p className="truncate text-[13px] text-muted-foreground">
+              {variante === "caixa"
+                ? agendamento.origem ?? "Balcão"
+                : `${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
+            </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <span
+              className={cn(
+                "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                status === "finalizado" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground",
+              )}
+            >
+              {status === "finalizado" ? "Paga" : "Em aberto"}
+            </span>
+            {variante === "agenda" && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-[13px] font-medium hover:bg-muted">
+                    <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
+                    {statusAtual.label}
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  {statusOpcoes.map((s) => (
+                    <DropdownMenuItem key={s.value} onClick={() => setStatus(s.value)}>
+                      <span className={cn("mr-2 h-2 w-2 rounded-full", s.cor)} />
+                      {s.label}
+                      {s.value === status && <Check className="ml-auto h-3.5 w-3.5" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {menuMais("bottom")}
+            {variante === "agenda" && (
+              <button
+                onClick={() => onFechar()}
+                className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </div>
+  );
+
   // Coluna direita do carrinho e do pagamento
   const painelCarrinho = (botao: string, onBotao: () => void) => (
     <aside className={cn("flex min-h-0 w-full flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
@@ -935,61 +994,7 @@ export function ComandaConteudo({
 
             <div className={cn("flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden", variante === "caixa" && "gap-4")}>
               <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
-                <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                      <ReceiptText className="h-[18px] w-[18px]" />
-                    </span>
-                    <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
-                    <p className="truncate text-[13px] text-muted-foreground">
-                      {variante === "caixa"
-                        ? agendamento.origem ?? "Balcão"
-                        : `${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
-                    </p>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                        status === "finalizado" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground",
-                      )}
-                    >
-                      {status === "finalizado" ? "Paga" : "Em aberto"}
-                    </span>
-                    {variante === "agenda" && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-[13px] font-medium hover:bg-muted">
-                            <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
-                            {statusAtual.label}
-                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44">
-                          {statusOpcoes.map((s) => (
-                            <DropdownMenuItem key={s.value} onClick={() => setStatus(s.value)}>
-                              <span className={cn("mr-2 h-2 w-2 rounded-full", s.cor)} />
-                              {s.label}
-                              {s.value === status && <Check className="ml-auto h-3.5 w-3.5" />}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                    {menuMais("bottom")}
-                    {variante === "agenda" && (
-                      <button
-                        onClick={() => onFechar()}
-                        className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-                        aria-label="Fechar"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
+                {cabecalhoComanda()}
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <div className="mb-4 flex items-center justify-between gap-2">
                     <p className={tituloSecao}>Itens da comanda</p>
@@ -1102,7 +1107,9 @@ export function ComandaConteudo({
 
         {etapa === "carrinho" && (
           <>
-            <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-5 py-4", variante === "caixa" && cartaoColuna)}>
+            <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
+              {cabecalhoComanda()}
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
               <div className="flex items-center justify-between">
                 {trilha("carrinho")}
                 <button
@@ -1187,6 +1194,7 @@ export function ComandaConteudo({
                   <p className="text-[13px] text-muted-foreground">Nada encontrado para “{busca}”.</p>
                 )}
               </div>
+              </div>
             </section>
             {painelCarrinho("Continuar para pagamento", () => setEtapa("pagamento"))}
           </>
@@ -1194,7 +1202,9 @@ export function ComandaConteudo({
 
         {etapa === "pagamento" && (
           <>
-            <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-5 py-4", variante === "caixa" && cartaoColuna)}>
+            <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
+              {cabecalhoComanda()}
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
               <div className="flex items-center justify-between">
                 {trilha("pagamento")}
                 <button
@@ -1277,6 +1287,7 @@ export function ComandaConteudo({
                   <p className="mt-2 text-right text-[13px] text-muted-foreground">Resta {R$(resta)}</p>
                 </div>
               )}
+              </div>
             </section>
             {painelCarrinho(
               forma && forma !== "Dividir" ? `Cobrar ${R$(total)}` : forma === "Dividir" ? "Concluir pagamento" : "Cobrar",
@@ -1286,7 +1297,9 @@ export function ComandaConteudo({
         )}
 
         {etapa === "pago" && (
-          <section className={cn("flex flex-1 flex-col items-center justify-center px-6 py-16 text-center", variante === "caixa" && cartaoColuna)}>
+          <section className={cn("flex flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
+            {cabecalhoComanda()}
+            <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
             {/* Anel verde carrega, preenche e o check aparece (estilo Mercado Pago) */}
             <svg viewBox="0 0 64 64" className="h-16 w-16 text-success" aria-hidden="true">
               <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="4" />
@@ -1347,6 +1360,7 @@ export function ComandaConteudo({
                   Agora não
                 </Button>
               </div>
+            </div>
             </div>
           </section>
         )}
