@@ -102,17 +102,19 @@ export default function FrenteCaixa() {
               onRangeChange={setPeriodo}
             />
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+          <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 pb-2">
             {lista.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setSelecionadaId(c.id)}
                 className={cn(
-                  "flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left transition-colors",
-                  c.id === selecionadaId ? "bg-muted" : "hover:bg-muted/60",
+                  "flex w-full items-center gap-3 rounded-lg border px-2.5 py-2.5 text-left transition-colors",
+                  c.id === selecionadaId
+                    ? "border-border bg-card shadow-sm"
+                    : "border-transparent hover:bg-muted/60",
                 )}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-foreground">
                   {iniciais(c.cliente)}
                 </span>
                 <span className="min-w-0 flex-1">
@@ -141,7 +143,7 @@ export default function FrenteCaixa() {
               <p className="max-w-xs text-xs text-muted-foreground">
                 Escolha uma comanda aberta na lista ou abra uma nova para vender no balcão.
               </p>
-              <Button size="sm" className="gap-1" onClick={novaComanda}>
+              <Button size="sm" className="gap-1 bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.85)]" onClick={novaComanda}>
                 <Plus className="h-3.5 w-3.5" /> Nova comanda
               </Button>
             </div>

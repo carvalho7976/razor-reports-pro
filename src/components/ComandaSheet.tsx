@@ -224,6 +224,9 @@ const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa
 // Avisos no topo: no canto de baixo cobriam o botão principal da comanda
 const noTopo = { position: "top-center" as const };
 
+// Ação principal no padrão do sistema: botão escuro, o mesmo do "Novo" das tabelas
+const btnPrincipal = "bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.85)]";
+
 const valorItem = (i: Item) => i.valor * (i.qtd ?? 1);
 
 const SeloSemEstoque = () => (
@@ -562,7 +565,7 @@ export function ComandaConteudo({
                 aria-label="Novo preço"
               />
             </div>
-            <Button type="submit" size="sm" className="h-8 text-xs">
+            <Button type="submit" size="sm" className={cn("h-8 text-xs", btnPrincipal)}>
               Aplicar
             </Button>
           </form>
@@ -643,7 +646,7 @@ export function ComandaConteudo({
           <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
           <p className="truncate text-xs text-muted-foreground">{subtituloCliente}</p>
         </div>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
           {iniciais}
         </div>
       </div>
@@ -684,7 +687,7 @@ export function ComandaConteudo({
           setEtapa("carrinho");
         }}
         className={cn(
-          "flex items-center justify-between rounded-lg bg-primary/[0.08] px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/[0.12]",
+          "flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted",
           classe,
         )}
       >
@@ -726,7 +729,7 @@ export function ComandaConteudo({
         </div>
         <div className="flex gap-2">
           {menuMais()}
-          <Button className="h-9 flex-1 font-semibold" onClick={onBotao}>
+          <Button className={cn("h-9 flex-1 font-semibold", btnPrincipal)} onClick={onBotao}>
             {botao}
           </Button>
         </div>
@@ -798,7 +801,7 @@ export function ComandaConteudo({
                     <span
                       className={cn(
                         "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                        status === "finalizado" ? "bg-success/10 text-success" : "bg-primary/10 text-primary",
+                        status === "finalizado" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground",
                       )}
                     >
                       {status === "finalizado" ? "Paga" : "Em aberto"}
@@ -927,7 +930,7 @@ export function ComandaConteudo({
                   </div>
                   <div className="flex gap-2">
                     {menuMais()}
-                    <Button className="h-9 flex-1 font-semibold" onClick={() => setEtapa("pagamento")}>
+                    <Button className={cn("h-9 flex-1 font-semibold", btnPrincipal)} onClick={() => setEtapa("pagamento")}>
                       Fechar comanda
                     </Button>
                   </div>
@@ -1127,7 +1130,7 @@ export function ComandaConteudo({
               </p>
               <div className="flex gap-2">
                 <Button
-                  className="h-9 flex-1"
+                  className={cn("h-9 flex-1", btnPrincipal)}
                   onClick={() => {
                     toast.success("Retorno agendado", noTopo);
                     onFechar();
