@@ -917,7 +917,7 @@ export function ComandaConteudo({
   ].filter((s) => s.n > 0);
   const planoAtrasado = !par;
   const saldosCliente = () => saldos.length > 0 && (
-    <div className="flex items-center gap-5 px-4 pb-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 pb-3">
       {saldos.map(({ label, icon: Icone, valor, cor }) => (
         <Tooltip key={label}>
           <TooltipTrigger asChild>
