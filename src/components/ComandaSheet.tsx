@@ -884,18 +884,18 @@ export function ComandaConteudo({
 
             <div className={cn("flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden", variante === "caixa" && "gap-4")}>
               <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
-                <div className="flex items-center justify-between gap-3 px-5 py-3">
+                <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                       <ReceiptText className="h-[18px] w-[18px]" />
                     </span>
                     <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
-                    <p className="truncate text-[13px] text-muted-foreground">
-                      {variante === "caixa"
-                        ? `Aberta em ${agendamento.data} · Balcão`
-                        : `${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
-                    </p>
+                    {variante === "agenda" && (
+                      <p className="truncate text-[13px] text-muted-foreground">
+                        {`${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
+                      </p>
+                    )}
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -938,15 +938,6 @@ export function ComandaConteudo({
                       </button>
                     )}
                   </div>
-                </div>
-                {/* Picote do ticket: tracejado com recortes laterais na cor do fundo da página */}
-                <div className="relative shrink-0 border-t-[1.5px] border-dashed border-border">
-                  {variante === "caixa" && (
-                    <>
-                      <span className="absolute -left-2 -top-2 h-4 w-4 rounded-full bg-background" />
-                      <span className="absolute -right-2 -top-2 h-4 w-4 rounded-full bg-background" />
-                    </>
-                  )}
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <div className="mb-4 flex items-center justify-between gap-2">
