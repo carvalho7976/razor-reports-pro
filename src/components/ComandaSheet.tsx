@@ -335,6 +335,14 @@ export function ComandaConteudo({
   }, [agendamento?.id]);
 
   const total = useMemo(() => itens.reduce((s, i) => s + valorItem(i), 0), [itens]);
+  const pagoAteAgora = pagamentos.reduce((s, p) => s + p.valor, 0);
+
+  // No pagamento dividido, o campo de valor já vem com o que falta pagar
+  useEffect(() => {
+    if (forma !== "Dividir") return;
+    const falta = Math.max(0, total - pagoAteAgora);
+    setNovoPgValor(falta > 0 ? falta.toFixed(2).replace(".", ",") : "");
+  }, [forma, total, pagoAteAgora]);
   const pago = useMemo(() => pagamentos.reduce((s, p) => s + p.valor, 0), [pagamentos]);
   const resta = Math.max(0, total - pago);
 
@@ -407,7 +415,6 @@ export function ComandaConteudo({
     }
     setPagamentos((prev) => [...prev, { id: Date.now(), forma: novoPgForma, valor: v }]);
     setNovoPgForma("");
-    setNovoPgValor("");
   };
 
   const cobrar = () => {
@@ -1204,10 +1211,32 @@ export function ComandaConteudo({
 
         {etapa === "pago" && (
           <section className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success/10 text-success">
-              <Check className="h-7 w-7" />
-            </div>
-            <h2 className="mt-3 text-xl font-semibold tracking-tight">Comanda paga</h2>
+            {/* Anel verde carrega, preenche e o check aparece (estilo Mercado Pago) */}
+            <svg viewBox="0 0 64 64" className="h-16 w-16 text-success" aria-hidden="true">
+              <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="4" />
+              <circle
+                cx="32"
+                cy="32"
+                r="24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                className="pago-anel"
+                transform="rotate(-90 32 32)"
+              />
+              <circle cx="32" cy="32" r="24" fill="currentColor" className="pago-fundo" />
+              <path
+                d="M22 33l7 7 13-15"
+                fill="none"
+                stroke="white"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="pago-check"
+              />
+            </svg>
+            <h2 className="pago-texto mt-3 text-xl font-semibold tracking-tight">Comanda paga</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {R$(total)} · {agendamento.cliente}
               {forma && ` · ${forma}`}
@@ -1247,7 +1276,7 @@ export function ComandaConteudo({
         )}
 
         <Dialog open={confirmando} onOpenChange={setConfirmando}>
-          <DialogContent className="max-w-md gap-0 p-0">
+          <DialogContent className="max-w-md gap-0 p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
             <DialogHeader className="space-y-0.5 border-b border-border px-5 py-4 text-left">
               <DialogTitle className="text-base">Confirmar pagamento</DialogTitle>
               <DialogDescription className="text-[13px]">

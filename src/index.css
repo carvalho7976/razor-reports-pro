@@ -158,3 +158,32 @@ shadow-sm hover:bg-[#dcdcdc] hover:border-[#cfcfcf] transition-all duration-150;
     transition: width 0.3s ease-in-out !important;
   }
 }
+
+/* Comanda paga: anel verde carrega, preenche e o check é desenhado */
+.pago-anel {
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+  animation: pago-anel 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.pago-fundo {
+  transform: scale(0);
+  transform-origin: 32px 32px;
+  animation: pago-fundo 0.35s 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.pago-check {
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+  animation: pago-check 0.3s 1s ease-out forwards;
+}
+.pago-texto {
+  opacity: 0;
+  transform: translateY(4px);
+  animation: pago-texto 0.35s 1.05s ease-out forwards;
+}
+@keyframes pago-anel { to { stroke-dashoffset: 0; } }
+@keyframes pago-fundo { to { transform: scale(1); } }
+@keyframes pago-check { to { stroke-dashoffset: 0; } }
+@keyframes pago-texto { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .pago-anel, .pago-fundo, .pago-check, .pago-texto { animation: none; stroke-dashoffset: 0; transform: none; opacity: 1; }
+}
