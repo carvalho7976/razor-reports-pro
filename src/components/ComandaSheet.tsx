@@ -835,8 +835,7 @@ export function ComandaConteudo({
   // Cabeçalho da cliente: o mesmo em todas as etapas (sem moldura; visita e retorno ficam no menu ⋯)
   const subtituloCliente = agendamento.telefone ?? [agendamento.data, agendamento.inicio].filter(Boolean).join(" · ");
   const cartaoCliente = () => (
-    <div>
-    <div className="flex items-center gap-3 px-4 pb-3 pt-4">
+    <div className="flex items-start gap-3 px-4 pb-3 pt-4">
       <div className="relative shrink-0">
         <div
           className={cn(
@@ -856,6 +855,7 @@ export function ComandaConteudo({
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-semibold leading-tight">{agendamento.cliente}</p>
         <p className="truncate text-[13px] text-muted-foreground">{subtituloCliente}</p>
+        {saldosCliente()}
       </div>
       <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} botao />
       <DropdownMenu>
@@ -896,8 +896,6 @@ export function ComandaConteudo({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-    {saldosCliente()}
-    </div>
   );
 
   // Saldos: só aparecem os que a cliente tem; crédito em azul, débito em vermelho
@@ -911,7 +909,7 @@ export function ComandaConteudo({
   ].filter((s) => s.n > 0);
   const planoAtrasado = !par;
   const saldosCliente = () => saldos.length > 0 && (
-    <div className="flex items-center gap-5 px-4 pb-3">
+    <div className="mt-2 flex items-center gap-4">
       {saldos.map(({ label, icon: Icone, valor, cor }) => (
         <Tooltip key={label}>
           <TooltipTrigger asChild>
