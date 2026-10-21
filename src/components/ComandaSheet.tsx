@@ -91,6 +91,7 @@ type Item = {
   profissional?: string;
   /** Preço de tabela, guardado quando o valor é alterado na comanda */
   valorOriginal?: number;
+  gratuito?: boolean;
   assistentes?: string[];
 };
 
@@ -291,7 +292,7 @@ const btnPrincipal = "bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foregro
 const selecionarTudo = (e: React.FocusEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>) =>
   e.currentTarget.select();
 
-const valorItem = (i: Item) => i.valor * (i.qtd ?? 1);
+const valorItem = (i: Item) => (i.gratuito ? 0 : i.valor * (i.qtd ?? 1));
 
 // Por onde o pagamento entra: maquininha (Rede) para cartão, Pix, caixa ou saldo da cliente
 const OrigemPagamento = ({ forma }: { forma: string }) => {
@@ -358,6 +359,8 @@ export function ComandaConteudo({
   const [observacoes, setObservacoes] = useState<Observacao[]>(observacoesExemplo);
   const [obs, setObs] = useState("");
   const [editandoObs, setEditandoObs] = useState(false);
+  const [pacotesAbertos, setPacotesAbertos] = useState(false);
+  const [obsAbertas, setObsAbertas] = useState(false);
   const [itens, setItens] = useState<Item[]>(() => itensIniciais(agendamento, variante));
   const [aba, setAba] = useState<Aba>("rapida");
   const [busca, setBusca] = useState("");
