@@ -91,6 +91,7 @@ type Item = {
   profissional?: string;
   /** Preço de tabela, guardado quando o valor é alterado na comanda */
   valorOriginal?: number;
+  gratuito?: boolean;
   assistentes?: string[];
 };
 
@@ -291,7 +292,7 @@ const btnPrincipal = "bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foregro
 const selecionarTudo = (e: React.FocusEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>) =>
   e.currentTarget.select();
 
-const valorItem = (i: Item) => i.valor * (i.qtd ?? 1);
+const valorItem = (i: Item) => (i.gratuito ? 0 : i.valor * (i.qtd ?? 1));
 
 // Por onde o pagamento entra: maquininha (Rede) para cartão, Pix, caixa ou saldo da cliente
 const OrigemPagamento = ({ forma }: { forma: string }) => {
@@ -358,6 +359,8 @@ export function ComandaConteudo({
   const [observacoes, setObservacoes] = useState<Observacao[]>(observacoesExemplo);
   const [obs, setObs] = useState("");
   const [editandoObs, setEditandoObs] = useState(false);
+  const [pacotesAbertos, setPacotesAbertos] = useState(false);
+  const [obsAbertas, setObsAbertas] = useState(false);
   const [itens, setItens] = useState<Item[]>(() => itensIniciais(agendamento, variante));
   const [aba, setAba] = useState<Aba>("rapida");
   const [busca, setBusca] = useState("");
@@ -680,10 +683,10 @@ export function ComandaConteudo({
               compacto ? "text-sm" : "text-sm",
             )}
           >
-            {R$(valorItem(i))}
-            {alterado && (
+            {i.gratuito ? <span className="text-success">Gratuito</span> : R$(valorItem(i))}
+            {(alterado || i.gratuito) && (
               <span className="text-[11px] font-normal text-muted-foreground line-through">
-                {R$(original * (i.qtd ?? 1))}
+                {R$((i.gratuito ? i.valor : original) * (i.qtd ?? 1))}
               </span>
             )}
           </button>
@@ -691,6 +694,13 @@ export function ComandaConteudo({
         <PopoverContent align="end" className="w-60 p-3">
           <p className="text-[13px] font-semibold">Preço de {i.descricao}</p>
           <p className="mb-2 text-xs text-muted-foreground">Tabela: {R$(original)}{i.qtd && i.qtd > 1 ? " cada" : ""}</p>
+          <label className="mb-3 flex cursor-pointer items-center justify-between rounded-md border border-border px-2.5 py-2 text-[13px]">
+            Gratuidade
+            <Switch
+              checked={!!i.gratuito}
+              onCheckedChange={(v) => alterarItem(i.id, (it) => ({ ...it, gratuito: v }))}
+            />
+          </label>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -857,19 +867,23 @@ export function ComandaConteudo({
     </div>
   );
 
-  // Saldos: só número e ícone; o nome aparece no tooltip
-  const saldosCliente = () => (
-    <div className="flex items-center justify-between gap-3 px-4">
-      {[
-        { label: "Moedas", icon: Coins, valor: "0" },
-        { label: "Packs", icon: Package, valor: "1" },
-        { label: "Débitos (a cliente deve)", icon: ArrowDown, valor: R$(0) },
-        { label: "Créditos (saldo a favor)", icon: ArrowUp, valor: R$(0) },
-      ].map(({ label, icon: Icone, valor }) => (
+  // Saldos: só aparecem os que a cliente tem; crédito em azul, débito em vermelho
+  // Exemplo: valores variam pelo nº da comanda
+  const par = agendamento.id % 2 === 0;
+  const saldos = [
+    { label: "Moedas", icon: Coins, n: par ? 12 : 0, valor: String(par ? 12 : 0), cor: "" },
+    { label: "Packs", icon: Package, n: pacotesCliente.length, valor: String(pacotesCliente.length), cor: "" },
+    { label: "Débitos (a cliente deve)", icon: ArrowDown, n: par ? 0 : 45, valor: R$(par ? 0 : 45), cor: "text-destructive" },
+    { label: "Créditos (saldo a favor)", icon: ArrowUp, n: par ? 30 : 0, valor: R$(par ? 30 : 0), cor: "text-info" },
+  ].filter((s) => s.n > 0);
+  const planoAtrasado = !par;
+  const saldosCliente = () => saldos.length > 0 && (
+    <div className="flex items-center gap-5 px-4">
+      {saldos.map(({ label, icon: Icone, valor, cor }) => (
         <Tooltip key={label}>
           <TooltipTrigger asChild>
-            <span className="flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums">
-              <Icone className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <span className={cn("flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums", cor)}>
+              <Icone className={cn("h-4 w-4 shrink-0", cor || "text-muted-foreground")} />
               {valor}
             </span>
           </TooltipTrigger>
@@ -1080,34 +1094,62 @@ export function ComandaConteudo({
                 <div className="mt-4 space-y-4 border-t border-border px-4 pb-4 pt-4 text-[13px]">
                   <div className="flex items-start gap-2.5">
                     <Crown className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span>
-                      Plano Especial · ativo
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-2">
+                        Plano Especial
+                        <span
+                          className={cn(
+                            "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                            planoAtrasado ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success",
+                          )}
+                        >
+                          {planoAtrasado ? "Atrasado" : "Ativo"}
+                        </span>
+                      </span>
                       <span className="block text-xs text-muted-foreground">Cortes e escova ilimitados</span>
                     </span>
                   </div>
-                  {pacotesCliente.map((p) => (
-                    <div key={p.nome} className="flex items-start gap-2.5">
-                      <Package className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                      <span className="min-w-0 flex-1">
-                        {p.nome}
-                        <span className="block text-xs text-muted-foreground">
-                          Restam {p.total - p.usadas} de {p.total} sessões
-                        </span>
-                        <span className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                          <span
-                            className="block h-full rounded-full bg-success"
-                            style={{ width: `${((p.total - p.usadas) / p.total) * 100}%` }}
-                          />
-                        </span>
-                      </span>
+                  {pacotesCliente.length > 0 && (
+                    <div>
+                      <button
+                        onClick={() => setPacotesAbertos((v) => !v)}
+                        className="flex w-full items-center justify-between"
+                      >
+                        <span className={tituloSecao}>Pacotes ({pacotesCliente.length})</span>
+                        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", pacotesAbertos && "rotate-180")} />
+                      </button>
+                      {pacotesAbertos && (
+                        <div className="mt-3 space-y-4">
+                          {pacotesCliente.map((p) => (
+                            <div key={p.nome} className="flex items-start gap-2.5">
+                              <Package className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                              <span className="min-w-0 flex-1">
+                                {p.nome}
+                                <span className="block text-xs text-muted-foreground">
+                                  Restam {p.total - p.usadas} de {p.total} sessões
+                                </span>
+                                <span className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                  <span
+                                    className="block h-full rounded-full bg-success"
+                                    style={{ width: `${((p.total - p.usadas) / p.total) * 100}%` }}
+                                  />
+                                </span>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  )}
 
                   <div className="border-t border-border pt-4">
                     <div className="mb-2 flex items-center justify-between">
-                      <p className={tituloSecao}>Observações</p>
+                      <button onClick={() => setObsAbertas((v) => !v)} className="flex items-center gap-1.5">
+                        <span className={tituloSecao}>Observações ({observacoes.length})</span>
+                        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", obsAbertas && "rotate-180")} />
+                      </button>
                       {!editandoObs && (
-                        <button onClick={() => setEditandoObs(true)} className="text-[13px] font-medium text-info hover:underline">
+                        <button onClick={() => { setEditandoObs(true); setObsAbertas(true); }} className="text-[13px] font-medium text-info hover:underline">
                           + Adicionar
                         </button>
                       )}
@@ -1155,7 +1197,7 @@ export function ComandaConteudo({
                     {observacoes.length === 0 && !editandoObs && (
                       <p className="text-[13px] text-muted-foreground">Nenhuma observação registrada.</p>
                     )}
-                    <ul className="space-y-2.5">
+                    <ul className={cn("space-y-2.5", !obsAbertas && "hidden")}>
                       {observacoes.map((o) => (
                         <li key={o.id} className="flex items-start gap-2.5">
                           <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
