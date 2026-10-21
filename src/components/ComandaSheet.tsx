@@ -683,10 +683,10 @@ export function ComandaConteudo({
               compacto ? "text-sm" : "text-sm",
             )}
           >
-            {R$(valorItem(i))}
-            {alterado && (
+            {i.gratuito ? <span className="text-success">Gratuito</span> : R$(valorItem(i))}
+            {(alterado || i.gratuito) && (
               <span className="text-[11px] font-normal text-muted-foreground line-through">
-                {R$(original * (i.qtd ?? 1))}
+                {R$((i.gratuito ? i.valor : original) * (i.qtd ?? 1))}
               </span>
             )}
           </button>
@@ -694,6 +694,13 @@ export function ComandaConteudo({
         <PopoverContent align="end" className="w-60 p-3">
           <p className="text-[13px] font-semibold">Preço de {i.descricao}</p>
           <p className="mb-2 text-xs text-muted-foreground">Tabela: {R$(original)}{i.qtd && i.qtd > 1 ? " cada" : ""}</p>
+          <label className="mb-3 flex cursor-pointer items-center justify-between rounded-md border border-border px-2.5 py-2 text-[13px]">
+            Gratuidade
+            <Switch
+              checked={!!i.gratuito}
+              onCheckedChange={(v) => alterarItem(i.id, (it) => ({ ...it, gratuito: v }))}
+            />
+          </label>
           <form
             onSubmit={(e) => {
               e.preventDefault();
