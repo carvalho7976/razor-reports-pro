@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import type React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -236,6 +237,10 @@ const noTopo = { position: "top-center" as const };
 
 // Ação principal no padrão do sistema: botão escuro, o mesmo do "Novo" das tabelas
 const btnPrincipal = "bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foreground))] hover:bg-[hsl(var(--novo-btn)/0.85)]";
+
+// Campos de dinheiro: ao clicar já seleciona tudo, para digitar por cima sem apagar
+const selecionarTudo = (e: React.FocusEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>) =>
+  e.currentTarget.select();
 
 const valorItem = (i: Item) => i.valor * (i.qtd ?? 1);
 
@@ -632,6 +637,7 @@ export function ComandaConteudo({
               <Input
                 name="valor"
                 autoFocus
+                onFocus={selecionarTudo}
                 defaultValue={i.valor.toFixed(2).replace(".", ",")}
                 className="h-8 pl-8 text-[13px] tabular-nums"
                 aria-label="Novo preço"
@@ -831,8 +837,11 @@ export function ComandaConteudo({
     icon: Icon,
     sub,
     marca,
+    rotulo,
   }: {
     value: string;
+    /** Texto exibido no card quando difere do valor da forma (ex.: só o final do cartão) */
+    rotulo?: string;
     icon?: typeof Crown;
     sub?: string;
     /** Logo colorido no lugar do ícone (ex.: bandeira do cartão salvo) */
@@ -849,7 +858,7 @@ export function ComandaConteudo({
       {marca ??
         (Icon && <Icon className={cn("h-4 w-4 shrink-0", forma === value ? "text-foreground" : "text-muted-foreground")} />)}
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-medium">{value}</span>
+        <span className="block truncate font-medium">{rotulo ?? value}</span>
         {sub && <span className="block truncate text-xs text-muted-foreground">{sub}</span>}
       </span>
       <span
@@ -1143,7 +1152,8 @@ export function ComandaConteudo({
                   cardForma({
                     value: `${agendamento.cartaoSalvo.bandeira} •••• ${agendamento.cartaoSalvo.final}`,
                     marca: <BandeiraCartao bandeira={agendamento.cartaoSalvo.bandeira} className="h-6 w-9" />,
-                    sub: `Salvo · vence ${agendamento.cartaoSalvo.validade}`,
+                    rotulo: `•••• ${agendamento.cartaoSalvo.final}`,
+                    sub: `Vence ${agendamento.cartaoSalvo.validade}`,
                   })}
                 {formasDaCliente.map((f) => cardForma(f))}
               </div>
@@ -1169,12 +1179,18 @@ export function ComandaConteudo({
                         ))}
                       </SelectContent>
                     </Select>
-                    <Input
-                      value={novoPgValor}
-                      onChange={(e) => setNovoPgValor(e.target.value)}
-                      placeholder={resta ? resta.toFixed(2).replace(".", ",") : "Valor"}
-                      className="h-9 text-[13px]"
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">R$</span>
+                      <Input
+                        value={novoPgValor}
+                        onChange={(e) => setNovoPgValor(e.target.value)}
+                        onFocus={selecionarTudo}
+                        onMouseUp={(e) => e.preventDefault()}
+                        placeholder="0,00"
+                        aria-label="Valor desta parte"
+                        className="h-9 pl-9 text-[13px] tabular-nums"
+                      />
+                    </div>
                     <Button size="sm" variant="outline" className="h-9 gap-1 text-[13px] hover:bg-muted hover:text-foreground" onClick={addPagamento}>
                       <Plus className="h-3.5 w-3.5" /> Adicionar
                     </Button>
@@ -1277,23 +1293,19 @@ export function ComandaConteudo({
 
         <Dialog open={confirmando} onOpenChange={setConfirmando}>
           <DialogContent className="max-w-md gap-0 p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
-            <DialogHeader className="space-y-0.5 border-b border-border px-5 py-4 text-left">
+            <DialogHeader className="space-y-0.5 px-5 pb-2 pt-5 text-left">
               <DialogTitle className="text-base">Confirmar pagamento</DialogTitle>
               <DialogDescription className="text-[13px]">
                 {agendamento.cliente} · #{numeroComanda}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 px-5 py-4">
-              <div className="overflow-hidden rounded-lg border border-border">
-                <div className="grid grid-cols-[1fr_auto] bg-muted/50 px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  <span>Pagamento</span>
-                  <span>Valor</span>
-                </div>
+            <div className="space-y-5 px-5 py-3">
+              <div className="space-y-2">
                 {linhasPagamento.map((l, idx) => (
-                  <div key={idx} className="flex items-center gap-3 border-t border-border px-3 py-2.5 text-sm">
+                  <div key={idx} className="flex items-center gap-3 text-sm">
                     <OrigemPagamento forma={l.forma} />
-                    <span className="min-w-0 flex-1 truncate">{l.forma}</span>
+                    <span className="min-w-0 flex-1 truncate font-medium">{l.forma}</span>
                     {forma === "Dividir" ? (
                       <span className="font-semibold tabular-nums">{R$(l.valor)}</span>
                     ) : (
@@ -1302,6 +1314,8 @@ export function ComandaConteudo({
                         <Input
                           value={recebido}
                           onChange={(e) => setRecebido(e.target.value)}
+                          onFocus={selecionarTudo}
+                          onMouseUp={(e) => e.preventDefault()}
                           aria-label="Valor recebido"
                           className="h-8 pl-8 text-right text-sm font-semibold tabular-nums"
                         />
@@ -1309,15 +1323,15 @@ export function ComandaConteudo({
                     )}
                   </div>
                 ))}
-                <div className="flex items-center justify-between border-t border-border bg-muted/30 px-3 py-2.5 text-sm">
-                  <span className="font-semibold">Total da comanda</span>
-                  <span className="font-semibold tabular-nums">{R$(total)}</span>
+                <div className="flex items-center justify-between pt-1 text-[13px] text-muted-foreground">
+                  <span>Total da comanda</span>
+                  <span className="tabular-nums">{R$(total)}</span>
                 </div>
               </div>
 
-              <div className="divide-y divide-border rounded-lg border border-border">
+              <div className="space-y-3 border-t border-border pt-4">
                 {excedente > 0 && (
-                  <label className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">
+                  <label className="flex cursor-pointer items-center justify-between gap-3">
                     <span>
                       <span className="block text-sm font-medium">Lançar {R$(excedente)} como crédito</span>
                       <span className="block text-xs text-muted-foreground">
@@ -1327,11 +1341,11 @@ export function ComandaConteudo({
                     <Switch checked={lancarCredito} onCheckedChange={setLancarCredito} />
                   </label>
                 )}
-                <label className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">
+                <label className="flex cursor-pointer items-center justify-between gap-3">
                   <span className="text-sm font-medium">Imprimir comprovante</span>
                   <Switch checked={imprimir} onCheckedChange={setImprimir} />
                 </label>
-                <label className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">
+                <label className="flex cursor-pointer items-center justify-between gap-3">
                   <span className="text-sm font-medium">Emitir nota fiscal</span>
                   <Switch checked={emitirNota} onCheckedChange={setEmitirNota} />
                 </label>
@@ -1341,7 +1355,7 @@ export function ComandaConteudo({
               )}
             </div>
 
-            <div className="flex gap-2 border-t border-border px-5 py-4">
+            <div className="flex gap-2 px-5 pb-5 pt-3">
               <Button variant="outline" className="h-9 flex-1 hover:bg-muted hover:text-foreground" onClick={() => setConfirmando(false)}>
                 Voltar
               </Button>
