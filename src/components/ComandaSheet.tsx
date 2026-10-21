@@ -78,7 +78,8 @@ type Item = {
   detalhe: string;
   valor: number;
   tipo: "servico" | "produto" | "pack";
-  assinatura?: boolean;
+  /** Serviço coberto por assinatura ou pacote da cliente: sai zerado, com o motivo */
+  cobertura?: Cobertura;
   qtd?: number;
   semEstoque?: boolean;
   /** Só serviços e pacotes: quem atende e quem ajuda */
@@ -140,6 +141,17 @@ const categoriaDe = (servico: string) => {
 
 const corCategoria = (servico: string) => categorias[categoriaDe(servico)];
 
+// Exemplo: a cliente assina o "Plano Especial" (cabelo ilimitado) e tem um pacote de hidratação
+const coberturaPara = (servico: string): Cobertura | undefined => {
+  if (/pacote/i.test(servico)) return { tipo: "pacote", nome: servico, detalhe: "sessão 2 de 5" };
+  const cat = categoriaDe(servico);
+  if (cat === "Cabelo") return { tipo: "assinatura", nome: "Plano Especial", detalhe: "cortes e escova ilimitados" };
+  if (cat === "Tratamento") return { tipo: "pacote", nome: "Pacote Hidratação", detalhe: "sessão 3 de 5" };
+  return undefined;
+};
+
+type Cobertura = { tipo: "assinatura" | "pacote"; nome: string; detalhe: string };
+
 type CatalogoItem = { nome: string; valor: number; detalhe?: string; tipo: Item["tipo"]; semEstoque?: boolean };
 
 
@@ -171,6 +183,10 @@ const catalogo: Record<"servicos" | "produtos" | "pacotes" | "assinaturas", Cata
     { nome: "Plano Especial", valor: 189, detalhe: "por mês · corte, escova e hidratação", tipo: "pack" },
   ],
 };
+
+const precoTabela = (servico: string) =>
+  catalogo.servicos.find((c) => c.nome.toLowerCase() === servico.toLowerCase())?.valor ??
+  (/pacote/i.test(servico) ? 30 : 50);
 
 const recompraSugestoes: CatalogoItem[] = [
   { nome: "Pomada Modeladora", valor: 49, detalhe: "comprou há 28 dias", tipo: "produto" },
@@ -228,8 +244,14 @@ const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa
     assistentes: [],
     valor: a?.valor ?? 0,
     tipo: "servico",
-    assinatura: variante === "agenda",
   };
+  // Na agenda, o serviço agendado já entra com a cobertura da assinatura/pacote da cliente
+  const cob = variante === "agenda" && a ? coberturaPara(a.servico) : undefined;
+  if (cob && a) {
+    servico.cobertura = cob;
+    servico.valorOriginal = precoTabela(a.servico);
+    servico.valor = 0;
+  }
   // Comanda de balcão começa só com o que veio da lista; a da agenda traz o exemplo da água
   return variante === "caixa"
     ? [servico]
@@ -403,7 +425,9 @@ export function ComandaConteudo({
           detalhe: c.tipo === "produto" ? "Produto" : "",
           profissional: agendamento.profissional || equipeSalao[0].nome,
           assistentes: c.tipo === "produto" ? undefined : [],
-          valor: c.valor,
+          ...(c.tipo === "servico" && coberturaPara(c.nome)
+            ? { valor: 0, valorOriginal: c.valor, cobertura: coberturaPara(c.nome) }
+            : { valor: c.valor }),
           tipo: c.tipo,
           qtd: c.tipo === "produto" ? 1 : undefined,
           semEstoque: c.semEstoque,
@@ -672,16 +696,32 @@ export function ComandaConteudo({
               </button>
             ))}
           </div>
-          {alterado && (
-            <button
-              onClick={() => {
-                aplicarPreco(i, original);
-                setEditandoPreco(null);
-              }}
-              className="mt-2.5 text-[13px] text-info hover:underline"
-            >
-              Voltar ao preço de tabela
-            </button>
+          {i.cobertura ? (
+            <div className="mt-3 rounded-md bg-success/10 px-2.5 py-2 text-xs text-success">
+              Coberto {i.cobertura.tipo === "assinatura" ? "pela assinatura" : "pelo pacote"} {i.cobertura.nome} (
+              {i.cobertura.detalhe}).
+              <button
+                onClick={() => {
+                  alterarItem(i.id, (it) => ({ ...it, valor: original, cobertura: undefined }));
+                  setEditandoPreco(null);
+                }}
+                className="mt-1 block font-medium text-info hover:underline"
+              >
+                Cobrar normalmente
+              </button>
+            </div>
+          ) : (
+            alterado && (
+              <button
+                onClick={() => {
+                  aplicarPreco(i, original);
+                  setEditandoPreco(null);
+                }}
+                className="mt-2.5 text-[13px] text-info hover:underline"
+              >
+                Voltar ao preço de tabela
+              </button>
+            )
           )}
         </PopoverContent>
       </Popover>
@@ -701,12 +741,17 @@ export function ComandaConteudo({
             <div className="min-w-0">
               <p className={cn("truncate font-medium", compacto ? "text-sm" : "text-sm")}>
                 {i.descricao}
-                {i.assinatura && (
-                  <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 align-middle text-[10px] font-medium text-muted-foreground">
-                    Assinatura
-                  </span>
-                )}
               </p>
+              {i.cobertura && (
+                <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-medium text-success">
+                  {i.cobertura.tipo === "assinatura" ? (
+                    <Crown className="h-3.5 w-3.5 shrink-0" />
+                  ) : (
+                    <Package className="h-3.5 w-3.5 shrink-0" />
+                  )}
+                  {i.cobertura.tipo === "assinatura" ? `Assinatura ${i.cobertura.nome}` : i.cobertura.nome} · {i.cobertura.detalhe}
+                </p>
+              )}
               {equipe(i)}
             </div>
             <div className="flex items-center gap-1">
