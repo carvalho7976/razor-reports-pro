@@ -30,6 +30,7 @@ import {
   Copy,
   CreditCard,
   Crown,
+  Gift,
   History,
   Link2,
   Minus,
@@ -437,11 +438,8 @@ export function ComandaConteudo({
   const [profEscolhida, setProfEscolhida] = useState("");
   const [assistEscolhidos, setAssistEscolhidos] = useState<string[]>([]);
 
+  // Todo item (serviço, produto, pack) passa pela escolha de quem vendeu/atendeu
   const escolherItem = (c: CatalogoItem) => {
-    if (c.tipo === "produto") {
-      adicionar(c);
-      return;
-    }
     // Já vem marcada a profissional da comanda, então o caso comum é um clique só em "Adicionar"
     setProfEscolhida(agendamento.profissional || equipeSalao[0].nome);
     setAssistEscolhidos([]);
@@ -683,7 +681,7 @@ export function ComandaConteudo({
               compacto ? "text-sm" : "text-sm",
             )}
           >
-            {i.gratuito ? <span className="text-success">Gratuito</span> : R$(valorItem(i))}
+            {R$(valorItem(i))}
             {(alterado || i.gratuito) && (
               <span className="text-[11px] font-normal text-muted-foreground line-through">
                 {R$((i.gratuito ? i.valor : original) * (i.qtd ?? 1))}
@@ -695,7 +693,7 @@ export function ComandaConteudo({
           <p className="text-[13px] font-semibold">Preço de {i.descricao}</p>
           <p className="mb-2 text-xs text-muted-foreground">Tabela: {R$(original)}{i.qtd && i.qtd > 1 ? " cada" : ""}</p>
           <label className="mb-3 flex cursor-pointer items-center justify-between rounded-md border border-border px-2.5 py-2 text-[13px]">
-            Gratuidade
+            Cortesia
             <Switch
               checked={!!i.gratuito}
               onCheckedChange={(v) => alterarItem(i.id, (it) => ({ ...it, gratuito: v }))}
@@ -795,6 +793,11 @@ export function ComandaConteudo({
                     <Package className="h-3.5 w-3.5 shrink-0" />
                   )}
                   {i.cobertura.tipo === "assinatura" ? `Assinatura ${i.cobertura.nome}` : i.cobertura.nome} · {i.cobertura.detalhe}
+                </p>
+              )}
+              {i.gratuito && (
+                <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-medium text-success">
+                  <Gift className="h-3.5 w-3.5 shrink-0" /> Cortesia
                 </p>
               )}
               {equipe(i)}
@@ -1529,8 +1532,8 @@ export function ComandaConteudo({
                 ))}
               </div>
 
-              <p className={cn(tituloSecao, "mb-2 mt-4")}>Assistentes</p>
-              <div className="flex flex-wrap gap-1.5">
+              {escolhendoEquipe?.tipo !== "produto" && <p className={cn(tituloSecao, "mb-2 mt-4")}>Assistentes</p>}
+              <div className={cn("flex flex-wrap gap-1.5", escolhendoEquipe?.tipo === "produto" && "hidden")}>
                 {equipeSalao
                   .filter((e) => e.nome !== profEscolhida)
                   .map((e) => {
