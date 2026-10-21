@@ -867,19 +867,23 @@ export function ComandaConteudo({
     </div>
   );
 
-  // Saldos: só número e ícone; o nome aparece no tooltip
-  const saldosCliente = () => (
-    <div className="flex items-center justify-between gap-3 px-4">
-      {[
-        { label: "Moedas", icon: Coins, valor: "0" },
-        { label: "Packs", icon: Package, valor: "1" },
-        { label: "Débitos (a cliente deve)", icon: ArrowDown, valor: R$(0) },
-        { label: "Créditos (saldo a favor)", icon: ArrowUp, valor: R$(0) },
-      ].map(({ label, icon: Icone, valor }) => (
+  // Saldos: só aparecem os que a cliente tem; crédito em azul, débito em vermelho
+  // Exemplo: valores variam pelo nº da comanda
+  const par = agendamento.id % 2 === 0;
+  const saldos = [
+    { label: "Moedas", icon: Coins, n: par ? 12 : 0, valor: String(par ? 12 : 0), cor: "" },
+    { label: "Packs", icon: Package, n: pacotesCliente.length, valor: String(pacotesCliente.length), cor: "" },
+    { label: "Débitos (a cliente deve)", icon: ArrowDown, n: par ? 0 : 45, valor: R$(par ? 0 : 45), cor: "text-destructive" },
+    { label: "Créditos (saldo a favor)", icon: ArrowUp, n: par ? 30 : 0, valor: R$(par ? 30 : 0), cor: "text-info" },
+  ].filter((s) => s.n > 0);
+  const planoAtrasado = !par;
+  const saldosCliente = () => saldos.length > 0 && (
+    <div className="flex items-center gap-5 px-4">
+      {saldos.map(({ label, icon: Icone, valor, cor }) => (
         <Tooltip key={label}>
           <TooltipTrigger asChild>
-            <span className="flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums">
-              <Icone className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <span className={cn("flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums", cor)}>
+              <Icone className={cn("h-4 w-4 shrink-0", cor || "text-muted-foreground")} />
               {valor}
             </span>
           </TooltipTrigger>
