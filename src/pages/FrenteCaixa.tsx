@@ -79,7 +79,7 @@ export default function FrenteCaixa() {
     <AppLayout>
       <div className="flex h-full min-h-0 flex-col gap-4 lg:-ml-6 lg:flex-row">
         <aside className="flex w-full shrink-0 flex-col rounded-xl bg-card lg:w-[300px]">
-          <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+          <div className="flex h-[65px] shrink-0 items-center justify-between gap-2 border-b border-border px-4">
             <h1 className="text-sm font-semibold">Comandas abertas</h1>
             <div className="flex items-center gap-1">
               <DateRangePicker
