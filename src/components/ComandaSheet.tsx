@@ -33,7 +33,10 @@ import {
   History,
   Link2,
   Minus,
+  MoreHorizontal,
   MoreVertical,
+  ArrowDown,
+  ArrowUp,
   Package,
   ReceiptText,
   Plus,
@@ -51,6 +54,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BandeiraCartao } from "@/components/BandeiraCartao";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export type ComandaAgendamento = {
@@ -195,6 +199,19 @@ const recompraSugestoes: CatalogoItem[] = [
 
 const ultimaVisita = { data: "27/04/2026", servico: "Corte Feminino", prof: "Matheus" };
 
+// Exemplo: pacotes ativos da cliente (sessões usadas de um total)
+const pacotesCliente = [
+  { nome: "Pacote Hidratação", usadas: 2, total: 5 },
+  { nome: "Pacote Escova", usadas: 7, total: 10 },
+];
+
+type Observacao = { id: number; texto: string; data: string; autor: string };
+
+const observacoesExemplo: Observacao[] = [
+  { id: 1, texto: "Alérgica a dipirona.", data: "12/03/2026", autor: "Lara" },
+  { id: 2, texto: "Prefere não cortar a franja.", data: "27/04/2026", autor: "Matheus" },
+];
+
 const statusOpcoes = [
   { value: "agendado", label: "Agendado", cor: "bg-info" },
   { value: "confirmado", label: "Confirmado", cor: "bg-success" },
@@ -338,6 +355,7 @@ export function ComandaConteudo({
 }) {
   const [etapa, setEtapa] = useState<Etapa>(agendamento?.nova ? "carrinho" : "agendamento");
   const [status, setStatus] = useState("agendado");
+  const [observacoes, setObservacoes] = useState<Observacao[]>(observacoesExemplo);
   const [obs, setObs] = useState("");
   const [editandoObs, setEditandoObs] = useState(false);
   const [itens, setItens] = useState<Item[]>(() => itensIniciais(agendamento, variante));
@@ -361,6 +379,7 @@ export function ComandaConteudo({
     setEtapa(agendamento?.nova ? "carrinho" : "agendamento");
     setStatus("agendado");
     setObs("");
+    setObservacoes(observacoesExemplo);
     setEditandoObs(false);
     setItens(itensIniciais(agendamento, variante));
     setAba("rapida");
@@ -770,43 +789,79 @@ export function ComandaConteudo({
     </div>
   );
 
-  // Card da cliente: o mesmo em todas as etapas (agendamento, carrinho e pagamento)
+  // Cabeçalho da cliente: o mesmo em todas as etapas (sem moldura; visita e retorno ficam no menu ⋯)
   const subtituloCliente = agendamento.telefone ?? [agendamento.data, agendamento.inicio].filter(Boolean).join(" · ");
   const cartaoCliente = () => (
-    <div className="m-4 rounded-xl border border-border p-3">
-      <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
-          <p className="truncate text-[13px] text-muted-foreground">{subtituloCliente}</p>
-        </div>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-[13px] font-semibold text-foreground">
-          {iniciais}
-        </div>
+    <div className="flex items-center gap-3 px-4 pb-3 pt-4">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-[13px] font-semibold text-foreground">
+        {iniciais}
       </div>
-      <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-[13px] text-muted-foreground">
-        <span className="flex min-w-0 items-center gap-1.5 truncate">
-          <Crown className="h-3.5 w-3.5 shrink-0" /> Assinante · R$ 0,00 em créditos
-        </span>
-        <div className="flex shrink-0 items-center gap-1">
-          <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="inline-flex items-center gap-0.5 rounded px-1 font-medium text-foreground hover:bg-muted">
-                Ações <ChevronDown className="h-3 w-3" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast("Abrindo ficha da cliente", noTopo)}>Ver ficha</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast("Abrindo histórico", noTopo)}>Histórico de visitas</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}>
-                Enviar lembrete
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setEtapa("carrinho")}>Cobrar avulso</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
+        <p className="truncate text-[13px] text-muted-foreground">{subtituloCliente}</p>
       </div>
+      <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-muted hover:text-foreground"
+            aria-label="Opções da cliente"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-60">
+          <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => toast("Abrindo ficha da cliente", noTopo)}>Ver ficha</DropdownMenuItem>
+          <DropdownMenuItem className="items-start" onClick={() => toast("Abrindo histórico", noTopo)}>
+            <History className="mr-2 mt-0.5 h-4 w-4" />
+            <span>
+              Histórico de visitas
+              <span className="block text-xs text-muted-foreground">
+                Última {ultimaVisita.data.slice(0, 5)} · {ultimaVisita.servico}
+              </span>
+            </span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="items-start" onClick={() => toast("Abrindo agenda para o retorno", noTopo)}>
+            <RefreshCw className="mr-2 mt-0.5 h-4 w-4" />
+            <span>
+              Agendar retorno
+              <span className="block text-xs text-muted-foreground">Ideal em 28 dias</span>
+            </span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}>
+            Enviar lembrete
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setEtapa("carrinho")}>Cobrar avulso</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+
+  // Saldos: só número e ícone; o nome aparece no tooltip
+  const saldosCliente = () => (
+    <div className="flex items-center justify-between gap-3 px-4">
+      {[
+        { label: "Moedas", icon: Coins, valor: "0" },
+        { label: "Packs", icon: Package, valor: "1" },
+        { label: "Débitos (a cliente deve)", icon: ArrowDown, valor: R$(0) },
+        { label: "Créditos (saldo a favor)", icon: ArrowUp, valor: R$(0) },
+      ].map(({ label, icon: Icone, valor }) => (
+        <Tooltip key={label}>
+          <TooltipTrigger asChild>
+            <span className="flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums">
+              <Icone className="h-4 w-4 shrink-0 text-muted-foreground" />
+              {valor}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            {label}
+          </TooltipContent>
+        </Tooltip>
+      ))}
     </div>
   );
 
@@ -1010,65 +1065,98 @@ export function ComandaConteudo({
               <aside className={cn("flex w-full shrink-0 flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
                 <div className="min-h-0 flex-1 overflow-y-auto">
                 {cartaoCliente()}
-                <div className="space-y-4 px-4 pb-4 text-[13px]">
-                  <dl className="grid grid-cols-4 divide-x divide-border">
-                    {[
-                      { label: "Moedas", valor: "0" },
-                      { label: "Packs", valor: "1" },
-                      { label: "Débitos", valor: R$(0) },
-                      { label: "Créditos", valor: R$(0) },
-                    ].map(({ label, valor }) => (
-                      <div key={label} className="px-2 first:pl-0">
-                        <dt className="text-xs text-muted-foreground">{label}</dt>
-                        <dd className="text-sm font-medium tabular-nums">{valor}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                  <div className="space-y-2.5 border-t border-border pt-4">
-                    <p className="flex items-start gap-2">
-                      <Crown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      <span>Plano Especial · ativo</span>
-                    </p>
-                    <p className="flex items-start gap-2">
-                      <History className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      <span>
-                        Última visita {ultimaVisita.data.slice(0, 5)} · {ultimaVisita.servico}
+                {saldosCliente()}
+                <div className="mt-4 space-y-4 border-t border-border px-4 pb-4 pt-4 text-[13px]">
+                  <div className="flex items-start gap-2.5">
+                    <Crown className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span>
+                      Plano Especial · ativo
+                      <span className="block text-xs text-muted-foreground">Cortes e escova ilimitados</span>
+                    </span>
+                  </div>
+                  {pacotesCliente.map((p) => (
+                    <div key={p.nome} className="flex items-start gap-2.5">
+                      <Package className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span className="min-w-0 flex-1">
+                        {p.nome}
+                        <span className="block text-xs text-muted-foreground">
+                          Restam {p.total - p.usadas} de {p.total} sessões
+                        </span>
+                        <span className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                          <span
+                            className="block h-full rounded-full bg-success"
+                            style={{ width: `${((p.total - p.usadas) / p.total) * 100}%` }}
+                          />
+                        </span>
                       </span>
-                    </p>
-                    <p className="flex items-start gap-2">
-                      <RefreshCw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      <span>Retorno ideal em 28 dias</span>
-                    </p>
-                    {editandoObs ? (
-                      <div className="space-y-2">
+                    </div>
+                  ))}
+
+                  <div className="border-t border-border pt-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className={tituloSecao}>Observações</p>
+                      {!editandoObs && (
+                        <button onClick={() => setEditandoObs(true)} className="text-[13px] font-medium text-info hover:underline">
+                          + Adicionar
+                        </button>
+                      )}
+                    </div>
+                    {editandoObs && (
+                      <div className="mb-3 space-y-2">
                         <Textarea
                           autoFocus
                           value={obs}
                           onChange={(e) => setObs(e.target.value)}
                           placeholder="Ex: alérgica a dipirona, não cortar franja"
-                          className="min-h-[70px] resize-none text-[13px]"
+                          className="min-h-[64px] resize-none text-[13px]"
                         />
-                        <Button size="sm" variant="outline" className="h-7 w-full text-[13px] hover:bg-muted hover:text-foreground" onClick={() => setEditandoObs(false)}>
-                          Salvar observação
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className={cn("h-7 flex-1 text-[13px]", btnPrincipal)}
+                            onClick={() => {
+                              if (obs.trim()) {
+                                setObservacoes((prev) => [
+                                  { id: Date.now(), texto: obs.trim(), data: new Date().toLocaleDateString("pt-BR"), autor: "Lara" },
+                                  ...prev,
+                                ]);
+                              }
+                              setObs("");
+                              setEditandoObs(false);
+                            }}
+                          >
+                            Salvar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 flex-1 text-[13px] hover:bg-muted hover:text-foreground"
+                            onClick={() => {
+                              setObs("");
+                              setEditandoObs(false);
+                            }}
+                          >
+                            Cancelar
+                          </Button>
+                        </div>
                       </div>
-                    ) : obs ? (
-                      <button
-                        onClick={() => setEditandoObs(true)}
-                        className="w-full rounded-lg bg-warning/10 px-3 py-2 text-left"
-                      >
-                        <span className="flex items-start gap-2">
-                          <StickyNote className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {obs}
-                        </span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setEditandoObs(true)}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-                      >
-                        <StickyNote className="h-3.5 w-3.5" /> Adicionar observação
-                      </button>
                     )}
+                    {observacoes.length === 0 && !editandoObs && (
+                      <p className="text-[13px] text-muted-foreground">Nenhuma observação registrada.</p>
+                    )}
+                    <ul className="space-y-2.5">
+                      {observacoes.map((o) => (
+                        <li key={o.id} className="flex items-start gap-2.5">
+                          <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                          <span>
+                            {o.texto}
+                            <span className="block text-xs text-muted-foreground">
+                              {o.data} · {o.autor}
+                            </span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
                 </div>
