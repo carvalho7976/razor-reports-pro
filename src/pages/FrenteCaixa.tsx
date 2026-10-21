@@ -17,7 +17,7 @@ const hoje = () => new Date().toLocaleDateString("pt-BR");
 
 const comandasIniciais: ComandaAberta[] = [
   { id: 3961388, cliente: "Caio César", servico: "auxiliar", profissional: "Claudia", inicio: "", fim: "", data: "19/10/2026", abertaEm: "19/10", valor: 0 },
-  { id: 3961390, cliente: "João Silva", servico: "Corte Masculino", profissional: "Cesar", inicio: "", fim: "", data: "19/10/2026", abertaEm: "19/10", valor: 50, telefone: "(41) 99123-4567", cartaoSalvo: { bandeira: "Mastercard", final: "9365", validade: "08/28" } },
+  { id: 3961390, cliente: "João Silva", servico: "Corte Masculino", profissional: "Cesar", inicio: "", fim: "", data: "19/10/2026", abertaEm: "19/10", valor: 50, origem: "Agenda", telefone: "(41) 99123-4567", cartaoSalvo: { bandeira: "Mastercard", final: "9365", validade: "08/28" } },
   { id: 3961391, cliente: "Maria Santos", servico: "Escova", profissional: "Claudia", inicio: "", fim: "", data: "18/10/2026", abertaEm: "18/10", valor: 60, telefone: "(41) 98765-4321" },
 ];
 

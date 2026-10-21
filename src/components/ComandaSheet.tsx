@@ -62,6 +62,8 @@ export type ComandaAgendamento = {
   fim: string;
   data: string;
   telefone?: string;
+  /** De onde veio a comanda (Balcão, Agenda...). Padrão: Balcão */
+  origem?: string;
   /** Cartão já salvo no cadastro da cliente, oferecido primeiro no pagamento */
   cartaoSalvo?: { bandeira: string; final: string; validade: string };
   /** Valor do primeiro item, quando a comanda já vem com preço (frente de caixa) */
@@ -892,11 +894,11 @@ export function ComandaConteudo({
                     </span>
                     <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
-                    {variante === "agenda" && (
-                      <p className="truncate text-[13px] text-muted-foreground">
-                        {`${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
-                      </p>
-                    )}
+                    <p className="truncate text-[13px] text-muted-foreground">
+                      {variante === "caixa"
+                        ? agendamento.origem ?? "Balcão"
+                        : `${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
+                    </p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
