@@ -2,16 +2,12 @@ import { useState } from "react";
 import { Bell, Heart, CreditCard, Grid3X3, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { toggleCaixa, useCaixaAberto } from "@/lib/caixa";
 import frizzarLogo from "@/assets/frizzar-logo.png";
 
 export function AppHeaderBar() {
   const { toggleSidebar, state, isMobile } = useSidebar();
   const [bannerOpen, setBannerOpen] = useState(true);
-  const caixaAberto = useCaixaAberto();
   const collapsed = !isMobile && state === "collapsed";
 
   return (
@@ -71,15 +67,9 @@ export function AppHeaderBar() {
           <span className="hidden sm:inline">Comandas</span>
         </Link>
 
-        <button
-          type="button"
-          onClick={toggleCaixa}
-          className="btn-action hidden bg-accent py-1.5 text-xs text-accent-foreground sm:inline-flex"
-          aria-label={caixaAberto ? "Fechar caixa" : "Abrir caixa"}
-        >
+        <button className="btn-action hidden bg-accent py-1.5 text-xs text-accent-foreground sm:inline-flex">
           <Grid3X3 className="h-3.5 w-3.5" />
           <span className="hidden lg:inline">Gaveta</span>
-          <span className={cn("h-1.5 w-1.5 rounded-full", caixaAberto ? "bg-success" : "bg-destructive")} />
         </button>
 
         <div className="ml-1 flex items-center gap-2 sm:ml-2">
@@ -92,29 +82,12 @@ export function AppHeaderBar() {
             </span>
           </button>
 
-          <TooltipProvider delayDuration={150}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="ml-1 flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "rounded-full p-[2.5px] transition-colors duration-300",
-                      caixaAberto ? "bg-success" : "bg-destructive",
-                    )}
-                    aria-label={caixaAberto ? "Caixa aberto" : "Caixa fechado"}
-                  >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-primary/20 text-xs font-bold text-primary">
-                      LP
-                    </span>
-                  </span>
-                  <span className="hidden text-xs font-medium sm:block">Lara</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">
-                {caixaAberto ? "Caixa aberto" : "Caixa fechado"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div className="ml-1 flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
+              LP
+            </div>
+            <span className="hidden text-xs font-medium sm:block">Lara</span>
+          </div>
         </div>
       </div>
     </header>
