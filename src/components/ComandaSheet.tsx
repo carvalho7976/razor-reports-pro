@@ -429,7 +429,23 @@ export function ComandaConteudo({
 
   const statusAtual = statusOpcoes.find((s) => s.value === status) ?? statusOpcoes[0];
 
-  const adicionar = (c: CatalogoItem) => {
+  // Serviço novo: antes de entrar na comanda, escolhe quem atende e quem ajuda
+  const [escolhendoEquipe, setEscolhendoEquipe] = useState<CatalogoItem | null>(null);
+  const [profEscolhida, setProfEscolhida] = useState("");
+  const [assistEscolhidos, setAssistEscolhidos] = useState<string[]>([]);
+
+  const escolherItem = (c: CatalogoItem) => {
+    if (c.tipo === "produto") {
+      adicionar(c);
+      return;
+    }
+    // Já vem marcada a profissional da comanda, então o caso comum é um clique só em "Adicionar"
+    setProfEscolhida(agendamento.profissional || equipeSalao[0].nome);
+    setAssistEscolhidos([]);
+    setEscolhendoEquipe(c);
+  };
+
+  const adicionar = (c: CatalogoItem, equipeItem?: { profissional: string; assistentes: string[] }) => {
     setItens((prev) => {
       // Produto repetido soma na quantidade em vez de virar outra linha
       const existente = c.tipo === "produto" && prev.find((i) => i.tipo === "produto" && i.descricao === c.nome);
@@ -442,8 +458,8 @@ export function ComandaConteudo({
           id: Date.now(),
           descricao: c.nome,
           detalhe: c.tipo === "produto" ? "Produto" : "",
-          profissional: agendamento.profissional || equipeSalao[0].nome,
-          assistentes: c.tipo === "produto" ? undefined : [],
+          profissional: equipeItem?.profissional ?? (agendamento.profissional || equipeSalao[0].nome),
+          assistentes: c.tipo === "produto" ? undefined : equipeItem?.assistentes ?? [],
           ...(c.tipo === "servico" && coberturaPara(c.nome)
             ? { valor: 0, valorOriginal: c.valor, cobertura: coberturaPara(c.nome) }
             : { valor: c.valor }),
@@ -1247,7 +1263,7 @@ export function ComandaConteudo({
                 {listaCatalogo.map((c) => (
                   <button
                     key={c.nome}
-                    onClick={() => adicionar(c)}
+                    onClick={() => escolherItem(c)}
                     className="flex min-h-[54px] items-stretch overflow-hidden rounded-lg border border-border bg-card text-left transition-colors hover:bg-muted active:scale-[0.99]"
                   >
                     {c.tipo === "produto" ? (
@@ -1438,6 +1454,87 @@ export function ComandaConteudo({
             </div>
           </section>
         )}
+
+        <Dialog open={!!escolhendoEquipe} onOpenChange={(o) => !o && setEscolhendoEquipe(null)}>
+          <DialogContent className="max-w-sm gap-0 p-0">
+            <DialogHeader className="space-y-0.5 px-5 pb-2 pt-5 text-left">
+              <DialogTitle className="text-base">{escolhendoEquipe?.nome}</DialogTitle>
+              <DialogDescription className="text-[13px]">
+                {escolhendoEquipe && R$(escolhendoEquipe.valor)}
+                {escolhendoEquipe?.detalhe && ` · ${escolhendoEquipe.detalhe}`}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="px-5 py-2">
+              <p className={cn(tituloSecao, "mb-2")}>Profissional</p>
+              <div className="space-y-1">
+                {equipeSalao.map((e) => (
+                  <button
+                    key={e.nome}
+                    onClick={() => {
+                      setProfEscolhida(e.nome);
+                      setAssistEscolhidos((prev) => prev.filter((n) => n !== e.nome));
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left text-sm transition-colors",
+                      profEscolhida === e.nome ? "bg-info/10" : "hover:bg-muted/60",
+                    )}
+                  >
+                    <FotoProf nome={e.nome} tamanho="h-8 w-8 text-xs" />
+                    <span className="flex-1 font-medium">{e.nome}</span>
+                    {profEscolhida === e.nome && <Check className="h-4 w-4 text-info" />}
+                  </button>
+                ))}
+              </div>
+
+              <p className={cn(tituloSecao, "mb-2 mt-4")}>Assistentes</p>
+              <div className="flex flex-wrap gap-1.5">
+                {equipeSalao
+                  .filter((e) => e.nome !== profEscolhida)
+                  .map((e) => {
+                    const ativo = assistEscolhidos.includes(e.nome);
+                    return (
+                      <button
+                        key={e.nome}
+                        onClick={() =>
+                          setAssistEscolhidos((prev) => (ativo ? prev.filter((n) => n !== e.nome) : [...prev, e.nome]))
+                        }
+                        className={cn(
+                          "inline-flex h-7 items-center gap-1.5 rounded-[30px] border pl-0.5 pr-2.5 text-[13px] transition-colors",
+                          ativo ? "border-info/40 bg-info/10" : "border-border hover:bg-muted",
+                        )}
+                      >
+                        <FotoProf nome={e.nome} tamanho="h-6 w-6 text-[10px]" />
+                        {e.nome}
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+
+            <div className="flex gap-2 px-5 pb-5 pt-4">
+              <Button
+                variant="outline"
+                className="h-9 flex-1 hover:bg-muted hover:text-foreground"
+                onClick={() => setEscolhendoEquipe(null)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                autoFocus
+                className={cn("h-9 flex-1 font-semibold", btnPrincipal)}
+                onClick={() => {
+                  if (escolhendoEquipe) {
+                    adicionar(escolhendoEquipe, { profissional: profEscolhida, assistentes: assistEscolhidos });
+                  }
+                  setEscolhendoEquipe(null);
+                }}
+              >
+                Adicionar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={confirmando} onOpenChange={setConfirmando}>
           <DialogContent className="max-w-md gap-0 p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
