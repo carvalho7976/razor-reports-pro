@@ -210,7 +210,8 @@ type Aba = (typeof abas)[number]["value"];
 
 const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const rotulo = "text-xs font-medium uppercase tracking-wide text-muted-foreground";
+// Título de seção: um só padrão em todas as etapas (Itens da comanda, Adicionar, Forma de pagamento...)
+const tituloSecao = "text-xs font-semibold uppercase tracking-wide text-foreground";
 
 const itensIniciais = (a: ComandaAgendamento | null, variante: "agenda" | "caixa"): Item[] => {
   const servico: Item = {
@@ -884,7 +885,7 @@ export function ComandaConteudo({
 
             <div className={cn("flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden", variante === "caixa" && "gap-4")}>
               <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
-                <div className="flex items-center justify-between gap-3 px-5 pb-3.5 pt-3">
+                <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                       <ReceiptText className="h-[18px] w-[18px]" />
@@ -939,21 +940,9 @@ export function ComandaConteudo({
                     )}
                   </div>
                 </div>
-                {/* Picote: o mesmo semicírculo das bordas repetido ao longo da linha (furos na cor do fundo) */}
-                <div aria-hidden="true" className="relative -my-1.5 h-3 shrink-0 overflow-hidden">
-                  <span
-                    className="absolute -inset-x-1.5 inset-y-0"
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle, hsl(var(--background)) 5px, hsl(var(--border)) 5px, hsl(var(--border)) 5.75px, transparent 6.25px)",
-                      backgroundSize: "22px 12px",
-                      backgroundRepeat: "round",
-                    }}
-                  />
-                </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <div className="mb-4 flex items-center justify-between gap-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Itens da comanda</p>
+                    <p className={tituloSecao}>Itens da comanda</p>
                     <button onClick={() => setEtapa("carrinho")} className="text-[13px] font-medium text-info hover:underline">
                       + Adicionar item
                     </button>
@@ -1073,7 +1062,7 @@ export function ComandaConteudo({
                   <ArrowLeft className="h-3.5 w-3.5" /> Agendamento
                 </button>
               </div>
-              <h2 className="mb-3 mt-1 text-lg font-semibold tracking-tight">Adicionar à comanda</h2>
+              <h2 className={cn(tituloSecao, "mb-4 mt-3")}>Adicionar à comanda</h2>
               <div className="relative mb-3">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -1165,7 +1154,7 @@ export function ComandaConteudo({
                   <ArrowLeft className="h-3.5 w-3.5" /> Agendamento
                 </button>
               </div>
-              <h2 className="mb-4 mt-1 text-lg font-semibold tracking-tight">Forma de pagamento</h2>
+              <h2 className={cn(tituloSecao, "mb-4 mt-3")}>Forma de pagamento</h2>
 
               <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {agendamento.cartaoSalvo &&
@@ -1178,14 +1167,14 @@ export function ComandaConteudo({
                 {formasDaCliente.map((f) => cardForma(f))}
               </div>
 
-              <p className={cn(rotulo, "mb-2")}>Outras formas</p>
+              <div className="mb-4 border-t border-border" />
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {outrasFormas.map((f) => cardForma(f))}
               </div>
 
               {forma === "Dividir" && (
                 <div className="mt-5 rounded-lg border border-border p-3">
-                  <p className={cn(rotulo, "mb-2")}>Pagamentos</p>
+                  <p className={cn(tituloSecao, "mb-2")}>Pagamentos</p>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
                     <Select value={novoPgForma} onValueChange={setNovoPgForma}>
                       <SelectTrigger className="h-9 text-[13px]">
