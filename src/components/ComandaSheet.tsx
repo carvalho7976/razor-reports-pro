@@ -884,7 +884,7 @@ export function ComandaConteudo({
 
             <div className={cn("flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden", variante === "caixa" && "gap-4")}>
               <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
-                <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+                <div className="flex items-center justify-between gap-3 px-5 pb-3.5 pt-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                       <ReceiptText className="h-[18px] w-[18px]" />
@@ -938,6 +938,24 @@ export function ComandaConteudo({
                       </button>
                     )}
                   </div>
+                </div>
+                {/* Picote delicado: furinhos redondos em linha e meia-lua nas bordas (só no caixa, onde há fundo de fora) */}
+                <div className="relative h-1 shrink-0">
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-4 top-0 h-1"
+                    style={{
+                      backgroundImage: "radial-gradient(circle, hsl(var(--muted-foreground) / 0.35) 1.25px, transparent 1.5px)",
+                      backgroundSize: "7px 4px",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                  {variante === "caixa" && (
+                    <>
+                      <span className="absolute -left-1.5 -top-1 h-3 w-3 rounded-full bg-background" />
+                      <span className="absolute -right-1.5 -top-1 h-3 w-3 rounded-full bg-background" />
+                    </>
+                  )}
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
                   <div className="mb-4 flex items-center justify-between gap-2">
@@ -1155,7 +1173,6 @@ export function ComandaConteudo({
               </div>
               <h2 className="mb-4 mt-1 text-lg font-semibold tracking-tight">Forma de pagamento</h2>
 
-              <p className={cn(rotulo, "mb-2")}>Da cliente</p>
               <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {agendamento.cartaoSalvo &&
                   cardForma({
