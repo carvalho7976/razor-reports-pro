@@ -1152,8 +1152,8 @@ export function ComandaConteudo({
                       {pacotesAbertos && (
                         <div className="mt-2.5 space-y-2">
                           {pacotesCliente.map((p) => (
-                            <div key={p.nome} className="flex items-start gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
-                              <Package className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                            <div key={p.nome} className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
+                              <Package className="h-4 w-4 shrink-0 text-muted-foreground" />
                               <span className="min-w-0 flex-1">
                                 <span className="font-medium">{p.nome}</span>
                                 <span className="block text-xs text-muted-foreground">
@@ -1234,8 +1234,8 @@ export function ComandaConteudo({
                     )}
                     <ul className={cn("space-y-2", !obsAbertas && "hidden")}>
                       {observacoes.map((o) => (
-                        <li key={o.id} className="flex items-start gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
-                          <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                        <li key={o.id} className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
+                          <StickyNote className="h-4 w-4 shrink-0 text-muted-foreground" />
                           <span className="min-w-0 flex-1">
                             {o.texto}
                             <span className="block text-xs text-muted-foreground">
