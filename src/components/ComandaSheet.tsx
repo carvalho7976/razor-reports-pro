@@ -397,7 +397,7 @@ export function ComandaConteudo({
   const menuMais = (lado: "top" | "bottom" = "top") => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground" aria-label="Mais ações">
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Mais ações">
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -910,7 +910,7 @@ export function ComandaConteudo({
                           placeholder="Ex: alérgica a dipirona, não cortar franja"
                           className="min-h-[70px] resize-none text-[13px]"
                         />
-                        <Button size="sm" variant="outline" className="h-7 w-full text-[13px]" onClick={() => setEditandoObs(false)}>
+                        <Button size="sm" variant="outline" className="h-7 w-full text-[13px] hover:bg-muted hover:text-foreground" onClick={() => setEditandoObs(false)}>
                           Salvar observação
                         </Button>
                       </div>
@@ -940,12 +940,13 @@ export function ComandaConteudo({
                     <span className="text-sm font-semibold">Total</span>
                     <span className="text-lg font-semibold tabular-nums">{R$(total)}</span>
                   </div>
-                  <div className="flex gap-2">
+                  <div className={cn("grid gap-2", agendamento.cartaoSalvo ? "grid-cols-[auto_minmax(0,1fr)]" : "grid-cols-1")}>
                     {/* Cartão salvo: paga direto daqui, sem passar pelo carrinho (como o "Pay now" da Fresha) */}
                     {agendamento.cartaoSalvo && (
                       <Button
                         variant="outline"
-                        className="h-9 flex-1 gap-1.5 font-semibold"
+                        aria-label={`Pagar com ${agendamento.cartaoSalvo.bandeira} final ${agendamento.cartaoSalvo.final}`}
+                        className="h-9 gap-2 px-3 font-semibold hover:border-info/40 hover:bg-info/10 hover:text-info"
                         title={`Cobrar ${R$(total)} no ${agendamento.cartaoSalvo.bandeira} final ${agendamento.cartaoSalvo.final}`}
                         onClick={() => {
                           setForma(`${agendamento.cartaoSalvo!.bandeira} •••• ${agendamento.cartaoSalvo!.final}`);
@@ -953,11 +954,11 @@ export function ComandaConteudo({
                           setEtapa("pago");
                         }}
                       >
-                        Pagar •••• {agendamento.cartaoSalvo.final}
+                        Pagar
                         <BandeiraCartao bandeira={agendamento.cartaoSalvo.bandeira} />
                       </Button>
                     )}
-                    <Button className={cn("h-9 flex-1 font-semibold", btnPrincipal)} onClick={() => setEtapa("pagamento")}>
+                    <Button className={cn("h-9 min-w-0 font-semibold", btnPrincipal)} onClick={() => setEtapa("pagamento")}>
                       Fechar comanda
                     </Button>
                   </div>
@@ -1111,7 +1112,7 @@ export function ComandaConteudo({
                       placeholder={resta ? resta.toFixed(2).replace(".", ",") : "Valor"}
                       className="h-9 text-[13px]"
                     />
-                    <Button size="sm" variant="outline" className="h-9 gap-1 text-[13px]" onClick={addPagamento}>
+                    <Button size="sm" variant="outline" className="h-9 gap-1 text-[13px] hover:bg-muted hover:text-foreground" onClick={addPagamento}>
                       <Plus className="h-3.5 w-3.5" /> Adicionar
                     </Button>
                   </div>
@@ -1172,7 +1173,7 @@ export function ComandaConteudo({
                 >
                   Agendar retorno
                 </Button>
-                <Button variant="outline" className="h-9 flex-1" onClick={() => onFechar()}>
+                <Button variant="outline" className="h-9 flex-1 hover:bg-muted hover:text-foreground" onClick={() => onFechar()}>
                   Agora não
                 </Button>
               </div>

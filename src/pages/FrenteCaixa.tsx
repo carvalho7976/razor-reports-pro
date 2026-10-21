@@ -89,7 +89,7 @@ export default function FrenteCaixa() {
                 onRangeChange={setPeriodo}
                 somenteIcone
               />
-              <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-[13px]" onClick={novaComanda}>
+              <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-[13px] hover:bg-muted hover:text-foreground" onClick={novaComanda}>
                 <Plus className="h-3.5 w-3.5" /> Nova
               </Button>
             </div>
