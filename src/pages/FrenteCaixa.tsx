@@ -77,8 +77,8 @@ export default function FrenteCaixa() {
 
   return (
     <AppLayout>
-      <div className="flex h-full min-h-0 flex-col gap-4 lg:flex-row">
-        <aside className="flex w-full shrink-0 flex-col rounded-xl border border-border bg-card lg:w-[260px]">
+      <div className="flex h-full min-h-0 flex-col gap-4 lg:-ml-6 lg:flex-row">
+        <aside className="flex w-full shrink-0 flex-col rounded-xl border border-border bg-card lg:w-[300px]">
           <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
             <h1 className="text-sm font-semibold">Comandas abertas</h1>
             <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={novaComanda}>
