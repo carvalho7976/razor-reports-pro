@@ -467,20 +467,10 @@ export function ComandaConteudo({
     setEtapa("pago");
   };
 
-  const menuMais = (lado: "top" | "bottom" = "top", escuro = false) => (
+  const menuMais = (lado: "top" | "bottom" = "top") => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(
-            "h-8 w-8 shrink-0",
-            escuro
-              ? "text-white/70 hover:bg-white/10 hover:text-white"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground",
-          )}
-          aria-label="Mais ações"
-        >
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Mais ações">
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -894,14 +884,14 @@ export function ComandaConteudo({
 
             <div className={cn("flex min-h-0 flex-1 flex-col md:flex-row md:overflow-hidden", variante === "caixa" && "gap-4")}>
               <section className={cn("flex min-h-0 min-w-0 flex-1 flex-col", variante === "caixa" && cartaoColuna)}>
-                <div className="relative flex items-center justify-between gap-3 bg-table-header px-5 pb-4 pt-3 text-table-header-foreground">
+                <div className="flex items-center justify-between gap-3 px-5 py-3">
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white/80">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                       <ReceiptText className="h-[18px] w-[18px]" />
                     </span>
                     <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">#{numeroComanda}</p>
-                    <p className="truncate text-[13px] text-white/60">
+                    <p className="truncate text-[13px] text-muted-foreground">
                       {variante === "caixa"
                         ? `Aberta em ${agendamento.data} · Balcão`
                         : `${agendamento.data} · ${agendamento.inicio}–${agendamento.fim} · ${agendamento.profissional}`}
@@ -912,7 +902,7 @@ export function ComandaConteudo({
                     <span
                       className={cn(
                         "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-                        status === "finalizado" ? "bg-success/25 text-white" : "bg-white/10 text-white/80",
+                        status === "finalizado" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground",
                       )}
                     >
                       {status === "finalizado" ? "Paga" : "Em aberto"}
@@ -920,10 +910,10 @@ export function ComandaConteudo({
                     {variante === "agenda" && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="inline-flex h-8 items-center gap-2 rounded-md border border-white/20 bg-white/5 px-2.5 text-[13px] font-medium hover:bg-white/10">
+                          <button className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-[13px] font-medium hover:bg-muted">
                             <span className={cn("h-2 w-2 rounded-full", statusAtual.cor)} />
                             {statusAtual.label}
-                            <ChevronDown className="h-3.5 w-3.5 text-white/60" />
+                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44">
@@ -937,11 +927,11 @@ export function ComandaConteudo({
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
-                    {menuMais("bottom", true)}
+                    {menuMais("bottom")}
                     {variante === "agenda" && (
                       <button
                         onClick={() => onFechar()}
-                        className="rounded-md p-1.5 text-white/70 hover:bg-white/10 hover:text-white"
+                        className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
                         aria-label="Fechar"
                       >
                         <X className="h-4 w-4" />
@@ -949,13 +939,8 @@ export function ComandaConteudo({
                     )}
                   </div>
                 </div>
-                {/* Picote do ticket: tracejado fino na base da faixa e recortes laterais na cor do fundo */}
-                <div className="relative shrink-0">
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-4 -top-[7px] h-px"
-                    style={{ backgroundImage: "linear-gradient(90deg, hsl(0 0% 100% / 0.28) 50%, transparent 50%)", backgroundSize: "8px 1px" }}
-                  />
+                {/* Picote do ticket: tracejado com recortes laterais na cor do fundo da página */}
+                <div className="relative shrink-0 border-t-[1.5px] border-dashed border-border">
                   {variante === "caixa" && (
                     <>
                       <span className="absolute -left-2 -top-2 h-4 w-4 rounded-full bg-background" />
