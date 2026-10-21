@@ -910,7 +910,7 @@ export function ComandaConteudo({
   const saldos = [
     { label: "Moedas", icon: Coins, n: par ? 12 : 0, valor: String(par ? 12 : 0), cor: "" },
     { label: "Packs", icon: Package, n: pacotesCliente.length, valor: String(pacotesCliente.length), cor: "" },
-    { label: "Débitos (a cliente deve)", icon: ArrowDown, n: par ? 0 : 45, valor: R$(par ? 0 : 45), cor: "text-destructive" },
+    { label: "Débitos (a cliente deve)", icon: ArrowDown, n: 45, valor: R$(45), cor: "text-destructive" },
     { label: "Créditos (saldo a favor)", icon: ArrowUp, n: par ? 30 : 0, valor: R$(par ? 30 : 0), cor: "text-info" },
   ].filter((s) => s.n > 0);
   const planoAtrasado = !par;
