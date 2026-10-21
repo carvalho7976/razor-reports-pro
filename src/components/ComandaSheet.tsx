@@ -30,6 +30,7 @@ import {
   Copy,
   CreditCard,
   Crown,
+  Gift,
   History,
   Link2,
   Minus,
@@ -1531,8 +1532,8 @@ export function ComandaConteudo({
                 ))}
               </div>
 
-              <p className={cn(tituloSecao, "mb-2 mt-4")}>Assistentes</p>
-              <div className="flex flex-wrap gap-1.5">
+              {escolhendoEquipe?.tipo !== "produto" && <p className={cn(tituloSecao, "mb-2 mt-4")}>Assistentes</p>}
+              <div className={cn("flex flex-wrap gap-1.5", escolhendoEquipe?.tipo === "produto" && "hidden")}>
                 {equipeSalao
                   .filter((e) => e.nome !== profEscolhida)
                   .map((e) => {
