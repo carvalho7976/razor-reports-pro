@@ -1154,7 +1154,8 @@ export function ComandaConteudo({
                   <ArrowLeft className="h-3.5 w-3.5" /> Agendamento
                 </button>
               </div>
-              <h2 className={cn(tituloSecao, "mb-4 mt-3")}>Forma de pagamento</h2>
+              <h2 className="sr-only">Forma de pagamento</h2>
+              <div className="h-4" />
 
               <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {agendamento.cartaoSalvo &&
