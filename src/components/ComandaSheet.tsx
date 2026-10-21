@@ -47,6 +47,8 @@ import {
 import { toast } from "sonner";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BandeiraCartao } from "@/components/BandeiraCartao";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 export type ComandaAgendamento = {
@@ -237,6 +239,24 @@ const btnPrincipal = "bg-[hsl(var(--novo-btn))] text-[hsl(var(--novo-btn-foregro
 
 const valorItem = (i: Item) => i.valor * (i.qtd ?? 1);
 
+// Por onde o pagamento entra: maquininha (Rede) para cartão, Pix, caixa ou saldo da cliente
+const OrigemPagamento = ({ forma }: { forma: string }) => {
+  const f = forma.toLowerCase();
+  if (/crédito|débito|••••|link/.test(f) && f !== "créditos") {
+    return (
+      <span className="inline-flex h-6 items-center justify-center rounded-full bg-[#FF6B00] px-2 text-[10px] font-bold lowercase tracking-tight text-white">
+        rede
+      </span>
+    );
+  }
+  const rotuloOrigem = f === "pix" ? "Pix" : f === "dinheiro" ? "Caixa" : "Cliente";
+  return (
+    <span className="inline-flex h-6 items-center rounded-full bg-muted px-2 text-[11px] font-medium text-muted-foreground">
+      {rotuloOrigem}
+    </span>
+  );
+};
+
 const SeloSemEstoque = () => (
   <span className="inline-block rounded bg-destructive px-1.5 py-0.5 text-[10px] font-semibold text-destructive-foreground">
     Sem estoque
@@ -291,6 +311,13 @@ export function ComandaConteudo({
   const [novoPgForma, setNovoPgForma] = useState("");
   const [novoPgValor, setNovoPgValor] = useState("");
   const [editandoPreco, setEditandoPreco] = useState<number | null>(null);
+  // Confirmação antes de finalizar (valor recebido, crédito, comprovante e nota)
+  const [confirmando, setConfirmando] = useState(false);
+  const [recebido, setRecebido] = useState("");
+  const [lancarCredito, setLancarCredito] = useState(true);
+  const [imprimir, setImprimir] = useState(false);
+  const [emitirNota, setEmitirNota] = useState(false);
+  const [resumoPago, setResumoPago] = useState<string[]>([]);
 
   // Cada agendamento aberto começa uma comanda nova
   useEffect(() => {
@@ -303,6 +330,8 @@ export function ComandaConteudo({
     setBusca("");
     setForma(null);
     setPagamentos([]);
+    setResumoPago([]);
+    setConfirmando(false);
   }, [agendamento?.id]);
 
   const total = useMemo(() => itens.reduce((s, i) => s + valorItem(i), 0), [itens]);
@@ -390,6 +419,34 @@ export function ComandaConteudo({
       toast.error(`Ainda faltam ${R$(resta)}`, noTopo);
       return;
     }
+    abrirConfirmacao();
+  };
+
+  const abrirConfirmacao = () => {
+    setRecebido(total.toFixed(2).replace(".", ","));
+    setLancarCredito(true);
+    setConfirmando(true);
+  };
+
+  const linhasPagamento =
+    forma === "Dividir" ? pagamentos.map((p) => ({ forma: p.forma, valor: p.valor })) : [{ forma: forma ?? "", valor: total }];
+  const valorRecebido = (() => {
+    const v = parseFloat(recebido.replace(/\./g, "").replace(",", "."));
+    return isNaN(v) ? total : v;
+  })();
+  const excedente = forma === "Dividir" ? Math.max(0, pago - total) : Math.max(0, valorRecebido - total);
+
+  const confirmarPagamento = () => {
+    const resumo: string[] = [];
+    if (excedente > 0) {
+      resumo.push(
+        lancarCredito ? `${R$(excedente)} lançados como crédito da cliente` : `Troco de ${R$(excedente)}`,
+      );
+    }
+    if (imprimir) resumo.push("Comprovante enviado para impressão");
+    if (emitirNota) resumo.push("Nota fiscal emitida");
+    setResumoPago(resumo);
+    setConfirmando(false);
     setStatus("finalizado");
     setEtapa("pago");
   };
@@ -950,8 +1007,7 @@ export function ComandaConteudo({
                         title={`Cobrar ${R$(total)} no ${agendamento.cartaoSalvo.bandeira} final ${agendamento.cartaoSalvo.final}`}
                         onClick={() => {
                           setForma(`${agendamento.cartaoSalvo!.bandeira} •••• ${agendamento.cartaoSalvo!.final}`);
-                          setStatus("finalizado");
-                          setEtapa("pago");
+                          abrirConfirmacao();
                         }}
                       >
                         Pagar
@@ -1156,6 +1212,15 @@ export function ComandaConteudo({
               {R$(total)} · {agendamento.cliente}
               {forma && ` · ${forma}`}
             </p>
+            {resumoPago.length > 0 && (
+              <ul className="mt-3 space-y-1 text-[13px] text-muted-foreground">
+                {resumoPago.map((r) => (
+                  <li key={r} className="flex items-center justify-center gap-1.5">
+                    <Check className="h-3.5 w-3.5 text-success" /> {r}
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="mt-6 w-full max-w-sm rounded-xl border border-border p-4 text-left">
               <p className="flex items-center gap-2 text-sm font-semibold">
                 <CalendarPlus className="h-4 w-4" /> Agendar retorno?
@@ -1180,6 +1245,87 @@ export function ComandaConteudo({
             </div>
           </section>
         )}
+
+        <Dialog open={confirmando} onOpenChange={setConfirmando}>
+          <DialogContent className="max-w-md gap-0 p-0">
+            <DialogHeader className="space-y-0.5 border-b border-border px-5 py-4 text-left">
+              <DialogTitle className="text-base">Confirmar pagamento</DialogTitle>
+              <DialogDescription className="text-[13px]">
+                {agendamento.cliente} · #{numeroComanda}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 px-5 py-4">
+              <div className="overflow-hidden rounded-lg border border-border">
+                <div className="grid grid-cols-[1fr_auto] bg-muted/50 px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <span>Pagamento</span>
+                  <span>Valor</span>
+                </div>
+                {linhasPagamento.map((l, idx) => (
+                  <div key={idx} className="flex items-center gap-3 border-t border-border px-3 py-2.5 text-sm">
+                    <OrigemPagamento forma={l.forma} />
+                    <span className="min-w-0 flex-1 truncate">{l.forma}</span>
+                    {forma === "Dividir" ? (
+                      <span className="font-semibold tabular-nums">{R$(l.valor)}</span>
+                    ) : (
+                      <div className="relative w-28">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">R$</span>
+                        <Input
+                          value={recebido}
+                          onChange={(e) => setRecebido(e.target.value)}
+                          aria-label="Valor recebido"
+                          className="h-8 pl-8 text-right text-sm font-semibold tabular-nums"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <div className="flex items-center justify-between border-t border-border bg-muted/30 px-3 py-2.5 text-sm">
+                  <span className="font-semibold">Total da comanda</span>
+                  <span className="font-semibold tabular-nums">{R$(total)}</span>
+                </div>
+              </div>
+
+              <div className="divide-y divide-border rounded-lg border border-border">
+                {excedente > 0 && (
+                  <label className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">
+                    <span>
+                      <span className="block text-sm font-medium">Lançar {R$(excedente)} como crédito</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {lancarCredito ? "Fica no saldo da cliente para a próxima visita" : `Devolver ${R$(excedente)} de troco`}
+                      </span>
+                    </span>
+                    <Switch checked={lancarCredito} onCheckedChange={setLancarCredito} />
+                  </label>
+                )}
+                <label className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">
+                  <span className="text-sm font-medium">Imprimir comprovante</span>
+                  <Switch checked={imprimir} onCheckedChange={setImprimir} />
+                </label>
+                <label className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">
+                  <span className="text-sm font-medium">Emitir nota fiscal</span>
+                  <Switch checked={emitirNota} onCheckedChange={setEmitirNota} />
+                </label>
+              </div>
+              {forma !== "Dividir" && valorRecebido < total && (
+                <p className="text-[13px] text-destructive">O valor recebido é menor que o total da comanda.</p>
+              )}
+            </div>
+
+            <div className="flex gap-2 border-t border-border px-5 py-4">
+              <Button variant="outline" className="h-9 flex-1 hover:bg-muted hover:text-foreground" onClick={() => setConfirmando(false)}>
+                Voltar
+              </Button>
+              <Button
+                className={cn("h-9 flex-1 font-semibold", btnPrincipal)}
+                disabled={forma !== "Dividir" && valorRecebido < total}
+                onClick={confirmarPagamento}
+              >
+                Confirmar {R$(forma === "Dividir" ? pago : valorRecebido)}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         </div>
   );
 }
