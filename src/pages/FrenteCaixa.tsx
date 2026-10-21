@@ -21,6 +21,15 @@ const comandasIniciais: ComandaAberta[] = [
   { id: 3961391, cliente: "Maria Santos", servico: "Escova", profissional: "Claudia", inicio: "", fim: "", data: "18/10/2026", abertaEm: "18/10", valor: 60, telefone: "(41) 98765-4321" },
 ];
 
+// Busca por nome (sem ligar para acento), data (19/10 ou 19/10/2026) ou número (#3961388 ou 3961388)
+const semAcento = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+const combinaBusca = (c: ComandaAberta, busca: string) => {
+  const q = semAcento(busca.trim()).replace(/^#/, "");
+  if (!q) return true;
+  return semAcento(c.cliente).includes(q) || String(c.id).includes(q) || c.data.includes(q);
+};
+
 const iniciais = (nome: string) =>
   nome
     .split(" ")
@@ -41,7 +50,7 @@ export default function FrenteCaixa() {
   const lista = useMemo(() => {
     const q = busca.trim().toLowerCase();
     return comandas.filter((c) => {
-      if (q && !c.cliente.toLowerCase().includes(q)) return false;
+      if (q && !combinaBusca(c, q)) return false;
       if (periodo?.from && periodo?.to) {
         const dia = parse(c.data, "dd/MM/yyyy", new Date());
         return isWithinInterval(dia, { start: startOfDay(periodo.from), end: endOfDay(periodo.to) });
@@ -100,7 +109,7 @@ export default function FrenteCaixa() {
               <Input
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
-                placeholder="Buscar cliente"
+                placeholder="Nome, data ou nº da comanda"
                 className="h-9 pl-8 text-[13px]"
               />
             </div>
