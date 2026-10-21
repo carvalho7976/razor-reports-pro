@@ -35,7 +35,7 @@ const messageTemplates = [
   },
 ];
 
-export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: string }) {
+export function WhatsAppButton({ telefone, nome, botao = false }: { telefone: string; nome: string; botao?: boolean }) {
   const [open, setOpen] = useState(false);
   const [customOpen, setCustomOpen] = useState(false);
   const [customText, setCustomText] = useState("");
@@ -65,8 +65,15 @@ export function WhatsAppButton({ telefone, nome }: { telefone: string; nome: str
       }}
     >
       <PopoverTrigger asChild>
-        <button className="p-1 rounded hover:bg-success/20 transition-colors" title="Enviar mensagem WhatsApp">
-          <MessageCircle className="h-4 w-4 text-success" />
+        <button
+          className={
+            botao
+              ? "flex h-8 w-8 items-center justify-center rounded-lg bg-success/10 transition-colors hover:bg-success/20"
+              : "p-1 rounded hover:bg-success/20 transition-colors"
+          }
+          title="Enviar mensagem WhatsApp"
+        >
+          <MessageCircle className={botao ? "h-[18px] w-[18px] text-success" : "h-4 w-4 text-success"} />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-72 p-2" align="start">

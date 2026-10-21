@@ -251,6 +251,17 @@ const R$ = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currenc
 
 // Título de seção: um só padrão em todas as etapas (Itens da comanda, Adicionar, Forma de pagamento...)
 // Título de grupo da coluna da cliente: menor e mais discreto que o título de seção
+// Cor suave do avatar da cliente, estável pelo nome
+const coresAvatar = [
+  "bg-blue-100 text-blue-800",
+  "bg-emerald-100 text-emerald-800",
+  "bg-amber-100 text-amber-800",
+  "bg-pink-100 text-pink-800",
+  "bg-violet-100 text-violet-800",
+  "bg-teal-100 text-teal-800",
+];
+const corAvatar = (nome: string) => coresAvatar[[...nome].reduce((a, ch) => a + ch.charCodeAt(0), 0) % coresAvatar.length];
+
 const tituloGrupo = "text-[11px] font-semibold uppercase tracking-wide text-muted-foreground";
 
 const tituloSecao = "text-xs font-semibold uppercase tracking-wide text-foreground";
@@ -824,24 +835,38 @@ export function ComandaConteudo({
   // Cabeçalho da cliente: o mesmo em todas as etapas (sem moldura; visita e retorno ficam no menu ⋯)
   const subtituloCliente = agendamento.telefone ?? [agendamento.data, agendamento.inicio].filter(Boolean).join(" · ");
   const cartaoCliente = () => (
-    <div className="flex items-center gap-3 px-4 pb-3 pt-4">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-[13px] font-semibold text-foreground">
-        {iniciais}
+    <div className="flex items-start gap-3 px-4 pb-3 pt-4">
+      <div className="relative shrink-0">
+        <div
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-full text-[15px] font-semibold",
+            corAvatar(agendamento.cliente),
+          )}
+        >
+          {iniciais}
+        </div>
+        <span
+          className="absolute -bottom-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-card"
+          title={planoAtrasado ? "Assinante com plano atrasado" : "Assinante"}
+        >
+          <Crown className={cn("h-3 w-3", planoAtrasado ? "text-destructive" : "text-warning")} />
+        </span>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold">{agendamento.cliente}</p>
+        <p className="truncate text-[15px] font-semibold leading-tight">{agendamento.cliente}</p>
         <p className="truncate text-[13px] text-muted-foreground">{subtituloCliente}</p>
+        {saldosCliente()}
       </div>
-      <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} />
+      <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} botao />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="h-8 w-8 shrink-0 rounded-lg bg-muted/70 text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label="Opções da cliente"
           >
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="h-[18px] w-[18px]" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
@@ -884,7 +909,7 @@ export function ComandaConteudo({
   ].filter((s) => s.n > 0);
   const planoAtrasado = !par;
   const saldosCliente = () => saldos.length > 0 && (
-    <div className="flex items-center gap-5 px-4">
+    <div className="mt-2 flex items-center gap-4">
       {saldos.map(({ label, icon: Icone, valor, cor }) => (
         <Tooltip key={label}>
           <TooltipTrigger asChild>
@@ -1096,7 +1121,6 @@ export function ComandaConteudo({
               <aside className={cn("flex w-full shrink-0 flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
                 <div className="min-h-0 flex-1 overflow-y-auto">
                 {cartaoCliente()}
-                {saldosCliente()}
                 <div className="mt-4 space-y-4 border-t border-border px-4 pb-4 pt-4 text-[13px]">
                   <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
                     <Crown className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -1116,7 +1140,7 @@ export function ComandaConteudo({
                         onClick={() => setPacotesAbertos((v) => !v)}
                         className="flex w-full items-center justify-between"
                       >
-                        <span className={tituloGrupo}>Pacotes ({pacotesCliente.length})</span>
+                        <span className={tituloGrupo}>Pacotes · {pacotesCliente.length}</span>
                         <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", pacotesAbertos && "rotate-180")} />
                       </button>
                       {pacotesAbertos && (
@@ -1145,15 +1169,19 @@ export function ComandaConteudo({
 
                   <div>
                     <div className="mb-2.5 flex items-center justify-between">
-                      <button onClick={() => setObsAbertas((v) => !v)} className="flex items-center gap-1.5">
-                        <span className={tituloGrupo}>Observações ({observacoes.length})</span>
-                        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", obsAbertas && "rotate-180")} />
+                      <button onClick={() => setObsAbertas((v) => !v)} className="text-left">
+                        <span className={tituloGrupo}>Observações · {observacoes.length}</span>
                       </button>
-                      {!editandoObs && (
-                        <button onClick={() => { setEditandoObs(true); setObsAbertas(true); }} className="text-[13px] font-medium text-info hover:underline">
-                          + Adicionar
+                      <span className="flex items-center gap-3">
+                        {!editandoObs && (
+                          <button onClick={() => { setEditandoObs(true); setObsAbertas(true); }} className="text-[13px] font-medium text-info hover:underline">
+                            + Adicionar
+                          </button>
+                        )}
+                        <button onClick={() => setObsAbertas((v) => !v)} aria-label="Recolher observações">
+                          <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", obsAbertas && "rotate-180")} />
                         </button>
-                      )}
+                      </span>
                     </div>
                     {editandoObs && (
                       <div className="mb-3 space-y-2">
