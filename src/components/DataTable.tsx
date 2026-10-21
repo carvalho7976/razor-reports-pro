@@ -205,11 +205,14 @@ export function DateRangePicker({
   onSelect,
   dateRange,
   onRangeChange,
+  somenteIcone = false,
 }: {
   datePreset: DatePreset;
   onSelect: (p: DatePreset) => void;
   dateRange: DateRange | undefined;
   onRangeChange: (range: DateRange | undefined) => void;
+  /** Gatilho só com o ícone, sem borda (para espaços estreitos) */
+  somenteIcone?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -282,10 +285,24 @@ export function DateRangePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn("toolbar-btn gap-1.5 text-xs", datePreset && "toolbar-btn-active")}>
-          <Calendar className="h-3.5 w-3.5" />
-          <span>{displayLabel}</span>
-        </button>
+        {somenteIcone ? (
+          <button
+            title={displayLabel}
+            aria-label={`Período: ${displayLabel}`}
+            className={cn(
+              "relative rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+              datePreset && "text-foreground",
+            )}
+          >
+            <Calendar className="h-4 w-4" />
+            {datePreset && <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-info" />}
+          </button>
+        ) : (
+          <button className={cn("toolbar-btn gap-1.5 text-xs", datePreset && "toolbar-btn-active")}>
+            <Calendar className="h-3.5 w-3.5" />
+            <span>{displayLabel}</span>
+          </button>
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
         <div className="flex flex-col sm:flex-row">

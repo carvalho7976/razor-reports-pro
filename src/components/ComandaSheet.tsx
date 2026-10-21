@@ -928,6 +928,21 @@ export function ComandaConteudo({
                     <span className="text-lg font-semibold tabular-nums">{R$(total)}</span>
                   </div>
                   <div className="flex gap-2">
+                    {/* Cartão salvo: paga direto daqui, sem passar pelo carrinho (como o "Pay now" da Fresha) */}
+                    {agendamento.cartaoSalvo && (
+                      <Button
+                        variant="outline"
+                        className="h-9 flex-1 gap-1.5 font-semibold"
+                        title={`Cobrar ${R$(total)} no ${agendamento.cartaoSalvo.bandeira} final ${agendamento.cartaoSalvo.final}`}
+                        onClick={() => {
+                          setForma(`${agendamento.cartaoSalvo!.bandeira} •••• ${agendamento.cartaoSalvo!.final}`);
+                          setStatus("finalizado");
+                          setEtapa("pago");
+                        }}
+                      >
+                        <CreditCard className="h-4 w-4" /> Pagar •••• {agendamento.cartaoSalvo.final}
+                      </Button>
+                    )}
                     <Button className={cn("h-9 flex-1 font-semibold", btnPrincipal)} onClick={() => setEtapa("pagamento")}>
                       Fechar comanda
                     </Button>
@@ -1124,6 +1139,7 @@ export function ComandaConteudo({
             <h2 className="mt-3 text-xl font-semibold tracking-tight">Comanda paga</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {R$(total)} · {agendamento.cliente}
+              {forma && ` · ${forma}`}
             </p>
             <div className="mt-6 w-full max-w-sm rounded-xl border border-border p-4 text-left">
               <p className="flex items-center gap-2 text-sm font-semibold">
