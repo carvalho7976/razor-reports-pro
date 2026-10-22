@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from "react";
 import type React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -983,18 +983,22 @@ export function ComandaConteudo({
   const planoAtrasado = !par;
   const saldosCliente = () => saldos.length > 0 && (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pb-3 pl-[76px] pr-4">
-      {saldos.map(({ label, icon: Icone, valor, cor }) => (
-        <Tooltip key={label}>
-          <TooltipTrigger asChild>
-            <span className="flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums">
-              {Icone ? <Icone className={cn("h-4 w-4 shrink-0", cor)} /> : <span className={cor}>R$</span>}
-              {valor}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="text-xs">
-            {label}
-          </TooltipContent>
-        </Tooltip>
+      {saldos.map(({ label, icon: Icone, valor, cor }, i) => (
+        <Fragment key={label}>
+          {/* barra bem clara entre o grupo moedas/packs e o grupo débito/crédito */}
+          {i > 0 && !Icone && saldos[i - 1].icon && <span aria-hidden="true" className="h-4 w-px bg-border/50" />}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums">
+                {Icone ? <Icone className={cn("h-4 w-4 shrink-0", cor)} /> : <span className={cor}>R$</span>}
+                {valor}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">
+              {label}
+            </TooltipContent>
+          </Tooltip>
+        </Fragment>
       ))}
     </div>
   );
