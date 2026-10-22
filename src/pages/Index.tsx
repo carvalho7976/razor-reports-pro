@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Wallet, CreditCard, Users, BarChart3, Scissors, FileText, UserMinus, CalendarX,
   ClipboardList, Star, Calendar, PackageX, ShoppingCart, TrendingDown, DollarSign,
-  List, Tag, Package, Banknote, LayoutGrid,
+  List, Tag, Package, Banknote, LayoutGrid, Crown,
 } from "lucide-react";
 
 interface ShortcutGroup {
@@ -62,6 +62,7 @@ const groups: ShortcutGroup[] = [
       { icon: ShoppingCart, label: "Nova Compra", path: "/novaCompra", color: "bg-accent" },
       { icon: FileText, label: "Cadastro de Assinatura", path: "/assinaturaCadastro", color: "bg-primary" },
       { icon: List, label: "Pesquisa de Assinaturas", path: "/assinaturaPesquisa", color: "bg-primary" },
+      { icon: Crown, label: "Página de Planos", path: "/assinaturaConfigFrente", color: "bg-primary" },
       { icon: BarChart3, label: "Relatório de Assinatura", path: "/relatorioAssinatura", color: "bg-warning" },
       { icon: Star, label: "Concorrentes", path: "/concorrentes", color: "bg-accent" },
     ],
