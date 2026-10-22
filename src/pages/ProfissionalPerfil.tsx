@@ -150,7 +150,7 @@ const campo =
 const linkAcao = "inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-medium text-info hover:underline";
 const btnEscuro =
   "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background";
-const subtitulo = "mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-foreground first:mt-0";
+const subtitulo = "mb-3 mt-6 text-xs font-semibold uppercase tracking-wide text-foreground first:mt-0";
 
 function Campo({ label, className, erro, dica, children }: { label: string; className?: string; erro?: string; dica?: string; children: React.ReactNode }) {
   return (
@@ -678,30 +678,28 @@ export default function ProfissionalPerfil() {
 
           {/* ---------------- PERMISSÕES ---------------- */}
           {aba === "permissoes" && (
-            <section className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-1 flex items-start justify-end gap-3">
-                <div className="flex gap-3.5 whitespace-nowrap">
-                  <button type="button" className={linkAcao} onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, true])) as Record<PermKey, boolean>)}>
-                    Liberar tudo
-                  </button>
-                  <button
-                    type="button"
-                    className="text-[13px] font-medium text-muted-foreground hover:underline"
-                    onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, false])) as Record<PermKey, boolean>)}
-                  >
-                    Bloquear tudo
-                  </button>
-                </div>
+            <div className="grid gap-4">
+              <div className="flex justify-end gap-3.5 whitespace-nowrap">
+                <button type="button" className={linkAcao} onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, true])) as Record<PermKey, boolean>)}>
+                  Liberar tudo
+                </button>
+                <button
+                  type="button"
+                  className="text-[13px] font-medium text-muted-foreground hover:underline"
+                  onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, false])) as Record<PermKey, boolean>)}
+                >
+                  Bloquear tudo
+                </button>
               </div>
               {gruposPerm.map((g) => (
-                <div key={g.titulo}>
-                  <p className={subtitulo}>{g.titulo}</p>
+                <section key={g.titulo} className="rounded-xl border border-border bg-card p-4">
+                  <h2 className="mb-3 text-base font-semibold text-foreground">{g.titulo}</h2>
                   {g.itens.map(([k, nome, ajuda]) => (
                     <Opcao key={k} label={nome} ajuda={ajuda} valor={f.perm[k]} onChange={(v) => set("perm", { ...f.perm, [k]: v })} />
                   ))}
-                </div>
+                </section>
               ))}
-            </section>
+            </div>
           )}
         </div>
       </div>
