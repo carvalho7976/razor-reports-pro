@@ -975,10 +975,10 @@ export function ComandaConteudo({
   // Exemplo: valores variam pelo nº da comanda
   const par = agendamento.id % 2 === 0;
   const saldos = [
-    { label: "Moedas", icon: Coins, n: par ? 12 : 0, valor: String(par ? 12 : 0), cor: "" },
-    { label: "Packs", icon: Package, n: pacotesCliente.length, valor: String(pacotesCliente.length), cor: "" },
+    { label: "Moedas", icon: Coins, n: par ? 12 : 0, valor: String(par ? 12 : 0), cor: "text-warning" },
+    { label: "Packs", icon: Package, n: pacotesCliente.length, valor: String(pacotesCliente.length), cor: "text-info" },
     { label: "Débitos (a cliente deve)", icon: null, n: 45, valor: Math.round(45).toLocaleString("pt-BR"), cor: "text-destructive" },
-    { label: "Créditos (saldo a favor)", icon: null, n: par ? 30 : 0, valor: Math.round(par ? 30 : 0).toLocaleString("pt-BR"), cor: "text-info" },
+    { label: "Créditos (saldo a favor)", icon: null, n: par ? 30 : 0, valor: Math.round(par ? 30 : 0).toLocaleString("pt-BR"), cor: "text-success" },
   ].filter((s) => s.n > 0);
   const planoAtrasado = !par;
   const saldosCliente = () => saldos.length > 0 && (
@@ -987,7 +987,7 @@ export function ComandaConteudo({
         <Tooltip key={label}>
           <TooltipTrigger asChild>
             <span className="flex cursor-default items-center gap-1.5 whitespace-nowrap text-sm font-medium tabular-nums">
-              {Icone ? <Icone className="h-4 w-4 shrink-0 text-muted-foreground" /> : <span className={cor}>R$</span>}
+              {Icone ? <Icone className={cn("h-4 w-4 shrink-0", cor)} /> : <span className={cor}>R$</span>}
               {valor}
             </span>
           </TooltipTrigger>
