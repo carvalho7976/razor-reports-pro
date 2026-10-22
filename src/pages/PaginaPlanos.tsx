@@ -140,8 +140,8 @@ export default function PaginaPlanos() {
   return (
     <AppLayout>
       <div className="flex flex-col gap-0">
-        {/* HEADER (fixo ao rolar) */}
-        <div className="sticky top-0 z-20 -mt-3 bg-background pb-3 pt-3 sm:-mt-5 sm:pt-5">
+        {/* HEADER */}
+        <div className="pb-3">
           <div className="flex flex-row flex-wrap items-center gap-3">
             <div className="flex items-center gap-2.5">
               <h1 className="text-xl font-bold leading-none tracking-tight text-foreground sm:text-2xl">
@@ -372,7 +372,7 @@ export default function PaginaPlanos() {
 
           {/* PRÉVIA DA PÁGINA PÚBLICA */}
           <aside>
-            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm lg:sticky lg:top-[76px]">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm ">
               <p className="px-4 pt-3 text-xs text-muted-foreground">Prévia da página</p>
               <div className="mt-2.5 h-20 overflow-hidden bg-muted/50">
                 {capa && <img src={capa} alt="" className="h-full w-full object-cover" />}
