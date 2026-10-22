@@ -38,6 +38,7 @@ import NovaCompra from "./pages/NovaCompra";
 import AssinaturaCadastro from "./pages/AssinaturaCadastro";
 import PaginaPlanos from "./pages/PaginaPlanos";
 import SiteAgendamento from "./pages/SiteAgendamento";
+import ConfiguracoesEmpresa from "./pages/ConfiguracoesEmpresa";
 import NovaAgenda2 from "./pages/NovaAgenda2";
 import AssinaturaPesquisa from "./pages/AssinaturaPesquisa";
 import RelatorioAssinatura from "./pages/RelatorioAssinatura";
@@ -86,6 +87,9 @@ const App = () => (
           <Route path="/assinaturaCadastro" element={<AssinaturaCadastro />} />
           <Route path="/novaAgenda2" element={<NovaAgenda2 />} />
           <Route path="/assinaturaPesquisa" element={<AssinaturaPesquisa />} />
+          <Route path="/configuracoes" element={<ConfiguracoesEmpresa />} />
+          <Route path="/edicaoUsuario" element={<ConfiguracoesEmpresa />} />
+          <Route path="/edicaoUsuario.xhtml" element={<ConfiguracoesEmpresa />} />
           <Route path="/frenteCliente" element={<SiteAgendamento />} />
           <Route path="/frenteCliente.xhtml" element={<SiteAgendamento />} />
           <Route path="/assinaturaConfigFrente" element={<PaginaPlanos />} />
