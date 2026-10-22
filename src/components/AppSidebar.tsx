@@ -15,6 +15,7 @@ import {
   GraduationCap,
   BookOpen,
   Crown,
+  Globe,
   ShoppingBag,
   PanelLeftClose,
   PanelLeftOpen,
@@ -47,6 +48,7 @@ const navGroups: NavGroup[] = [
     items: [
       { icon: CalendarDays, label: "Agenda", path: "/agenda" },
       { icon: MessageCircle, label: "Marketing", path: "/chat", badge: 1 },
+      { icon: Globe, label: "Meu site", path: "/frenteCliente" },
       { icon: Wallet, label: "Financeiro", path: "/contasPesquisa" },
     ],
   },
