@@ -353,28 +353,34 @@ export default function NovoPacote() {
 
           {/* RESUMO */}
           <aside className="rounded-xl border border-border bg-card p-4 lg:sticky lg:top-4">
-            <p className={cn("text-base font-semibold", nome.trim() ? "text-foreground" : "text-muted-foreground")}>{nome.trim() || "Pacote sem nome"}</p>
-            <p className="mt-3 text-xs text-muted-foreground">Valor do pacote</p>
-            <p className="text-[26px] font-bold leading-tight text-foreground">{R(total)}</p>
-            <div className="mt-1.5">
-              {economia > 0.005 ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-info/10 px-2.5 py-0.5 text-[13px] font-semibold text-info">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground">Resumo</p>
+            <div className="flex items-center justify-between gap-3 py-1 text-[13px]">
+              <span className="text-muted-foreground">Pacote</span>
+              <b className={cn("truncate font-semibold", nome.trim() ? "text-foreground" : "text-muted-foreground")}>{nome.trim() || "Sem nome"}</b>
+            </div>
+            <div className="flex items-baseline justify-between py-1 text-[13px]">
+              <span className="text-muted-foreground">Valor do pacote</span>
+              <b className="text-xl font-bold tabular-nums text-foreground">{R(total)}</b>
+            </div>
+            {economia > 0.005 ? (
+              <div className="mt-1 flex justify-end">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-info/10 px-2.5 py-0.5 text-xs font-semibold text-info">
                   <Tag className="h-3.5 w-3.5" /> Economia de {R(economia)} ({Math.round((economia / tabela) * 100)}%)
                 </span>
-              ) : itens.length > 0 ? (
-                <span className="text-xs text-muted-foreground">Sem desconto sobre a tabela</span>
-              ) : null}
-            </div>
-            <hr className="my-3 border-border" />
+              </div>
+            ) : itens.length > 0 ? (
+              <p className="mt-1 text-right text-xs text-muted-foreground">Sem desconto sobre a tabela</p>
+            ) : null}
+            <hr className="my-2.5 border-border" />
             {[
               ["Valor sem desconto", R(tabela)],
               ["Serviços", String(itens.length)],
               ["Sessões no total", String(itens.reduce((s, i) => s + i.q, 0))],
               ["Expiração", expira && dias ? `${dias} dias` : "Não expira"],
             ].map(([k, v]) => (
-              <div key={k} className="flex items-center justify-between py-1.5 text-sm">
-                <span>{k}</span>
-                <b>{v}</b>
+              <div key={k} className="flex items-center justify-between py-1 text-[13px]">
+                <span className="text-muted-foreground">{k}</span>
+                <b className="font-semibold tabular-nums text-foreground">{v}</b>
               </div>
             ))}
           </aside>

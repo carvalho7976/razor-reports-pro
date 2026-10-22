@@ -322,18 +322,20 @@ export default function NovaCompra() {
 
           {/* RESUMO */}
           <aside className="rounded-xl border border-border bg-card p-4 lg:sticky lg:top-4">
-            <h2 className="mb-2.5 text-base font-semibold text-foreground">Resumo</h2>
-            <div className="flex items-center justify-between py-1 text-sm">
-              <span>Subtotal</span>
-              <b>{R(subtotal)}</b>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground">Resumo</p>
+            <div className="flex items-center justify-between py-1 text-[13px]">
+              <span className="text-muted-foreground">Subtotal</span>
+              <b className="font-semibold tabular-nums text-foreground">{R(subtotal)}</b>
             </div>
             <Campo label="Desconto" className="my-1.5" erro={erroDesconto}>
               <CampoReais value={desconto} placeholder="0,00" onChange={setDesconto} />
             </Campo>
-            <hr className="my-3 border-border" />
-            <p className="text-xs text-muted-foreground">Total final</p>
-            <p className="text-[26px] font-bold leading-tight text-foreground">{R(total)}</p>
-            <hr className="my-3 border-border" />
+            <hr className="my-2.5 border-border" />
+            <div className="flex items-baseline justify-between py-1 text-[13px]">
+              <span className="text-muted-foreground">Total final</span>
+              <b className="text-xl font-bold tabular-nums text-foreground">{R(total)}</b>
+            </div>
+            <hr className="my-2.5 border-border" />
             <Campo label="Origem do pagamento">
               <select className={campo} value={origem} onChange={(e) => setOrigem(e.target.value)}>
                 {origens.map((o) => (
