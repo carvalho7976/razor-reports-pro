@@ -105,10 +105,9 @@ const btnEscuro =
   "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background";
 const subtitulo = "mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-foreground first:mt-0";
 
-function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+function Secao({ children }: { children: React.ReactNode }) {
   return (
     <section className="rounded-xl border border-border bg-card p-4">
-      <h2 className="mb-3.5 text-base font-semibold text-foreground">{titulo}</h2>
       {children}
     </section>
   );
@@ -254,7 +253,7 @@ export default function ConfiguracoesEmpresa() {
         <div className="mt-3 flex max-w-[980px] flex-col gap-4 pb-12">
           {/* ---------------- EMPRESA ---------------- */}
           {aba === "empresa" && (
-            <Secao titulo="Empresa">
+            <Secao>
               <div className="grid grid-cols-12 gap-3">
                 <Campo label="Nome da empresa *" className="col-span-12 md:col-span-4">
                   <input className={campo} {...txt("nome")} />
@@ -356,7 +355,7 @@ export default function ConfiguracoesEmpresa() {
 
           {/* ---------------- PAGAMENTO ---------------- */}
           {aba === "pagamento" && (
-            <Secao titulo="Pagamento">
+            <Secao>
               <p className={subtitulo}>Maquineta</p>
               <Opcao label="Ratear custo da maquineta" ajuda="Divide o custo da maquineta entre quem atendeu na comanda." valor={c.maq} onChange={(v) => set("maq", v)} />
               {c.maq && (
@@ -395,7 +394,7 @@ export default function ConfiguracoesEmpresa() {
 
           {/* ---------------- AGENDAMENTO ONLINE ---------------- */}
           {aba === "online" && (
-            <Secao titulo="Agendamento online">
+            <Secao>
               <p className={subtitulo}>Regras</p>
               <Opcao label="Mostrar preços" ajuda="Exibe o valor de cada serviço no agendamento online." valor={c.preco} onChange={(v) => set("preco", v)} />
               <Opcao label="Incluir produtos no preço" ajuda="Soma ao preço final o valor dos produtos atrelados ao serviço." valor={c.prod} onChange={(v) => set("prod", v)} />
@@ -486,7 +485,7 @@ export default function ConfiguracoesEmpresa() {
 
           {/* ---------------- MENSAGENS ---------------- */}
           {aba === "msgs" && (
-            <Secao titulo="Mensagens WhatsApp">
+            <Secao>
               {mensagens.map(({ k, titulo, marcas }) => (
                 <div key={k}>
                   <p className={subtitulo}>{titulo}</p>
@@ -527,7 +526,7 @@ export default function ConfiguracoesEmpresa() {
 
           {/* ---------------- DADOS FISCAIS ---------------- */}
           {aba === "fiscal" && (
-            <Secao titulo="Dados fiscais">
+            <Secao>
               <p className={subtitulo}>Regras do município</p>
               <Opcao label="Município exige e-mail" ajuda="A nota só é emitida se o cliente tiver e-mail cadastrado." valor={c.meml} onChange={(v) => set("meml", v)} />
               <Opcao label="Município exige CPF" ajuda="A nota só é emitida se o cliente tiver CPF cadastrado." valor={c.mcpf} onChange={(v) => set("mcpf", v)} />
@@ -634,7 +633,7 @@ export default function ConfiguracoesEmpresa() {
 
           {/* ---------------- MEU PLANO ---------------- */}
           {aba === "plano" && (
-            <Secao titulo="Meu plano">
+            <Secao>
               <div className="grid items-start gap-6 md:grid-cols-[260px_minmax(0,1fr)]">
                 <div>
                   <b className="text-lg font-bold">Essencial</b>
@@ -668,7 +667,7 @@ export default function ConfiguracoesEmpresa() {
 
           {/* ---------------- MEUS DADOS ---------------- */}
           {aba === "meus" && (
-            <Secao titulo="Meus dados">
+            <Secao>
               <div className="grid grid-cols-12 gap-3">
                 <Campo label="Nome *" className="col-span-12 md:col-span-4"><input className={campo} {...txt("mnome")} /></Campo>
                 <Campo label="E-mail *" className="col-span-12 md:col-span-5"><input type="email" className={campo} {...txt("memail")} /></Campo>
