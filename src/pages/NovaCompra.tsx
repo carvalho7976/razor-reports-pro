@@ -191,7 +191,7 @@ export default function NovaCompra() {
         <div className="mt-1 grid grid-cols-1 items-start gap-4 pb-12 lg:grid-cols-[minmax(0,1fr)_300px]">
           <section className="min-w-0 rounded-xl border border-border bg-card p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h2 className="text-base font-semibold text-foreground">Itens da compra</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-foreground">Itens da compra</h2>
               <label className={linkAcao}>
                 <Upload className="h-4 w-4" /> Importar XML
                 <input

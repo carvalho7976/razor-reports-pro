@@ -177,7 +177,7 @@ export default function NovoPacote() {
         <div className="mt-1 grid grid-cols-1 items-start gap-4 pb-12 lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="flex min-w-0 flex-col gap-4">
             <section className="rounded-xl border border-border bg-card p-4">
-              <h2 className="mb-3.5 text-base font-semibold text-foreground">Dados do pacote</h2>
+              <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground">Dados do pacote</h2>
               <div className="grid grid-cols-12 gap-3">
                 <Campo label="Nome do pacote *" className="col-span-12" erro={erroNome}>
                   <input
@@ -221,7 +221,7 @@ export default function NovoPacote() {
             </section>
 
             <section className="rounded-xl border border-border bg-card p-4">
-              <h2 className="mb-3.5 text-base font-semibold text-foreground">Serviços do pacote</h2>
+              <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground">Serviços do pacote</h2>
               <div className="grid grid-cols-1 items-end gap-2.5 sm:grid-cols-[minmax(0,5fr)_minmax(0,2fr)_minmax(0,3fr)_auto]">
                 <Campo label="Serviço">
                   <Popover open={busca} onOpenChange={setBusca}>
