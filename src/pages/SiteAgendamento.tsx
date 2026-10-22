@@ -172,6 +172,15 @@ const resumoDias = (ds: string[]) => {
   return nomes.length === 1 ? nomes[0] : `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
 };
 
+// Texto escuro sobre cores claras e claro sobre cores escuras
+const textoSobre = (hex: string) => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return "#fff";
+  const n = parseInt(m[1], 16);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? "#111" : "#fff";
+};
+
 const capaDe = (d: Destaque) => d.cover || d.fotos.find((f) => f.src)?.src || null;
 
 /* ------------------------------------------------------------------ estilos */
@@ -496,6 +505,7 @@ export default function SiteAgendamento() {
 
   /* ---- prévia ---- */
   const claro = s.tema === "light";
+  const txCor = textoSobre(s.cor);
   const blocos: Record<string, React.ReactNode> = {
     Sobre: <Bloco t="Sobre nós">{s.desc}</Bloco>,
     "Horário de funcionamento": <Bloco t="Horário de funcionamento">{horarioTexto}</Bloco>,
@@ -550,14 +560,14 @@ export default function SiteAgendamento() {
             )}
           </div>
           <div
-            className="ml-3.5 -mt-[27px] flex h-[54px] w-[54px] items-center justify-center overflow-hidden rounded-[14px] text-[9px] font-bold text-white"
-            style={{ background: s.cor, border: `3px solid ${claro ? "#fafafa" : "#0d0d0d"}` }}
+            className="ml-3.5 -mt-[27px] flex h-[54px] w-[54px] items-center justify-center overflow-hidden rounded-[14px] text-[9px] font-bold"
+            style={{ background: s.cor, color: txCor, border: `3px solid ${claro ? "#fafafa" : "#0d0d0d"}` }}
           >
             {s.logo ? <img src={s.logo} alt="" className="h-full w-full object-cover" /> : "FRIZZAR."}
           </div>
           <p className="mx-3.5 mt-1.5 text-base font-bold">{s.nome || "Nome do salão"}</p>
           <p className="mx-3.5 mt-0.5 text-[11px] opacity-70">{s.end}</p>
-          <div className="mx-3.5 my-3 grid h-[38px] place-items-center rounded-[10px] text-[13px] font-bold text-white" style={{ background: s.cor }}>
+          <div className="mx-3.5 my-3 grid h-[38px] place-items-center rounded-[10px] text-[13px] font-bold" style={{ background: s.cor, color: txCor }}>
             Agendar horário
           </div>
           {s.dest.length > 0 && (
