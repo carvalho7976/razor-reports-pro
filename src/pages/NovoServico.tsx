@@ -339,6 +339,12 @@ export default function NovoServico() {
                     <input className={cn(campo, "pr-9")} inputMode="decimal" placeholder="0" value={f.comissaoAssistente} onFocus={(e) => e.target.select()} onChange={(e) => set("comissaoAssistente", e.target.value)} />
                   </Prefixo>
                 </Campo>
+                <Campo label="Moedas Frizzar" ajuda="Moedas que o cliente ganha ao fazer este serviço." className="col-span-12 sm:col-span-6 md:col-span-3">
+                  <input type="number" min={0} className={campo} placeholder="0" value={f.moedas} onFocus={(e) => e.target.select()} onChange={(e) => set("moedas", e.target.value)} />
+                </Campo>
+                <Campo label="Pontos da assinatura" ajuda="Quantos pontos este serviço consome do plano de assinatura do cliente." className="col-span-12 sm:col-span-6 md:col-span-3">
+                  <input type="number" min={0} className={campo} placeholder="0" value={f.pontos} onFocus={(e) => e.target.select()} onChange={(e) => set("pontos", e.target.value)} />
+                </Campo>
               </div>
               <div className="mt-2.5 flex flex-wrap items-baseline gap-x-5 gap-y-1 rounded-[10px] bg-muted/60 px-3 py-2 text-[13px] text-muted-foreground">
                 <div>
@@ -367,21 +373,15 @@ export default function NovoServico() {
                     <input type="number" min={0} className={cn(campo, "pr-11")} placeholder="Sem previsão" value={f.retorno} onFocus={(e) => e.target.select()} onChange={(e) => set("retorno", e.target.value)} />
                   </Prefixo>
                 </Campo>
-                <Campo label="Moedas Frizzar" ajuda="Moedas que o cliente ganha ao fazer este serviço." className="col-span-12 md:col-span-4">
-                  <input type="number" min={0} className={campo} placeholder="0" value={f.moedas} onFocus={(e) => e.target.select()} onChange={(e) => set("moedas", e.target.value)} />
-                </Campo>
-                <Campo label="Pontos da assinatura" ajuda="Quantos pontos este serviço consome do plano de assinatura do cliente." className="col-span-12 md:col-span-4">
-                  <input type="number" min={0} className={campo} placeholder="0" value={f.pontos} onFocus={(e) => e.target.select()} onChange={(e) => set("pontos", e.target.value)} />
-                </Campo>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-x-7 gap-y-1">
-                <Opcao label="Permite agendar online" ajuda="O cliente pode escolher este serviço ao agendar pelo site." valor={f.online} onChange={(v) => set("online", v)} />
-                <Opcao
-                  label="Todos os profissionais"
-                  ajuda="Vincula este serviço a todos os profissionais. Desligado, você escolhe quais."
-                  valor={f.profissionais.length === profissionais.length}
-                  onChange={(v) => set("profissionais", v ? profissionais.map((p) => p.nome) : [])}
-                />
+                <div className="col-span-12 flex flex-wrap items-end gap-x-7 gap-y-1 md:col-span-8">
+                  <Opcao label="Permite agendar online" ajuda="O cliente pode escolher este serviço ao agendar pelo site." valor={f.online} onChange={(v) => set("online", v)} />
+                  <Opcao
+                    label="Todos os profissionais"
+                    ajuda="Vincula este serviço a todos os profissionais. Desligado, você escolhe quais."
+                    valor={f.profissionais.length === profissionais.length}
+                    onChange={(v) => set("profissionais", v ? profissionais.map((p) => p.nome) : [])}
+                  />
+                </div>
               </div>
               <p className="mb-1.5 mt-2.5 text-xs text-muted-foreground">Profissionais que fazem este serviço</p>
               <div className="flex flex-wrap gap-2">
