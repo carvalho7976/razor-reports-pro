@@ -327,8 +327,6 @@ export default function ProfissionalPerfil() {
       return { ...g, ints: [...g.ints, { i: ini, f: hhmm(Math.min(23 * 60, mins(ini) + 60)) }] };
     });
 
-  const subtituloPagina = [f.nivel, f.email, f.celular].filter(Boolean).join(" · ");
-
   return (
     <AppLayout>
       <div className="flex flex-col gap-0">
@@ -345,7 +343,6 @@ export default function ProfissionalPerfil() {
             </button>
             {sujo && <span className="text-xs text-muted-foreground">Alterações não salvas</span>}
           </div>
-          {subtituloPagina && <p className="mt-1.5 text-[13px] text-muted-foreground">{subtituloPagina}</p>}
           <div role="tablist" className="mt-3 flex gap-6 overflow-x-auto overflow-y-hidden border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {abas.map(([id, nome]) => (
               <button
