@@ -954,6 +954,20 @@ export function ComandaConteudo({
       </DropdownMenu>
     </div>
     {saldosCliente()}
+    <div className="px-4 pb-1">
+      <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 text-[13px]">
+        <Crown className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <span className="min-w-0 flex-1 truncate font-medium">Plano Especial</span>
+        <span
+          className={cn(
+            "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
+            planoAtrasado ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success",
+          )}
+        >
+          {planoAtrasado ? "Atrasado" : "Ativo"}
+        </span>
+      </div>
+    </div>
     </div>
   );
 
@@ -1182,18 +1196,6 @@ export function ComandaConteudo({
                 <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {cartaoCliente()}
                 <div className="mt-4 space-y-4 border-t border-border px-4 pb-4 pt-4 text-[13px]">
-                  <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
-                    <Crown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="min-w-0 flex-1 truncate font-medium">Plano Especial</span>
-                    <span
-                      className={cn(
-                        "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
-                        planoAtrasado ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success",
-                      )}
-                    >
-                      {planoAtrasado ? "Atrasado" : "Ativo"}
-                    </span>
-                  </div>
                   {pacotesCliente.length > 0 && (
                     <div>
                       <button
