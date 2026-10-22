@@ -602,7 +602,7 @@ export default function SiteAgendamento() {
             </button>
             {sujo && <span className="text-xs text-muted-foreground">Alterações não salvas</span>}
           </div>
-          <div role="tablist" className="mt-3 flex gap-6 overflow-x-auto border-b border-border">
+          <div role="tablist" className="mt-3 flex gap-6 overflow-x-auto overflow-y-hidden border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {abas.map(([id, nome]) => (
               <button
                 key={id}
