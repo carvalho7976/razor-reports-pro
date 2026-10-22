@@ -39,6 +39,7 @@ import AssinaturaCadastro from "./pages/AssinaturaCadastro";
 import PaginaPlanos from "./pages/PaginaPlanos";
 import SiteAgendamento from "./pages/SiteAgendamento";
 import ConfiguracoesEmpresa from "./pages/ConfiguracoesEmpresa";
+import NovoPacote from "./pages/NovoPacote";
 import NovaAgenda2 from "./pages/NovaAgenda2";
 import AssinaturaPesquisa from "./pages/AssinaturaPesquisa";
 import RelatorioAssinatura from "./pages/RelatorioAssinatura";
@@ -81,6 +82,8 @@ const App = () => (
           <Route path="/categoriaServicoPesquisa" element={<ListaCategorias />} />
           <Route path="/produtoPesquisa" element={<ListaProdutos />} />
           <Route path="/comboPesquisa" element={<ListaPacotes />} />
+          <Route path="/novoPacote" element={<NovoPacote />} />
+          <Route path="/comboCadastro" element={<NovoPacote />} />
           <Route path="/formaPagamentoPesquisa" element={<ListaFormasPagamento />} />
           <Route path="/profissionalPerfil" element={<ProfissionalPerfil />} />
           <Route path="/novaCompra" element={<NovaCompra />} />

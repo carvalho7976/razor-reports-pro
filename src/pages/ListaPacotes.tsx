@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu, TabDef } from "@/components/DataTable";
 import { Trash2, Eye, Pencil, ToggleLeft, ToggleRight } from "lucide-react";
@@ -46,6 +47,7 @@ type ModalState =
 const emptyForm = (): Pacote => ({ id: 0, nome: "", servicos: "", valor: 0, validade: "60 dias", status: "Ativo" });
 
 export default function ListaPacotes() {
+  const navigate = useNavigate();
   const [aulaOpen, setAulaOpen] = useState(false);
   const [allData, setAllData] = useState(initialData);
   const [tab, setTab] = useState("todos");
@@ -62,7 +64,7 @@ export default function ListaPacotes() {
 
   const errors = { nome: !form?.nome ? "Informe o nome do pacote." : "" };
 
-  const openNew = () => { setForm(emptyForm()); setShowErrors(false); setModal({ type: "new" }); };
+  const openNew = () => navigate("/novoPacote");
   const openEdit = (item: Pacote) => { setForm({ ...item }); setShowErrors(false); setModal({ type: "edit", item }); };
   const openDelete = (item: Pacote) => setModal({ type: "delete", item });
   const openView = (item: Pacote) => setModal({ type: "view", item });
