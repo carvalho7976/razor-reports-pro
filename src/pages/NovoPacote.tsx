@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
@@ -78,9 +79,10 @@ export default function NovoPacote() {
   const navigate = useNavigate();
   const [aulaOpen, setAulaOpen] = useState(false);
   const [nome, setNome] = useState("");
+  const [expira, setExpira] = useState(false);
   const [dias, setDias] = useState("");
   const [itens, setItens] = useState<Item[]>([]);
-  const [salvo, setSalvo] = useState(JSON.stringify({ nome: "", dias: "", itens: [] }));
+  const [salvo, setSalvo] = useState(JSON.stringify({ nome: "", expira: false, dias: "", itens: [] }));
   const [erroNome, setErroNome] = useState("");
   const [erroAdd, setErroAdd] = useState("");
 
@@ -96,7 +98,7 @@ export default function NovoPacote() {
   const total = itens.reduce((s, i) => s + i.p, 0);
   const tabela = itens.reduce((s, i) => s + catalogo[i.s].preco * i.q, 0);
   const economia = tabela - total;
-  const sujo = useMemo(() => JSON.stringify({ nome, dias, itens }) !== salvo, [nome, dias, itens, salvo]);
+  const sujo = useMemo(() => JSON.stringify({ nome, expira, dias, itens }) !== salvo, [nome, expira, dias, itens, salvo]);
 
   const recalcula = (idx: number, q: string) => {
     if (idx < 0 || precoEditado) return;
@@ -149,7 +151,7 @@ export default function NovoPacote() {
       ok = false;
     }
     if (!ok) return;
-    setSalvo(JSON.stringify({ nome, dias, itens }));
+    setSalvo(JSON.stringify({ nome, expira, dias, itens }));
     toast({ title: "Pacote salvo" });
     navigate("/comboPesquisa");
   };
@@ -177,7 +179,7 @@ export default function NovoPacote() {
             <section className="rounded-xl border border-border bg-card p-4">
               <h2 className="mb-3.5 text-base font-semibold text-foreground">Dados do pacote</h2>
               <div className="grid grid-cols-12 gap-3">
-                <Campo label="Nome do pacote *" className="col-span-12 md:col-span-8" erro={erroNome}>
+                <Campo label="Nome do pacote *" className="col-span-12" erro={erroNome}>
                   <input
                     className={cn(campo, erroNome && "border-destructive focus:border-destructive focus:ring-destructive/30")}
                     value={nome}
@@ -188,9 +190,33 @@ export default function NovoPacote() {
                     }}
                   />
                 </Campo>
-                <Campo label="Dias para expirar" className="col-span-12 md:col-span-4" dica="Deixe vazio se o pacote não expira.">
-                  <input type="number" min={1} className={campo} value={dias} placeholder="Não expira" onChange={(e) => setDias(e.target.value)} />
-                </Campo>
+                <div className="col-span-12 flex flex-wrap items-center gap-x-6 gap-y-2">
+                  <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+                    <Switch
+                      checked={expira}
+                      onCheckedChange={(v) => {
+                        setExpira(v);
+                        if (v && !dias) setDias("30");
+                      }}
+                      aria-label="Pacote expira"
+                    />
+                    Pacote expira
+                  </label>
+                  {expira && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <input
+                        type="number"
+                        min={1}
+                        aria-label="Dias para expirar"
+                        className={cn(campo, "h-9 w-24")}
+                        value={dias}
+                        onFocus={(e) => e.target.select()}
+                        onChange={(e) => setDias(e.target.value)}
+                      />
+                      dias após a compra
+                    </div>
+                  )}
+                </div>
               </div>
             </section>
 
@@ -344,7 +370,7 @@ export default function NovoPacote() {
               ["Valor sem desconto", R(tabela)],
               ["Serviços", String(itens.length)],
               ["Sessões no total", String(itens.reduce((s, i) => s + i.q, 0))],
-              ["Expiração", dias ? `${dias} dias` : "Não expira"],
+              ["Expiração", expira && dias ? `${dias} dias` : "Não expira"],
             ].map(([k, v]) => (
               <div key={k} className="flex items-center justify-between py-1.5 text-sm">
                 <span>{k}</span>
