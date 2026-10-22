@@ -400,7 +400,7 @@ export default function ProfissionalPerfil() {
                     />
                   </div>
                   <div className="grid grid-cols-12 gap-3">
-                    <Campo label="Nome *" className="col-span-12" erro={erroNome}>
+                    <Campo label="Nome *" className="col-span-12 md:col-span-4" erro={erroNome}>
                       <input
                         className={cn(campo, erroNome && "border-destructive focus:border-destructive focus:ring-destructive/30")}
                         value={f.nome}
@@ -410,10 +410,10 @@ export default function ProfissionalPerfil() {
                         }}
                       />
                     </Campo>
-                    <Campo label="E-mail *" className="col-span-12 md:col-span-7">
+                    <Campo label="E-mail *" className="col-span-12 md:col-span-5">
                       <input type="email" className={campo} value={f.email} onChange={(e) => set("email", e.target.value)} />
                     </Campo>
-                    <Campo label="Celular" className="col-span-12 md:col-span-5">
+                    <Campo label="Celular" className="col-span-12 md:col-span-3">
                       <input className={campo} value={f.celular} placeholder="(00) 00000-0000" onChange={(e) => set("celular", e.target.value)} />
                     </Campo>
                     <Campo label="Nível de acesso" className="col-span-12 md:col-span-4">
