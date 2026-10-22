@@ -250,7 +250,7 @@ export default function ConfiguracoesEmpresa() {
           </div>
         </div>
 
-        <div className="mt-3 flex max-w-[980px] flex-col gap-4 pb-12">
+        <div className="mt-3 flex max-w-[1280px] flex-col gap-4 pb-12">
           {/* ---------------- EMPRESA ---------------- */}
           {aba === "empresa" && (
             <Secao>

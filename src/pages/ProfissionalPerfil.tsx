@@ -373,7 +373,7 @@ export default function ProfissionalPerfil() {
           </div>
         </div>
 
-        <div className="mt-3 max-w-[1040px] pb-12">
+        <div className="mt-3 max-w-[1280px] pb-12">
           {/* ---------------- PERFIL ---------------- */}
           {aba === "perfil" && (
             <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">

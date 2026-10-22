@@ -215,7 +215,7 @@ export default function NovoServico() {
           </div>
         </div>
 
-        <div className="mx-auto mt-3 grid w-full max-w-[1040px] items-start gap-3 pb-10 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="mt-3 grid w-full max-w-[1280px] items-start gap-3 pb-10 lg:grid-cols-[minmax(0,1fr)_440px]">
           {/* DADOS */}
           <div className="grid min-w-0 gap-3">
             <section className="rounded-xl border border-border bg-card p-3.5">
