@@ -411,6 +411,17 @@ export default function ProfissionalPerfil() {
                         }}
                       />
                     </Campo>
+                    <Campo label="Aniversário" className="col-span-12 md:col-span-4">
+                      <input type="date" className={campo} value={f.aniversario} onChange={(e) => set("aniversario", e.target.value)} />
+                    </Campo>
+                    <Campo label="Sexo" className="col-span-12 md:col-span-4">
+                      <select className={campo} value={f.sexo} onChange={(e) => set("sexo", e.target.value)}>
+                        <option value="">Selecione</option>
+                        {sexos.map((n) => (
+                          <option key={n}>{n}</option>
+                        ))}
+                      </select>
+                    </Campo>
                     <Campo label="E-mail *" className="col-span-12 md:col-span-5">
                       <input type="email" className={campo} value={f.email} onChange={(e) => set("email", e.target.value)} />
                     </Campo>
@@ -420,17 +431,6 @@ export default function ProfissionalPerfil() {
                     <Campo label="Nível de acesso" className="col-span-12 md:col-span-4">
                       <select className={campo} value={f.nivel} onChange={(e) => set("nivel", e.target.value)}>
                         {niveis.map((n) => (
-                          <option key={n}>{n}</option>
-                        ))}
-                      </select>
-                    </Campo>
-                    <Campo label="Aniversário" className="col-span-12 md:col-span-4">
-                      <input type="date" className={campo} value={f.aniversario} onChange={(e) => set("aniversario", e.target.value)} />
-                    </Campo>
-                    <Campo label="Sexo" className="col-span-12 md:col-span-4">
-                      <select className={campo} value={f.sexo} onChange={(e) => set("sexo", e.target.value)}>
-                        <option value="">Selecione</option>
-                        {sexos.map((n) => (
                           <option key={n}>{n}</option>
                         ))}
                       </select>
