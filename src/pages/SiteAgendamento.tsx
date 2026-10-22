@@ -792,7 +792,7 @@ export default function SiteAgendamento() {
                         role="switch"
                         aria-checked={s.telobr}
                         onClick={() => set("telobr", !s.telobr)}
-                        className="flex h-10 items-center gap-2.5 rounded-lg border border-info/50 bg-card pl-3 pr-3.5 text-sm"
+                        className="flex h-10 items-center gap-2.5 text-sm"
                       >
                         <Switch checked={s.telobr} tabIndex={-1} className="pointer-events-none" />
                         {s.telobr ? "Obrigatório" : "Opcional"}
