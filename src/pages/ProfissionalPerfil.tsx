@@ -150,7 +150,7 @@ const campo =
 const linkAcao = "inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-medium text-info hover:underline";
 const btnEscuro =
   "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background";
-const subtitulo = "mb-3 mt-6 text-base font-semibold text-foreground first:mt-0";
+const subtitulo = "mb-3 mt-6 text-xs font-semibold uppercase tracking-wide text-foreground first:mt-0";
 
 function Campo({ label, className, erro, dica, children }: { label: string; className?: string; erro?: string; dica?: string; children: React.ReactNode }) {
   return (
@@ -682,7 +682,7 @@ export default function ProfissionalPerfil() {
               {gruposPerm.map((g) => (
                 <section key={g.titulo} className="rounded-xl border border-border bg-card p-4">
                   <div className="mb-3 flex items-center justify-between gap-3">
-                    <h2 className="text-base font-semibold text-foreground">{g.titulo}</h2>
+                    <h2 className="text-xs font-semibold uppercase tracking-wide text-foreground">{g.titulo}</h2>
                     {g.titulo === gruposPerm[0].titulo && (
                       <div className="flex gap-3.5 whitespace-nowrap">
                         <button type="button" className={linkAcao} onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, true])) as Record<PermKey, boolean>)}>
