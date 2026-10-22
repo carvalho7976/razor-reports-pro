@@ -1095,24 +1095,25 @@ export function ComandaConteudo({
     <button
       key={value}
       onClick={() => setForma(value)}
+      aria-pressed={forma === value}
       className={cn(
-        "flex items-center gap-2.5 rounded-lg border bg-card px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted/60",
+        "relative flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-lg border bg-card px-3 py-4 text-center text-sm transition-colors hover:bg-muted/60",
         forma === value ? "border-foreground/70 bg-muted/60" : "border-border",
       )}
     >
-      {marca ??
-        (Icon && <Icon className={cn("h-4 w-4 shrink-0", forma === value ? "text-foreground" : "text-muted-foreground")} />)}
-      <span className="min-w-0 flex-1">
-        <span className="block truncate font-medium">{rotulo ?? value}</span>
-        {sub && <span className="block truncate text-xs text-muted-foreground">{sub}</span>}
-      </span>
       <span
         className={cn(
-          "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
+          "absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full border",
           forma === value ? "border-foreground bg-foreground text-background" : "border-border",
         )}
       >
         {forma === value && <Check className="h-2.5 w-2.5" />}
+      </span>
+      {marca ??
+        (Icon && <Icon className={cn("h-6 w-6 shrink-0", forma === value ? "text-foreground" : "text-muted-foreground")} />)}
+      <span className="w-full min-w-0">
+        <span className="block truncate font-medium">{rotulo ?? value}</span>
+        {sub && <span className="block truncate text-xs text-muted-foreground">{sub}</span>}
       </span>
     </button>
   );
@@ -1440,7 +1441,7 @@ export function ComandaConteudo({
               <h2 className="sr-only">Forma de pagamento</h2>
               <div className="h-4" />
 
-              <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {agendamento.cartaoSalvo &&
                   cardForma({
                     value: `${agendamento.cartaoSalvo.bandeira} •••• ${agendamento.cartaoSalvo.final}`,
@@ -1453,7 +1454,7 @@ export function ComandaConteudo({
               </div>
 
               <div className="mb-4 border-t border-border" />
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {outrasFormas.map((f) => cardForma(f))}
               </div>
 
