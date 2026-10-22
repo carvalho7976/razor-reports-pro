@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, ChevronDown, HelpCircle, X } from "lucide-react";
+import { Check, CheckCircle2, ChevronDown, HelpCircle, X } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +13,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 /* ------------------------------------------------------------------ dados */
 
 const categorias = ["Cabelo", "Barba", "Química", "Tratamento", "Unhas", "Estética", "Sobrancelha"];
-const profissionais = ["Cesar", "Lara", "Bruno", "Marcos"];
+const profissionais = [
+  { nome: "Cesar", iniciais: "CC", cor: "bg-blue-500" },
+  { nome: "Lara", iniciais: "LP", cor: "bg-pink-500" },
+  { nome: "Bruno", iniciais: "BR", cor: "bg-amber-500" },
+  { nome: "Marcos", iniciais: "MM", cor: "bg-emerald-500" },
+];
 // Produtos desta conta com o último custo (exemplo; o sistema real traz o estoque do próprio salão)
 const produtos = [
   { nome: "Creme de barbear", custo: 18 },
@@ -53,7 +58,6 @@ type Form = {
   moedas: string;
   pontos: string;
   online: boolean;
-  todos: boolean;
   profissionais: string[];
   itens: Item[];
 };
@@ -73,8 +77,7 @@ const inicial: Form = {
   moedas: "",
   pontos: "",
   online: true,
-  todos: true,
-  profissionais: [],
+  profissionais: profissionais.map((p) => p.nome),
   itens: [],
 };
 
@@ -144,7 +147,6 @@ export default function NovoServico() {
   const [aulaOpen, setAulaOpen] = useState(false);
   const [f, setF] = useState<Form>(inicial);
   const [salvo, setSalvo] = useState<Form>(inicial);
-  const [passo, setPasso] = useState<1 | 2>(1);
   const [erroNome, setErroNome] = useState("");
   const [erroPreco, setErroPreco] = useState("");
   const [catAberta, setCatAberta] = useState(false);
@@ -187,10 +189,7 @@ export default function NovoServico() {
       setErroPreco("Informe o preço.");
       ok = false;
     }
-    if (!ok) {
-      setPasso(1);
-      return;
-    }
+    if (!ok) return;
     setSalvo(f);
     toast({ title: "Serviço salvo" });
     navigate("/servicoPesquisa");
@@ -214,277 +213,264 @@ export default function NovoServico() {
             </button>
             {sujo && <span className="text-xs text-muted-foreground">Alterações não salvas</span>}
           </div>
-          {/* passos livres: clique para ir e voltar */}
-          <div className="mt-2.5 flex items-center gap-2.5" role="tablist">
-            {([1, 2] as const).map((n, k) => (
-              <div key={n} className="flex items-center gap-2.5">
-                {k > 0 && <span className="h-px w-10 bg-border" />}
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={passo === n}
-                  onClick={() => setPasso(n)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-lg px-1 py-0.5 text-sm font-semibold transition-colors hover:bg-muted",
-                    passo === n ? "text-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex h-6 w-6 items-center justify-center rounded-full border text-xs",
-                      passo === n ? "border-foreground bg-foreground text-background" : n < passo ? "border-border bg-muted text-foreground" : "border-border bg-card",
-                    )}
-                  >
-                    {n < passo ? <Check className="h-3.5 w-3.5" /> : n}
-                  </span>
-                  {n === 1 ? "Dados" : "Produtos"}
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
 
-        <div className="mt-2.5 grid items-start gap-3 pb-10 lg:grid-cols-[minmax(0,1fr)_260px]">
-          {passo === 1 ? (
-            <div className="grid min-w-0 gap-3">
-              <section className="rounded-xl border border-border bg-card p-3.5">
-                <p className={tituloSecao}>Serviço</p>
-                <div className="grid grid-cols-12 gap-x-2.5 gap-y-2">
-                  <Campo label="Nome *" className="col-span-12 md:col-span-6" erro={erroNome}>
-                    <input
-                      className={cn(campo, erroNome && "border-destructive focus:border-destructive focus:ring-destructive/30")}
-                      value={f.nome}
-                      placeholder="Ex.: Corte masculino"
-                      onChange={(e) => {
-                        set("nome", e.target.value);
-                        setErroNome("");
-                      }}
-                    />
-                  </Campo>
-                  <Campo label="Categoria" className="col-span-12 md:col-span-3">
-                    <Popover open={catAberta} onOpenChange={setCatAberta}>
-                      <PopoverTrigger asChild>
-                        <button type="button" className={cn(campo, "flex items-center justify-between gap-2 text-left")}>
-                          <span className="truncate">{f.categoria}</span>
-                          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] min-w-[200px] p-0">
-                        <Command filter={(value, search) => (semAcento(value).includes(semAcento(search)) ? 1 : 0)}>
-                          <CommandInput placeholder="Buscar categoria" />
-                          <CommandList>
-                            <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">Nenhuma categoria.</CommandEmpty>
-                            <CommandGroup>
-                              {categorias.map((c) => (
-                                <CommandItem
-                                  key={c}
-                                  value={c}
-                                  onSelect={() => {
-                                    set("categoria", c);
-                                    setCatAberta(false);
-                                  }}
-                                >
-                                  {c}
-                                  {f.categoria === c && <Check className="ml-auto h-4 w-4 text-info" />}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </Campo>
-                  <Campo label="Tempo de serviço" className="col-span-12 md:col-span-3">
-                    <select className={campo} value={f.tempo} onChange={(e) => set("tempo", Number(e.target.value))}>
-                      {tempos.map((t) => (
-                        <option key={t} value={t}>
-                          {fmtTempo(t)}
-                        </option>
-                      ))}
-                    </select>
-                  </Campo>
-                  <Campo label="Descrição" className="col-span-12">
-                    <input className={campo} value={f.descricao} placeholder="Opcional. O que está incluso no serviço" onChange={(e) => set("descricao", e.target.value)} />
-                  </Campo>
-                </div>
-              </section>
+        <div className="mx-auto mt-3 grid w-full max-w-[1040px] items-start gap-3 pb-10 lg:grid-cols-[minmax(0,1fr)_380px]">
+          {/* DADOS */}
+          <div className="grid min-w-0 gap-3">
+            <section className="rounded-xl border border-border bg-card p-3.5">
+              <p className={tituloSecao}>Serviço</p>
+              <div className="grid grid-cols-12 gap-x-2.5 gap-y-2">
+                <Campo label="Nome *" className="col-span-12 md:col-span-6" erro={erroNome}>
+                  <input
+                    className={cn(campo, erroNome && "border-destructive focus:border-destructive focus:ring-destructive/30")}
+                    value={f.nome}
+                    placeholder="Ex.: Corte masculino"
+                    onChange={(e) => {
+                      set("nome", e.target.value);
+                      setErroNome("");
+                    }}
+                  />
+                </Campo>
+                <Campo label="Categoria" className="col-span-12 md:col-span-3">
+                  <Popover open={catAberta} onOpenChange={setCatAberta}>
+                    <PopoverTrigger asChild>
+                      <button type="button" className={cn(campo, "flex items-center justify-between gap-2 text-left")}>
+                        <span className="truncate">{f.categoria}</span>
+                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] min-w-[200px] p-0">
+                      <Command filter={(value, search) => (semAcento(value).includes(semAcento(search)) ? 1 : 0)}>
+                        <CommandInput placeholder="Buscar categoria" />
+                        <CommandList>
+                          <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">Nenhuma categoria.</CommandEmpty>
+                          <CommandGroup>
+                            {categorias.map((c) => (
+                              <CommandItem
+                                key={c}
+                                value={c}
+                                onSelect={() => {
+                                  set("categoria", c);
+                                  setCatAberta(false);
+                                }}
+                              >
+                                {c}
+                                {f.categoria === c && <Check className="ml-auto h-4 w-4 text-info" />}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </Campo>
+                <Campo label="Tempo de serviço" className="col-span-12 md:col-span-3">
+                  <select className={campo} value={f.tempo} onChange={(e) => set("tempo", Number(e.target.value))}>
+                    {tempos.map((t) => (
+                      <option key={t} value={t}>
+                        {fmtTempo(t)}
+                      </option>
+                    ))}
+                  </select>
+                </Campo>
+                <Campo label="Descrição" className="col-span-12">
+                  <input className={campo} value={f.descricao} placeholder="Opcional. O que está incluso no serviço" onChange={(e) => set("descricao", e.target.value)} />
+                </Campo>
+              </div>
+            </section>
 
-              <section className="rounded-xl border border-border bg-card p-3.5">
-                <p className={tituloSecao}>Preço e comissão</p>
-                <div className="grid grid-cols-12 gap-x-2.5 gap-y-2">
-                  <Campo label="Preço *" className="col-span-12 sm:col-span-6 md:col-span-3" erro={erroPreco}>
-                    <Prefixo lado="esq" texto="R$">
-                      <input className={cn(campo, "pl-9", erroPreco && "border-destructive focus:border-destructive focus:ring-destructive/30")} {...camposReais("preco")} />
-                    </Prefixo>
-                  </Campo>
-                  <Campo label="Custo" className="col-span-12 sm:col-span-6 md:col-span-3">
-                    <Prefixo lado="esq" texto="R$">
-                      <input className={cn(campo, "pl-9")} {...camposReais("custo")} />
-                    </Prefixo>
-                  </Campo>
-                  <Campo
-                    label="Não comissionável"
-                    ajuda="Parte do preço que não entra no cálculo da comissão, como o custo de um produto usado no serviço."
-                    className="col-span-12 sm:col-span-6 md:col-span-3"
-                  >
-                    <Prefixo lado="esq" texto="R$">
-                      <input className={cn(campo, "pl-9")} {...camposReais("naoComissionavel")} />
-                    </Prefixo>
-                  </Campo>
-                  <Campo
-                    label="Comissão"
-                    className="col-span-12 sm:col-span-6 md:col-span-3"
-                    dica={
-                      f.comissao !== "" ? (
-                        <>
-                          = <b className="text-foreground">{R(com)}</b> sobre {R(base)}
-                        </>
-                      ) : nao > 0 ? (
-                        <>
-                          Calculada sobre <b className="text-foreground">{R(base)}</b>
-                        </>
-                      ) : undefined
-                    }
-                  >
-                    <Prefixo lado="dir" texto="%">
-                      <input
-                        className={cn(campo, "pr-9")}
-                        inputMode="decimal"
-                        placeholder="0"
-                        value={f.comissao}
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) => set("comissao", e.target.value)}
-                      />
-                    </Prefixo>
-                  </Campo>
-                  <Campo
-                    label="Comissão assistente"
-                    className="col-span-12 sm:col-span-6 md:col-span-3"
-                    dica={
-                      f.comissaoAssistente !== "" ? (
-                        <>
-                          = <b className="text-foreground">{R(comAss)}</b> sobre {R(base)}
-                        </>
-                      ) : undefined
-                    }
-                  >
-                    <Prefixo lado="dir" texto="%">
-                      <input
-                        className={cn(campo, "pr-9")}
-                        inputMode="decimal"
-                        placeholder="0"
-                        value={f.comissaoAssistente}
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) => set("comissaoAssistente", e.target.value)}
-                      />
-                    </Prefixo>
-                  </Campo>
-                  <div className="col-span-12 flex items-center md:col-span-9">
-                    <Opcao label="Preço varia" ajuda={'O preço é um valor inicial. O cliente vê "a partir de" e o valor final pode mudar na comanda.'} valor={f.varia} onChange={(v) => set("varia", v)} />
-                  </div>
+            <section className="rounded-xl border border-border bg-card p-3.5">
+              <p className={tituloSecao}>Preço e comissão</p>
+              <div className="grid grid-cols-12 gap-x-2.5 gap-y-2">
+                <Campo label="Preço *" className="col-span-12 sm:col-span-6 md:col-span-3" erro={erroPreco}>
+                  <Prefixo lado="esq" texto="R$">
+                    <input className={cn(campo, "pl-9", erroPreco && "border-destructive focus:border-destructive focus:ring-destructive/30")} {...camposReais("preco")} />
+                  </Prefixo>
+                </Campo>
+                <Campo label="Custo" className="col-span-12 sm:col-span-6 md:col-span-3">
+                  <Prefixo lado="esq" texto="R$">
+                    <input className={cn(campo, "pl-9")} {...camposReais("custo")} />
+                  </Prefixo>
+                </Campo>
+                <Campo
+                  label="Não comissionável"
+                  ajuda="Parte do preço que não entra no cálculo da comissão, como o custo de um produto usado no serviço."
+                  className="col-span-12 sm:col-span-6 md:col-span-3"
+                >
+                  <Prefixo lado="esq" texto="R$">
+                    <input className={cn(campo, "pl-9")} {...camposReais("naoComissionavel")} />
+                  </Prefixo>
+                </Campo>
+                <div className="col-span-12 flex items-end sm:col-span-6 md:col-span-3">
+                  <Opcao label="Preço varia" ajuda={'O preço é um valor inicial. O cliente vê "a partir de" e o valor final pode mudar na comanda.'} valor={f.varia} onChange={(v) => set("varia", v)} />
                 </div>
-              </section>
-
-              <section className="rounded-xl border border-border bg-card p-3.5">
-                <p className={tituloSecao}>Retorno e disponibilidade</p>
-                <div className="grid grid-cols-12 gap-x-2.5 gap-y-2">
-                  <Campo label="Previsão de retorno" ajuda="Em quantos dias o cliente costuma voltar. Usado nos lembretes de retorno." className="col-span-12 md:col-span-4">
-                    <Prefixo lado="dir" texto="dias">
-                      <input type="number" min={0} className={cn(campo, "pr-11")} placeholder="Sem previsão" value={f.retorno} onFocus={(e) => e.target.select()} onChange={(e) => set("retorno", e.target.value)} />
-                    </Prefixo>
-                  </Campo>
-                  <Campo label="Moedas Frizzar" ajuda="Moedas que o cliente ganha ao fazer este serviço." className="col-span-12 md:col-span-4">
-                    <input type="number" min={0} className={campo} placeholder="0" value={f.moedas} onFocus={(e) => e.target.select()} onChange={(e) => set("moedas", e.target.value)} />
-                  </Campo>
-                  <Campo label="Pontos da assinatura" ajuda="Quantos pontos este serviço consome do plano de assinatura do cliente." className="col-span-12 md:col-span-4">
-                    <input type="number" min={0} className={campo} placeholder="0" value={f.pontos} onFocus={(e) => e.target.select()} onChange={(e) => set("pontos", e.target.value)} />
-                  </Campo>
+                <Campo
+                  label="Comissão"
+                  className="col-span-12 sm:col-span-6 md:col-span-3"
+                  dica={
+                    f.comissao !== "" ? (
+                      <>
+                        = <b className="text-foreground">{R(com)}</b> sobre {R(base)}
+                      </>
+                    ) : nao > 0 ? (
+                      <>
+                        Calculada sobre <b className="text-foreground">{R(base)}</b>
+                      </>
+                    ) : undefined
+                  }
+                >
+                  <Prefixo lado="dir" texto="%">
+                    <input className={cn(campo, "pr-9")} inputMode="decimal" placeholder="0" value={f.comissao} onFocus={(e) => e.target.select()} onChange={(e) => set("comissao", e.target.value)} />
+                  </Prefixo>
+                </Campo>
+                <Campo
+                  label="Comissão assistente"
+                  className="col-span-12 sm:col-span-6 md:col-span-3"
+                  dica={
+                    f.comissaoAssistente !== "" ? (
+                      <>
+                        = <b className="text-foreground">{R(comAss)}</b> sobre {R(base)}
+                      </>
+                    ) : undefined
+                  }
+                >
+                  <Prefixo lado="dir" texto="%">
+                    <input className={cn(campo, "pr-9")} inputMode="decimal" placeholder="0" value={f.comissaoAssistente} onFocus={(e) => e.target.select()} onChange={(e) => set("comissaoAssistente", e.target.value)} />
+                  </Prefixo>
+                </Campo>
+              </div>
+              <div className="mt-2.5 flex flex-wrap items-baseline gap-x-5 gap-y-1 rounded-[10px] bg-muted/60 px-3 py-2 text-[13px] text-muted-foreground">
+                <div>
+                  Margem do salão{" "}
+                  <b className={cn("text-base font-bold", margem < 0 ? "text-destructive" : "text-foreground")}>{R(margem)}</b>
+                  {preco > 0 && <span> · {Math.round((margem / preco) * 100)}%</span>}
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-x-7 gap-y-1">
-                  <Opcao label="Permite agendar online" ajuda="O cliente pode escolher este serviço ao agendar pelo site." valor={f.online} onChange={(v) => set("online", v)} />
-                  <Opcao label="Todos os profissionais" ajuda="Vincula este serviço a todos os profissionais. Desligado, você escolhe quais." valor={f.todos} onChange={(v) => set("todos", v)} />
-                </div>
-                {!f.todos && (
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    {profissionais.map((p) => {
-                      const on = f.profissionais.includes(p);
-                      return (
-                        <button
-                          key={p}
-                          type="button"
-                          aria-pressed={on}
-                          onClick={() => set("profissionais", on ? f.profissionais.filter((x) => x !== p) : [...f.profissionais, p])}
-                          className={cn(
-                            "h-[34px] rounded-full border px-3.5 text-[13px] font-semibold transition-colors",
-                            on ? "border-foreground bg-foreground text-background" : "border-border bg-card text-muted-foreground hover:bg-muted",
-                          )}
-                        >
-                          {p}
-                        </button>
-                      );
-                    })}
-                  </div>
+                {comAss > 0 && (
+                  <span>
+                    Com assistente <b className="font-semibold text-foreground">{R(margem - comAss)}</b>
+                  </span>
                 )}
-              </section>
-            </div>
-          ) : (
-            <section className="min-w-0 rounded-xl border border-border bg-card p-3.5">
-              <p className={tituloSecao}>
-                Produtos usados neste serviço <span className="font-normal normal-case tracking-normal text-muted-foreground">· opcional</span>
-              </p>
-              <Popover open={prodAberto} onOpenChange={setProdAberto}>
-                <PopoverTrigger asChild>
-                  <button type="button" className={cn(campo, "flex max-w-[420px] items-center justify-between gap-2 text-left text-muted-foreground/70")}>
-                    Adicionar produto
-                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] min-w-[280px] p-0">
-                  <Command filter={(value, search) => (semAcento(value).includes(semAcento(search)) ? 1 : 0)}>
-                    <CommandInput placeholder="Buscar produto" />
-                    <CommandList>
-                      <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">
-                        {disponiveis.length === 0 ? "Todos os produtos já foram adicionados." : "Nenhum produto encontrado."}
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {disponiveis.map((p) => (
-                          <CommandItem
-                            key={p.i}
-                            value={p.nome}
-                            onSelect={() => {
-                              set("itens", [...f.itens, { p: p.i, q: 1 }]);
-                              setProdAberto(false);
-                            }}
-                          >
-                            <span className="flex-1 truncate">{p.nome}</span>
-                            <span className="text-muted-foreground">{R(p.custo)}</span>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+                {f.varia && (
+                  <span>
+                    Preço mostrado como <b className="font-semibold text-foreground">a partir de</b>
+                  </span>
+                )}
+              </div>
+            </section>
 
-              {f.itens.length === 0 ? (
-                <div className="mt-3 rounded-[10px] border border-dashed border-border p-5 text-center text-[13px] text-muted-foreground">
-                  Nenhum produto. Busque um produto acima para registrar o que o serviço consome.
-                </div>
-              ) : (
-                <table className="mt-3 w-full text-sm">
+            <section className="rounded-xl border border-border bg-card p-3.5">
+              <p className={tituloSecao}>Retorno e disponibilidade</p>
+              <div className="grid grid-cols-12 gap-x-2.5 gap-y-2">
+                <Campo label="Previsão de retorno" ajuda="Em quantos dias o cliente costuma voltar. Usado nos lembretes de retorno." className="col-span-12 md:col-span-4">
+                  <Prefixo lado="dir" texto="dias">
+                    <input type="number" min={0} className={cn(campo, "pr-11")} placeholder="Sem previsão" value={f.retorno} onFocus={(e) => e.target.select()} onChange={(e) => set("retorno", e.target.value)} />
+                  </Prefixo>
+                </Campo>
+                <Campo label="Moedas Frizzar" ajuda="Moedas que o cliente ganha ao fazer este serviço." className="col-span-12 md:col-span-4">
+                  <input type="number" min={0} className={campo} placeholder="0" value={f.moedas} onFocus={(e) => e.target.select()} onChange={(e) => set("moedas", e.target.value)} />
+                </Campo>
+                <Campo label="Pontos da assinatura" ajuda="Quantos pontos este serviço consome do plano de assinatura do cliente." className="col-span-12 md:col-span-4">
+                  <input type="number" min={0} className={campo} placeholder="0" value={f.pontos} onFocus={(e) => e.target.select()} onChange={(e) => set("pontos", e.target.value)} />
+                </Campo>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-x-7 gap-y-1">
+                <Opcao label="Permite agendar online" ajuda="O cliente pode escolher este serviço ao agendar pelo site." valor={f.online} onChange={(v) => set("online", v)} />
+                <Opcao
+                  label="Todos os profissionais"
+                  ajuda="Vincula este serviço a todos os profissionais. Desligado, você escolhe quais."
+                  valor={f.profissionais.length === profissionais.length}
+                  onChange={(v) => set("profissionais", v ? profissionais.map((p) => p.nome) : [])}
+                />
+              </div>
+              <p className="mb-1.5 mt-2.5 text-xs text-muted-foreground">Profissionais que fazem este serviço</p>
+              <div className="flex flex-wrap gap-2">
+                {profissionais.map((p) => {
+                  const on = f.profissionais.includes(p.nome);
+                  return (
+                    <button
+                      key={p.nome}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => set("profissionais", on ? f.profissionais.filter((x) => x !== p.nome) : [...f.profissionais, p.nome])}
+                      className={cn(
+                        "flex min-w-[72px] flex-col items-center gap-1.5 rounded-[10px] border p-2 transition",
+                        on ? "border-info bg-info/5" : "border-border bg-card opacity-60 hover:opacity-100",
+                      )}
+                    >
+                      <span className="relative">
+                        <span className={cn("flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm", p.cor)}>{p.iniciais}</span>
+                        {on && <CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-background fill-info text-white" />}
+                      </span>
+                      <span className={cn("max-w-[72px] truncate text-[11px] font-medium", on ? "text-foreground" : "text-muted-foreground")}>{p.nome}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+
+          {/* PRODUTOS */}
+          <section className="rounded-xl border border-border bg-card p-3.5 lg:sticky lg:top-4">
+            <p className={tituloSecao}>
+              Produtos usados neste serviço <span className="font-normal normal-case tracking-normal text-muted-foreground">· opcional</span>
+            </p>
+            <Popover open={prodAberto} onOpenChange={setProdAberto}>
+              <PopoverTrigger asChild>
+                <button type="button" className={cn(campo, "flex items-center justify-between gap-2 text-left text-muted-foreground/70")}>
+                  Adicionar produto
+                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] min-w-[280px] p-0">
+                <Command filter={(value, search) => (semAcento(value).includes(semAcento(search)) ? 1 : 0)}>
+                  <CommandInput placeholder="Buscar produto" />
+                  <CommandList>
+                    <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">
+                      {disponiveis.length === 0 ? "Todos os produtos já foram adicionados." : "Nenhum produto encontrado."}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {disponiveis.map((p) => (
+                        <CommandItem
+                          key={p.i}
+                          value={p.nome}
+                          onSelect={() => {
+                            set("itens", [...f.itens, { p: p.i, q: 1 }]);
+                            setProdAberto(false);
+                          }}
+                        >
+                          <span className="flex-1 truncate">{p.nome}</span>
+                          <span className="text-muted-foreground">{R(p.custo)}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+
+            {f.itens.length === 0 ? (
+              <div className="mt-2.5 rounded-[10px] border border-dashed border-border p-4 text-center text-[13px] text-muted-foreground">
+                Nenhum produto. Busque um produto acima para registrar o que o serviço consome.
+              </div>
+            ) : (
+              <>
+                <table className="mt-2.5 w-full text-sm">
                   <thead>
                     <tr className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <th className="px-2 pb-2">Produto</th>
-                      <th className="px-2 pb-2">Quantidade</th>
-                      <th className="px-2 pb-2 text-right">Custo unitário</th>
+                      <th className="px-2 pb-2">Qtd</th>
                       <th className="px-2 pb-2 text-right">Total</th>
-                      <th className="w-10" />
+                      <th className="w-9" />
                     </tr>
                   </thead>
                   <tbody>
                     {f.itens.map((it, k) => (
                       <tr key={it.p} className="border-t border-border">
-                        <td className="px-2 py-2">{produtos[it.p].nome}</td>
+                        <td className="px-2 py-2">
+                          {produtos[it.p].nome}
+                          <div className="text-xs text-muted-foreground">{R(produtos[it.p].custo)} cada</div>
+                        </td>
                         <td className="px-2 py-2">
                           <input
                             type="number"
@@ -496,10 +482,9 @@ export default function NovoServico() {
                               const q = Math.max(1, Math.floor(Number(e.target.value)) || 1);
                               set("itens", f.itens.map((x, i) => (i === k ? { ...x, q } : x)));
                             }}
-                            className={cn(campo, "h-8 w-[72px] text-[13px]")}
+                            className={cn(campo, "h-8 w-[60px] text-[13px]")}
                           />
                         </td>
-                        <td className="px-2 py-2 text-right text-muted-foreground">{R(produtos[it.p].custo)}</td>
                         <td className="px-2 py-2 text-right tabular-nums">{R(produtos[it.p].custo * it.q)}</td>
                         <td className="px-2 py-2 text-right">
                           <button
@@ -515,50 +500,14 @@ export default function NovoServico() {
                     ))}
                   </tbody>
                 </table>
-              )}
-            </section>
-          )}
-
-          {/* RESUMO */}
-          <aside className="rounded-xl border border-border bg-card p-3.5 lg:sticky lg:top-4">
-            <p className={tituloSecao}>Resumo</p>
-            {passo === 1 ? (
-              <>
-                <div className="flex items-center justify-between py-1 text-sm">
-                  <span>Preço</span>
-                  <b>
-                    {f.varia ? "a partir de " : ""}
-                    {R(preco)}
-                  </b>
-                </div>
-                <div className="flex items-center justify-between py-1 text-sm">
-                  <span>Comissão</span>
-                  <b>{R(com)}</b>
-                </div>
-                <div className="flex items-center justify-between py-1 text-sm">
-                  <span>Custo</span>
-                  <b>{R(custo)}</b>
-                </div>
-                <hr className="my-2.5 border-border" />
-                <p className="text-xs text-muted-foreground">Margem do salão</p>
-                <p className={cn("text-[26px] font-bold leading-tight", margem < 0 && "text-destructive")}>{R(margem)}</p>
-                {preco > 0 && <p className="text-xs text-muted-foreground">{Math.round((margem / preco) * 100)}% do preço</p>}
-                {comAss > 0 && <p className="mt-2 text-xs text-muted-foreground">Com assistente: {R(margem - comAss)}</p>}
-              </>
-            ) : (
-              <>
-                <div className="flex items-center justify-between py-1 text-sm">
-                  <span>Produtos</span>
-                  <b>{f.itens.length}</b>
-                </div>
-                <div className="flex items-center justify-between py-1 text-sm">
-                  <span>Custo dos produtos</span>
-                  <b>{R(custoProdutos)}</b>
-                </div>
-                {f.itens.length > 0 && (
+                <div className="mt-2.5 grid gap-1.5 border-t border-border pt-2.5 text-[13px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Custo total dos produtos</span>
+                    <b className="text-sm text-foreground">{R(custoProdutos)}</b>
+                  </div>
                   <button
                     type="button"
-                    className="mt-2 text-[13px] font-medium text-info hover:underline"
+                    className="justify-self-start font-medium text-info hover:underline"
                     onClick={() => {
                       set("custo", virgula(custoProdutos));
                       toast({ title: "Custo do serviço atualizado" });
@@ -566,17 +515,10 @@ export default function NovoServico() {
                   >
                     Usar como custo do serviço
                   </button>
-                )}
-                <hr className="my-2.5 border-border" />
-                <p className="text-xs text-muted-foreground">Serviço</p>
-                <p className="text-[15px] font-semibold">{f.nome.trim() || "Serviço sem nome"}</p>
-                <p className="text-xs text-muted-foreground">
-                  {f.varia ? "a partir de " : ""}
-                  {R(preco)} · {fmtTempo(f.tempo)}
-                </p>
+                </div>
               </>
             )}
-          </aside>
+          </section>
         </div>
       </div>
       <YouTubeModal
