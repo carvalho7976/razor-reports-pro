@@ -141,7 +141,7 @@ export default function PaginaPlanos() {
     <AppLayout>
       <div className="flex flex-col gap-0">
         {/* HEADER (fixo ao rolar) */}
-        <div className="sticky top-0 z-20 -mx-4 -mt-3 bg-background px-4 pb-3 pt-3 sm:-mx-[45px] sm:-mt-5 sm:px-[45px] sm:pt-5">
+        <div className="sticky top-0 z-20 -mt-3 bg-background pb-3 pt-3 sm:-mt-5 sm:pt-5">
           <div className="flex flex-row flex-wrap items-center gap-3">
             <div className="flex items-center gap-2.5">
               <h1 className="text-xl font-bold leading-none tracking-tight text-foreground sm:text-2xl">
