@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { DataTable, Column, SelectionAction, ActionsMenu } from "@/components/DataTable";
 import { Trash2, Pencil } from "lucide-react";
@@ -58,12 +59,13 @@ export default function ListaServicos() {
   const [form, setForm] = useState<Servico | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const errors = {
     nome: !form?.nome ? "Informe o nome do serviço." : "",
   };
 
-  const openNew = () => { setForm(emptyForm()); setShowErrors(false); setModal({ type: "new" }); };
+  const openNew = () => navigate("/novoServico");
   const openEdit = (item: Servico) => { setForm({ ...item }); setShowErrors(false); setModal({ type: "edit", item }); };
   const openDelete = (item: Servico) => setModal({ type: "delete", item });
   const closeModal = () => { setModal(null); setForm(null); setShowErrors(false); };

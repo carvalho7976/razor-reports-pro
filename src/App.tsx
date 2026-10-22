@@ -40,6 +40,7 @@ import PaginaPlanos from "./pages/PaginaPlanos";
 import SiteAgendamento from "./pages/SiteAgendamento";
 import ConfiguracoesEmpresa from "./pages/ConfiguracoesEmpresa";
 import NovoPacote from "./pages/NovoPacote";
+import NovoServico from "./pages/NovoServico";
 import NovaAgenda2 from "./pages/NovaAgenda2";
 import AssinaturaPesquisa from "./pages/AssinaturaPesquisa";
 import RelatorioAssinatura from "./pages/RelatorioAssinatura";
@@ -79,6 +80,8 @@ const App = () => (
           <Route path="/debitoClientes" element={<RelatorioDebitos />} />
           <Route path="/relatorioFluxoCaixaNovo" element={<FluxoCaixa />} />
           <Route path="/servicoPesquisa" element={<ListaServicos />} />
+          <Route path="/novoServico" element={<NovoServico />} />
+          <Route path="/servicoCadastro" element={<NovoServico />} />
           <Route path="/categoriaServicoPesquisa" element={<ListaCategorias />} />
           <Route path="/produtoPesquisa" element={<ListaProdutos />} />
           <Route path="/comboPesquisa" element={<ListaPacotes />} />
