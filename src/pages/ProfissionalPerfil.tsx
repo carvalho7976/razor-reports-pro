@@ -40,8 +40,6 @@ const gruposPerm = [
   {
     titulo: "Agenda",
     itens: [
-      ["online", "Aparece no agendamento online", "O cliente pode escolher este profissional ao agendar pelo site."],
-      ["agendaInterna", "Aparece na agenda interna", "Desligado, o profissional deixa de ser uma coluna na agenda do salão."],
       ["criar", "Criar agendamentos e folgas", "No app, o profissional pode criar agendamentos e folgas."],
       ["reagendar", "Reagendar", "No app, o profissional pode mudar o horário de um agendamento."],
       ["maisAgend", "Adicionar agendamentos a um agendamento aberto", "Permite incluir mais agendamentos manualmente dentro de um agendamento que já está aberto."],
@@ -71,8 +69,15 @@ const gruposPerm = [
   },
 ] as const;
 
-type PermKey = (typeof gruposPerm)[number]["itens"][number][0];
+// Visibilidade: decide se o profissional pode ser agendado (fica no Perfil, não em Permissões)
+const visibilidade = [
+  ["online", "Aparece no agendamento online", "O cliente pode escolher este profissional ao agendar pelo site."],
+  ["agendaInterna", "Aparece na agenda interna", "Desligado, o profissional deixa de ser uma coluna na agenda do salão."],
+] as const;
+
+type PermKey = (typeof gruposPerm)[number]["itens"][number][0] | (typeof visibilidade)[number][0];
 const todasPerm = gruposPerm.flatMap((g) => g.itens.map((i) => i[0])) as PermKey[];
+const chavesVisib = visibilidade.map((v) => v[0]) as PermKey[];
 
 type Form = {
   nome: string;
@@ -97,7 +102,7 @@ type Form = {
   perm: Record<PermKey, boolean>;
 };
 
-const permInicial = Object.fromEntries(todasPerm.map((k) => [k, k !== "notificar"])) as Record<PermKey, boolean>;
+const permInicial = Object.fromEntries([...todasPerm, ...chavesVisib].map((k) => [k, k !== "notificar"])) as Record<PermKey, boolean>;
 
 const abas = [
   ["perfil", "Perfil"],
@@ -236,7 +241,12 @@ export default function ProfissionalPerfil() {
     setAba(id);
     window.history.replaceState(null, "", `#${id}`);
   };
-  const abaSuja = (id: AbaId) => chaves[id].some((k) => JSON.stringify(f[k]) !== JSON.stringify(salvo[k]));
+  const permMudou = (ks: PermKey[]) => ks.some((k) => f.perm[k] !== salvo.perm[k]);
+  const abaSuja = (id: AbaId) => {
+    if (id === "permissoes") return permMudou(todasPerm);
+    const base = chaves[id].some((k) => JSON.stringify(f[k]) !== JSON.stringify(salvo[k]));
+    return id === "perfil" ? base || permMudou(chavesVisib) : base;
+  };
   const sujo = useMemo(() => JSON.stringify(f) !== JSON.stringify(salvo), [f, salvo]);
 
   // CEP preenche rua, bairro, cidade e estado
@@ -464,6 +474,13 @@ export default function ProfissionalPerfil() {
                 </div>
               </section>
 
+              <div className="grid gap-4">
+              <section className="rounded-xl border border-border bg-card p-4">
+                <p className={subtitulo}>Visibilidade</p>
+                {visibilidade.map(([k, nome, ajuda]) => (
+                  <Opcao key={k} label={nome} ajuda={ajuda} valor={f.perm[k]} onChange={(v) => set("perm", { ...f.perm, [k]: v })} />
+                ))}
+              </section>
               <section className="rounded-xl border border-border bg-card p-4">
                 <p className={subtitulo}>Parceria</p>
                 <Opcao label="Profissional parceiro" ajuda="Parceiro tem CNPJ próprio e não é funcionário do salão." valor={f.parceiro} onChange={(v) => set("parceiro", v)} />
@@ -473,6 +490,7 @@ export default function ProfissionalPerfil() {
                   </Campo>
                 )}
               </section>
+              </div>
             </div>
           )}
 
@@ -685,13 +703,13 @@ export default function ProfissionalPerfil() {
                     <h2 className="text-xs font-semibold uppercase tracking-wide text-foreground">{g.titulo}</h2>
                     {g.titulo === gruposPerm[0].titulo && (
                       <div className="flex gap-3.5 whitespace-nowrap">
-                        <button type="button" className={linkAcao} onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, true])) as Record<PermKey, boolean>)}>
+                        <button type="button" className={linkAcao} onClick={() => set("perm", { ...f.perm, ...(Object.fromEntries(todasPerm.map((k) => [k, true])) as Record<PermKey, boolean>) })}>
                           Liberar tudo
                         </button>
                         <button
                           type="button"
                           className="text-[13px] font-medium text-muted-foreground hover:underline"
-                          onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, false])) as Record<PermKey, boolean>)}
+                          onClick={() => set("perm", { ...f.perm, ...(Object.fromEntries(todasPerm.map((k) => [k, false])) as Record<PermKey, boolean>) })}
                         >
                           Bloquear tudo
                         </button>
