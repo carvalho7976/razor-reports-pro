@@ -392,6 +392,7 @@ export function ComandaConteudo({
   const [gorjeta, setGorjeta] = useState(0);
   const [gorjetaOutro, setGorjetaOutro] = useState(false);
   const [gorjetaTxt, setGorjetaTxt] = useState("");
+  const [gorjetaPara, setGorjetaPara] = useState<string[]>([]);
   const [lancarCredito, setLancarCredito] = useState(true);
   const [imprimir, setImprimir] = useState(false);
   const [emitirNota, setEmitirNota] = useState(false);
@@ -534,12 +535,28 @@ export function ComandaConteudo({
     setGorjeta(0);
     setGorjetaOutro(false);
     setGorjetaTxt("");
+    setGorjetaPara([quemRecebeGorjeta]);
     setConfirmando(true);
   };
 
   // A gorjeta vai para quem atendeu: a profissional do primeiro serviço da comanda
   const quemRecebeGorjeta =
     itens.find((i) => i.tipo !== "produto" && i.profissional)?.profissional ?? (agendamento.profissional || equipeSalao[0].nome);
+
+  // Equipe que atendeu na comanda (profissionais e assistentes dos serviços), para dividir a gorjeta
+  const equipeDaComanda = [
+    ...new Set(
+      itens
+        .filter((i) => i.tipo !== "produto")
+        .flatMap((i) => [i.profissional, ...(i.assistentes ?? [])])
+        .filter((n): n is string => !!n && equipeSalao.some((e) => e.nome === n)),
+    ),
+  ];
+  const gorjetaCada = gorjetaPara.length > 0 ? gorjeta / gorjetaPara.length : 0;
+  const nomesGorjeta =
+    gorjetaPara.length <= 1
+      ? gorjetaPara[0] ?? quemRecebeGorjeta
+      : `${gorjetaPara.slice(0, -1).join(", ")} e ${gorjetaPara[gorjetaPara.length - 1]}`;
 
   // Escolher a gorjeta já atualiza o valor a receber (menos um campo para mexer); clicar de novo tira
   const escolherGorjeta = (v: number) => {
@@ -571,7 +588,13 @@ export function ComandaConteudo({
 
   const confirmarPagamento = () => {
     const resumo: string[] = [];
-    if (gorjeta > 0) resumo.push(`Gorjeta de ${R$(gorjeta)} para ${quemRecebeGorjeta}`);
+    if (gorjeta > 0) {
+      resumo.push(
+        gorjetaPara.length > 1
+          ? `Gorjeta de ${R$(gorjeta)} dividida entre ${nomesGorjeta} (${R$(gorjetaCada)} cada)`
+          : `Gorjeta de ${R$(gorjeta)} para ${nomesGorjeta}`,
+      );
+    }
     if (excedente > 0) {
       resumo.push(
         lancarCredito ? `${R$(excedente)} lançados como crédito da cliente` : `Troco de ${R$(excedente)}`,
@@ -593,9 +616,6 @@ export function ComandaConteudo({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side={lado} align="start" className="w-52">
-        <DropdownMenuItem onClick={() => setEtapa("carrinho")}>
-          <Plus className="mr-2 h-4 w-4" /> Cobrar avulso
-        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             setEtapa("agendamento");
@@ -930,7 +950,6 @@ export function ComandaConteudo({
           <DropdownMenuItem onClick={() => toast.success(`Lembrete enviado para ${agendamento.cliente}`, noTopo)}>
             Enviar lembrete
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setEtapa("carrinho")}>Cobrar avulso</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -991,8 +1010,9 @@ export function ComandaConteudo({
   const painelCarrinho = (botao: string, onBotao: () => void) => (
     <aside className={cn("flex min-h-0 w-full flex-col md:w-[320px]", variante === "caixa" ? cartaoColuna : "border-t border-border md:border-l md:border-t-0")}>
       {cartaoCliente()}
+      <div className="mt-4 border-t border-border" />
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2 pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {listaItens(true)}
       </div>
 
@@ -1427,6 +1447,7 @@ export function ComandaConteudo({
                     sub: `Vence ${agendamento.cartaoSalvo.validade}`,
                   })}
                 {formasDaCliente.map((f) => cardForma(f))}
+                {planoAtrasado && cardForma({ value: "Cobrar avulso", icon: ReceiptText, sub: "Plano atrasado" })}
               </div>
 
               <div className="mb-4 border-t border-border" />
@@ -1681,10 +1702,7 @@ export function ComandaConteudo({
                 </div>
                 {gorjeta > 0 && (
                   <div className="flex items-center justify-between text-[13px] text-muted-foreground">
-                    <span className="flex items-center gap-1.5">
-                      Gorjeta para <FotoProf nome={quemRecebeGorjeta} tamanho="h-4 w-4 text-[8px]" />
-                      {quemRecebeGorjeta}
-                    </span>
+                    <span>Gorjeta</span>
                     <span className="tabular-nums">{R$(gorjeta)}</span>
                   </div>
                 )}
@@ -1694,7 +1712,7 @@ export function ComandaConteudo({
                 <p className={cn(tituloSecao, "mb-2")}>
                   Gorjeta <span className="font-normal normal-case tracking-normal text-muted-foreground">· opcional</span>
                 </p>
-                <div className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {[1, 2, 5, 10].map((v) => {
                     const ativo = gorjeta === v && !gorjetaOutro;
                     return (
@@ -1721,7 +1739,7 @@ export function ComandaConteudo({
                         onFocus={selecionarTudo}
                         placeholder="0,00"
                         aria-label="Valor da gorjeta"
-                        className="h-8 rounded-[30px] pl-8 text-[13px] tabular-nums"
+                        className="h-8 pl-8 text-[13px] tabular-nums"
                       />
                     </div>
                   ) : (
@@ -1738,6 +1756,61 @@ export function ComandaConteudo({
                     </button>
                   )}
                 </div>
+
+                {gorjeta > 0 && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="mt-2 flex w-full items-center gap-2 rounded-md border border-border px-3 py-2 text-[13px] transition-colors hover:bg-muted">
+                        <span className="text-muted-foreground">Para</span>
+                        <span className="flex -space-x-1.5">
+                          {gorjetaPara.slice(0, 3).map((n) => (
+                            <FotoProf key={n} nome={n} tamanho="h-5 w-5 text-[9px] ring-2 ring-background" />
+                          ))}
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-left font-medium">
+                          {gorjetaPara.length > 1 ? `Dividir entre ${gorjetaPara.length}` : nomesGorjeta}
+                        </span>
+                        {gorjetaPara.length > 1 && (
+                          <span className="text-xs text-muted-foreground tabular-nums">{R$(gorjetaCada)} cada</span>
+                        )}
+                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-1">
+                      {equipeSalao.map((e) => {
+                        const ativo = gorjetaPara.includes(e.nome);
+                        return (
+                          <button
+                            key={e.nome}
+                            onClick={() =>
+                              setGorjetaPara((prev) =>
+                                ativo ? (prev.length > 1 ? prev.filter((n) => n !== e.nome) : prev) : [...prev, e.nome],
+                              )
+                            }
+                            className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted"
+                          >
+                            <FotoProf nome={e.nome} tamanho="h-6 w-6 text-[10px]" />
+                            <span className="flex-1 text-left">{e.nome}</span>
+                            {ativo && <Check className="h-4 w-4 text-info" />}
+                          </button>
+                        );
+                      })}
+                      {equipeDaComanda.length > 1 && (
+                        <div className="mt-1 border-t border-border pt-1">
+                          <button
+                            onClick={() => setGorjetaPara(equipeDaComanda)}
+                            className="w-full rounded-md px-2 py-1.5 text-left text-[13px] text-info transition-colors hover:bg-muted"
+                          >
+                            Dividir com a equipe da comanda
+                          </button>
+                        </div>
+                      )}
+                      <p className="px-2 pb-1 pt-1.5 text-xs text-muted-foreground">
+                        Marque mais de uma pessoa para dividir igualmente.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                )}
               </div>
 
               <div className="space-y-3 border-t border-border pt-4">
