@@ -213,10 +213,10 @@ export default function PaginaPlanos() {
                         <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent align="start" className="w-80 p-0">
+                    <PopoverContent align="start" className="w-[22rem] p-0">
                       <div className="px-4 py-3">
                         <p className="mb-2.5 text-center text-sm font-semibold text-foreground">Dias de funcionamento</p>
-                        <div className="flex flex-wrap items-center justify-center gap-1.5">
+                        <div className="flex flex-nowrap items-center justify-center gap-1.5">
                           {dias.map((d) => {
                             const ativo = rascunho.dias.includes(d);
                             return (
@@ -233,7 +233,7 @@ export default function PaginaPlanos() {
                                   }))
                                 }
                                 className={cn(
-                                  "flex h-9 w-9 items-center justify-center rounded-full border text-[11px] font-semibold transition-colors",
+                                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold transition-colors",
                                   ativo
                                     ? "border-foreground bg-foreground text-background"
                                     : "border-border bg-background text-muted-foreground hover:bg-muted",
