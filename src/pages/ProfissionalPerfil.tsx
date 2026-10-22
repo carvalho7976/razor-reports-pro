@@ -1,907 +1,808 @@
-import { useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Camera, Check, ChevronDown, Clock, HelpCircle, Plus, X } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
-import { TextField, Dropdown } from "@/components/FormModal";
+import { AulaButton, YouTubeModal } from "@/components/YouTubeModal";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Plus, Trash2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
-interface ServicoDisponivel {
-  id: number;
-  nome: string;
-  preco: string;
-  tempo: string;
-}
+/* ------------------------------------------------------------------ dados */
 
-interface ServicoAdicionado extends ServicoDisponivel {
-  comissao: string;
-}
-
-const servicosDisponiveis: ServicoDisponivel[] = [
-  { id: 1, nome: "Corte Masculino", preco: "R$ 45,00", tempo: "30 min" },
-  { id: 2, nome: "Corte Feminino", preco: "R$ 65,00", tempo: "45 min" },
-  { id: 3, nome: "Barba", preco: "R$ 30,00", tempo: "20 min" },
-  { id: 4, nome: "Hidratação", preco: "R$ 80,00", tempo: "60 min" },
-  { id: 5, nome: "Coloração", preco: "R$ 120,00", tempo: "90 min" },
-  { id: 6, nome: "Escova Progressiva", preco: "R$ 200,00", tempo: "120 min" },
-  { id: 7, nome: "Manicure", preco: "R$ 35,00", tempo: "40 min" },
-  { id: 8, nome: "Pedicure", preco: "R$ 40,00", tempo: "50 min" },
+// Serviços desta conta (exemplo; o sistema real traz os serviços do próprio salão)
+const catalogo = [
+  { id: 1, nome: "Corte Masculino", preco: 45, tempo: 30 },
+  { id: 2, nome: "Corte Feminino", preco: 65, tempo: 45 },
+  { id: 3, nome: "Barba", preco: 30, tempo: 20 },
+  { id: 4, nome: "Hidratação", preco: 80, tempo: 60 },
+  { id: 5, nome: "Coloração", preco: 120, tempo: 90 },
+  { id: 6, nome: "Escova Progressiva", preco: 200, tempo: 120 },
+  { id: 7, nome: "Manicure", preco: 35, tempo: 40 },
+  { id: 8, nome: "Pedicure", preco: 40, tempo: 50 },
 ];
 
-const diasSemana = [
-  { key: "seg", label: "Seg" },
-  { key: "ter", label: "Ter" },
-  { key: "qua", label: "Qua" },
-  { key: "qui", label: "Qui" },
-  { key: "sex", label: "Sex" },
-  { key: "sab", label: "Sáb" },
-  { key: "dom", label: "Dom" },
+type Vinculo = { id: number; preco: number; tempo: number; comissao: string };
+type Intervalo = { i: string; f: string };
+type Grupo = { dias: boolean[]; ints: Intervalo[] };
+
+const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const niveis = ["Gerente", "Profissional", "Recepção", "Caixa", "Auxiliar", "Assistente"];
+const sexos = ["Feminino", "Masculino", "Outro"];
+const logradouros = ["Rua", "Avenida", "Alameda", "Travessa", "Rodovia", "Estrada", "Praça"];
+const ufs = ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"];
+
+// Permissões: ligado = o profissional pode. (No sistema antigo eram "Bloquear ..." com checkbox.)
+const gruposPerm = [
+  {
+    titulo: "Agenda",
+    itens: [
+      ["online", "Aparece no agendamento online", "O cliente pode escolher este profissional ao agendar pelo site."],
+      ["agendaInterna", "Aparece na agenda interna", "Desligado, o profissional deixa de ser uma coluna na agenda do salão."],
+      ["criar", "Criar agendamentos e folgas", "No app, o profissional pode criar agendamentos e folgas."],
+      ["reagendar", "Reagendar", "No app, o profissional pode mudar o horário de um agendamento."],
+      ["maisAgend", "Adicionar agendamentos a um agendamento aberto", "Permite incluir mais agendamentos manualmente dentro de um agendamento que já está aberto."],
+      ["deletar", "Excluir agendamentos e folgas", "No app, o profissional pode excluir agendamentos e folgas."],
+      ["verServicos", "Ver a lista de serviços", "No app, o profissional enxerga a lista de serviços do salão."],
+    ],
+  },
+  {
+    titulo: "Comandas",
+    itens: [
+      ["verComanda", "Ver a comanda do agendamento", "No app, abrir a comanda a partir de um agendamento."],
+      ["verLista", "Ver a lista de comandas abertas", "No app, enxergar todas as comandas abertas do salão."],
+      ["fechar", "Fechar comanda", "No app, o profissional pode fechar uma comanda."],
+      ["incluir", "Incluir itens na comanda", "No app, o profissional pode adicionar itens à comanda."],
+      ["editar", "Editar itens da comanda", "No app, o profissional pode alterar ou remover itens da comanda."],
+      ["opcoes", "Usar as opções da comanda", "No app, o profissional acessa as opções da comanda (desconto, transferir etc.)."],
+    ],
+  },
+  {
+    titulo: "Clientes",
+    itens: [
+      ["verDados", "Ver dados cadastrais do cliente", "Desligado, os dados do cliente (como telefone) ficam escondidos para este profissional."],
+      ["enviarAval", "Enviar avaliação ao cliente", "No app, enviar manualmente o pedido de avaliação."],
+      ["enviarLemb", "Enviar lembrete ao cliente", "No app, enviar manualmente o lembrete de agendamento."],
+      ["notificar", "Receber e-mail de novo agendamento", "Envia um e-mail ao profissional a cada novo agendamento."],
+    ],
+  },
 ] as const;
 
-interface DiaExpediente {
-  ativo: boolean;
-  trabalhoInicio: string;
-  trabalhoFim: string;
-  almocoInicio: string;
-  almocoFim: string;
-}
+type PermKey = (typeof gruposPerm)[number]["itens"][number][0];
+const todasPerm = gruposPerm.flatMap((g) => g.itens.map((i) => i[0])) as PermKey[];
 
-const defaultDia = (ativo = true): DiaExpediente => ({
-  ativo,
-  trabalhoInicio: "08:00",
-  trabalhoFim: "18:00",
-  almocoInicio: "12:00",
-  almocoFim: "13:00",
-});
-
-type ExpedienteState = Record<string, DiaExpediente>;
-
-const defaultExpediente = (): ExpedienteState =>
-  Object.fromEntries(diasSemana.map((d) => [d.key, defaultDia(d.key !== "dom")]));
-
-const nivelAcessoOptions = [
-  { value: "Gerente", label: "Gerente" },
-  { value: "Profissional", label: "Profissional" },
-  { value: "Recepção", label: "Recepção" },
-  { value: "Caixa", label: "Caixa" },
-  { value: "Auxiliar", label: "Auxiliar" },
-  { value: "Assistente", label: "Assistente" },
-];
-
-const sexoOptions = [
-  { value: "", label: "Selecione..." },
-  { value: "Masculino", label: "Masculino" },
-  { value: "Feminino", label: "Feminino" },
-  { value: "Outro", label: "Outro" },
-];
-
-const tipoLogradouroOptions = [
-  { value: "", label: "Selecione..." },
-  { value: "Rua", label: "Rua" },
-  { value: "Avenida", label: "Avenida" },
-  { value: "Travessa", label: "Travessa" },
-  { value: "Alameda", label: "Alameda" },
-  { value: "Praça", label: "Praça" },
-];
-
-const estadoOptions = [
-  { value: "", label: "Selecione..." },
-  { value: "AC", label: "AC" },
-  { value: "AL", label: "AL" },
-  { value: "AP", label: "AP" },
-  { value: "AM", label: "AM" },
-  { value: "BA", label: "BA" },
-  { value: "CE", label: "CE" },
-  { value: "DF", label: "DF" },
-  { value: "ES", label: "ES" },
-  { value: "GO", label: "GO" },
-  { value: "MA", label: "MA" },
-  { value: "MT", label: "MT" },
-  { value: "MS", label: "MS" },
-  { value: "MG", label: "MG" },
-  { value: "PA", label: "PA" },
-  { value: "PB", label: "PB" },
-  { value: "PR", label: "PR" },
-  { value: "PE", label: "PE" },
-  { value: "PI", label: "PI" },
-  { value: "RJ", label: "RJ" },
-  { value: "RN", label: "RN" },
-  { value: "RS", label: "RS" },
-  { value: "RO", label: "RO" },
-  { value: "RR", label: "RR" },
-  { value: "SC", label: "SC" },
-  { value: "SP", label: "SP" },
-  { value: "SE", label: "SE" },
-  { value: "TO", label: "TO" },
-];
-
-interface ProfissionalForm {
+type Form = {
   nome: string;
   email: string;
   celular: string;
-  nivelAcesso: string;
+  nivel: string;
   aniversario: string;
   sexo: string;
+  cep: string;
   tipoLogradouro: string;
   endereco: string;
   numero: string;
   complemento: string;
-  cep: string;
   bairro: string;
-  estado: string;
   cidade: string;
+  estado: string;
   parceiro: boolean;
   cnpj: string;
-  permitirAgendamentoOnline: boolean;
-  notificarEmail: boolean;
-  ocultarDados: boolean;
-  naoAparecerAgenda: boolean;
-  fotoPreview: string;
+  foto: string;
+  servicos: Vinculo[];
+  grupos: Grupo[];
+  perm: Record<PermKey, boolean>;
+};
+
+const permInicial = Object.fromEntries(todasPerm.map((k) => [k, k !== "notificar"])) as Record<PermKey, boolean>;
+
+const abas = [
+  ["perfil", "Perfil"],
+  ["servicos", "Serviços"],
+  ["expediente", "Expediente"],
+  ["permissoes", "Permissões"],
+] as const;
+type AbaId = (typeof abas)[number][0];
+
+const chaves: Record<AbaId, (keyof Form)[]> = {
+  perfil: ["nome", "email", "celular", "nivel", "aniversario", "sexo", "cep", "tipoLogradouro", "endereco", "numero", "complemento", "bairro", "cidade", "estado", "parceiro", "cnpj", "foto"],
+  servicos: ["servicos"],
+  expediente: ["grupos"],
+  permissoes: ["perm"],
+};
+
+/* ------------------------------------------------------------------ utilitários */
+
+const R = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const paraNumero = (v: string) => {
+  const n = parseFloat(v.replace(/\./g, "").replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+};
+const virgula = (n: number) => n.toFixed(2).replace(".", ",");
+const mins = (t: string) => {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+};
+const hhmm = (n: number) => `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
+const semAcento = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+function nomeDias(ds: boolean[]) {
+  const ix = ds.map((v, i) => (v ? i : -1)).filter((i) => i >= 0);
+  if (!ix.length) return "Nenhum dia";
+  if (ix.length === 7) return "Todos os dias";
+  const seq = ix.every((v, i) => i === 0 || v === ix[i - 1] + 1);
+  if (seq && ix.length > 2) return `${dias[ix[0]]} a ${dias[ix[ix.length - 1]]}`;
+  const n = ix.map((i) => dias[i]);
+  return n.length === 1 ? n[0] : `${n.slice(0, -1).join(", ")} e ${n[n.length - 1]}`;
 }
+const horasDoDia = (ints: Intervalo[]) => ints.reduce((s, x) => s + Math.max(0, mins(x.f) - mins(x.i)), 0) / 60;
+const fmtHoras = (h: number) => {
+  const t = Math.round(h * 2) / 2;
+  return `${Number.isInteger(t) ? t : String(t).replace(".", ",")}h`;
+};
+const duracao = (d: number) => (d >= 60 ? `${Math.floor(d / 60)}h${d % 60 ? String(d % 60).padStart(2, "0") : ""}` : `${d} min`);
 
-const emptyForm = (): ProfissionalForm => ({
-  nome: "",
-  email: "",
-  celular: "",
-  nivelAcesso: "Profissional",
-  aniversario: "",
-  sexo: "",
-  tipoLogradouro: "",
-  endereco: "",
-  numero: "",
-  complemento: "",
-  cep: "",
-  bairro: "",
-  estado: "",
-  cidade: "",
-  parceiro: false,
-  cnpj: "",
-  permitirAgendamentoOnline: true,
-  notificarEmail: false,
-  ocultarDados: false,
-  naoAparecerAgenda: false,
-  fotoPreview: "",
-});
+const campo =
+  "h-10 w-full rounded-lg border border-info/50 bg-card px-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-info/60 focus:ring-2 focus:ring-info/40";
+const linkAcao = "inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-medium text-info hover:underline";
+const btnEscuro =
+  "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background";
+const subtitulo = "mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-foreground first:mt-0";
 
-const tabs = [
-  { id: "basicos", label: "Dados Básicos" },
-  { id: "pessoais", label: "Dados pessoais" },
-];
-
-function SectionBlock({
-  title,
-  description,
-  children,
-  className = "",
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
+function Campo({ label, className, erro, dica, children }: { label: string; className?: string; erro?: string; dica?: string; children: React.ReactNode }) {
   return (
-    <div className={cn("rounded-xl border border-border bg-card p-4", className)}>
-      <div className="mb-3">
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
-        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
-      </div>
+    <div className={cn("grid min-w-0 content-start gap-0.5", className)}>
+      <label className="text-[13px] font-semibold text-foreground">{label}</label>
       {children}
+      {erro ? <p className="text-xs text-destructive">{erro}</p> : dica ? <p className="text-xs text-muted-foreground">{dica}</p> : null}
     </div>
   );
 }
 
+function Opcao({ label, ajuda, valor, onChange }: { label: string; ajuda: string; valor: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex h-[34px] items-center gap-2.5">
+      <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+        <Switch checked={valor} onCheckedChange={onChange} aria-label={label} />
+        {label}
+      </label>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button type="button" aria-label={ajuda} className="text-muted-foreground hover:text-foreground">
+            <HelpCircle className="h-[15px] w-[15px]" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-[240px] text-xs">{ajuda}</TooltipContent>
+      </Tooltip>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ página */
+
 export default function ProfissionalPerfil() {
-  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [aulaOpen, setAulaOpen] = useState(false);
 
-  const profNome = searchParams.get("nome");
-  const profEmail = searchParams.get("email") || "";
-  const profCelular = searchParams.get("celular") || "";
-  const profFuncao = searchParams.get("funcao") || "Profissional";
+  const inicial = useMemo<Form>(
+    () => ({
+      nome: searchParams.get("nome") || "",
+      email: searchParams.get("email") || "",
+      celular: searchParams.get("celular") || "",
+      nivel: searchParams.get("funcao") || "Profissional",
+      aniversario: "",
+      sexo: "",
+      cep: "",
+      tipoLogradouro: "Rua",
+      endereco: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      estado: "PR",
+      parceiro: false,
+      cnpj: "",
+      foto: "",
+      servicos: [],
+      grupos: [
+        { dias: [true, true, true, true, true, false, false], ints: [{ i: "09:00", f: "12:00" }, { i: "13:00", f: "18:00" }] },
+        { dias: [false, false, false, false, false, true, false], ints: [{ i: "09:00", f: "14:00" }] },
+      ],
+      perm: permInicial,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
-  const [form, setForm] = useState<ProfissionalForm>(() => ({
-    ...emptyForm(),
-    nome: profNome || "",
-    email: profEmail,
-    celular: profCelular,
-    nivelAcesso: profFuncao,
-  }));
+  const [salvo, setSalvo] = useState<Form>(inicial);
+  const [f, setF] = useState<Form>(inicial);
+  const [aba, setAba] = useState<AbaId>(() => {
+    const h = window.location.hash.slice(1);
+    return (abas.find((a) => a[0] === h)?.[0] ?? "perfil") as AbaId;
+  });
+  const [erroNome, setErroNome] = useState("");
+  const [buscaAberta, setBuscaAberta] = useState(false);
+  const [grupoEdit, setGrupoEdit] = useState<{ idx: number; dias: boolean[]; ints: Intervalo[] } | null>(null);
+  const [erroGrupo, setErroGrupo] = useState("");
 
-  const [activeTab, setActiveTab] = useState("basicos");
-  const [expedienteOpen, setExpedienteOpen] = useState(false);
-  const [expediente, setExpediente] = useState<ExpedienteState>(defaultExpediente);
-  const [servicosOpen, setServicosOpen] = useState(false);
-  const [servicoBusca, setServicoBusca] = useState("");
-  const [servicosAdicionados, setServicosAdicionados] = useState<ServicoAdicionado[]>([]);
-  const [servicosSelecionados, setServicosSelecionados] = useState<number[]>([]);
-  const [servicosDropdownOpen, setServicosDropdownOpen] = useState(false);
-  const [servicosPendentes, setServicosPendentes] = useState<number[]>([]);
-  const servicosDropdownRef = useRef<HTMLDivElement | null>(null);
-
-  const updateDia = (key: string, field: keyof DiaExpediente, value: string | boolean) =>
-    setExpediente((prev) => ({ ...prev, [key]: { ...prev[key], [field]: value } }));
-
-  const servicosDispFiltrados = servicosDisponiveis
-    .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
-    .filter((s) => s.nome.toLowerCase().includes(servicoBusca.toLowerCase()));
-
-  const toggleServicoPendente = (id: number) => {
-    setServicosPendentes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const set = <K extends keyof Form>(k: K, v: Form[K]) => setF((p) => ({ ...p, [k]: v }));
+  const irPara = (id: AbaId) => {
+    setAba(id);
+    window.history.replaceState(null, "", `#${id}`);
   };
+  const abaSuja = (id: AbaId) => chaves[id].some((k) => JSON.stringify(f[k]) !== JSON.stringify(salvo[k]));
+  const sujo = useMemo(() => JSON.stringify(f) !== JSON.stringify(salvo), [f, salvo]);
 
-  const handleAdicionarSelecionados = () => {
-    const novos = servicosDisponiveis
-      .filter((s) => servicosPendentes.includes(s.id) && !servicosAdicionados.some((a) => a.id === s.id))
-      .map((s) => ({ ...s, comissao: "" }));
+  // CEP preenche rua, bairro, cidade e estado
+  useEffect(() => {
+    const d = f.cep.replace(/\D/g, "");
+    if (d.length !== 8) return;
+    let ativo = true;
+    fetch(`https://viacep.com.br/ws/${d}/json/`)
+      .then((r) => r.json())
+      .then((j) => {
+        if (!ativo || j.erro) return;
+        setF((p) => ({
+          ...p,
+          endereco: j.logradouro || p.endereco,
+          bairro: j.bairro || p.bairro,
+          cidade: j.localidade || p.cidade,
+          estado: j.uf || p.estado,
+        }));
+      })
+      .catch(() => undefined);
+    return () => {
+      ativo = false;
+    };
+  }, [f.cep]);
 
-    setServicosAdicionados((prev) => [...prev, ...novos]);
-    setServicosPendentes([]);
-    setServicosDropdownOpen(false);
-    setServicoBusca("");
-  };
-
-  const handleAdicionarTodos = () => {
-    const novos = servicosDisponiveis
-      .filter((s) => !servicosAdicionados.some((a) => a.id === s.id))
-      .map((s) => ({ ...s, comissao: "" }));
-
-    setServicosAdicionados((prev) => [...prev, ...novos]);
-    setServicosPendentes([]);
-    setServicosDropdownOpen(false);
-    setServicoBusca("");
-  };
-
-  const handleRemoverServicos = () => {
-    setServicosAdicionados((prev) => prev.filter((s) => !servicosSelecionados.includes(s.id)));
-    setServicosSelecionados([]);
-  };
-
-  const updateServico = (id: number, field: keyof ServicoAdicionado, value: string) =>
-    setServicosAdicionados((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
-
-  const toggleServicoSelecionado = (id: number) => {
-    setServicosSelecionados((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  };
-
-  const toggleTodosServicos = () => {
-    if (servicosSelecionados.length === servicosAdicionados.length) {
-      setServicosSelecionados([]);
-    } else {
-      setServicosSelecionados(servicosAdicionados.map((s) => s.id));
+  const salvar = () => {
+    if (!f.nome.trim()) {
+      irPara("perfil");
+      setErroNome("Informe o nome.");
+      return;
     }
+    setSalvo(f);
+    toast({ title: "Profissional salvo" });
+    navigate("/funcionarioPesquisa");
   };
 
-  const update = (field: keyof ProfissionalForm, value: string | boolean) => {
-    setForm((prev) => {
-      const next = { ...prev, [field]: value };
-      if (value !== "" && value !== false) {
-        toast({ title: "Alteração salva automaticamente" });
-      }
-      return next;
+  /* ---- serviços ---- */
+  const disponiveis = catalogo.filter((c) => !f.servicos.some((s) => s.id === c.id));
+  const adicionarServico = (id: number) => {
+    const c = catalogo.find((x) => x.id === id);
+    if (!c) return;
+    set("servicos", [...f.servicos, { id, preco: c.preco, tempo: c.tempo, comissao: "" }]);
+    setBuscaAberta(false);
+  };
+  const upServico = (id: number, patch: Partial<Vinculo>) => set("servicos", f.servicos.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+
+  /* ---- expediente ---- */
+  const diaOcupado = (k: number) => f.grupos.some((g, i) => i !== grupoEdit?.idx && g.dias[k]);
+  const livres = dias.filter((_, k) => !f.grupos.some((g) => g.dias[k]));
+
+  const abrirGrupo = (idx: number) => {
+    setErroGrupo("");
+    if (idx >= 0) {
+      const g = f.grupos[idx];
+      setGrupoEdit({ idx, dias: [...g.dias], ints: g.ints.map((x) => ({ ...x })) });
+      return;
+    }
+    const k = dias.findIndex((_, i) => !f.grupos.some((g) => g.dias[i]));
+    if (k < 0) return;
+    const d = dias.map((_, i) => i === k);
+    setGrupoEdit({ idx: -1, dias: d, ints: [{ i: "09:00", f: "18:00" }] });
+  };
+
+  const salvarGrupo = () => {
+    if (!grupoEdit) return;
+    if (!grupoEdit.dias.some(Boolean)) return setErroGrupo("Escolha ao menos um dia.");
+    const ints = grupoEdit.ints.filter((x) => x.i && x.f).sort((a, b) => mins(a.i) - mins(b.i));
+    if (!ints.length) return setErroGrupo("Informe ao menos um intervalo.");
+    for (let n = 0; n < ints.length; n++) {
+      if (mins(ints[n].f) <= mins(ints[n].i)) return setErroGrupo("O horário final precisa ser depois do inicial.");
+      if (n && mins(ints[n].i) < mins(ints[n - 1].f)) return setErroGrupo("Os intervalos não podem se sobrepor.");
+    }
+    const g: Grupo = { dias: grupoEdit.dias, ints };
+    const lista = grupoEdit.idx < 0 ? [...f.grupos, g] : f.grupos.map((x, i) => (i === grupoEdit.idx ? g : x));
+    lista.sort((a, b) => a.dias.indexOf(true) - b.dias.indexOf(true));
+    set("grupos", lista);
+    setGrupoEdit(null);
+  };
+
+  const upInt = (n: number, c: "i" | "f", v: string) =>
+    setGrupoEdit((g) => (g ? { ...g, ints: g.ints.map((x, i) => (i === n ? { ...x, [c]: v } : x)) } : g));
+
+  const adicionarInt = () =>
+    setGrupoEdit((g) => {
+      if (!g) return g;
+      const u = g.ints[g.ints.length - 1];
+      const ini = u.f && mins(u.f) < 22 * 60 ? u.f : "13:00";
+      return { ...g, ints: [...g.ints, { i: ini, f: hhmm(Math.min(23 * 60, mins(ini) + 60)) }] };
     });
-  };
 
-  const handleFotoClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const previewUrl = URL.createObjectURL(file);
-    update("fotoPreview", previewUrl);
-  };
+  const subtituloPagina = [f.nivel, f.email, f.celular].filter(Boolean).join(" · ");
 
   return (
     <AppLayout>
       <div className="flex flex-col gap-0">
-        <div className="mx-6 mt-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-5">
-              <button
-                type="button"
-                onClick={handleFotoClick}
-                className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 border-border bg-muted shadow-sm transition hover:border-muted-foreground"
-                aria-label="Alterar foto"
-              >
-                {form.fotoPreview ? (
-                  <img src={form.fotoPreview} alt="Foto do profissional" className="h-full w-full object-cover" />
-                ) : (
-                  <Camera className="h-6 w-6 text-muted-foreground" />
-                )}
-                <div className="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[10px] font-medium text-white">
-                  Alterar
-                </div>
-              </button>
-
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFotoChange} />
-
-              <div className="pt-1">
-                <h1 className="text-xl font-bold text-foreground">{form.nome || "Novo profissional"}</h1>
-                <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-sm text-muted-foreground">
-                  <span>{form.nivelAcesso}</span>
-                  {form.email && <span>{form.email}</span>}
-                  {form.celular && <span>{form.celular}</span>}
-                </div>
-              </div>
+        {/* HEADER */}
+        <div className="pb-1">
+          <div className="flex flex-row flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl font-bold leading-none tracking-tight text-foreground sm:text-2xl">{f.nome.trim() || "Novo profissional"}</h1>
+              <AulaButton onOpen={() => setAulaOpen(true)} />
             </div>
+            <span aria-hidden="true" className="inline-block h-6 w-px bg-border" />
+            <button type="button" onClick={salvar} className={btnEscuro}>
+              Salvar alterações
+            </button>
+            {sujo && <span className="text-xs text-muted-foreground">Alterações não salvas</span>}
           </div>
-        </div>
-
-        <div className="mx-6 mt-4 border-b border-border">
-          <div className="flex gap-6">
-            {tabs.map((tab) => (
+          {subtituloPagina && <p className="mt-1.5 text-[13px] text-muted-foreground">{subtituloPagina}</p>}
+          <div role="tablist" className="mt-3 flex gap-6 overflow-x-auto overflow-y-hidden border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {abas.map(([id, nome]) => (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={aba === id}
+                onClick={() => irPara(id)}
                 className={cn(
-                  "relative pb-2.5 text-sm font-medium transition-colors",
-                  activeTab === tab.id
-                    ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                  "relative -mb-px whitespace-nowrap border-b-2 pb-2.5 pt-2 text-sm font-medium transition-colors",
+                  aba === id ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
-                {tab.label}
+                {nome}
+                {abaSuja(id) && <span title="Alterações não salvas" className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-destructive align-middle" />}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="mx-6 mt-5 pb-10">
-          {activeTab === "basicos" && (
-            <div className="grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-              <div className="grid gap-5">
-                <SectionBlock title="Dados básicos" description="Informações principais do profissional.">
-                  <div className="grid max-w-3xl gap-4">
-                    <div className="max-w-xl">
-                      <TextField label="Nome *" value={form.nome} onChange={(v) => update("nome", v)} />
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <TextField label="Email *" value={form.email} onChange={(v) => update("email", v)} />
-                      <TextField
-                        label="Celular"
-                        value={form.celular}
-                        onChange={(v) => update("celular", v)}
-                        placeholder="(00) 00000-0000"
-                      />
-                    </div>
-
-                    <div className="max-w-sm">
-                      <Dropdown
-                        label="Nível de acesso"
-                        value={form.nivelAcesso}
-                        setValue={(v) => update("nivelAcesso", v)}
-                        options={nivelAcessoOptions}
-                      />
-                    </div>
-                  </div>
-                </SectionBlock>
-              </div>
-
-              <div className="grid gap-5 self-start">
-                <SectionBlock
-                  title="Permissões"
-                  description="Controle o comportamento do profissional dentro do sistema."
-                >
-                  <div className="grid gap-3">
-                    {[
-                      {
-                        field: "permitirAgendamentoOnline" as const,
-                        label: "Permitir agendamento online",
-                      },
-                      {
-                        field: "notificarEmail" as const,
-                        label: "Notificar via email novo agendamento",
-                      },
-                      {
-                        field: "ocultarDados" as const,
-                        label: "Ocultar dados cadastrais do cliente",
-                      },
-                      {
-                        field: "naoAparecerAgenda" as const,
-                        label: "Não aparecer na agenda interna",
-                      },
-                    ].map((item) => (
-                      <label key={item.field} className="flex cursor-pointer select-none items-center gap-3">
-                        <Checkbox
-                          checked={form[item.field] as boolean}
-                          onCheckedChange={(v) => update(item.field, !!v)}
-                          className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
-                        />
-                        <span className="text-sm text-foreground">{item.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </SectionBlock>
-
-                <SectionBlock title="Ações" description="Configurações complementares do profissional.">
-                  <div className="flex flex-col gap-3">
+        <div className="mt-3 max-w-[1040px] pb-12">
+          {/* ---------------- PERFIL ---------------- */}
+          {aba === "perfil" && (
+            <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <section className="rounded-xl border border-border bg-card p-4">
+                <div className="grid gap-4 sm:grid-cols-[80px_minmax(0,1fr)]">
+                  <div>
                     <button
-                      onClick={() => setServicosOpen(true)}
-                      className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      aria-label="Alterar foto"
+                      className="mt-[19px] flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted text-muted-foreground transition hover:border-muted-foreground"
                     >
-                      Configurar serviços
+                      {f.foto ? <img src={f.foto} alt="Foto do profissional" className="h-full w-full object-cover" /> : <Camera className="h-[22px] w-[22px]" />}
                     </button>
-                    <button
-                      onClick={() => setExpedienteOpen(true)}
-                      className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
-                    >
-                      Configurar expediente
-                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={(e) => {
+                        const a = e.target.files?.[0];
+                        if (a) set("foto", URL.createObjectURL(a));
+                      }}
+                    />
                   </div>
-                </SectionBlock>
-              </div>
+                  <div className="grid grid-cols-12 gap-3">
+                    <Campo label="Nome *" className="col-span-12" erro={erroNome}>
+                      <input
+                        className={cn(campo, erroNome && "border-destructive focus:border-destructive focus:ring-destructive/30")}
+                        value={f.nome}
+                        onChange={(e) => {
+                          set("nome", e.target.value);
+                          setErroNome("");
+                        }}
+                      />
+                    </Campo>
+                    <Campo label="E-mail *" className="col-span-12 md:col-span-7">
+                      <input type="email" className={campo} value={f.email} onChange={(e) => set("email", e.target.value)} />
+                    </Campo>
+                    <Campo label="Celular" className="col-span-12 md:col-span-5">
+                      <input className={campo} value={f.celular} placeholder="(00) 00000-0000" onChange={(e) => set("celular", e.target.value)} />
+                    </Campo>
+                    <Campo label="Nível de acesso" className="col-span-12 md:col-span-4">
+                      <select className={campo} value={f.nivel} onChange={(e) => set("nivel", e.target.value)}>
+                        {niveis.map((n) => (
+                          <option key={n}>{n}</option>
+                        ))}
+                      </select>
+                    </Campo>
+                    <Campo label="Aniversário" className="col-span-12 md:col-span-4">
+                      <input type="date" className={campo} value={f.aniversario} onChange={(e) => set("aniversario", e.target.value)} />
+                    </Campo>
+                    <Campo label="Sexo" className="col-span-12 md:col-span-4">
+                      <select className={campo} value={f.sexo} onChange={(e) => set("sexo", e.target.value)}>
+                        <option value="">Selecione</option>
+                        {sexos.map((n) => (
+                          <option key={n}>{n}</option>
+                        ))}
+                      </select>
+                    </Campo>
+                  </div>
+                </div>
+
+                <p className={subtitulo}>Endereço</p>
+                <div className="grid grid-cols-12 gap-3">
+                  <Campo label="CEP" className="col-span-12 md:col-span-3" dica="Preenche rua, bairro e cidade.">
+                    <input inputMode="numeric" placeholder="00000-000" className={campo} value={f.cep} onChange={(e) => set("cep", e.target.value)} />
+                  </Campo>
+                  <Campo label="Tipo" className="col-span-12 md:col-span-2">
+                    <select className={campo} value={f.tipoLogradouro} onChange={(e) => set("tipoLogradouro", e.target.value)}>
+                      {logradouros.map((n) => (
+                        <option key={n}>{n}</option>
+                      ))}
+                    </select>
+                  </Campo>
+                  <Campo label="Endereço" className="col-span-12 md:col-span-5">
+                    <input className={campo} value={f.endereco} onChange={(e) => set("endereco", e.target.value)} />
+                  </Campo>
+                  <Campo label="Nº" className="col-span-12 md:col-span-2">
+                    <input className={campo} value={f.numero} onChange={(e) => set("numero", e.target.value)} />
+                  </Campo>
+                  <Campo label="Complemento" className="col-span-12 md:col-span-4">
+                    <input className={campo} value={f.complemento} onChange={(e) => set("complemento", e.target.value)} />
+                  </Campo>
+                  <Campo label="Bairro" className="col-span-12 md:col-span-3">
+                    <input className={campo} value={f.bairro} onChange={(e) => set("bairro", e.target.value)} />
+                  </Campo>
+                  <Campo label="Cidade" className="col-span-12 md:col-span-3">
+                    <input className={campo} value={f.cidade} onChange={(e) => set("cidade", e.target.value)} />
+                  </Campo>
+                  <Campo label="Estado" className="col-span-12 md:col-span-2">
+                    <select className={campo} value={f.estado} onChange={(e) => set("estado", e.target.value)}>
+                      {ufs.map((n) => (
+                        <option key={n}>{n}</option>
+                      ))}
+                    </select>
+                  </Campo>
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-border bg-card p-4">
+                <p className={subtitulo}>Parceria</p>
+                <Opcao label="Profissional parceiro" ajuda="Parceiro tem CNPJ próprio e não é funcionário do salão." valor={f.parceiro} onChange={(v) => set("parceiro", v)} />
+                {f.parceiro && (
+                  <Campo label="CNPJ" className="mt-2">
+                    <input className={campo} value={f.cnpj} placeholder="00.000.000/0000-00" onChange={(e) => set("cnpj", e.target.value)} />
+                  </Campo>
+                )}
+              </section>
             </div>
           )}
 
-          {activeTab === "pessoais" && (
-            <div className="grid max-w-5xl gap-5">
-              <SectionBlock title="Informações pessoais" description="Dados complementares do profissional.">
-                <div className="grid gap-4">
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <TextField
-                      label="Aniversário"
-                      value={form.aniversario}
-                      onChange={(v) => update("aniversario", v)}
-                      placeholder="DD/MM/AAAA"
-                    />
-                    <Dropdown
-                      label="Sexo"
-                      value={form.sexo}
-                      setValue={(v) => update("sexo", v)}
-                      options={sexoOptions}
-                    />
-                    <Dropdown
-                      label="Tipo logradouro"
-                      value={form.tipoLogradouro}
-                      setValue={(v) => update("tipoLogradouro", v)}
-                      options={tipoLogradouroOptions}
-                    />
-                  </div>
+          {/* ---------------- SERVIÇOS ---------------- */}
+          {aba === "servicos" && (
+            <section className="rounded-xl border border-border bg-card p-4">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <Campo label="Adicionar serviço" className="w-full max-w-[480px]">
+                  <Popover open={buscaAberta} onOpenChange={setBuscaAberta}>
+                    <PopoverTrigger asChild>
+                      <button type="button" className={cn(campo, "flex items-center justify-between gap-2 text-left text-muted-foreground/70")}>
+                        Buscar serviço
+                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] min-w-[260px] p-0">
+                      <Command filter={(value, search) => (semAcento(value).includes(semAcento(search)) ? 1 : 0)}>
+                        <CommandInput placeholder="Buscar serviço" />
+                        <CommandList>
+                          <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">
+                            {disponiveis.length === 0 ? "Todos os serviços já foram adicionados." : "Nenhum serviço encontrado."}
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {disponiveis.map((c) => (
+                              <CommandItem key={c.id} value={c.nome} onSelect={() => adicionarServico(c.id)}>
+                                <span className="flex-1 truncate">{c.nome}</span>
+                                <span className="text-muted-foreground">
+                                  {R(c.preco)} · {c.tempo} min
+                                </span>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </Campo>
+                {disponiveis.length > 0 && (
+                  <button
+                    type="button"
+                    className={cn(linkAcao, "h-10")}
+                    onClick={() => set("servicos", [...f.servicos, ...disponiveis.map((c) => ({ id: c.id, preco: c.preco, tempo: c.tempo, comissao: "" }))])}
+                  >
+                    Adicionar todos os serviços
+                  </button>
+                )}
+              </div>
+
+              {f.servicos.length === 0 ? (
+                <div className="mt-3 rounded-[10px] border border-dashed border-border p-5 text-center text-[13px] text-muted-foreground">
+                  Nenhum serviço vinculado. Busque um serviço acima.
                 </div>
-              </SectionBlock>
+              ) : (
+                <>
+                  <table className="mt-3 w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <th className="px-2 pb-2">Serviço</th>
+                        <th className="px-2 pb-2">Preço</th>
+                        <th className="px-2 pb-2">Tempo</th>
+                        <th className="px-2 pb-2">Comissão</th>
+                        <th className="w-10" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {f.servicos.map((s) => (
+                        <tr key={s.id} className="border-t border-border">
+                          <td className="px-2 py-1.5">{catalogo.find((c) => c.id === s.id)?.nome}</td>
+                          <td className="px-2 py-1.5">
+                            <div className="relative w-[112px]">
+                              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">R$</span>
+                              <input
+                                aria-label="Preço"
+                                inputMode="decimal"
+                                defaultValue={virgula(s.preco)}
+                                key={`p-${s.id}`}
+                                onFocus={(e) => e.target.select()}
+                                onBlur={(e) => {
+                                  upServico(s.id, { preco: paraNumero(e.target.value) });
+                                  e.target.value = virgula(paraNumero(e.target.value));
+                                }}
+                                className={cn(campo, "h-8 pl-9 text-[13px]")}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <div className="relative w-[84px]">
+                              <input
+                                aria-label="Tempo em minutos"
+                                type="number"
+                                min={5}
+                                step={5}
+                                value={s.tempo}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => upServico(s.id, { tempo: Math.max(5, Number(e.target.value) || 5) })}
+                                className={cn(campo, "h-8 pr-9 text-[13px]")}
+                              />
+                              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">min</span>
+                            </div>
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <div className="relative w-[84px]">
+                              <input
+                                aria-label="Comissão"
+                                type="number"
+                                min={0}
+                                max={100}
+                                placeholder="Padrão"
+                                value={s.comissao}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => upServico(s.id, { comissao: e.target.value === "" ? "" : String(Math.min(100, Math.max(0, Number(e.target.value)))) })}
+                                className={cn(campo, "h-8 pr-7 text-[13px]")}
+                              />
+                              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">%</span>
+                            </div>
+                          </td>
+                          <td className="px-2 py-1.5 text-right">
+                            <button
+                              type="button"
+                              aria-label="Remover"
+                              onClick={() => set("servicos", f.servicos.filter((x) => x.id !== s.id))}
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {f.servicos.length} de {catalogo.length} serviços. Comissão vazia usa o padrão do salão.
+                  </p>
+                </>
+              )}
+            </section>
+          )}
 
-              <SectionBlock title="Endereço" description="Localização e dados de endereço.">
-                <div className="grid gap-4">
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <TextField label="Endereço" value={form.endereco} onChange={(v) => update("endereco", v)} />
-                    <TextField label="Nº" value={form.numero} onChange={(v) => update("numero", v)} />
-                    <TextField
-                      label="Complemento"
-                      value={form.complemento}
-                      onChange={(v) => update("complemento", v)}
-                    />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <TextField
-                      label="CEP"
-                      value={form.cep}
-                      onChange={(v) => update("cep", v)}
-                      placeholder="00000-000"
-                    />
-                    <TextField label="Bairro" value={form.bairro} onChange={(v) => update("bairro", v)} />
-                    <Dropdown
-                      label="Estado"
-                      value={form.estado}
-                      setValue={(v) => update("estado", v)}
-                      options={estadoOptions}
-                    />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <TextField label="Cidade" value={form.cidade} onChange={(v) => update("cidade", v)} />
-                  </div>
+          {/* ---------------- EXPEDIENTE ---------------- */}
+          {aba === "expediente" && (
+            <section className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <p className="max-w-[520px] text-[13px] text-muted-foreground">Dias e horários em que o profissional atende. Toque em um cartão para editar.</p>
+                <button type="button" disabled={livres.length === 0} onClick={() => abrirGrupo(-1)} className={cn(btnEscuro, "whitespace-nowrap disabled:opacity-40")}>
+                  <Plus className="h-4 w-4" /> Adicionar horário
+                </button>
+              </div>
+              {f.grupos.length === 0 ? (
+                <div className="rounded-[10px] border border-dashed border-border p-5 text-center text-[13px] text-muted-foreground">
+                  Nenhum horário. Todos os dias ficam de folga. Use “Adicionar horário”.
                 </div>
-              </SectionBlock>
-
-              <SectionBlock
-                title="Parceria"
-                description="Configuração para profissionais parceiros."
-                className="max-w-xl"
-              >
-                <div className="grid gap-4">
-                  <label className="flex cursor-pointer select-none items-center gap-3">
-                    <Checkbox
-                      checked={form.parceiro}
-                      onCheckedChange={(v) => update("parceiro", !!v)}
-                      className="h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm hover:bg-muted data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white transition-all duration-300"
-                    />
-                    <span className="text-sm font-medium text-foreground">Profissional parceiro</span>
-                  </label>
-
-                  <TextField
-                    label="CNPJ"
-                    value={form.cnpj}
-                    onChange={(v) => update("cnpj", v)}
-                    placeholder="00.000.000/0000-00"
-                    disabled={!form.parceiro}
-                  />
+              ) : (
+                <div className="grid gap-2.5">
+                  {f.grupos.map((g, idx) => (
+                    <div
+                      key={idx}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => abrirGrupo(idx)}
+                      onKeyDown={(e) => e.key === "Enter" && abrirGrupo(idx)}
+                      className="flex cursor-pointer items-center justify-between gap-3.5 rounded-xl border border-border bg-card px-3.5 py-3 text-left transition-colors hover:bg-muted"
+                    >
+                      <div>
+                        <div className="text-[15px] font-semibold">{nomeDias(g.dias)}</div>
+                        <div className="mt-0.5 text-sm text-muted-foreground">{g.ints.map((x) => `${x.i} – ${x.f}`).join(" · ")}</div>
+                        {g.ints.length > 1 && (
+                          <div className="mt-0.5 text-xs font-medium text-info">
+                            {g.ints.slice(1).map((x, k) => `Almoço ${g.ints[k].f} – ${x.i}`).join(" · ")}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="whitespace-nowrap text-xs text-muted-foreground">{fmtHoras(horasDoDia(g.ints))} por dia</span>
+                        <button
+                          type="button"
+                          aria-label="Excluir horário"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            set("grupos", f.grupos.filter((_, i) => i !== idx));
+                          }}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-background hover:text-destructive"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </SectionBlock>
-            </div>
+              )}
+              {livres.length > 0 && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Folga: {livres.length === 1 ? livres[0] : `${livres.slice(0, -1).join(", ")} e ${livres[livres.length - 1]}`}.
+                </p>
+              )}
+            </section>
+          )}
+
+          {/* ---------------- PERMISSÕES ---------------- */}
+          {aba === "permissoes" && (
+            <section className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <p className="max-w-[560px] text-[13px] text-muted-foreground">
+                  Ligado quer dizer que o profissional pode. Tudo vem liberado; desligue o que ele não deve fazer.
+                </p>
+                <div className="flex gap-3.5 whitespace-nowrap">
+                  <button type="button" className={linkAcao} onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, true])) as Record<PermKey, boolean>)}>
+                    Liberar tudo
+                  </button>
+                  <button
+                    type="button"
+                    className="text-[13px] font-medium text-muted-foreground hover:underline"
+                    onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, false])) as Record<PermKey, boolean>)}
+                  >
+                    Bloquear tudo
+                  </button>
+                </div>
+              </div>
+              {gruposPerm.map((g) => (
+                <div key={g.titulo}>
+                  <p className={subtitulo}>{g.titulo}</p>
+                  {g.itens.map(([k, nome, ajuda]) => (
+                    <Opcao key={k} label={nome} ajuda={ajuda} valor={f.perm[k]} onChange={(v) => set("perm", { ...f.perm, [k]: v })} />
+                  ))}
+                </div>
+              ))}
+            </section>
           )}
         </div>
       </div>
 
-      <Dialog open={expedienteOpen} onOpenChange={setExpedienteOpen}>
-        <DialogContent className="w-[calc(100vw-24px)] max-w-4xl gap-0 overflow-hidden rounded-2xl p-0">
-          <div className="border-b border-border px-4 py-4 sm:px-5">
-            <h2 className="text-base font-semibold text-foreground">Configurar expediente</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Defina os dias ativos e os horários de atendimento.</p>
-          </div>
-
-          <div className="max-h-[70vh] overflow-y-auto p-4 sm:p-5">
-            <div className="grid gap-2.5">
-              {diasSemana.map((dia) => {
-                const d = expediente[dia.key];
-                return (
-                  <div key={dia.key} className="rounded-xl border border-border bg-card px-3 py-3 sm:px-4">
-                    <div className="grid gap-3 lg:grid-cols-[110px_auto_1fr] lg:items-center">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm font-semibold text-foreground">{dia.label}</p>
-                        <div className="lg:hidden">
-                          <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
-                        </div>
-                      </div>
-
-                      <div className="hidden lg:flex lg:justify-center">
-                        <Switch checked={d.ativo} onCheckedChange={(v) => updateDia(dia.key, "ativo", v)} />
-                      </div>
-
-                      {d.ativo ? (
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <div className="grid gap-1.5">
-                            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                              Trabalho
-                            </span>
-                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-                              <input
-                                type="time"
-                                value={d.trabalhoInicio}
-                                onChange={(e) => updateDia(dia.key, "trabalhoInicio", e.target.value)}
-                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                              />
-                              <span className="text-xs text-muted-foreground">às</span>
-                              <input
-                                type="time"
-                                value={d.trabalhoFim}
-                                onChange={(e) => updateDia(dia.key, "trabalhoFim", e.target.value)}
-                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid gap-1.5">
-                            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                              Almoço
-                            </span>
-                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-                              <input
-                                type="time"
-                                value={d.almocoInicio}
-                                onChange={(e) => updateDia(dia.key, "almocoInicio", e.target.value)}
-                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                              />
-                              <span className="text-xs text-muted-foreground">às</span>
-                              <input
-                                type="time"
-                                value={d.almocoFim}
-                                onChange={(e) => updateDia(dia.key, "almocoFim", e.target.value)}
-                                className="h-9 min-w-0 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
-                          Dia desativado
-                        </div>
-                      )}
-                    </div>
+      {/* ---------------- HORÁRIO DE TRABALHO ---------------- */}
+      <Dialog open={!!grupoEdit} onOpenChange={(o) => !o && setGrupoEdit(null)}>
+        <DialogContent className="max-w-[520px] gap-0 p-0">
+          {grupoEdit && (
+            <>
+              <DialogHeader className="border-b border-border px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <DialogTitle className="text-base font-semibold">Horário de trabalho</DialogTitle>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Escolha os dias e os intervalos em que atende. O espaço entre dois intervalos é o almoço.</p>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex flex-col-reverse gap-2 border-t border-border px-4 py-4 sm:flex-row sm:justify-end sm:px-5">
-            <button
-              type="button"
-              onClick={() => setExpedienteOpen(false)}
-              className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-background px-5 text-sm font-medium text-foreground transition hover:bg-muted"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => setExpedienteOpen(false)}
-              className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
-            >
-              Salvar
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={servicosOpen}
-        onOpenChange={(open) => {
-          setServicosOpen(open);
-          if (!open) {
-            setServicoBusca("");
-            setServicosDropdownOpen(false);
-          }
-        }}
-      >
-        <DialogContent className="w-[calc(100vw-24px)] max-w-5xl gap-0 overflow-hidden rounded-2xl p-0 [&>button]:hidden">
-          <div className="border-b border-border px-4 py-4 sm:px-5">
-            <h2 className="text-base font-semibold text-foreground">Serviços vinculados</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Adicione os serviços do profissional e ajuste preço, tempo e comissão.
-            </p>
-          </div>
-
-          <div className="max-h-[75vh] overflow-y-auto p-4 sm:p-5">
-            <div className="grid gap-4">
-              <div className="rounded-xl border border-border bg-card p-4">
-                <div className="mb-3">
-                  <h3 className="text-sm font-semibold text-foreground">Adicionar serviços</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">Pesquise e adicione um ou vários serviços.</p>
                 </div>
-
-                <div className="flex flex-col gap-3 md:flex-row md:items-end">
-                  <div className="relative flex-1" ref={servicosDropdownRef}>
-                    <label className="mb-1 block text-[13px] font-semibold text-foreground">Selecionar serviços</label>
-                    <button
-                      type="button"
-                      onClick={() => setServicosDropdownOpen((p) => !p)}
-                      className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-background px-3 text-sm text-foreground transition-all hover:border-muted-foreground"
-                    >
-                      <span className="text-muted-foreground">Buscar serviço...</span>
-                      <Search className="h-4 w-4 text-muted-foreground" />
-                    </button>
-
-                    {servicosDropdownOpen && (
-                      <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card shadow-xl">
-                        <div className="border-b border-border p-2">
-                          <input
-                            placeholder="Buscar..."
-                            value={servicoBusca}
-                            onChange={(e) => setServicoBusca(e.target.value)}
-                            className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-foreground"
-                            autoFocus
-                          />
-                        </div>
-
-                        <div className="max-h-48 overflow-auto">
+              </DialogHeader>
+              <div className="grid gap-4 px-5 py-4">
+                <div className="flex flex-wrap gap-1.5">
+                  {dias.map((d, k) => {
+                    const ocupado = diaOcupado(k);
+                    const on = grupoEdit.dias[k];
+                    return (
+                      <button
+                        key={d}
+                        type="button"
+                        aria-pressed={on}
+                        aria-disabled={ocupado}
+                        title={ocupado ? "Já tem outro horário" : undefined}
+                        onClick={() => !ocupado && setGrupoEdit({ ...grupoEdit, dias: grupoEdit.dias.map((v, i) => (i === k ? !v : v)) })}
+                        className={cn(
+                          "h-9 w-11 rounded-full border text-xs font-semibold transition-colors",
+                          on ? "border-foreground bg-foreground text-background" : "border-border bg-background text-muted-foreground hover:bg-muted",
+                          ocupado && "cursor-not-allowed line-through opacity-30 hover:bg-background",
+                        )}
+                      >
+                        {d}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="grid gap-2">
+                  {grupoEdit.ints.map((x, n) => {
+                    const ant = grupoEdit.ints[n - 1];
+                    const gap = ant && ant.f && x.i && mins(x.i) > mins(ant.f) ? mins(x.i) - mins(ant.f) : 0;
+                    return (
+                      <div key={n} className="grid gap-2">
+                        {gap > 0 && (
+                          <div className="ml-10 flex items-center gap-2 rounded-lg bg-info/10 px-2.5 py-1.5 text-[13px] text-info">
+                            Almoço das {ant.f} às {x.i} <b className="font-semibold">({duracao(gap)})</b>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-[32px_minmax(0,1fr)_20px_minmax(0,1fr)_36px] items-center gap-2">
                           <button
                             type="button"
-                            onClick={handleAdicionarTodos}
-                            className="flex w-full items-center gap-3 border-b border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted"
+                            aria-label="Excluir intervalo"
+                            disabled={grupoEdit.ints.length < 2}
+                            onClick={() => setGrupoEdit({ ...grupoEdit, ints: grupoEdit.ints.filter((_, i) => i !== n) })}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-destructive disabled:opacity-30"
                           >
-                            Selecionar todos
+                            <X className="h-4 w-4" />
                           </button>
-
-                          {servicosDispFiltrados.map((s) => (
-                            <button
-                              key={s.id}
-                              type="button"
-                              onClick={() => toggleServicoPendente(s.id)}
-                              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-muted"
-                            >
-                              <Checkbox
-                                checked={servicosPendentes.includes(s.id)}
-                                className="pointer-events-none h-4 w-4 rounded-md border border-zinc-400 bg-background shadow-sm data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=checked]:text-white"
-                              />
-                              <span>{s.nome}</span>
+                          <input type="time" aria-label="De" className={cn(campo, "h-[38px] px-2")} value={x.i} onChange={(e) => upInt(n, "i", e.target.value)} />
+                          <span className="text-center text-muted-foreground">→</span>
+                          <input type="time" aria-label="Até" className={cn(campo, "h-[38px] px-2")} value={x.f} onChange={(e) => upInt(n, "f", e.target.value)} />
+                          {n === grupoEdit.ints.length - 1 ? (
+                            <button type="button" aria-label="Adicionar intervalo" onClick={adicionarInt} className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-muted">
+                              <Plus className="h-4 w-4" />
                             </button>
-                          ))}
-
-                          {servicosDispFiltrados.length === 0 && (
-                            <p className="px-4 py-3 text-center text-sm text-muted-foreground">
-                              Nenhum serviço encontrado
-                            </p>
+                          ) : (
+                            <span />
                           )}
                         </div>
                       </div>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={handleAdicionarSelecionados}
-                    className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background transition hover:bg-foreground/90 active:scale-[0.98]"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Adicionar{servicosPendentes.length > 0 ? ` (${servicosPendentes.length})` : ""}
-                  </button>
+                    );
+                  })}
                 </div>
+                {erroGrupo && <p className="text-xs text-destructive">{erroGrupo}</p>}
               </div>
-
-              <div className="rounded-xl border border-border bg-card p-4">
-                <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground">Serviços adicionados</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">Edite os valores diretamente.</p>
-                  </div>
-
-                  {servicosAdicionados.length > 0 && (
-                    <span className="w-fit rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                      {servicosAdicionados.length} item(ns)
-                    </span>
-                  )}
-                </div>
-
-                {/* MOBILE */}
-                <div className="grid gap-3 md:hidden">
-                  {servicosAdicionados.length === 0 ? (
-                    <div className="rounded-lg border border-border px-4 py-8 text-center text-sm text-muted-foreground">
-                      Nenhum registro encontrado
-                    </div>
-                  ) : (
-                    servicosAdicionados.map((s) => (
-                      <div key={s.id} className="rounded-lg border border-border p-3">
-                        <div className="mb-3 flex items-start gap-3">
-                          <Checkbox
-                            checked={servicosSelecionados.includes(s.id)}
-                            onCheckedChange={() => toggleServicoSelecionado(s.id)}
-                          />
-                          <div className="min-w-0">
-                            <div className="text-sm font-semibold text-foreground">{s.nome}</div>
-                          </div>
-                        </div>
-
-                        <div className="grid gap-3 sm:grid-cols-3">
-                          <div className="grid gap-1">
-                            <span className="text-xs font-medium text-muted-foreground">Preço</span>
-                            <input
-                              type="text"
-                              value={s.preco}
-                              onChange={(e) => updateServico(s.id, "preco", e.target.value)}
-                              className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </div>
-
-                          <div className="grid gap-1">
-                            <span className="text-xs font-medium text-muted-foreground">Tempo</span>
-                            <input
-                              type="text"
-                              value={s.tempo}
-                              onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
-                              className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </div>
-
-                          <div className="grid gap-1">
-                            <span className="text-xs font-medium text-muted-foreground">Comissão</span>
-                            <input
-                              type="text"
-                              value={s.comissao}
-                              onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
-                              placeholder="Ex: 50%"
-                              className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                {/* DESKTOP */}
-                <div className="hidden overflow-x-auto rounded-lg border border-border md:block">
-                  <table className="w-full text-sm">
-                    <thead className="sticky top-0 z-10">
-                      <tr className="bg-[hsl(0_0%_20%)] text-white">
-                        <th className="w-10 px-3 py-2 text-left">
-                          <Checkbox
-                            checked={
-                              servicosAdicionados.length > 0 &&
-                              servicosSelecionados.length === servicosAdicionados.length
-                            }
-                            onCheckedChange={toggleTodosServicos}
-                            className="border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-[hsl(0_0%_20%)]"
-                          />
-                        </th>
-                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Nome</th>
-                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Preço</th>
-                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Tempo</th>
-                        <th className="px-3 py-2 text-left text-[13px] font-semibold">Comissão</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {servicosAdicionados.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                            Nenhum registro encontrado
-                          </td>
-                        </tr>
-                      ) : (
-                        servicosAdicionados.map((s) => (
-                          <tr key={s.id} className="border-t border-border transition-colors hover:bg-muted/50">
-                            <td className="px-3 py-2">
-                              <Checkbox
-                                checked={servicosSelecionados.includes(s.id)}
-                                onCheckedChange={() => toggleServicoSelecionado(s.id)}
-                              />
-                            </td>
-                            <td className="px-3 py-2 text-foreground">{s.nome}</td>
-                            <td className="px-3 py-2">
-                              <input
-                                type="text"
-                                value={s.preco}
-                                onChange={(e) => updateServico(s.id, "preco", e.target.value)}
-                                className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                              />
-                            </td>
-                            <td className="px-3 py-2">
-                              <input
-                                type="text"
-                                value={s.tempo}
-                                onChange={(e) => updateServico(s.id, "tempo", e.target.value)}
-                                className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                              />
-                            </td>
-                            <td className="px-3 py-2">
-                              <input
-                                type="text"
-                                value={s.comissao}
-                                onChange={(e) => updateServico(s.id, "comissao", e.target.value)}
-                                placeholder="Ex: 50%"
-                                className="h-8 w-24 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-                              />
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {servicosSelecionados.length > 0 && (
-                  <div className="mt-4 flex items-center justify-center">
-                    <div className="inline-flex items-center gap-3 rounded-full border border-border bg-background px-4 py-2 shadow-sm">
-                      <span className="text-sm text-muted-foreground">
-                        {servicosSelecionados.length} selecionado(s)
-                      </span>
-                      <button
-                        onClick={handleRemoverServicos}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive transition hover:bg-destructive/20"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        Remover
-                      </button>
-                    </div>
-                  </div>
-                )}
+              <div className="flex justify-end gap-2 border-t border-border px-5 py-3">
+                <button type="button" onClick={() => setGrupoEdit(null)} className="h-8 rounded-lg border border-border px-4 text-sm font-medium hover:bg-muted">
+                  Cancelar
+                </button>
+                <button type="button" onClick={salvarGrupo} className={btnEscuro}>
+                  <Check className="h-4 w-4" /> Salvar horário
+                </button>
               </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col-reverse gap-2 border-t border-border px-4 py-4 sm:flex-row sm:justify-end sm:px-5">
-            <button
-              type="button"
-              onClick={() => setServicosOpen(false)}
-              className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-background px-5 text-sm font-medium text-foreground transition hover:bg-muted"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => setServicosOpen(false)}
-              className="inline-flex h-10 items-center justify-center rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/90"
-            >
-              Salvar
-            </button>
-          </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
+
+      <YouTubeModal
+        open={aulaOpen}
+        onClose={() => setAulaOpen(false)}
+        videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        title="Aula - Cadastro de profissional"
+      />
     </AppLayout>
   );
 }
