@@ -192,16 +192,15 @@ const btnEscuro =
   "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-semibold text-background";
 const tituloSecao = "text-xs font-semibold uppercase tracking-wide text-foreground";
 
-function Secao({ titulo, desc, acao, children }: { titulo: string; desc?: string; acao?: React.ReactNode; children: React.ReactNode }) {
+function Secao({ desc, acao, children }: { desc?: string; acao?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="rounded-xl border border-border bg-card p-4">
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold text-foreground">{titulo}</h2>
-          {desc && <p className="mt-0.5 text-[13px] text-muted-foreground">{desc}</p>}
+      {(desc || acao) && (
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <p className="text-[13px] text-muted-foreground">{desc}</p>
+          {acao}
         </div>
-        {acao}
-      </div>
+      )}
       {children}
     </section>
   );
@@ -636,7 +635,7 @@ export default function SiteAgendamento() {
           <div className="flex min-w-0 flex-col gap-4">
             {/* ---------------- DADOS BÁSICOS ---------------- */}
             {aba === "dados" && (
-              <Secao titulo="Dados básicos">
+              <Secao>
                 <div className="grid grid-cols-12 gap-3">
                   <Campo label="Nome do salão" className="col-span-12 md:col-span-3">
                     <input className={campo} value={s.nome} onChange={(e) => set("nome", e.target.value)} />
@@ -805,7 +804,7 @@ export default function SiteAgendamento() {
 
             {/* ---------------- LOGO E CAPAS ---------------- */}
             {aba === "imagens" && (
-              <Secao titulo="Logo e capas">
+              <Secao>
                 <div className="grid gap-5 sm:grid-cols-[auto_minmax(0,1fr)]">
                   <div className="flex items-center gap-3.5">
                     <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-foreground text-[11px] font-bold tracking-[0.08em] text-background">
@@ -863,7 +862,7 @@ export default function SiteAgendamento() {
 
             {/* ---------------- LINKS ---------------- */}
             {aba === "links" && (
-              <Secao titulo="Links">
+              <Secao>
                 <div className="grid grid-cols-12 gap-3">
                   <Campo label="WhatsApp" icone={<MessageCircle />} className="col-span-12 md:col-span-6">
                     <input className={campo} value={s.wa} onChange={(e) => set("wa", e.target.value)} />
@@ -927,7 +926,6 @@ export default function SiteAgendamento() {
             {/* ---------------- DESTAQUES ---------------- */}
             {aba === "destaques" && (
               <Secao
-                titulo="Destaques"
                 desc="Coleções de fotos para mostrar serviços, ambientes e promoções no seu site. Arraste para reordenar."
                 acao={
                   <button type="button" className={btnEscuro} onClick={() => setRd({ idx: -1, n: "", cover: null, fotos: [], aberta: -1 })}>
@@ -990,7 +988,7 @@ export default function SiteAgendamento() {
 
             {/* ---------------- DIFERENCIAIS ---------------- */}
             {aba === "diferenciais" && (
-              <Secao titulo="Diferenciais" desc="Toque para ativar ou desativar o que o seu salão oferece.">
+              <Secao desc="Toque para ativar ou desativar o que o seu salão oferece.">
                 <div className="flex flex-wrap gap-2">
                   {todosDifs.map((d) => {
                     const on = s.difs.includes(d);
@@ -1037,7 +1035,7 @@ export default function SiteAgendamento() {
 
             {/* ---------------- MÓDULOS ---------------- */}
             {aba === "modulos" && (
-              <Secao titulo="Módulos" desc="Ative o que aparece no site e arraste para mudar a ordem. A prévia ao lado acompanha.">
+              <Secao desc="Ative o que aparece no site e arraste para mudar a ordem. A prévia ao lado acompanha.">
                 <div onPointerDown={ordemMods} className="grid gap-2">
                   {s.mods.map((m, i) => (
                     <div key={m.n} data-i={i} className="flex items-center gap-2.5 rounded-[10px] border border-border bg-card px-3 py-2">
@@ -1057,7 +1055,6 @@ export default function SiteAgendamento() {
             {/* ---------------- CENTRAL DE AVISOS ---------------- */}
             {aba === "aviso" && (
               <Secao
-                titulo="Central de Avisos"
                 desc="Aviso exibido uma vez por dia no seu site."
                 acao={
                   <label className="flex items-center gap-2 text-[13px] font-semibold">
@@ -1127,7 +1124,7 @@ export default function SiteAgendamento() {
 
             {/* ---------------- ACESSOS ---------------- */}
             {aba === "acessos" && (
-              <Secao titulo="Acessos" desc="Estatística de acessos dos últimos 7 dias.">
+              <Secao desc="Estatística de acessos dos últimos 7 dias.">
                 <div className="mb-3 flex items-baseline justify-between">
                   <div>
                     <span className="text-[28px] font-bold">0</span> <span className="text-xs text-muted-foreground">acessos no período</span>
