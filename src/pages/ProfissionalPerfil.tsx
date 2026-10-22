@@ -479,8 +479,8 @@ export default function ProfissionalPerfil() {
           {/* ---------------- SERVIÇOS ---------------- */}
           {aba === "servicos" && (
             <section className="rounded-xl border border-border bg-card p-4">
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <Campo label="Adicionar serviço" className="w-full max-w-[480px]">
+              <div className="flex flex-wrap items-end gap-x-5 gap-y-2">
+                <Campo label="Adicionar serviço" className="w-full max-w-[420px]">
                   <Popover open={buscaAberta} onOpenChange={setBuscaAberta}>
                     <PopoverTrigger asChild>
                       <button type="button" className={cn(campo, "flex items-center justify-between gap-2 text-left text-muted-foreground/70")}>
@@ -527,22 +527,29 @@ export default function ProfissionalPerfil() {
                 </div>
               ) : (
                 <>
-                  <table className="mt-3 w-full text-sm">
+                  <table className="mt-4 w-full table-fixed text-sm">
+                    <colgroup>
+                      <col />
+                      <col className="w-[150px]" />
+                      <col className="w-[130px]" />
+                      <col className="w-[140px]" />
+                      <col className="w-12" />
+                    </colgroup>
                     <thead>
                       <tr className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        <th className="px-2 pb-2">Serviço</th>
-                        <th className="px-2 pb-2">Preço</th>
-                        <th className="px-2 pb-2">Tempo</th>
-                        <th className="px-2 pb-2">Comissão</th>
-                        <th className="w-10" />
+                        <th className="px-3 pb-2.5">Serviço</th>
+                        <th className="px-3 pb-2.5">Preço</th>
+                        <th className="px-3 pb-2.5">Tempo</th>
+                        <th className="px-3 pb-2.5">Comissão</th>
+                        <th />
                       </tr>
                     </thead>
                     <tbody>
                       {f.servicos.map((s) => (
                         <tr key={s.id} className="border-t border-border">
-                          <td className="px-2 py-1.5">{catalogo.find((c) => c.id === s.id)?.nome}</td>
-                          <td className="px-2 py-1.5">
-                            <div className="relative w-[112px]">
+                          <td className="px-3 py-2.5">{catalogo.find((c) => c.id === s.id)?.nome}</td>
+                          <td className="px-3 py-2.5">
+                            <div className="relative w-full">
                               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">R$</span>
                               <input
                                 aria-label="Preço"
@@ -554,12 +561,12 @@ export default function ProfissionalPerfil() {
                                   upServico(s.id, { preco: paraNumero(e.target.value) });
                                   e.target.value = virgula(paraNumero(e.target.value));
                                 }}
-                                className={cn(campo, "h-8 pl-9 text-[13px]")}
+                                className={cn(campo, "h-9 pl-9 text-[13px]")}
                               />
                             </div>
                           </td>
-                          <td className="px-2 py-1.5">
-                            <div className="relative w-[84px]">
+                          <td className="px-3 py-2.5">
+                            <div className="relative w-full">
                               <input
                                 aria-label="Tempo em minutos"
                                 type="number"
@@ -568,13 +575,13 @@ export default function ProfissionalPerfil() {
                                 value={s.tempo}
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => upServico(s.id, { tempo: Math.max(5, Number(e.target.value) || 5) })}
-                                className={cn(campo, "h-8 pr-9 text-[13px]")}
+                                className={cn(campo, "h-9 pr-9 text-[13px]")}
                               />
                               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">min</span>
                             </div>
                           </td>
-                          <td className="px-2 py-1.5">
-                            <div className="relative w-[84px]">
+                          <td className="px-3 py-2.5">
+                            <div className="relative w-full">
                               <input
                                 aria-label="Comissão"
                                 type="number"
@@ -584,12 +591,12 @@ export default function ProfissionalPerfil() {
                                 value={s.comissao}
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => upServico(s.id, { comissao: e.target.value === "" ? "" : String(Math.min(100, Math.max(0, Number(e.target.value)))) })}
-                                className={cn(campo, "h-8 pr-7 text-[13px]")}
+                                className={cn(campo, "h-9 pr-7 text-[13px]")}
                               />
                               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">%</span>
                             </div>
                           </td>
-                          <td className="px-2 py-1.5 text-right">
+                          <td className="px-3 py-2.5 text-right">
                             <button
                               type="button"
                               aria-label="Remover"
@@ -614,8 +621,7 @@ export default function ProfissionalPerfil() {
           {/* ---------------- EXPEDIENTE ---------------- */}
           {aba === "expediente" && (
             <section className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <p className="max-w-[520px] text-[13px] text-muted-foreground">Dias e horários em que o profissional atende. Toque em um cartão para editar.</p>
+              <div className="mb-3 flex items-start justify-end gap-3">
                 <button type="button" disabled={livres.length === 0} onClick={() => abrirGrupo(-1)} className={cn(btnEscuro, "whitespace-nowrap disabled:opacity-40")}>
                   <Plus className="h-4 w-4" /> Adicionar horário
                 </button>
@@ -673,10 +679,7 @@ export default function ProfissionalPerfil() {
           {/* ---------------- PERMISSÕES ---------------- */}
           {aba === "permissoes" && (
             <section className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <p className="max-w-[560px] text-[13px] text-muted-foreground">
-                  Ligado quer dizer que o profissional pode. Tudo vem liberado; desligue o que ele não deve fazer.
-                </p>
+              <div className="mb-1 flex items-start justify-end gap-3">
                 <div className="flex gap-3.5 whitespace-nowrap">
                   <button type="button" className={linkAcao} onClick={() => set("perm", Object.fromEntries(todasPerm.map((k) => [k, true])) as Record<PermKey, boolean>)}>
                     Liberar tudo
