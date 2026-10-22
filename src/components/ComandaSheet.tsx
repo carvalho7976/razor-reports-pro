@@ -388,6 +388,10 @@ export function ComandaConteudo({
   // Confirmação antes de finalizar (valor recebido, crédito, comprovante e nota)
   const [confirmando, setConfirmando] = useState(false);
   const [recebido, setRecebido] = useState("");
+  // Gorjeta opcional: valor escolhido no carrossel (1, 2, 5, 10) ou digitado em "Outro"
+  const [gorjeta, setGorjeta] = useState(0);
+  const [gorjetaOutro, setGorjetaOutro] = useState(false);
+  const [gorjetaTxt, setGorjetaTxt] = useState("");
   const [lancarCredito, setLancarCredito] = useState(true);
   const [imprimir, setImprimir] = useState(false);
   const [emitirNota, setEmitirNota] = useState(false);
@@ -527,19 +531,47 @@ export function ComandaConteudo({
   const abrirConfirmacao = () => {
     setRecebido(total.toFixed(2).replace(".", ","));
     setLancarCredito(true);
+    setGorjeta(0);
+    setGorjetaOutro(false);
+    setGorjetaTxt("");
     setConfirmando(true);
+  };
+
+  // A gorjeta vai para quem atendeu: a profissional do primeiro serviço da comanda
+  const quemRecebeGorjeta =
+    itens.find((i) => i.tipo !== "produto" && i.profissional)?.profissional ?? (agendamento.profissional || equipeSalao[0].nome);
+
+  // Escolher a gorjeta já atualiza o valor a receber (menos um campo para mexer); clicar de novo tira
+  const escolherGorjeta = (v: number) => {
+    const novo = gorjeta === v && !gorjetaOutro ? 0 : v;
+    setGorjetaOutro(false);
+    setGorjetaTxt("");
+    setGorjeta(novo);
+    setRecebido((total + novo).toFixed(2).replace(".", ","));
+  };
+
+  const digitarGorjeta = (txt: string) => {
+    setGorjetaTxt(txt);
+    const v = parseFloat(txt.replace(/\./g, "").replace(",", "."));
+    const novo = isNaN(v) || v < 0 ? 0 : v;
+    setGorjeta(novo);
+    setRecebido((total + novo).toFixed(2).replace(".", ","));
   };
 
   const linhasPagamento =
     forma === "Dividir" ? pagamentos.map((p) => ({ forma: p.forma, valor: p.valor })) : [{ forma: forma ?? "", valor: total }];
   const valorRecebido = (() => {
     const v = parseFloat(recebido.replace(/\./g, "").replace(",", "."));
-    return isNaN(v) ? total : v;
+    return isNaN(v) ? total + gorjeta : v;
   })();
-  const excedente = forma === "Dividir" ? Math.max(0, pago - total) : Math.max(0, valorRecebido - total);
+  const devido = total + gorjeta;
+  const recebidoTotal = forma === "Dividir" ? pago : valorRecebido;
+  const faltaReceber = Math.max(0, devido - recebidoTotal);
+  const excedente = Math.max(0, recebidoTotal - devido);
 
   const confirmarPagamento = () => {
     const resumo: string[] = [];
+    if (gorjeta > 0) resumo.push(`Gorjeta de ${R$(gorjeta)} para ${quemRecebeGorjeta}`);
     if (excedente > 0) {
       resumo.push(
         lancarCredito ? `${R$(excedente)} lançados como crédito da cliente` : `Troco de ${R$(excedente)}`,
@@ -1647,6 +1679,65 @@ export function ComandaConteudo({
                   <span>Total da comanda</span>
                   <span className="tabular-nums">{R$(total)}</span>
                 </div>
+                {gorjeta > 0 && (
+                  <div className="flex items-center justify-between text-[13px] text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      Gorjeta para <FotoProf nome={quemRecebeGorjeta} tamanho="h-4 w-4 text-[8px]" />
+                      {quemRecebeGorjeta}
+                    </span>
+                    <span className="tabular-nums">{R$(gorjeta)}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <p className={cn(tituloSecao, "mb-2")}>
+                  Gorjeta <span className="font-normal normal-case tracking-normal text-muted-foreground">· opcional</span>
+                </p>
+                <div className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {[1, 2, 5, 10].map((v) => {
+                    const ativo = gorjeta === v && !gorjetaOutro;
+                    return (
+                      <button
+                        key={v}
+                        onClick={() => escolherGorjeta(v)}
+                        aria-pressed={ativo}
+                        className={cn(
+                          "h-8 shrink-0 snap-start rounded-[30px] border px-4 text-[13px] font-medium tabular-nums transition-colors",
+                          ativo ? "border-info/40 bg-info/10 text-info" : "border-border hover:bg-muted",
+                        )}
+                      >
+                        R$ {v}
+                      </button>
+                    );
+                  })}
+                  {gorjetaOutro ? (
+                    <div className="relative w-28 shrink-0 snap-start">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">R$</span>
+                      <Input
+                        autoFocus
+                        value={gorjetaTxt}
+                        onChange={(e) => digitarGorjeta(e.target.value)}
+                        onFocus={selecionarTudo}
+                        placeholder="0,00"
+                        aria-label="Valor da gorjeta"
+                        className="h-8 rounded-[30px] pl-8 text-[13px] tabular-nums"
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setGorjetaOutro(true);
+                        setGorjetaTxt("");
+                        setGorjeta(0);
+                        setRecebido(total.toFixed(2).replace(".", ","));
+                      }}
+                      className="h-8 shrink-0 snap-start rounded-[30px] border border-dashed border-border px-4 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      Outro valor
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-3 border-t border-border pt-4">
@@ -1670,8 +1761,10 @@ export function ComandaConteudo({
                   <Switch checked={emitirNota} onCheckedChange={setEmitirNota} />
                 </label>
               </div>
-              {forma !== "Dividir" && valorRecebido < total && (
-                <p className="text-[13px] text-destructive">O valor recebido é menor que o total da comanda.</p>
+              {faltaReceber > 0 && (
+                <p className="text-[13px] text-destructive">
+                  Faltam {R$(faltaReceber)} para cobrir {gorjeta > 0 ? "a comanda e a gorjeta" : "o total da comanda"}.
+                </p>
               )}
             </div>
 
@@ -1681,10 +1774,10 @@ export function ComandaConteudo({
               </Button>
               <Button
                 className={cn("h-9 flex-1 font-semibold", btnPrincipal)}
-                disabled={forma !== "Dividir" && valorRecebido < total}
+                disabled={faltaReceber > 0}
                 onClick={confirmarPagamento}
               >
-                Confirmar {R$(forma === "Dividir" ? pago : valorRecebido)}
+                Confirmar {R$(recebidoTotal)}
               </Button>
             </div>
           </DialogContent>
