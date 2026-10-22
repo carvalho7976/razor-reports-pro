@@ -346,10 +346,10 @@ export default function NovoServico() {
                   <input type="number" min={0} className={campo} placeholder="0" value={f.pontos} onFocus={(e) => e.target.select()} onChange={(e) => set("pontos", e.target.value)} />
                 </Campo>
               </div>
-              <div className="mt-2.5 flex flex-wrap items-baseline gap-x-5 gap-y-1 rounded-[10px] bg-muted/60 px-3 py-2 text-[13px] text-muted-foreground">
+              <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-[10px] bg-muted/60 px-3 py-2 text-[13px] leading-5 text-muted-foreground">
                 <div>
                   Margem do salão{" "}
-                  <b className={cn("text-base font-bold", margem < 0 ? "text-destructive" : "text-foreground")}>{R(margem)}</b>
+                  <b className={cn("font-semibold", margem < 0 ? "text-destructive" : "text-foreground")}>{R(margem)}</b>
                   {preco > 0 && <span> · {Math.round((margem / preco) * 100)}%</span>}
                 </div>
                 {comAss > 0 && (
@@ -503,7 +503,7 @@ export default function NovoServico() {
                 <div className="mt-2.5 grid gap-1.5 border-t border-border pt-2.5 text-[13px]">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Custo total dos produtos</span>
-                    <b className="text-sm text-foreground">{R(custoProdutos)}</b>
+                    <b className="font-semibold text-foreground">{R(custoProdutos)}</b>
                   </div>
                   <button
                     type="button"
