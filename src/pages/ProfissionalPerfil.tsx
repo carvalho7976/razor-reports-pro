@@ -377,6 +377,7 @@ export default function ProfissionalPerfil() {
           {/* ---------------- PERFIL ---------------- */}
           {aba === "perfil" && (
             <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="grid min-w-0 gap-4">
               <section className="rounded-xl border border-border bg-card p-4">
                 <div className="grid gap-4 sm:grid-cols-[80px_minmax(0,1fr)]">
                   <div>
@@ -437,6 +438,9 @@ export default function ProfissionalPerfil() {
                   </div>
                 </div>
 
+              </section>
+
+              <section className="rounded-xl border border-border bg-card p-4">
                 <p className={subtitulo}>Endereço</p>
                 <div className="grid grid-cols-12 gap-3">
                   <Campo label="CEP" className="col-span-12 md:col-span-3" dica="Preenche rua, bairro e cidade.">
@@ -473,6 +477,7 @@ export default function ProfissionalPerfil() {
                   </Campo>
                 </div>
               </section>
+              </div>
 
               <div className="grid gap-4">
               <section className="rounded-xl border border-border bg-card p-4">
