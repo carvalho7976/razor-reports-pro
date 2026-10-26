@@ -25,8 +25,16 @@ import {
   Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Sidebar,
   SidebarContent,
@@ -70,7 +78,10 @@ const navGroups: NavGroup[] = [
             heading: "Caixa",
             links: [
               { label: "Comandas abertas", path: "/comandasAbertas" },
-              { label: "Movimentação diária", path: "/relatorioMovimentacaoDiaria" },
+              {
+                label: "Movimentação diária",
+                path: "/relatorioMovimentacaoDiaria",
+              },
               { label: "Fluxo de caixa", path: "/relatorioFluxoCaixaNovo" },
             ],
           },
@@ -99,7 +110,10 @@ const navGroups: NavGroup[] = [
               { label: "Pesquisar / adicionar", path: "/clientePesquisa" },
               { label: "Relatório de clientes", path: "/relatorioClientes" },
               { label: "Débitos", path: "/debitoClientes" },
-              { label: "Relatório de exclusão", path: "/relatorioExclusaoCliente" },
+              {
+                label: "Relatório de exclusão",
+                path: "/relatorioExclusaoCliente",
+              },
               { label: "Lixeira", path: "/clientePesquisa?lixeira=1" },
               { label: "Ajuda", path: AJUDA, external: true },
             ],
@@ -125,7 +139,15 @@ const navGroups: NavGroup[] = [
               { label: "Adiantamentos", path: "/adiantamento" },
             ],
           },
-          { heading: "Relatórios", links: [{ label: "Exclusão de agendamentos", path: "/relatorioExclusaoAgendamento" }] },
+          {
+            heading: "Relatórios",
+            links: [
+              {
+                label: "Exclusão de agendamentos",
+                path: "/relatorioExclusaoAgendamento",
+              },
+            ],
+          },
         ],
       },
       {
@@ -160,7 +182,12 @@ const navGroups: NavGroup[] = [
               { label: "Entrada de produtos", path: "/novaCompra" },
             ],
           },
-          { heading: "Relatórios", links: [{ label: "Relatório de produtos", path: "/relatorioProdutos" }] },
+          {
+            heading: "Relatórios",
+            links: [
+              { label: "Relatório de produtos", path: "/relatorioProdutos" },
+            ],
+          },
         ],
       },
     ],
@@ -188,7 +215,10 @@ const navGroups: NavGroup[] = [
             links: [
               { label: "Agendamentos", path: "/relatorioAgendamentos" },
               { label: "Avaliações", path: "/avaliacoes" },
-              { label: "Exclusão de agendamentos", path: "/relatorioExclusaoAgendamento" },
+              {
+                label: "Exclusão de agendamentos",
+                path: "/relatorioExclusaoAgendamento",
+              },
             ],
           },
           {
@@ -202,7 +232,10 @@ const navGroups: NavGroup[] = [
           {
             heading: "Equipe e clientes",
             links: [
-              { label: "Desempenho dos profissionais", path: "/relatorioDesempenhoFuncionario" },
+              {
+                label: "Desempenho dos profissionais",
+                path: "/relatorioDesempenhoFuncionario",
+              },
               { label: "Clientes", path: "/relatorioClientes" },
             ],
           },
@@ -225,9 +258,15 @@ const navGroups: NavGroup[] = [
             heading: "Assinaturas",
             links: [
               { label: "Assinatura", path: "/assinaturaPesquisa" },
-              { label: "Relatório de assinaturas", path: "/relatorioAssinatura" },
+              {
+                label: "Relatório de assinaturas",
+                path: "/relatorioAssinatura",
+              },
               { label: "Página de planos", path: "/assinaturaConfigFrente" },
-              { label: "Relatório de cancelamento", path: "/relatorioExclusaoAssinante" },
+              {
+                label: "Relatório de cancelamento",
+                path: "/relatorioExclusaoAssinante",
+              },
               { label: "Ajuda das assinaturas", path: AJUDA, external: true },
             ],
           },
@@ -244,15 +283,26 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-const semAcento = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const semAcento = (t: string) =>
+  t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const pathOf = (p: string) => p.split("?")[0];
 
 // link do submenu que representa a página atual (distingue "?lixeira=1" da lista principal)
-function linkAtivo(item: NavItem, pathname: string, search: string): SubLink | undefined {
-  const mesmos = (item.sub ?? []).flatMap((g) => g.links).filter((l) => !l.external && pathOf(l.path) === pathname);
+function linkAtivo(
+  item: NavItem,
+  pathname: string,
+  search: string,
+): SubLink | undefined {
+  const mesmos = (item.sub ?? [])
+    .flatMap((g) => g.links)
+    .filter((l) => !l.external && pathOf(l.path) === pathname);
   return (
-    mesmos.find((l) => l.path.includes("?") && search && l.path.slice(l.path.indexOf("?")) === search) ??
-    mesmos.find((l) => !l.path.includes("?"))
+    mesmos.find(
+      (l) =>
+        l.path.includes("?") &&
+        search &&
+        l.path.slice(l.path.indexOf("?")) === search,
+    ) ?? mesmos.find((l) => !l.path.includes("?"))
   );
 }
 
@@ -295,18 +345,28 @@ function SubLinks({
       {groups.map((g, i) => (
         <div key={i}>
           {g.heading && (
-            <p className="px-2.5 pb-1 pt-2.5 text-[11px] font-medium uppercase tracking-[0.04em] text-white/40">{g.heading}</p>
+            <p className="px-2.5 pb-1 pt-2.5 text-[11px] font-medium uppercase tracking-[0.04em] text-white/40">
+              {g.heading}
+            </p>
           )}
           <ul className="flex flex-col gap-0.5">
             {g.links.map((l) => {
               const cls = cn(
                 "flex h-8 items-center justify-between gap-2 rounded-lg px-2.5 text-[13px] leading-5 transition-colors",
-                ativo === l ? "bg-white/10 font-medium text-white" : "font-normal text-white/60 hover:bg-white/[0.08] hover:text-white",
+                ativo === l
+                  ? "bg-white/10 font-medium text-white"
+                  : "font-normal text-white/60 hover:bg-white/[0.08] hover:text-white",
               );
               return (
                 <li key={l.label}>
                   {l.external ? (
-                    <a href={l.path} target="_blank" rel="noreferrer" className={cls} onClick={onNavigate}>
+                    <a
+                      href={l.path}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={cls}
+                      onClick={onNavigate}
+                    >
                       <span>{l.label}</span>
                       <ExternalLink className="h-3.5 w-3.5 shrink-0 text-white/40" />
                     </a>
@@ -325,9 +385,12 @@ function SubLinks({
   );
 }
 
-const botaoBase = "relative rounded-lg text-sm leading-5 transition-colors duration-200";
-const botaoAtivo = "!bg-white font-medium !text-black hover:!bg-white hover:!text-black";
-const botaoInativo = "font-normal text-white/70 hover:bg-white/[0.08] hover:text-white/70";
+const botaoBase =
+  "relative rounded-lg text-sm leading-5 transition-colors duration-200";
+const botaoAtivo =
+  "!bg-white font-medium !text-black hover:!bg-white hover:!text-black";
+const botaoInativo =
+  "font-normal text-white/70 hover:bg-white/[0.08] hover:text-white/70";
 
 function Badge({ n, collapsed }: { n: number; collapsed: boolean }) {
   return (
@@ -343,11 +406,26 @@ function Badge({ n, collapsed }: { n: number; collapsed: boolean }) {
 }
 
 // item simples (sem submenu)
-function SidebarNavItem({ item, collapsed, active, onNavigate }: { item: NavItem; collapsed: boolean; active: boolean; onNavigate?: () => void }) {
+function SidebarNavItem({
+  item,
+  collapsed,
+  active,
+  onNavigate,
+}: {
+  item: NavItem;
+  collapsed: boolean;
+  active: boolean;
+  onNavigate?: () => void;
+}) {
   const Icon = item.icon;
 
   return (
-    <SidebarMenuItem className={cn("relative", collapsed && "flex h-9 items-center justify-center")}>
+    <SidebarMenuItem
+      className={cn(
+        "relative",
+        collapsed && "flex h-9 items-center justify-center",
+      )}
+    >
       {active && <ActiveBar collapsed={collapsed} />}
       <SidebarMenuButton
         asChild
@@ -356,13 +434,28 @@ function SidebarNavItem({ item, collapsed, active, onNavigate }: { item: NavItem
         className={cn(
           botaoBase,
           // expandido: linha de 34px, 10px de padding lateral; recolhido: quadrado de 32px centralizado
-          collapsed ? "!size-8 flex items-center justify-center !p-0" : "h-[34px] gap-2.5 px-2.5",
+          collapsed
+            ? "!size-8 flex items-center justify-center !p-0"
+            : "h-[34px] gap-2.5 px-2.5",
           // ativo: branco com texto/ícone preto, igual expandido e recolhido (a barra branca reforça)
           active ? botaoAtivo : botaoInativo,
         )}
       >
-        <Link to={item.path} className={cn("flex items-center gap-2.5", collapsed && "justify-center")} onClick={onNavigate}>
-          <Icon className={cn("shrink-0", active ? "text-black" : "text-current", collapsed ? "!h-[18px] !w-[18px]" : "!h-4 !w-4")} />
+        <Link
+          to={item.path}
+          className={cn(
+            "flex items-center gap-2.5",
+            collapsed && "justify-center",
+          )}
+          onClick={onNavigate}
+        >
+          <Icon
+            className={cn(
+              "shrink-0",
+              active ? "text-black" : "text-current",
+              collapsed ? "!h-[18px] !w-[18px]" : "!h-4 !w-4",
+            )}
+          />
           {!collapsed && <span>{item.label}</span>}
         </Link>
       </SidebarMenuButton>
@@ -390,28 +483,45 @@ function SidebarParentItem({
   const Icon = item.icon;
 
   return (
-    <SidebarMenuItem className="relative">
-      {active && <ActiveBar collapsed={false} />}
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
+    <SidebarMenuItem>
+      {/* a barra fica só na linha do item, não no bloco inteiro com os links abertos */}
+      <div className="relative">
+        {active && <ActiveBar collapsed={false} />}
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className={cn(
+            botaoBase,
+            "flex h-[34px] w-full items-center gap-2.5 px-2.5 text-left hover:bg-white/[0.08]",
+            // pai com filho ativo fica claro (sem pílula branca: a pílula é só do item aberto na página)
+            active ? "font-medium text-white" : "font-normal text-white/70",
+          )}
+        >
+          <Icon className="h-4 w-4 shrink-0" />
+          <span className="flex-1">{item.label}</span>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 shrink-0 text-white/40 transition-transform duration-200",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+      </div>
+
+      <div
         className={cn(
-          botaoBase,
-          "flex h-[34px] w-full items-center gap-2.5 px-2.5 text-left hover:bg-white/[0.08]",
-          // pai com filho ativo fica claro (sem pílula branca: a pílula é só do item aberto na página)
-          active ? "font-medium text-white" : "font-normal text-white/70",
+          "grid transition-[grid-template-rows] duration-200 ease-out",
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}
       >
-        <Icon className="h-4 w-4 shrink-0" />
-        <span className="flex-1">{item.label}</span>
-        <ChevronDown className={cn("h-4 w-4 shrink-0 text-white/40 transition-transform duration-200", open && "rotate-180")} />
-      </button>
-
-      <div className={cn("grid transition-[grid-template-rows] duration-200 ease-out", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
         <div className={cn("overflow-hidden", !open && "invisible")}>
           <div className="ml-[18px] mt-0.5 border-l border-white/10 pb-1 pl-3">
-            <SubLinks groups={item.sub ?? []} ativo={ativo} onNavigate={onNavigate} />
+            <SubLinks
+              groups={item.sub ?? []}
+              ativo={ativo}
+              onNavigate={onNavigate}
+            />
           </div>
         </div>
       </div>
@@ -420,7 +530,17 @@ function SidebarParentItem({
 }
 
 // recolhido: ao passar o mouse abre um painel ao lado com o título do item e os mesmos links
-function SidebarFlyout({ item, active, ativo, onNavigate }: { item: NavItem; active: boolean; ativo?: SubLink; onNavigate?: () => void }) {
+function SidebarFlyout({
+  item,
+  active,
+  ativo,
+  onNavigate,
+}: {
+  item: NavItem;
+  active: boolean;
+  ativo?: SubLink;
+  onNavigate?: () => void;
+}) {
   const Icon = item.icon;
   const [open, setOpen] = React.useState(false);
   const timer = React.useRef<number>();
@@ -442,9 +562,18 @@ function SidebarFlyout({ item, active, ativo, onNavigate }: { item: NavItem; act
             aria-label={item.label}
             onMouseEnter={abrir}
             onMouseLeave={fechar}
-            className={cn(botaoBase, "flex size-8 items-center justify-center outline-none focus:outline-none focus-visible:ring-0", active ? botaoAtivo : botaoInativo)}
+            className={cn(
+              botaoBase,
+              "flex size-8 items-center justify-center outline-none focus:outline-none focus-visible:ring-0",
+              active ? botaoAtivo : botaoInativo,
+            )}
           >
-            <Icon className={cn("!h-[18px] !w-[18px] shrink-0", active ? "text-black" : "text-current")} />
+            <Icon
+              className={cn(
+                "!h-[18px] !w-[18px] shrink-0",
+                active ? "text-black" : "text-current",
+              )}
+            />
           </button>
         </PopoverTrigger>
         <PopoverContent
@@ -457,7 +586,9 @@ function SidebarFlyout({ item, active, ativo, onNavigate }: { item: NavItem; act
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="w-60 rounded-xl border border-white/10 bg-black p-2 text-white shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
         >
-          <p className="px-2.5 pb-1 pt-1.5 text-sm font-semibold leading-5 text-white">{item.label}</p>
+          <p className="px-2.5 pb-1 pt-1.5 text-sm font-semibold leading-5 text-white">
+            {item.label}
+          </p>
           <SubLinks
             groups={item.sub ?? []}
             ativo={ativo}
@@ -483,8 +614,11 @@ export function AppSidebar() {
 
   // abre sozinho o item que contém a página atual
   React.useEffect(() => {
-    const dono = navGroups.flatMap((g) => g.items).find((i) => i.sub && itemAtivo(i, location.pathname, location.search));
-    if (dono) setAbertos((a) => (a[dono.label] ? a : { ...a, [dono.label]: true }));
+    const dono = navGroups
+      .flatMap((g) => g.items)
+      .find((i) => i.sub && itemAtivo(i, location.pathname, location.search));
+    if (dono)
+      setAbertos((a) => (a[dono.label] ? a : { ...a, [dono.label]: true }));
   }, [location.pathname, location.search]);
 
   // a busca olha o nome do item e dos links do submenu; item que casa só por um link mostra só esses links
@@ -496,7 +630,10 @@ export function AppSidebar() {
           if (!busca || semAcento(i.label).includes(busca)) return i;
           if (!i.sub) return null;
           const sub = i.sub
-            .map((s) => ({ ...s, links: s.links.filter((l) => semAcento(l.label).includes(busca)) }))
+            .map((s) => ({
+              ...s,
+              links: s.links.filter((l) => semAcento(l.label).includes(busca)),
+            }))
             .filter((s) => s.links.length > 0);
           return sub.length ? { ...i, sub } : null;
         })
@@ -574,23 +711,55 @@ export function AppSidebar() {
             )}
           >
             {filtrados.map((group, groupIndex) => (
-              <div key={groupIndex} className={cn(!collapsed && "mb-3 last:mb-0")}>
-                {collapsed && groupIndex > 0 && <div aria-hidden="true" className="my-2 h-0 border-t-[0.5px] border-white/15" />}
+              <div
+                key={groupIndex}
+                className={cn(!collapsed && "mb-3 last:mb-0")}
+              >
+                {collapsed && groupIndex > 0 && (
+                  <div
+                    aria-hidden="true"
+                    className="my-2 h-0 border-t-[0.5px] border-white/15"
+                  />
+                )}
                 {!collapsed && group.title && (
                   <div className="px-2.5 pb-1.5 pt-2.5">
-                    <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-white/45">{group.title}</p>
+                    <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-white/45">
+                      {group.title}
+                    </p>
                   </div>
                 )}
 
                 <SidebarMenu className="gap-0.5 overflow-visible">
                   {group.items.map((item) => {
-                    const active = itemAtivo(item, location.pathname, location.search);
+                    const active = itemAtivo(
+                      item,
+                      location.pathname,
+                      location.search,
+                    );
                     if (!item.sub) {
-                      return <SidebarNavItem key={item.label} item={item} collapsed={collapsed} active={active} onNavigate={fecharMobile} />;
+                      return (
+                        <SidebarNavItem
+                          key={item.label}
+                          item={item}
+                          collapsed={collapsed}
+                          active={active}
+                          onNavigate={fecharMobile}
+                        />
+                      );
                     }
-                    const ativo = linkAtivo(item, location.pathname, location.search);
+                    const ativo = linkAtivo(
+                      item,
+                      location.pathname,
+                      location.search,
+                    );
                     return collapsed ? (
-                      <SidebarFlyout key={item.label} item={item} active={active} ativo={ativo} onNavigate={fecharMobile} />
+                      <SidebarFlyout
+                        key={item.label}
+                        item={item}
+                        active={active}
+                        ativo={ativo}
+                        onNavigate={fecharMobile}
+                      />
                     ) : (
                       <SidebarParentItem
                         key={item.label}
@@ -598,7 +767,12 @@ export function AppSidebar() {
                         active={active}
                         ativo={ativo}
                         open={!!busca || !!abertos[item.label]}
-                        onToggle={() => setAbertos((a) => ({ ...a, [item.label]: !a[item.label] }))}
+                        onToggle={() =>
+                          setAbertos((a) => ({
+                            ...a,
+                            [item.label]: !a[item.label],
+                          }))
+                        }
                         onNavigate={fecharMobile}
                       />
                     );
@@ -609,14 +783,20 @@ export function AppSidebar() {
           </SidebarContent>
 
           <div className={cn("mt-auto pb-3 pt-2", collapsed ? "px-2" : "px-4")}>
-            <div className={cn(collapsed && "flex h-9 items-center justify-center")}>
+            <div
+              className={cn(
+                collapsed && "flex h-9 items-center justify-center",
+              )}
+            >
               <button
                 type="button"
                 onClick={toggleSidebar}
                 aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
                 className={cn(
                   "flex items-center rounded-lg text-sm font-normal leading-5 text-white/70 transition-colors hover:bg-white/[0.08]",
-                  collapsed ? "h-8 w-8 justify-center" : "h-[34px] w-full gap-2.5 px-2.5",
+                  collapsed
+                    ? "h-8 w-8 justify-center"
+                    : "h-[34px] w-full gap-2.5 px-2.5",
                 )}
               >
                 {collapsed ? (
