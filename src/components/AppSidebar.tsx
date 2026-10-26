@@ -442,7 +442,7 @@ function SidebarFlyout({ item, active, ativo, onNavigate }: { item: NavItem; act
             aria-label={item.label}
             onMouseEnter={abrir}
             onMouseLeave={fechar}
-            className={cn(botaoBase, "flex size-8 items-center justify-center", active ? botaoAtivo : botaoInativo)}
+            className={cn(botaoBase, "flex size-8 items-center justify-center outline-none focus:outline-none focus-visible:ring-0", active ? botaoAtivo : botaoInativo)}
           >
             <Icon className={cn("!h-[18px] !w-[18px] shrink-0", active ? "text-black" : "text-current")} />
           </button>
