@@ -19,12 +19,13 @@ import {
   ShoppingBag,
   PanelLeftClose,
   PanelLeftOpen,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sidebar,
   SidebarContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -86,6 +87,22 @@ function SidebarNavItem({ item, collapsed, active, onNavigate }: { item: NavItem
 
   return (
     <SidebarMenuItem className={cn("relative", collapsed && "flex h-9 items-center justify-center")}>
+      {active && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: collapsed ? "0" : "-16px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: collapsed ? "4px" : "6px",
+            height: collapsed ? "24px" : "28px",
+            backgroundColor: "#ffffff",
+            borderRadius: collapsed ? "4px" : "0 4px 4px 0",
+            zIndex: 50,
+          }}
+        />
+      )}
       <SidebarMenuButton
         asChild
         isActive={active}
@@ -124,6 +141,12 @@ export function AppSidebar() {
   const location = useLocation();
   const { state, isMobile, toggleSidebar, setOpenMobile } = useSidebar();
   const collapsed = !isMobile && state === "collapsed";
+  const [termo, setTermo] = React.useState("");
+  const campoBusca = React.useRef<HTMLInputElement>(null);
+  const semAcento = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const filtrados = navGroups
+    .map((g) => ({ ...g, items: g.items.filter((i) => !termo.trim() || semAcento(i.label).includes(semAcento(termo.trim()))) }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <Sidebar
@@ -144,33 +167,44 @@ export function AppSidebar() {
           className="flex h-full w-full flex-col rounded-[12px] bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.28)]"
           style={{ overflow: "visible" }}
         >
-          <SidebarHeader className={cn("px-4 pb-3 pt-3", collapsed && "px-2")}>
-            <Link
-              to="/"
-              className={cn(
-                "flex items-center gap-3 transition-colors",
-                collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
-              )}
-            >
-              <div
-                className={cn(
-                  "flex shrink-0 items-center justify-center rounded-md bg-white/10 text-white",
-                  collapsed ? "h-8 w-8" : "h-11 w-11",
-                )}
-              >
-                <Scissors className={collapsed ? "h-[18px] w-[18px]" : "h-5 w-5"} />
-              </div>
-
-              {!collapsed && (
-                <div className="min-w-0">
-                  <p className="truncate text-[18px] font-medium leading-none text-white">
-                    FRIZZAR<span className="text-primary">.</span>
-                  </p>
-                  <p className="mt-1 truncate text-[11px] text-white/45">Painel de gestão</p>
-                </div>
-              )}
-            </Link>
-          </SidebarHeader>
+          {/* PESQUISAR: filtra os itens do menu; recolhido, vira um ícone que expande e foca o campo */}
+          <div className={cn("pb-2 pt-3", collapsed ? "px-2" : "px-4")}>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Pesquisar"
+                    onClick={() => {
+                      toggleSidebar();
+                      setTimeout(() => campoBusca.current?.focus(), 350);
+                    }}
+                    className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/[0.08]"
+                  >
+                    <Search className="h-[18px] w-[18px]" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="text-sm">
+                  Pesquisar
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <label className="flex h-[34px] items-center gap-2.5 rounded-lg bg-white/[0.08] px-2.5 text-white/70 focus-within:bg-white/[0.12]">
+                <Search className="h-4 w-4 shrink-0" />
+                <input
+                  ref={campoBusca}
+                  value={termo}
+                  onChange={(e) => setTermo(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") setTermo("");
+                  }}
+                  placeholder="Pesquisar"
+                  aria-label="Pesquisar no menu"
+                  className="min-w-0 flex-1 bg-transparent text-sm font-normal leading-5 text-white outline-none placeholder:text-white/45"
+                />
+              </label>
+            )}
+          </div>
 
           <SidebarContent
             className={cn(
@@ -181,7 +215,7 @@ export function AppSidebar() {
               "overflow-x-visible overflow-y-scroll",
             )}
           >
-            {navGroups.map((group, groupIndex) => (
+            {filtrados.map((group, groupIndex) => (
               <div key={groupIndex} className={cn(!collapsed && "mb-3 last:mb-0")}>
                 {collapsed && groupIndex > 0 && <div aria-hidden="true" className="my-2 h-0 border-t-[0.5px] border-white/15" />}
                 {!collapsed && group.title && (
