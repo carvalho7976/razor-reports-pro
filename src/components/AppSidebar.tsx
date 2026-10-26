@@ -494,8 +494,8 @@ function SidebarParentItem({
           className={cn(
             botaoBase,
             "flex h-[34px] w-full items-center gap-2.5 px-2.5 text-left hover:bg-white/[0.08]",
-            // pai com filho ativo fica claro (sem pílula branca: a pílula é só do item aberto na página)
-            active ? "font-medium text-white" : "font-normal text-white/70",
+            // pai que contém a página atual: pílula branca, igual aos itens simples
+            active ? botaoAtivo : botaoInativo,
           )}
         >
           <Icon className="h-4 w-4 shrink-0" />
