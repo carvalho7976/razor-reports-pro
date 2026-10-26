@@ -112,16 +112,14 @@ function SidebarNavItem({ item, collapsed, active, onNavigate }: { item: NavItem
           // expandido: linha de 34px, 10px de padding lateral; recolhido: quadrado de 32px centralizado
           collapsed ? "!size-8 flex items-center justify-center !p-0" : "h-[34px] gap-2.5 px-2.5",
           // hierarquia por cor e peso: inativo apagado (400), ativo escuro (500) com fundo sutil
-          // expandido: pílula branca; recolhido: quadrado sutil com ícone claro (a barra branca marca o ativo)
+          // ativo: branco com texto/ícone preto, igual expandido e recolhido (a barra branca reforça)
           active
-            ? collapsed
-              ? "!bg-white/10 font-medium !text-white hover:!bg-white/10 hover:!text-white"
-              : "!bg-white font-medium !text-black hover:!bg-white hover:!text-black"
+            ? "!bg-white font-medium !text-black hover:!bg-white hover:!text-black"
             : "font-normal text-white/70 hover:bg-white/[0.08] hover:text-white/70",
         )}
       >
         <Link to={item.path} className={cn("flex items-center gap-2.5", collapsed && "justify-center")} onClick={onNavigate}>
-          <Icon className={cn("shrink-0", active ? (collapsed ? "text-white" : "text-black") : "text-current", collapsed ? "!h-[18px] !w-[18px]" : "!h-4 !w-4")} />
+          <Icon className={cn("shrink-0", active ? "text-black" : "text-current", collapsed ? "!h-[18px] !w-[18px]" : "!h-4 !w-4")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
       </SidebarMenuButton>
