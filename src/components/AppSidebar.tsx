@@ -85,47 +85,34 @@ function SidebarNavItem({ item, collapsed, active, onNavigate }: { item: NavItem
   const Icon = item.icon;
 
   return (
-    <SidebarMenuItem className="relative">
-      {active && (
-        <span
-          style={{
-            position: "absolute",
-            left: collapsed ? "0" : "-16px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: collapsed ? "4px" : "6px",
-            height: collapsed ? "24px" : "28px",
-            backgroundColor: "#ffffff",
-            borderRadius: collapsed ? "4px" : "0 4px 4px 0",
-            zIndex: 50,
-          }}
-        />
-      )}
-
+    <SidebarMenuItem className={cn("relative", collapsed && "flex h-9 items-center justify-center")}>
       <SidebarMenuButton
         asChild
         isActive={active}
-        tooltip={item.label}
+        tooltip={{ children: item.label, className: "text-sm" }}
         className={cn(
-          "relative h-10 text-sm font-medium transition-all duration-200 rounded-lg",
-          collapsed ? "flex justify-center items-center px-0 w-full" : "px-3",
+          "relative rounded-lg text-sm leading-5 transition-colors duration-200",
+          // expandido: linha de 34px, 10px de padding lateral; recolhido: quadrado de 32px centralizado
+          collapsed ? "!size-8 flex items-center justify-center !p-0" : "h-[34px] gap-2.5 px-2.5",
+          // hierarquia por cor e peso: inativo apagado (400), ativo escuro (500) com fundo sutil
           active
-            ? "!bg-white !text-black hover:!bg-white hover:!text-black"
-            : "text-white/72 hover:bg-white/8 hover:text-white",
+            ? "bg-white/10 font-medium text-white hover:bg-white/10 hover:text-white"
+            : "font-normal text-white/70 hover:bg-white/[0.08] hover:text-white/70",
         )}
       >
-        <Link
-          to={item.path}
-          className={cn("flex items-center gap-3", collapsed && "justify-center w-full")}
-          onClick={onNavigate}
-        >
-          <Icon className={cn("h-4 w-4 shrink-0", active ? "text-black" : "text-current")} />
+        <Link to={item.path} className={cn("flex items-center gap-2.5", collapsed && "justify-center")} onClick={onNavigate}>
+          <Icon className={cn("shrink-0 text-current", collapsed ? "!h-[18px] !w-[18px]" : "!h-4 !w-4")} />
           {!collapsed && <span>{item.label}</span>}
         </Link>
       </SidebarMenuButton>
 
-      {!collapsed && item.badge ? (
-        <span className="absolute right-3 top-1/2 flex h-5 min-w-5 -translate-y-1/2 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+      {item.badge ? (
+        <span
+          className={cn(
+            "absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-0.5 text-[10px] font-medium leading-none text-white",
+            collapsed ? "right-0.5 top-0.5" : "right-2.5 top-1/2 -translate-y-1/2",
+          )}
+        >
           {item.badge}
         </span>
       ) : null}
@@ -146,7 +133,8 @@ export function AppSidebar() {
       style={
         {
           "--sidebar-width": "272px",
-          "--sidebar-width-icon": "65px",
+          // painel recolhido de 48px (o contêiner tem 8px de respiro de cada lado)
+          "--sidebar-width-icon": "64px",
           "--sidebar-transition": "width 0.3s ease-in-out",
         } as React.CSSProperties
       }
@@ -164,13 +152,18 @@ export function AppSidebar() {
                 collapsed ? "justify-center px-0 py-1" : "px-1 py-1.5",
               )}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/10 text-white">
-                <Scissors className="h-5 w-5" />
+              <div
+                className={cn(
+                  "flex shrink-0 items-center justify-center rounded-md bg-white/10 text-white",
+                  collapsed ? "h-8 w-8" : "h-11 w-11",
+                )}
+              >
+                <Scissors className={collapsed ? "h-[18px] w-[18px]" : "h-5 w-5"} />
               </div>
 
               {!collapsed && (
                 <div className="min-w-0">
-                  <p className="truncate text-[18px] font-bold leading-none text-white">
+                  <p className="truncate text-[18px] font-medium leading-none text-white">
                     FRIZZAR<span className="text-primary">.</span>
                   </p>
                   <p className="mt-1 truncate text-[11px] text-white/45">Painel de gestão</p>
@@ -189,14 +182,15 @@ export function AppSidebar() {
             )}
           >
             {navGroups.map((group, groupIndex) => (
-              <div key={groupIndex} className="mb-4 last:mb-0">
+              <div key={groupIndex} className={cn(!collapsed && "mb-3 last:mb-0")}>
+                {collapsed && groupIndex > 0 && <div aria-hidden="true" className="my-2 h-0 border-t-[0.5px] border-white/15" />}
                 {!collapsed && group.title && (
-                  <div className="px-3 pb-2 pt-2">
-                    <p className="text-[11px] font-semibold text-white/22">{group.title}</p>
+                  <div className="px-2.5 pb-1.5 pt-2.5">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-white/45">{group.title}</p>
                   </div>
                 )}
 
-                <SidebarMenu className="gap-1.5 overflow-visible">
+                <SidebarMenu className="gap-0.5 overflow-visible">
                   {group.items.map((item) => {
                     const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
                     return <SidebarNavItem key={item.path} item={item} collapsed={collapsed} active={active} onNavigate={isMobile ? () => setOpenMobile(false) : undefined} />;
@@ -207,23 +201,26 @@ export function AppSidebar() {
           </SidebarContent>
 
           <div className={cn("mt-auto pb-3 pt-2", collapsed ? "px-2" : "px-4")}>
-            <button
-              type="button"
-              onClick={toggleSidebar}
-              className={cn(
-                "flex h-10 w-full items-center gap-3 rounded-lg px-3 text-white/65 transition-colors hover:bg-white/8 hover:text-white",
-                collapsed && "justify-center px-0",
-              )}
-            >
-              {collapsed ? (
-                <PanelLeftOpen className="h-4 w-4 shrink-0" />
-              ) : (
-                <>
-                  <PanelLeftClose className="h-4 w-4 shrink-0" />
-                  <span className="text-sm font-medium">Recolher menu</span>
-                </>
-              )}
-            </button>
+            <div className={cn(collapsed && "flex h-9 items-center justify-center")}>
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+                className={cn(
+                  "flex items-center rounded-lg text-sm font-normal leading-5 text-white/70 transition-colors hover:bg-white/[0.08]",
+                  collapsed ? "h-8 w-8 justify-center" : "h-[34px] w-full gap-2.5 px-2.5",
+                )}
+              >
+                {collapsed ? (
+                  <PanelLeftOpen className="h-[18px] w-[18px] shrink-0" />
+                ) : (
+                  <>
+                    <PanelLeftClose className="h-4 w-4 shrink-0" />
+                    <span>Recolher menu</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
