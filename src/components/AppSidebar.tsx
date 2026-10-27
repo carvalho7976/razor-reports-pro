@@ -317,7 +317,7 @@ function ActiveBar({ collapsed }: { collapsed: boolean }) {
       aria-hidden="true"
       style={{
         position: "absolute",
-        left: collapsed ? "-8px" : "-16px",
+        left: collapsed ? "-4px" : "-16px",
         top: "50%",
         transform: "translateY(-50%)",
         width: collapsed ? "4px" : "6px",
