@@ -143,7 +143,7 @@ const navGroups: NavGroup[] = [
             heading: "Relatórios",
             links: [
               {
-                label: "Exclusão de agendamentos",
+                label: "Agendamentos excluídos",
                 path: "/relatorioExclusaoAgendamento",
               },
             ],
@@ -216,7 +216,7 @@ const navGroups: NavGroup[] = [
               { label: "Agendamentos", path: "/relatorioAgendamentos" },
               { label: "Avaliações", path: "/avaliacoes" },
               {
-                label: "Exclusão de agendamentos",
+                label: "Agendamentos excluídos",
                 path: "/relatorioExclusaoAgendamento",
               },
             ],
@@ -230,10 +230,10 @@ const navGroups: NavGroup[] = [
             ],
           },
           {
-            heading: "Equipe e clientes",
+            heading: "Pessoas",
             links: [
               {
-                label: "Desempenho dos profissionais",
+                label: "Desempenho",
                 path: "/relatorioDesempenhoFuncionario",
               },
               { label: "Clientes", path: "/relatorioClientes" },
@@ -345,14 +345,15 @@ function SubLinks({
       {groups.map((g, i) => (
         <div key={i}>
           {g.heading && (
-            <p className="px-2.5 pb-1 pt-2.5 text-[11px] font-medium uppercase tracking-[0.04em] text-white/40">
+            <p className="px-2.5 pb-1.5 pt-4 text-[11px] font-semibold uppercase tracking-[0.06em] text-white/35 first:pt-2">
               {g.heading}
             </p>
           )}
           <ul className="flex flex-col gap-0.5">
             {g.links.map((l) => {
               const cls = cn(
-                "flex h-8 items-center justify-between gap-2 rounded-lg px-2.5 text-[13px] leading-5 transition-colors",
+                "flex h-8 items-center justify-between gap-2 whitespace-nowrap rounded-lg text-[13px] leading-5 transition-colors",
+                g.heading ? "pl-5 pr-2.5" : "px-2.5",
                 ativo === l
                   ? "bg-white/10 font-medium text-white"
                   : "font-normal text-white/60 hover:bg-white/[0.08] hover:text-white",
