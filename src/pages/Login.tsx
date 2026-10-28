@@ -19,51 +19,55 @@ function LojasDiscretas() {
   const chip =
     "inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 text-xs text-muted-foreground transition hover:text-foreground";
   return (
-    <div className="mt-6 hidden items-center justify-center gap-2 lg:flex">
-      <span className="text-xs text-muted-foreground">Baixe o app</span>
-      <a
-        href={LINK_GOOGLE_PLAY}
-        target="_blank"
-        rel="noreferrer"
-        className={chip}
-      >
-        <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="#00d4ff"
-            d="M3.6 2.2c-.2.2-.4.6-.4 1v17.6c0 .4.1.7.4 1l9.7-9.8z"
-          />
-          <path
-            fill="#00f076"
-            d="M16.6 15.2l-3.3-3.3 3.3-3.3 3.9 2.2c1.1.6 1.1 1.7 0 2.3z"
-          />
-          <path
-            fill="#ff3a44"
-            d="M16.6 15.2 13.3 12l-9.7 9.8c.4.4.9.4 1.6.1z"
-          />
-          <path
-            fill="#ffd400"
-            d="M16.6 8.8 5.2 2.1c-.7-.4-1.2-.3-1.6.1l9.7 9.8z"
-          />
-        </svg>
-        Google Play
-      </a>
-      <a
-        href={LINK_APP_STORE}
-        target="_blank"
-        rel="noreferrer"
-        className={chip}
-      >
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
+    <div className="mt-6 hidden border-t border-border pt-5 text-center lg:block">
+      <span className="mb-3 block text-xs text-muted-foreground">
+        Baixe o app Frizzar
+      </span>
+      <div className="flex justify-center gap-2">
+        <a
+          href={LINK_GOOGLE_PLAY}
+          target="_blank"
+          rel="noreferrer"
+          className={chip}
         >
-          <path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.1 1.7 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14.1 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z" />
-        </svg>
-        App Store
-      </a>
+          <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="#00d4ff"
+              d="M3.6 2.2c-.2.2-.4.6-.4 1v17.6c0 .4.1.7.4 1l9.7-9.8z"
+            />
+            <path
+              fill="#00f076"
+              d="M16.6 15.2l-3.3-3.3 3.3-3.3 3.9 2.2c1.1.6 1.1 1.7 0 2.3z"
+            />
+            <path
+              fill="#ff3a44"
+              d="M16.6 15.2 13.3 12l-9.7 9.8c.4.4.9.4 1.6.1z"
+            />
+            <path
+              fill="#ffd400"
+              d="M16.6 8.8 5.2 2.1c-.7-.4-1.2-.3-1.6.1l9.7 9.8z"
+            />
+          </svg>
+          Google Play
+        </a>
+        <a
+          href={LINK_APP_STORE}
+          target="_blank"
+          rel="noreferrer"
+          className={chip}
+        >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.1 1.7 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14.1 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z" />
+          </svg>
+          App Store
+        </a>
+      </div>
     </div>
   );
 }
