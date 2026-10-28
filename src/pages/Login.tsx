@@ -309,7 +309,7 @@ export default function Login() {
     "h-10 w-full rounded-lg border border-info/50 bg-white px-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-info/60 focus:ring-2 focus:ring-info/40";
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-white dark:bg-background lg:block lg:overflow-hidden lg:bg-[#f3f4f8] lg:p-4">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background lg:block lg:overflow-hidden lg:p-4">
       <div className="flex min-h-full flex-1 flex-col lg:grid lg:h-[calc(100vh-32px)] lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_400px]">
         {/* esquerda: embutido, com margem igual em volta; só ele rola */}
         <section
@@ -332,7 +332,7 @@ export default function Login() {
         <BannerMobile />
 
         {/* direita: login fixo */}
-        <section className="flex min-h-0 flex-1 flex-col items-center bg-white px-5 pb-8 pt-6 dark:bg-background lg:h-[calc(100vh-32px)] lg:overflow-hidden lg:rounded-none lg:bg-transparent lg:px-10 lg:pb-0 lg:pt-[9vh]">
+        <section className="flex min-h-0 flex-1 flex-col items-center bg-background px-5 pb-8 pt-6 lg:h-[calc(100vh-32px)] lg:overflow-hidden lg:rounded-none lg:bg-transparent lg:px-10 lg:pb-0 lg:pt-[9vh]">
           <form
             className="w-full max-w-[320px]"
             onSubmit={(e) => {
