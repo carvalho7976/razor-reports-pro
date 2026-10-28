@@ -19,7 +19,7 @@ function LojasDiscretas() {
   const chip =
     "inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 text-xs text-muted-foreground transition hover:text-foreground";
   return (
-    <div className="mt-6 hidden border-t border-border pt-5 text-center lg:block">
+    <div className="mt-6 border-t border-border pt-5 text-center">
       <span className="mb-3 block text-xs text-muted-foreground">
         Baixe o app Frizzar
       </span>
@@ -66,71 +66,6 @@ function LojasDiscretas() {
             <path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.1 1.7 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14.1 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z" />
           </svg>
           App Store
-        </a>
-      </div>
-    </div>
-  );
-}
-
-function LojasApp() {
-  const loja =
-    "flex h-[42px] flex-1 items-center gap-2 rounded-[11px] bg-[#161616] px-3 text-left text-[9px] leading-[1.1] text-white";
-  return (
-    <div className="mt-6 rounded-2xl border border-border bg-gradient-to-br from-[#e8f3fc] to-[#fdeee2] p-3.5 lg:hidden">
-      <p className="text-xs font-semibold">
-        Baixe o app Frizzar
-        <span className="mt-0.5 block font-normal text-muted-foreground">
-          Agenda e comandas no celular.
-        </span>
-      </p>
-      <div className="mt-2.5 flex gap-2">
-        <a
-          href={LINK_GOOGLE_PLAY}
-          target="_blank"
-          rel="noreferrer"
-          className={loja}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="#00d4ff"
-              d="M3.6 2.2c-.2.2-.4.6-.4 1v17.6c0 .4.1.7.4 1l9.7-9.8z"
-            />
-            <path
-              fill="#00f076"
-              d="M16.6 15.2l-3.3-3.3 3.3-3.3 3.9 2.2c1.1.6 1.1 1.7 0 2.3z"
-            />
-            <path
-              fill="#ff3a44"
-              d="M16.6 15.2 13.3 12l-9.7 9.8c.4.4.9.4 1.6.1z"
-            />
-            <path
-              fill="#ffd400"
-              d="M16.6 8.8 5.2 2.1c-.7-.4-1.2-.3-1.6.1l9.7 9.8z"
-            />
-          </svg>
-          <span>
-            Disponível no
-            <b className="block text-xs font-semibold">Google Play</b>
-          </span>
-        </a>
-        <a
-          href={LINK_APP_STORE}
-          target="_blank"
-          rel="noreferrer"
-          className={loja}
-        >
-          <svg
-            width="17"
-            height="17"
-            viewBox="0 0 24 24"
-            fill="#fff"
-            aria-hidden="true"
-          >
-            <path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.1 1.7 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14.1 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z" />
-          </svg>
-          <span>
-            Baixar na<b className="block text-xs font-semibold">App Store</b>
-          </span>
         </a>
       </div>
     </div>
@@ -413,8 +348,6 @@ export default function Login() {
             >
               Entrar
             </button>
-
-            <LojasApp />
 
             <LojasDiscretas />
           </form>
