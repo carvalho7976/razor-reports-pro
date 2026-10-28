@@ -84,7 +84,7 @@ export default function Login() {
     "h-[42px] w-full rounded-[10px] border border-info/40 bg-white px-3.5 dark:bg-background text-sm outline-none transition focus:border-info focus:ring-[3px] focus:ring-info/20";
 
   return (
-    <div className="grid h-screen grid-cols-1 overflow-hidden bg-white p-4 dark:bg-background lg:grid-cols-[minmax(0,1fr)_400px]">
+    <div className="fixed inset-0 z-50 grid grid-cols-1 overflow-hidden bg-white p-4 dark:bg-background lg:grid-cols-[minmax(0,1fr)_400px]">
       {/* esquerda: embutido, com margem igual em volta; só ele rola */}
       <section
         aria-label="Novidades"
