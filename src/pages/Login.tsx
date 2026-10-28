@@ -15,9 +15,6 @@ const LINK_APP_STORE =
 const GRADIENTE_CLARO =
   "radial-gradient(120% 80% at 85% 35%,#fbd9d9 0%,#fbeeee 38%,#f7f7f9 70%)";
 
-const GRADIENTE =
-  "radial-gradient(60% 45% at 85% 12%,rgba(255,170,140,.55) 0%,rgba(255,170,140,0) 70%),radial-gradient(70% 50% at 10% 100%,rgba(230,59,59,.55) 0%,rgba(230,59,59,0) 70%),linear-gradient(165deg,#2a0e16 0%,#5a1623 45%,#8d2231 100%)";
-
 function LojasDiscretas() {
   const chip =
     "inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 text-xs text-muted-foreground transition hover:text-foreground";
@@ -241,8 +238,8 @@ function BannerMobile() {
   const [aberto, setAberto] = useState(false);
   return (
     <div
-      className="m-4 mb-0 overflow-hidden rounded-2xl text-white lg:hidden"
-      style={{ background: GRADIENTE }}
+      className="m-4 mb-0 overflow-hidden rounded-2xl border border-[#f1e1e1] text-[#1d1d22] lg:hidden"
+      style={{ background: GRADIENTE_CLARO }}
     >
       <button
         type="button"
@@ -255,7 +252,7 @@ function BannerMobile() {
           <b className="block text-[13px]">Novidade</b>
           Parceira oficial da Meta
         </span>
-        <span className="grid h-[26px] w-[26px] place-items-center rounded-full bg-white/15">
+        <span className="grid h-[26px] w-[26px] place-items-center rounded-full bg-black/5">
           <ChevronDown
             className={`h-4 w-4 transition-transform duration-200 ${aberto ? "rotate-180" : ""}`}
           />
@@ -269,21 +266,21 @@ function BannerMobile() {
           <div className="px-4 pb-5 pt-1">
             <h2 className="text-[24px] font-bold leading-[1.1] tracking-tight">
               A Frizzar agora é{" "}
-              <span className="block text-[#ffb4a6]">
+              <span className="block text-primary">
                 parceira oficial da Meta.
               </span>
             </h2>
-            <p className="mt-2 text-[12.5px] leading-normal text-white/70">
+            <p className="mt-2 text-[12.5px] leading-normal text-[#6b6e79]">
               Com a integração à API Oficial, o Chatbot e o Connections enviam
               suas mensagens pelo canal oficial do WhatsApp, com mais segurança
               e estabilidade para o seu negócio.
             </p>
-            <div className="mt-4 rounded-xl border border-white/20 bg-white/10 p-3.5">
+            <div className="mt-4 rounded-xl border border-[#f3dede] bg-gradient-to-br from-[#fdecec] to-white p-3.5">
               <p className="text-[15px] font-bold leading-tight">
                 Seu cliente conversa com{" "}
-                <span className="text-[#ffb4a6]">um canal oficial.</span>
+                <span className="text-primary">um canal oficial.</span>
               </p>
-              <p className="mt-1.5 text-[11.5px] leading-snug text-white/70">
+              <p className="mt-1.5 text-[11.5px] leading-snug text-[#7a7d88]">
                 Lembretes, confirmações e campanhas saem pela API Oficial da
                 Meta, a empresa dona do WhatsApp.
               </p>
@@ -317,18 +314,21 @@ export default function Login() {
         {/* esquerda: embutido, com margem igual em volta; só ele rola */}
         <section
           aria-label="Novidades"
-          className="hidden h-[calc(100vh-32px)] overflow-y-auto rounded-[28px] border border-[#f1e1e1] [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/15 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2 lg:block"
+          className="hidden h-[calc(100vh-32px)] overflow-hidden rounded-[28px] border border-[#f1e1e1] lg:block"
           style={{ background: GRADIENTE_CLARO }}
         >
-          {PAINEL_URL ? (
-            <iframe
-              src={PAINEL_URL}
-              title="Novidades da Frizzar"
-              className="h-full w-full border-0"
-            />
-          ) : (
-            <ComunicadoPadrao />
-          )}
+          {/* a rolagem fica num filho interno: a barra é fina, afastada da borda e não escapa do canto arredondado */}
+          <div className="h-full overflow-y-auto [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[3px] [&::-webkit-scrollbar-thumb]:border-solid [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-black/15 [&::-webkit-scrollbar-thumb]:bg-clip-padding [&::-webkit-scrollbar-track]:my-4 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-3">
+            {PAINEL_URL ? (
+              <iframe
+                src={PAINEL_URL}
+                title="Novidades da Frizzar"
+                className="h-full w-full border-0"
+              />
+            ) : (
+              <ComunicadoPadrao />
+            )}
+          </div>
         </section>
 
         {/* celular: faixa da novidade que abre o comunicado completo; o resto da página rola */}
