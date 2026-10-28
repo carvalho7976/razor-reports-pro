@@ -88,7 +88,7 @@ export default function Login() {
       {/* esquerda: embutido, com margem igual em volta; só ele rola */}
       <section
         aria-label="Novidades"
-        className="hidden h-[calc(100vh-32px)] overflow-y-auto rounded-[28px] [scrollbar-color:rgba(255,255,255,.3)_transparent] [scrollbar-width:thin] lg:block"
+        className="hidden h-[calc(100vh-32px)] overflow-y-auto rounded-[28px] [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2 lg:block"
         style={{
           background:
             "radial-gradient(60% 45% at 85% 12%,rgba(255,170,140,.55) 0%,rgba(255,170,140,0) 70%),radial-gradient(70% 50% at 10% 100%,rgba(230,59,59,.55) 0%,rgba(230,59,59,0) 70%),linear-gradient(165deg,#2a0e16 0%,#5a1623 45%,#8d2231 100%)",
