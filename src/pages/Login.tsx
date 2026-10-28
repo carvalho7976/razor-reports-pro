@@ -7,6 +7,9 @@ import logo from "@/assets/frizzar-logo.png";
 // sem URL, mostra o comunicado padrão abaixo.
 const PAINEL_URL = "";
 
+const LINK_GOOGLE_PLAY = "https://play.google.com/store/apps/details?id=com.frizzar";
+const LINK_APP_STORE = "https://apps.apple.com/br/app/frizzar-sal%C3%B5es-e-equipe/id1519074462";
+
 const GRADIENTE =
   "radial-gradient(60% 45% at 85% 12%,rgba(255,170,140,.55) 0%,rgba(255,170,140,0) 70%),radial-gradient(70% 50% at 10% 100%,rgba(230,59,59,.55) 0%,rgba(230,59,59,0) 70%),linear-gradient(165deg,#2a0e16 0%,#5a1623 45%,#8d2231 100%)";
 
@@ -19,7 +22,7 @@ function LojasApp() {
         <span className="mt-0.5 block font-normal text-muted-foreground">Agenda e comandas no celular.</span>
       </p>
       <div className="mt-2.5 flex gap-2">
-        <button type="button" className={loja}>
+        <a href={LINK_GOOGLE_PLAY} target="_blank" rel="noreferrer" className={loja}>
           <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#00d4ff" d="M3.6 2.2c-.2.2-.4.6-.4 1v17.6c0 .4.1.7.4 1l9.7-9.8z" />
             <path fill="#00f076" d="M16.6 15.2l-3.3-3.3 3.3-3.3 3.9 2.2c1.1.6 1.1 1.7 0 2.3z" />
@@ -29,15 +32,15 @@ function LojasApp() {
           <span>
             Disponível no<b className="block text-xs font-semibold">Google Play</b>
           </span>
-        </button>
-        <button type="button" className={loja}>
+        </a>
+        <a href={LINK_APP_STORE} target="_blank" rel="noreferrer" className={loja}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
             <path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.1 1.7 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14.1 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z" />
           </svg>
           <span>
             Baixar na<b className="block text-xs font-semibold">App Store</b>
           </span>
-        </button>
+        </a>
       </div>
     </div>
   );
