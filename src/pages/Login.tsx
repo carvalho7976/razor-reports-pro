@@ -15,6 +15,59 @@ const LINK_APP_STORE =
 const GRADIENTE =
   "radial-gradient(60% 45% at 85% 12%,rgba(255,170,140,.55) 0%,rgba(255,170,140,0) 70%),radial-gradient(70% 50% at 10% 100%,rgba(230,59,59,.55) 0%,rgba(230,59,59,0) 70%),linear-gradient(165deg,#2a0e16 0%,#5a1623 45%,#8d2231 100%)";
 
+function LojasDiscretas() {
+  const chip =
+    "inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-white px-2.5 text-xs text-muted-foreground transition hover:text-foreground";
+  return (
+    <div className="mt-6 hidden items-center justify-center gap-2 lg:flex">
+      <span className="text-xs text-muted-foreground">Baixe o app</span>
+      <a
+        href={LINK_GOOGLE_PLAY}
+        target="_blank"
+        rel="noreferrer"
+        className={chip}
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="#00d4ff"
+            d="M3.6 2.2c-.2.2-.4.6-.4 1v17.6c0 .4.1.7.4 1l9.7-9.8z"
+          />
+          <path
+            fill="#00f076"
+            d="M16.6 15.2l-3.3-3.3 3.3-3.3 3.9 2.2c1.1.6 1.1 1.7 0 2.3z"
+          />
+          <path
+            fill="#ff3a44"
+            d="M16.6 15.2 13.3 12l-9.7 9.8c.4.4.9.4 1.6.1z"
+          />
+          <path
+            fill="#ffd400"
+            d="M16.6 8.8 5.2 2.1c-.7-.4-1.2-.3-1.6.1l9.7 9.8z"
+          />
+        </svg>
+        Google Play
+      </a>
+      <a
+        href={LINK_APP_STORE}
+        target="_blank"
+        rel="noreferrer"
+        className={chip}
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.1 1.7 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14.1 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z" />
+        </svg>
+        App Store
+      </a>
+    </div>
+  );
+}
+
 function LojasApp() {
   const loja =
     "flex h-[42px] flex-1 items-center gap-2 rounded-[11px] bg-[#161616] px-3 text-left text-[9px] leading-[1.1] text-white";
@@ -256,12 +309,12 @@ export default function Login() {
     "h-10 w-full rounded-lg border border-info/50 bg-white px-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-info/60 focus:ring-2 focus:ring-info/40";
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-white dark:bg-background lg:block lg:overflow-hidden lg:bg-[#1b0f13] lg:p-2">
-      <div className="flex min-h-full flex-1 flex-col lg:grid lg:h-[calc(100vh-16px)] lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_400px] lg:rounded-[28px] lg:bg-[#f3f4f8] lg:p-3.5">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-white dark:bg-background lg:block lg:overflow-hidden lg:bg-[#f3f4f8] lg:p-4">
+      <div className="flex min-h-full flex-1 flex-col lg:grid lg:h-[calc(100vh-32px)] lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_400px]">
         {/* esquerda: embutido, com margem igual em volta; só ele rola */}
         <section
           aria-label="Novidades"
-          className="hidden h-[calc(100vh-44px)] overflow-y-auto rounded-[22px] [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2 lg:block"
+          className="hidden h-[calc(100vh-32px)] overflow-y-auto rounded-[28px] [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2 lg:block"
           style={{ background: GRADIENTE }}
         >
           {PAINEL_URL ? (
@@ -279,7 +332,7 @@ export default function Login() {
         <BannerMobile />
 
         {/* direita: login fixo */}
-        <section className="flex min-h-0 flex-1 flex-col items-center bg-white px-5 pb-8 pt-6 dark:bg-background lg:h-[calc(100vh-44px)] lg:overflow-hidden lg:rounded-none lg:bg-transparent lg:px-10 lg:pb-0 lg:pt-[9vh]">
+        <section className="flex min-h-0 flex-1 flex-col items-center bg-white px-5 pb-8 pt-6 dark:bg-background lg:h-[calc(100vh-32px)] lg:overflow-hidden lg:rounded-none lg:bg-transparent lg:px-10 lg:pb-0 lg:pt-[9vh]">
           <form
             className="w-full max-w-[320px]"
             onSubmit={(e) => {
@@ -396,6 +449,8 @@ export default function Login() {
                 Teste grátis
               </Link>
             </p>
+
+            <LojasDiscretas />
           </form>
         </section>
       </div>
