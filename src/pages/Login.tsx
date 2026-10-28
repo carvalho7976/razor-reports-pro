@@ -253,7 +253,7 @@ export default function Login() {
   const [ver, setVer] = useState(false);
 
   const campo =
-    "h-12 w-full rounded-xl bg-white px-3.5 text-sm outline-none transition focus:ring-[3px] focus:ring-info/25 max-lg:border max-lg:border-info/40 max-lg:focus:border-info lg:shadow-[0_1px_2px_rgba(20,20,40,.05),0_6px_16px_rgba(20,20,40,.04)]";
+    "h-10 w-full rounded-lg border border-info/50 bg-white px-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-info/60 focus:ring-2 focus:ring-info/40";
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-white dark:bg-background lg:block lg:overflow-hidden lg:bg-[#1b0f13] lg:p-2">
@@ -349,7 +349,7 @@ export default function Login() {
 
             <button
               type="submit"
-              className="mt-5 h-12 w-full rounded-xl bg-foreground text-sm font-semibold text-background transition hover:opacity-90"
+              className="mt-5 h-10 w-full rounded-lg bg-foreground text-sm font-semibold text-background transition hover:opacity-90"
             >
               Entrar
             </button>
@@ -360,7 +360,7 @@ export default function Login() {
 
             <button
               type="button"
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-[13px] font-medium transition hover:bg-white/70 max-lg:border max-lg:border-border"
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-white text-sm font-medium transition hover:bg-muted/40"
             >
               <svg
                 width="18"
