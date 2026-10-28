@@ -409,7 +409,7 @@ export default function Login() {
 
             <button
               type="submit"
-              className="mt-6 h-12 w-full rounded-full bg-[#0a0a0a] text-[15px] font-semibold text-white transition hover:bg-black/80"
+              className="mt-6 h-12 w-full rounded-lg bg-[#0a0a0a] text-[15px] font-semibold text-white transition hover:bg-black/80"
             >
               Entrar
             </button>
