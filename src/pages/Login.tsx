@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import logo from "@/assets/frizzar-logo.png";
 
 // Painel da esquerda: se houver URL, carrega em iframe (conteúdo gerenciado fora do app);
@@ -112,6 +112,47 @@ function ComunicadoPadrao() {
   );
 }
 
+function BannerMobile() {
+  const [aberto, setAberto] = useState(false);
+  return (
+    <div className="m-4 mb-0 overflow-hidden rounded-2xl text-white lg:hidden" style={{ background: GRADIENTE }}>
+      <button type="button" onClick={() => setAberto((v) => !v)} aria-expanded={aberto} className="flex w-full items-center gap-3 px-3.5 py-3 text-left">
+        <MetaMark className="!px-2.5 !py-1" />
+        <span className="flex-1 text-xs leading-tight">
+          <b className="block text-[13px]">Novidade</b>
+          Parceira oficial da Meta
+        </span>
+        <span className="grid h-[26px] w-[26px] place-items-center rounded-full bg-white/15">
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${aberto ? "rotate-180" : ""}`} />
+        </span>
+      </button>
+
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${aberto ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+        <div className={`overflow-hidden ${aberto ? "" : "invisible"}`}>
+          <div className="px-4 pb-5 pt-1">
+            <h2 className="text-[24px] font-bold leading-[1.1] tracking-tight">
+              A Frizzar agora é <span className="block text-[#ffb4a6]">parceira oficial da Meta.</span>
+            </h2>
+            <p className="mt-2 text-[12.5px] leading-normal text-white/70">
+              Com a integração à API Oficial, o Chatbot e o Connections enviam suas mensagens pelo canal oficial do WhatsApp, com mais segurança e estabilidade para o seu negócio.
+            </p>
+            <div className="mt-4 rounded-xl border border-white/20 bg-white/10 p-3.5">
+              <p className="text-[15px] font-bold leading-tight">
+                Seu cliente conversa com <span className="text-[#ffb4a6]">um canal oficial.</span>
+              </p>
+              <p className="mt-1.5 text-[11.5px] leading-snug text-white/70">Lembretes, confirmações e campanhas saem pela API Oficial da Meta, a empresa dona do WhatsApp.</p>
+              <p className="mt-3 rounded-xl bg-white px-3 py-2 text-[11.5px] leading-snug text-[#161616] shadow-sm">
+                Oi, Ana! Passando para lembrar do seu horário amanhã às 14h. Podemos confirmar?
+                <span className="mt-0.5 block text-right text-[8.5px] text-muted-foreground">09:30</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -133,26 +174,11 @@ export default function Login() {
         {PAINEL_URL ? <iframe src={PAINEL_URL} title="Novidades da Frizzar" className="h-full w-full border-0" /> : <ComunicadoPadrao />}
       </section>
 
-      {/* celular: cabeçalho com a novidade; o formulário sobe como uma folha por cima */}
-      <header className="relative px-5 pb-24 pt-[22px] text-white lg:hidden" style={{ background: GRADIENTE }}>
-        <div className="flex items-center gap-2.5">
-          <img src={logo} alt="Frizzar" className="h-[22px] brightness-0 invert" />
-          <span className="font-bold text-[#ffb4a6]">+</span>
-          <MetaMark className="!px-2.5 !py-1" />
-        </div>
-        <span className="mt-[18px] inline-block rounded-full border border-white/25 bg-white/15 px-2.5 py-[3px] text-[9.5px] font-bold uppercase tracking-wider">Novidade</span>
-        <h2 className="mt-2.5 text-[26px] font-bold leading-[1.1] tracking-tight">
-          A Frizzar agora é <span className="block text-[#ffb4a6]">parceira oficial da Meta.</span>
-        </h2>
-        <p className="mt-2 max-w-[300px] text-[12.5px] leading-normal text-white/70">Chatbot e Connections enviam suas mensagens pelo canal oficial do WhatsApp.</p>
-        <p className="absolute bottom-9 right-4 max-w-[190px] rounded-xl bg-white px-3 py-2 text-[10.5px] leading-snug text-[#161616] shadow-xl">
-          Oi, Ana! Passando para lembrar do seu horário amanhã às 14h.
-          <span className="mt-0.5 block text-right text-[8.5px] text-muted-foreground">09:30</span>
-        </p>
-      </header>
+      {/* celular: faixa da novidade que abre o comunicado completo; o resto da página rola */}
+      <BannerMobile />
 
       {/* direita: login fixo */}
-      <section className="relative flex min-h-0 flex-1 flex-col items-center rounded-t-[26px] bg-white px-5 pb-8 pt-6 dark:bg-background max-lg:-mt-7 lg:h-[calc(100vh-32px)] lg:overflow-hidden lg:rounded-none lg:px-10 lg:pb-0 lg:pt-[9vh]">
+      <section className="flex min-h-0 flex-1 flex-col items-center bg-white px-5 pb-8 pt-6 dark:bg-background lg:h-[calc(100vh-32px)] lg:overflow-hidden lg:rounded-none lg:px-10 lg:pb-0 lg:pt-[9vh]">
         <form
           className="w-full max-w-[320px]"
           onSubmit={(e) => {
@@ -160,7 +186,7 @@ export default function Login() {
             navigate("/");
           }}
         >
-          <img src={logo} alt="Frizzar" className="mx-auto mb-[34px] h-[46px] max-lg:hidden" />
+          <img src={logo} alt="Frizzar" className="mx-auto mb-[34px] h-[46px]" />
 
           <label htmlFor="email" className="mb-1.5 block text-xs font-semibold">
             E-mail
