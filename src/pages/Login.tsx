@@ -7,6 +7,42 @@ import logo from "@/assets/frizzar-logo.png";
 // sem URL, mostra o comunicado padrão abaixo.
 const PAINEL_URL = "";
 
+const GRADIENTE =
+  "radial-gradient(60% 45% at 85% 12%,rgba(255,170,140,.55) 0%,rgba(255,170,140,0) 70%),radial-gradient(70% 50% at 10% 100%,rgba(230,59,59,.55) 0%,rgba(230,59,59,0) 70%),linear-gradient(165deg,#2a0e16 0%,#5a1623 45%,#8d2231 100%)";
+
+function LojasApp() {
+  const loja = "flex h-[42px] flex-1 items-center gap-2 rounded-[11px] bg-[#161616] px-3 text-left text-[9px] leading-[1.1] text-white";
+  return (
+    <div className="mt-6 rounded-2xl border border-border bg-gradient-to-br from-[#e8f3fc] to-[#fdeee2] p-3.5 lg:hidden">
+      <p className="text-xs font-semibold">
+        Baixe o app Frizzar
+        <span className="mt-0.5 block font-normal text-muted-foreground">Agenda e comandas no celular.</span>
+      </p>
+      <div className="mt-2.5 flex gap-2">
+        <button type="button" className={loja}>
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#00d4ff" d="M3.6 2.2c-.2.2-.4.6-.4 1v17.6c0 .4.1.7.4 1l9.7-9.8z" />
+            <path fill="#00f076" d="M16.6 15.2l-3.3-3.3 3.3-3.3 3.9 2.2c1.1.6 1.1 1.7 0 2.3z" />
+            <path fill="#ff3a44" d="M16.6 15.2 13.3 12l-9.7 9.8c.4.4.9.4 1.6.1z" />
+            <path fill="#ffd400" d="M16.6 8.8 5.2 2.1c-.7-.4-1.2-.3-1.6.1l9.7 9.8z" />
+          </svg>
+          <span>
+            Disponível no<b className="block text-xs font-semibold">Google Play</b>
+          </span>
+        </button>
+        <button type="button" className={loja}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+            <path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.1 1.7 2.4 3 2.4 1.2 0 1.7-.8 3.1-.8s1.8.8 3.1.8 2.1-1.2 2.9-2.3c.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14.1 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z" />
+          </svg>
+          <span>
+            Baixar na<b className="block text-xs font-semibold">App Store</b>
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const MetaMark = ({ className = "" }: { className?: string }) => (
   <span className={`inline-flex flex-col items-center rounded-[10px] border border-border bg-white px-3.5 py-1.5 leading-tight text-[#161616] ${className}`}>
     <span className="flex items-center gap-1 text-[15px] font-bold text-[#0a7cff]">
@@ -84,21 +120,36 @@ export default function Login() {
     "h-[42px] w-full rounded-[10px] border border-info/40 bg-white px-3.5 dark:bg-background text-sm outline-none transition focus:border-info focus:ring-[3px] focus:ring-info/20";
 
   return (
-    <div className="fixed inset-0 z-50 grid grid-cols-1 overflow-hidden bg-white p-4 dark:bg-background lg:grid-cols-[minmax(0,1fr)_400px]">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-white dark:bg-background lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:overflow-hidden lg:p-4">
       {/* esquerda: embutido, com margem igual em volta; só ele rola */}
       <section
         aria-label="Novidades"
         className="hidden h-[calc(100vh-32px)] overflow-y-auto rounded-[28px] [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2 lg:block"
-        style={{
-          background:
-            "radial-gradient(60% 45% at 85% 12%,rgba(255,170,140,.55) 0%,rgba(255,170,140,0) 70%),radial-gradient(70% 50% at 10% 100%,rgba(230,59,59,.55) 0%,rgba(230,59,59,0) 70%),linear-gradient(165deg,#2a0e16 0%,#5a1623 45%,#8d2231 100%)",
-        }}
+        style={{ background: GRADIENTE }}
       >
         {PAINEL_URL ? <iframe src={PAINEL_URL} title="Novidades da Frizzar" className="h-full w-full border-0" /> : <ComunicadoPadrao />}
       </section>
 
+      {/* celular: cabeçalho com a novidade; o formulário sobe como uma folha por cima */}
+      <header className="relative px-5 pb-24 pt-[22px] text-white lg:hidden" style={{ background: GRADIENTE }}>
+        <div className="flex items-center gap-2.5">
+          <img src={logo} alt="Frizzar" className="h-[22px] brightness-0 invert" />
+          <span className="font-bold text-[#ffb4a6]">+</span>
+          <MetaMark className="!px-2.5 !py-1" />
+        </div>
+        <span className="mt-[18px] inline-block rounded-full border border-white/25 bg-white/15 px-2.5 py-[3px] text-[9.5px] font-bold uppercase tracking-wider">Novidade</span>
+        <h2 className="mt-2.5 text-[26px] font-bold leading-[1.1] tracking-tight">
+          A Frizzar agora é <span className="block text-[#ffb4a6]">parceira oficial da Meta.</span>
+        </h2>
+        <p className="mt-2 max-w-[300px] text-[12.5px] leading-normal text-white/70">Chatbot e Connections enviam suas mensagens pelo canal oficial do WhatsApp.</p>
+        <p className="absolute bottom-9 right-4 max-w-[190px] rounded-xl bg-white px-3 py-2 text-[10.5px] leading-snug text-[#161616] shadow-xl">
+          Oi, Ana! Passando para lembrar do seu horário amanhã às 14h.
+          <span className="mt-0.5 block text-right text-[8.5px] text-muted-foreground">09:30</span>
+        </p>
+      </header>
+
       {/* direita: login fixo */}
-      <section className="flex h-[calc(100vh-32px)] flex-col items-center overflow-hidden px-10 pt-[9vh]">
+      <section className="relative flex min-h-0 flex-1 flex-col items-center rounded-t-[26px] bg-white px-5 pb-8 pt-6 dark:bg-background max-lg:-mt-7 lg:h-[calc(100vh-32px)] lg:overflow-hidden lg:rounded-none lg:px-10 lg:pb-0 lg:pt-[9vh]">
         <form
           className="w-full max-w-[320px]"
           onSubmit={(e) => {
@@ -106,7 +157,7 @@ export default function Login() {
             navigate("/");
           }}
         >
-          <img src={logo} alt="Frizzar" className="mx-auto mb-[34px] h-[46px]" />
+          <img src={logo} alt="Frizzar" className="mx-auto mb-[34px] h-[46px] max-lg:hidden" />
 
           <label htmlFor="email" className="mb-1.5 block text-xs font-semibold">
             E-mail
@@ -148,6 +199,8 @@ export default function Login() {
             </svg>
             Entrar com Google
           </button>
+
+          <LojasApp />
 
           <p className="mt-[22px] text-center text-xs text-muted-foreground">
             Ainda não tem conta?{" "}
