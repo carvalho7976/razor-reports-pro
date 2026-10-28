@@ -405,7 +405,7 @@ export default function Login() {
 
             <button
               type="submit"
-              className="mt-5 h-10 w-full rounded-lg bg-foreground text-sm font-semibold text-background transition hover:opacity-90"
+              className="mt-6 h-12 w-full rounded-lg bg-foreground text-[15px] font-semibold text-background transition hover:opacity-90"
             >
               Entrar
             </button>
