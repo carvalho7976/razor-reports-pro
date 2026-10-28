@@ -409,13 +409,6 @@ export default function Login() {
 
             <LojasApp />
 
-            <p className="mt-[22px] text-center text-xs text-muted-foreground">
-              Ainda não tem conta?{" "}
-              <Link to="/login" className="text-info hover:underline">
-                Teste grátis
-              </Link>
-            </p>
-
             <LojasDiscretas />
           </form>
         </section>
