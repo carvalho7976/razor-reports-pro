@@ -12,6 +12,9 @@ const LINK_GOOGLE_PLAY =
 const LINK_APP_STORE =
   "https://apps.apple.com/br/app/frizzar-sal%C3%B5es-e-equipe/id1519074462";
 
+const GRADIENTE_CLARO =
+  "radial-gradient(120% 80% at 85% 35%,#fbd9d9 0%,#fbeeee 38%,#f7f7f9 70%)";
+
 const GRADIENTE =
   "radial-gradient(60% 45% at 85% 12%,rgba(255,170,140,.55) 0%,rgba(255,170,140,0) 70%),radial-gradient(70% 50% at 10% 100%,rgba(230,59,59,.55) 0%,rgba(230,59,59,0) 70%),linear-gradient(165deg,#2a0e16 0%,#5a1623 45%,#8d2231 100%)";
 
@@ -158,35 +161,35 @@ const MetaMark = ({ className = "" }: { className?: string }) => (
 
 function ComunicadoPadrao() {
   return (
-    <div className="flex min-h-full flex-col gap-5 px-12 py-11 text-white">
+    <div className="flex min-h-full flex-col gap-5 px-12 py-11 text-[#1d1d22]">
       <div className="flex items-center gap-3">
-        <img src={logo} alt="Frizzar" className="h-9 brightness-0 invert" />
-        <span className="font-bold text-[#ffb4a6]">+</span>
+        <img src={logo} alt="Frizzar" className="h-9" />
+        <span className="font-bold text-primary">+</span>
         <MetaMark />
       </div>
 
-      <span className="self-start rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider">
+      <span className="self-start rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
         Novidade
       </span>
 
       <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight">
         A Frizzar agora é
         <br />
-        <span className="text-[#ffb4a6]">parceira oficial da Meta.</span>
+        <span className="text-primary">parceira oficial da Meta.</span>
       </h2>
-      <p className="max-w-[560px] text-[15px] leading-relaxed text-white/70">
+      <p className="max-w-[560px] text-[15px] leading-relaxed text-[#6b6e79]">
         Com a integração à API Oficial, o Chatbot e o Connections enviam suas
         mensagens pelo canal oficial do WhatsApp, com mais segurança e
         estabilidade para o seu negócio.
       </p>
 
-      <div className="grid grid-cols-[.9fr_1.1fr] items-center gap-7 rounded-2xl border border-white/20 bg-white/10 p-7 backdrop-blur">
+      <div className="grid grid-cols-[.9fr_1.1fr] items-center gap-7 rounded-2xl border border-[#f3dede] bg-gradient-to-br from-[#fdecec] to-white p-7">
         <div>
           <h3 className="text-[22px] font-bold leading-tight">
             Seu cliente conversa com{" "}
-            <span className="text-[#ffb4a6]">um canal oficial.</span>
+            <span className="text-primary">um canal oficial.</span>
           </h3>
-          <p className="mt-2 text-[13.5px] leading-snug text-white/70">
+          <p className="mt-2 text-[13.5px] leading-snug text-[#7a7d88]">
             Lembretes, confirmações e campanhas saem pela API Oficial da Meta, a
             empresa dona do WhatsApp.
           </p>
@@ -219,12 +222,12 @@ function ComunicadoPadrao() {
         </div>
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-3 rounded-[14px] border border-white/20 border-b-[3px] border-b-[#ff6b63] bg-white/10 px-5 py-[18px]">
+      <div className="mt-auto flex items-center justify-between gap-3 rounded-[14px] border border-[#f3cccc] border-b-[3px] border-b-primary bg-gradient-to-r from-white to-[#fdecec] px-5 py-[18px]">
         <div>
           <p className="text-base font-semibold">
             Sua comunicação pelo WhatsApp em uma nova fase.
           </p>
-          <p className="text-[12.5px] text-white/70">
+          <p className="text-[12.5px] text-[#7a7d88]">
             Chatbot e Connections com mais segurança e estabilidade.
           </p>
         </div>
@@ -314,8 +317,8 @@ export default function Login() {
         {/* esquerda: embutido, com margem igual em volta; só ele rola */}
         <section
           aria-label="Novidades"
-          className="hidden h-[calc(100vh-32px)] overflow-y-auto rounded-[28px] [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2 lg:block"
-          style={{ background: GRADIENTE }}
+          className="hidden h-[calc(100vh-32px)] overflow-y-auto rounded-[28px] border border-[#f1e1e1] [&::-webkit-scrollbar-button]:hidden [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/15 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2 lg:block"
+          style={{ background: GRADIENTE_CLARO }}
         >
           {PAINEL_URL ? (
             <iframe
