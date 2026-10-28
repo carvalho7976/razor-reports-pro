@@ -310,7 +310,7 @@ export default function Login() {
   const [ver, setVer] = useState(false);
 
   const campo =
-    "h-11 w-full rounded-[10px] border border-[#d6e0f2] bg-[#e8f0fe] px-3.5 text-[15px] text-foreground outline-none transition-all placeholder:text-[#8a96ad] focus:border-info/60 focus:ring-2 focus:ring-info/30";
+    "h-10 w-full rounded-lg border border-info/50 bg-white px-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-info/60 focus:ring-2 focus:ring-info/40";
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background lg:block lg:overflow-hidden lg:p-4">
