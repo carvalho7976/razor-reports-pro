@@ -51,6 +51,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BandeiraCartao } from "@/components/BandeiraCartao";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -369,6 +370,7 @@ export function ComandaConteudo({
   variante?: "agenda" | "caixa";
   onFechar: () => void;
 }) {
+  const navigate = useNavigate();
   const [etapa, setEtapa] = useState<Etapa>(agendamento?.nova ? "carrinho" : "agendamento");
   const [status, setStatus] = useState("agendado");
   const [observacoes, setObservacoes] = useState<Observacao[]>(observacoesExemplo);
@@ -912,7 +914,7 @@ export function ComandaConteudo({
         </span>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] font-semibold leading-tight">{agendamento.cliente}</p>
+        <button type="button" onClick={() => navigate("/clienteFicha")} className="block max-w-full truncate text-left text-[15px] font-semibold leading-tight hover:underline">{agendamento.cliente}</button>
         <p className="truncate text-[13px] text-muted-foreground">{subtituloCliente}</p>
       </div>
       <WhatsAppButton telefone={agendamento.telefone} nome={agendamento.cliente} botao />
@@ -928,8 +930,7 @@ export function ComandaConteudo({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
-          <DropdownMenuItem onClick={() => toast("Abrindo perfil", noTopo)}>Ver perfil</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => toast("Abrindo ficha da cliente", noTopo)}>Ver ficha</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/clienteFicha")}>Ver ficha da cliente</DropdownMenuItem>
           <DropdownMenuItem className="items-start" onClick={() => toast("Abrindo histórico", noTopo)}>
             <History className="mr-2 mt-0.5 h-4 w-4" />
             <span>
