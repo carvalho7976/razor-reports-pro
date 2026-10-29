@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Box,
+  ChevronDown,
   Coins,
   Crown,
   MoreHorizontal,
@@ -255,6 +256,7 @@ export default function FichaCliente() {
   const navigate = useNavigate();
   const [aba, setAba] = useState<AbaId>("historico");
   const [todosAgendados, setTodosAgendados] = useState(false);
+  const [resumoAberto, setResumoAberto] = useState(false);
   const [historicoCompleto, setHistoricoCompleto] = useState(false);
   const [observacoes, setObservacoes] = useState(observacoesIniciais);
   const [novaObs, setNovaObs] = useState("");
@@ -524,42 +526,40 @@ export default function FichaCliente() {
             )}
           </div>
 
-          <div className="space-y-1.5 border-t border-border px-4 py-3 text-xs text-muted-foreground lg:hidden">
-            <div className="flex justify-between">
-              <span>
-                <b className="text-foreground">{resumo.visitas}</b> visitas
+          <div className="border-t border-border px-4 py-4">
+            <button
+              type="button"
+              onClick={() => setResumoAberto((v) => !v)}
+              aria-expanded={resumoAberto}
+              className="flex w-full items-center justify-between lg:pointer-events-none"
+            >
+              <h2 className={tituloBloco}>Resumo</h2>
+              <span className="flex items-center gap-1.5 text-xs text-muted-foreground lg:hidden">
+                {resumo.visitas} visitas · {R$(resumo.total)}
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    resumoAberto && "rotate-180",
+                  )}
+                />
               </span>
-              <span>
-                <b className="text-foreground">{R$(resumo.total)}</b> total
-              </span>
-              <span>
-                a cada <b className="text-foreground">{resumo.frequencia}</b>
-              </span>
+            </button>
+            <div className={cn("mt-2", !resumoAberto && "max-lg:hidden")}>
+              {[
+                ["Visitas", String(resumo.visitas)],
+                ["Total gasto", R$(resumo.total)],
+                ["Ticket médio", R$(resumo.ticket)],
+                ["Volta a cada", resumo.frequencia],
+                ["Dia favorito", resumo.dia],
+                ["Horário favorito", resumo.horario],
+                ["Profissional favorita", resumo.profissional],
+              ].map(([k, v]) => (
+                <div key={k} className="flex justify-between py-1 text-[13px]">
+                  <span className="text-muted-foreground">{k}</span>
+                  <span className="font-semibold tabular-nums">{v}</span>
+                </div>
+              ))}
             </div>
-            <p>
-              Prefere{" "}
-              <b className="text-foreground">{resumo.dia.toLowerCase()}</b>,{" "}
-              <b className="text-foreground">{resumo.horario}</b>, com{" "}
-              <b className="text-foreground">{resumo.profissional}</b>
-            </p>
-          </div>
-
-          <div className="hidden border-t border-border px-4 py-4 lg:block">
-            <h2 className={cn(tituloBloco, "mb-2")}>Resumo</h2>
-            {[
-              ["Visitas", String(resumo.visitas)],
-              ["Total gasto", R$(resumo.total)],
-              ["Ticket médio", R$(resumo.ticket)],
-              ["Volta a cada", resumo.frequencia],
-              ["Dia favorito", resumo.dia],
-              ["Horário favorito", resumo.horario],
-              ["Profissional favorita", resumo.profissional],
-            ].map(([k, v]) => (
-              <div key={k} className="flex justify-between py-1 text-[13px]">
-                <span className="text-muted-foreground">{k}</span>
-                <span className="font-semibold tabular-nums">{v}</span>
-              </div>
-            ))}
           </div>
         </aside>
 
