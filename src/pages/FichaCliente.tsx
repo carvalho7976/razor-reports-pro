@@ -39,7 +39,15 @@ const cliente = {
   planoAtivo: true,
 };
 const saldos = { moedas: 240, packs: 2, debitos: 0, creditos: 100 };
-const resumo = { visitas: 18, total: 1640, ticket: 91, frequencia: "34 dias" };
+const resumo = {
+  visitas: 18,
+  total: 1640,
+  ticket: 91,
+  frequencia: "34 dias",
+  dia: "Sábado",
+  horario: "14h às 16h",
+  profissional: "Cláudia",
+};
 
 const proximos = [
   {
@@ -516,16 +524,24 @@ export default function FichaCliente() {
             )}
           </div>
 
-          <div className="flex justify-between border-t border-border px-4 py-3 text-xs text-muted-foreground lg:hidden">
-            <span>
-              <b className="text-foreground">{resumo.visitas}</b> visitas
-            </span>
-            <span>
-              <b className="text-foreground">{R$(resumo.total)}</b> total
-            </span>
-            <span>
-              a cada <b className="text-foreground">{resumo.frequencia}</b>
-            </span>
+          <div className="space-y-1.5 border-t border-border px-4 py-3 text-xs text-muted-foreground lg:hidden">
+            <div className="flex justify-between">
+              <span>
+                <b className="text-foreground">{resumo.visitas}</b> visitas
+              </span>
+              <span>
+                <b className="text-foreground">{R$(resumo.total)}</b> total
+              </span>
+              <span>
+                a cada <b className="text-foreground">{resumo.frequencia}</b>
+              </span>
+            </div>
+            <p>
+              Prefere{" "}
+              <b className="text-foreground">{resumo.dia.toLowerCase()}</b>,{" "}
+              <b className="text-foreground">{resumo.horario}</b>, com{" "}
+              <b className="text-foreground">{resumo.profissional}</b>
+            </p>
           </div>
 
           <div className="hidden border-t border-border px-4 py-4 lg:block">
@@ -535,6 +551,9 @@ export default function FichaCliente() {
               ["Total gasto", R$(resumo.total)],
               ["Ticket médio", R$(resumo.ticket)],
               ["Volta a cada", resumo.frequencia],
+              ["Dia favorito", resumo.dia],
+              ["Horário favorito", resumo.horario],
+              ["Profissional favorita", resumo.profissional],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between py-1 text-[13px]">
                 <span className="text-muted-foreground">{k}</span>
